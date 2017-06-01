@@ -314,6 +314,8 @@ class Header():
         self.processed = odict((line, "?") for line in self.textlines)
         self.set_varname(pdef, units)       
         self.set_unit(units)
+        print(self)
+        print()
     
     def set_varname(self, pdef, units):        
         varname_dict = pdef.headers
@@ -423,16 +425,24 @@ if __name__=="__main__":
     assert get_year("19991)") == 1999
     
     
-    #from cfg import get_path_csv    
-    #csv_path = get_path_csv() 
-    from cfg import csv_path 
+    from cfg import get_path_csv    
+    csv_path = get_path_csv() 
     
+    #? <в % к общей численности населения / percent of total population>
+    #varname: None, unit: None
+    #
+    #> c:\users\pogrebnyakev\desktop\mini-kep\src\kep\cell.py(13)as_float()
+    #     11     except ValueError:
+    #     12         import pdb; pdb.set_trace()
+    #---> 13         raise ValueError("Cannot parse to float: <>".format(text))
+    #     14 
+    #     15 def filter_value(text):
+      
+    # ERROR: Must not be getting to read this table spec[0] is limited by endline
+    #        why this happens
     
-    # Ideas:
-    # - restore print of table values    
-    # Risks:
-    # - some rog/yoy tables snot parsed, in EXPORT_GOODS_TOTAL, IMPORT_GOODS_TOTAL
-
+    # NOTE: not interrested to fix as_float() yet
+    
     valid_datapoints =  [
 {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
 {'freq': 'a', 'label': 'GDP_rog', 'value': 106.4, 'year': 1999},
@@ -456,12 +466,18 @@ if __name__=="__main__":
     a = list(d.emit('a'))
     for x in valid_datapoints:
         assert x in a
-    #ERROR: must not read yet 97,1,    
+    
+    
+       
+    
+    
+    
         
+    #from cfg import csv_path 
         
     # TODO: 
     # convert existing parsing definitions to cfg.py
     # merge code from cell.py
-    
-
+    # IDEAS:
+    # - restore print of table values    
         
