@@ -6,22 +6,19 @@
 Pseudocode:
     1. Read inputs:
       read csv file and wrap it as list of dictionaries 
-      read parsing definitions as ordered dicts
-      reorder parsing definitions by start line 
+      read parsing definitions 
       
     2. Parse csv file using parsing definitions
       apply "Procedure 1" to each parsing definition with start/end line
-      apply "Procedure 1" to default parsing defintion
-      
+      apply "Procedure 1" to default parsing defintion      
       
     For each parsing definition ("procedure 1"):   
       - cut out a segment of csv file as delimited by start and end lines (1)
-        save remaining parts of csv file for further parsing      
+      - save remaining parts of csv file for further parsing      
       - break csv segment into tables, each table containing text headers and data rows
       - parse table headers to obtain variable name ("GDP") and unit ("bln_rub") 
-        variable name ("GDP") and unit ("bln_rub") are a label for indicator ("GDP_bln_rub") 
-        a table is defined is it has a label 
-      - for defined tables: 
+        variable name ("GDP") and unit ("bln_rub") are a label for indicator ("GDP_bln_rub")         
+      - for defined tables with label: 
           split datarows to obtain annual, quarter and monthly values
           emit values as dicts (frequency-label-date-value)
          
