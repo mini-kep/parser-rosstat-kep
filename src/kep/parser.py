@@ -45,6 +45,9 @@ from cfg import exclude
 ENC = 'utf-8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
+LABEL_SEP = "__"
+
+
 # csv file access
 def to_csv(rows, path):
     """Accept iterable of rows *rows* and write in to *csv_path*"""
@@ -182,7 +185,7 @@ def split_to_tables(csv_dicts):
     datarows = []
     headers = []
     state = State.INIT
-    for d in csv_dicts: 
+    for d in csv_dicts:        
         if is_data_row(d):
             datarows.append(d)
             state = State.DATA
@@ -237,17 +240,16 @@ class DataRows():
     
 
 class Table():    
-    def __init__(self, textrows, data_rows):
+    def __init__(self, textrows, datarows):
         self.textrows = textrows
-        self.datarows = data_rows
-        self.coln = max([len(d['data']) for d in self.datarows])        
+        self.datarows = datarows
+        self.coln = max([len(d['data']) for d in self.datarows])          
+        self.header = Header(textrows)
                 
-    def parse(self, pdef, units):
-        self.header = Header(self.textrows, pdef, units) 
+    def parse(self, pdef, units):        
+        self.header.set_varname(pdef, units)       
+        self.header.set_unit(units)
         self.set_splitter(pdef)
-        # for defined tables obtain values
-        if self.header.varname and self.header.unit:
-            self.calc()
         return self           
     
     def set_splitter(self, pdef):
@@ -257,12 +259,10 @@ class Table():
         else:
             self.splitter_func = splitter.get_splitter(self.coln) 
     
-    def calc(self): 
-        if self.label is None: import pdb; pdb.set_trace() 
+    def calc(self):         
         self.a = []
         self.q = []
-        self.m = []
-        self.is_run = True
+        self.m = []        
         ds = DataRows(self.label, self.splitter_func)
         for row in self.datarows:
             year = get_year(row['head'])
@@ -270,7 +270,8 @@ class Table():
                 ds.parse_row(year, row['data'])
                 self.a.append(ds.a)
                 self.q.extend(ds.q)
-                self.m.extend(ds.m)            
+                self.m.extend(ds.m)
+        return self
                 
     def emit(self, freq):
         assert freq in 'aqm'
@@ -282,10 +283,12 @@ class Table():
 
     @property
     def label(self): 
-        vn = self.header.varname
-        u = self.header.unit
-        if vn and u:
-            return vn + "_" + u
+        if self.header:
+            vn = self.header.varname
+            u = self.header.unit
+            if vn and u:
+                return vn + LABEL_SEP + u        
+
     @property    
     def nrows(self):
         return len(self.datarows)
@@ -298,24 +301,31 @@ class Table():
             return 0
         
     def __str__(self):
-        return (self.header.__str__() + 
-                "\nlabel: {}".format(self.label)) 
+        msg = "\nTable with {} header(s) and {} datarow(s)".format(len(self.textrows),
+                                                                 self.nrows)
+        if self.header:
+              msg += "\n"+self.header.__str__() 
+        if self.label:                               
+              msg += "\nlabel: {}".format(self.label) 
+        return msg 
         
     def __repr__(self):
-        return ("{} ({}/{})".format(self.label, self.npoints
-                                                         , self.nrows))     
+        return "{} ({}/{})".format(self.label, 
+                                   self.npoints,
+                                   self.nrows)     
 
 # hold and process info in table header
 class Header():
-    def __init__(self, csv_dicts, pdef, units):
+    
+    KNOWN = "+"
+    UNKNOWN = "+"
+    
+    def __init__(self, csv_dicts):
         self.varname = None
         self.unit = None      
         self.textlines = [d['head'] for d in csv_dicts]
-        self.processed = odict((line, "?") for line in self.textlines)
-        self.set_varname(pdef, units)       
-        self.set_unit(units)
-        print(self)
-        print()
+        self.processed = odict((line, self.UNKNOWN) for line in self.textlines)
+        
     
     def set_varname(self, pdef, units):        
         varname_dict = pdef.headers
@@ -325,7 +335,7 @@ class Header():
                 just_one = 0 
                 if header in line:
                     just_one += 1
-                    self.processed[line] = "+"
+                    self.processed[line] = self.KNOWN
                     self.varname = varname_dict[header]
                     self.unit = get_unit(line, units)
                     if self.unit is None:
@@ -344,7 +354,7 @@ class Header():
                       self.processed[line] = "+"                
     
     def unknown_lines(self):
-        return len([True for k,v in self.processed.items() if k == "U"])
+        return len([True for v in self.processed.values() if v == self.UNKNOWN])
     
     def __str__(self):
         show = [v+" <"+k+">" for k,v in self.processed.items()] 
@@ -359,7 +369,8 @@ def get_unit(line, units):
 
 def fix_multitable_units(blocks):
     """For those blocks which do not have parameter definition,
-       but do not have any unknown rows, copy parameter from previous block
+       but do not have any unknown rows, copy parameter 
+       from previous block
     """
     for prev_block, block in zip(blocks, blocks[1:]):
         if block.header.unknown_lines() == 0 and \
@@ -370,10 +381,7 @@ def get_tables(csv_dicts, pdef, units):
     tables = [t.parse(pdef, units) for t in split_to_tables(csv_dicts)]
     fix_multitable_units(tables)
     # FIXME: move "___"-commment strings around
-    for t in tables:
-        if t.label: 
-            t.calc()
-    return tables
+    return [t for t in tables if t.label and t.label not in exclude]
 
 def get_all_tables(csv_path, spec):
     csv_dicts = read_csv(csv_path) 
@@ -388,12 +396,13 @@ def get_all_tables(csv_path, spec):
     return [t for t in all_tables if t.label and t.label not in exclude] 
 
 class Datapoints():
-    def __init__(self, csv_path, spec):
-        self.tables = get_all_tables(csv_path, spec)
+    def __init__(self, tables):
+        self.tables = tables
         self.datapoints = list(self.walk_by_blocks())
 
     def walk_by_blocks(self):
         for t in self.tables:
+            t.calc()
             for freq in "aqm":
                  for x in t.emit(freq):
                      if x:
@@ -418,7 +427,7 @@ class Datapoints():
 
     @functools.lru_cache()
     def unique_varheads(self):
-        vh = [x.split("__")[0] for x in self.unique_varnames()]
+        vh = [x.split(LABEL_SEP)[0] for x in self.unique_varnames()]
         return sorted(list(set(vh)))
 
 if __name__=="__main__": 
@@ -427,57 +436,37 @@ if __name__=="__main__":
     
     from cfg import get_path_csv    
     csv_path = get_path_csv() 
+
+    tables = get_all_tables(csv_path, spec)
+    d = Datapoints(tables)
+    a = list(x for x in d.emit('a') if x['year'] in (1999, 2014, 2016))
     
-    #? <в % к общей численности населения / percent of total population>
-    #varname: None, unit: None
-    #
-    #> c:\users\pogrebnyakev\desktop\mini-kep\src\kep\cell.py(13)as_float()
-    #     11     except ValueError:
-    #     12         import pdb; pdb.set_trace()
-    #---> 13         raise ValueError("Cannot parse to float: <>".format(text))
-    #     14 
-    #     15 def filter_value(text):
-      
-    # ERROR: Must not be getting to read this table spec[0] is limited by endline
-    #        why this happens
-    
-    # NOTE: not interrested to fix as_float() yet
-    
+    #FIXME add more datapoints
     valid_datapoints =  [
-{'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
-{'freq': 'a', 'label': 'GDP_rog', 'value': 106.4, 'year': 1999},
+{'freq': 'a', 'label': 'GDP__bln_rub', 'value': 4823.0, 'year': 1999},
+{'freq': 'a', 'label': 'GDP__rog', 'value': 106.4, 'year': 1999},
         
-{'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL_bln_usd', 'value': 75.6, 'year': 1999},
-{'freq': 'a', 'label': 'IMPORT_GOODS_TOTAL_bln_usd', 'value': 39.5, 'year': 1999},
+{'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL__bln_usd', 'value': 75.6, 'year': 1999},
+{'freq': 'a', 'label': 'IMPORT_GOODS_TOTAL__bln_usd', 'value': 39.5, 'year': 1999},
         
-{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub', 'value': 26766.1, 'year': 2014},
-{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_FEDERAL_bln_rub', 'value': 14496.9, 'year': 2014},
-{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub', 'value': 8905.7, 'year': 2014},
+{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_CONSOLIDATED__bln_rub', 'value': 26766.1, 'year': 2014},
+{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_FEDERAL__bln_rub', 'value': 14496.9, 'year': 2014},
+{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_SUBFEDERAL__bln_rub', 'value': 8905.7, 'year': 2014},
 
-{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub', 'value': 30888.8, 'year': 2016},
-{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_FEDERAL_bln_rub', 'value': 14831.6, 'year': 2014},
-{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub', 'value': 9353.3, 'year': 2014},
+{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_CONSOLIDATED__bln_rub', 'value': 30888.8, 'year': 2016},
+{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_FEDERAL__bln_rub', 'value': 14831.6, 'year': 2014},
+{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_SUBFEDERAL__bln_rub', 'value': 9353.3, 'year': 2014},
 
-{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_FEDERAL_bln_rub', 'value': -334.7, 'year': 2014},
-{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub', 'value': -447.6, 'year': 2014}
-]
-        
-    d = Datapoints(csv_path, spec)
-    a = list(d.emit('a'))
+{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_FEDERAL__bln_rub', 'value': -334.7, 'year': 2014},
+{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_SUBFEDERAL__bln_rub', 'value': -447.6, 'year': 2014}
+]        
+
     for x in valid_datapoints:
-        assert x in a
-    
-    
-       
-    
-    
-    
-        
-    #from cfg import csv_path 
-        
+        assert x in a    
+            
     # TODO: 
-    # convert existing parsing definitions to cfg.py
+    # convert existing parsing definitions from cfg.py
     # merge code from cell.py
-    # IDEAS:
+    # NOT TODO:
     # - restore print of table values    
         

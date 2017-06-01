@@ -79,8 +79,8 @@ units = {'млрд.долларов': 'bln_usd',
              'рублей / rubles': 'rub'}
     
 
-exclude = ["IMPORT_GOODS_TOTAL_yoy", "IMPORT_GOODS_TOTAL_rog",
-           "EXPORT_GOODS_TOTAL_yoy", "EXPORT_GOODS_TOTAL_rog"]
+exclude = ["IMPORT_GOODS__TOTAL_yoy", "IMPORT__GOODS_TOTAL_rog",
+           "EXPORT_GOODS__TOTAL_yoy", "EXPORT__GOODS_TOTAL_rog"]
     
 class Definition():    
     def __init__(self, name):        
