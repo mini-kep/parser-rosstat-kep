@@ -1,0 +1,68 @@
+﻿# Раздел 1. Информация по сегментам
+# Section 1. Segment information 
+
+# segment information
+start line : 2.4.1. Кредиторская задолженность
+end line : 2.4.2. Дебиторская задолженность
+special reader: null
+
+---
+
+# Cтандартные единицы измерения
+# rog - темп изменения к предыдущему периоду  
+# yoy - темп изменения к соответствующему периоду предыдущего года  
+# ytd - темп изменения за период с начала текущегогода к аппп
+
+#в % к соответствующему периоду предыдущего года : yoy
+#в % к предыдущему периоду : rog
+#в % к предыдущему месяцу: rog
+#период с начала отчетного года : ytd
+#отчетный месяц в % к соответствующему месяцу предыдущего года : yoy
+#в % к соответствующему месяцу предыдущего года : yoy
+#отчетный месяц в % к предыдущему месяцу : rog 
+
+# ЕП: добавляем что-то, чтобы был какой-то словарь, а не None 
+no subheaders should be considered units here : no_extra_units
+---
+#2.4.1. Кредиторская задолженность, млрд.рублей / Creditor indebtedness, bln rubles
+# WARNING: есть риск того что "в том числе просроченная" прочитается дважды
+
+#в том числе просроченная, млрд.рублей / of which overdue payments, bln rubles
+#          здесь читать надо
+
+#в % к предыдущему периоду / percent of previous period
+#в том числе просроченная :
+#          здесь читать НЕ надо 
+
+#Из просроченной кредиторской задолженности – задолженность:  / from creditor overdue payments is indebtedness to:
+#Поставщикам, млрд.рублей / Suppliers, bln rubles
+#в % к предыдущему периоду / percent of previous period
+#В бюджеты всех уровней, млрд.рублей / In budgets of all levels, bln rubles
+#в % к предыдущему периоду / percent of previous period
+
+Кредиторская задолженность : 
+ - CORP_DEBT
+ - bln_rub
+
+в том числе просроченная, млрд.рублей / of which overdue payments, bln rubles : 
+ - CORP_DEBT_OVERDUE
+ - bln_rub
+
+Поставщикам, млрд.рублей : 
+ - CORP_DEBT_OVERDUE_SUPPLIERS
+ - bln_rub
+
+В бюджеты всех уровней : 
+ - CORP_DEBT_OVERDUE_BUDGET
+ - bln_rub
+
+#2.4.2. Дебиторская задолженность, млрд.рублей / Debtor indebtedness, bln rubles
+#в том числе просроченная, млрд.рублей / of which overdue payments, bln rubles
+#в % к предыдущему периоду / percent of previous period
+#Из просроченной дебиторской задолженности – задолженность покупателей   / from debtor overdue payments is indebtedness of customers
+#млрд.рублей / bln rubles
+#в % к предыдущему периоду / percent of previous period
+
+#2.5. Просроченная задолженность по заработной плате на начало месяца, всего1)          / Overdue wage payments at beginning of month, total 1)
+#млн.рублей / mln rubles
+#в % к предыдущему периоду / percent of previous period

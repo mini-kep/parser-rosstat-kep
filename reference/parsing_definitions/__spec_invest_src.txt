@@ -1,0 +1,85 @@
+﻿# Раздел 1. Информация по сегментам
+# Section 1. Segment information 
+
+# segment information
+start line : 
+ - 1.7.1. Инвестиции в основной капитал организаций
+ - 1.6.1. Инвестиции в основной капитал организаций
+
+end line : 
+ - 1.8. Объем работ по виду деятельности Строительство
+ - 1.7. Объем работ по виду деятельности Строительство
+
+special reader: null
+
+---
+# Раздел 2. Единицы измерении
+# Section 2. Units of measurement
+
+# rog - темп изменения к предыдущему периоду  
+# yoy - темп изменения к соответствующему периоду предыдущего года  
+# ytd - темп изменения за период с начала текущегогода к аппп
+
+в % к соответствующему периоду предыдущего года : yoy
+в % к предыдущему периоду : rog
+в % к предыдущему месяцу: rog
+период с начала отчетного года : ytd
+отчетный месяц в % к соответствующему месяцу предыдущего года : yoy
+в % к соответствующему месяцу предыдущего года : yoy
+отчетный месяц в % к предыдущему месяцу : rog 
+рублей / rubles : rub
+млн.рублей : mln_rub
+в % к ВВП : gdp_percent
+в % к декабрю предыдущего года: ytd
+
+---
+# Раздел 3. Определения переменных
+# Section 3. Variable definitions
+# ************************************
+# Текст из НАЧАЛА названия таблицы : # text from start of header
+# - VAR_LABEL # sample label
+# - bln_rub # sample units
+# ************************************
+
+# TODO: *** --- not parsed below 
+#1.7.1. Инвестиции в основной капитал организаций (без субъектов малого предпринимательства)            по источникам финансирования, млрд.рублей            / Fixed capital investments of organizations (without small entrepreneurship)             by sources of financing, bln rubles
+#собственные средства предприятий  / own funds of organizations
+#20141)
+
+собственные средства предприятий : 
+  - I_EXSB_FUNDING_OWN_FUNDS
+  - bln_rub
+
+#привлеченные средства  / external funds
+#20141)
+
+привлеченные средства : 
+  - I_EXSB_FUNDING_EXTERNAL_FUNDS
+  - bln_rub
+
+#из них бюджетные средства  / of which budget funds
+#20141)
+#в том числе:       / of which:
+
+бюджетные средства : 
+  - I_EXSB_FUNDING_EXTERNAL_FUNDS_BUDGET
+  - bln_rub
+
+#из федерального бюджета     / from federal budget
+#20141)
+
+из федерального бюджета : 
+  - I_EXSB_FUNDING_EXTERNAL_FUNDS_BUDGET_FEDERAL
+  - bln_rub
+
+#из бюджетов субъектов Российской Федерации     / from budgets  of constituent entities of the Russian Federation
+
+из бюджетов субъектов Российской Федерации : 
+  - I_EXSB_FUNDING_EXTERNAL_FUNDS_BUDGET_SUBFEDERAL
+  - bln_rub
+
+
+#20141)
+# *** ---------- Not parsed above
+
+#1.8. Объем работ по виду деятельности "Строительство"           (в фактических ценах соответствующих лет), млрд.рублей      / Volume of work performed by economic activity "Construction"          (at current prices of corresponding years), bln rubles
