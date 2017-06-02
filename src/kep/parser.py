@@ -1,29 +1,18 @@
-"""Parse tables from raw CSV file using specification dictionaries:
+"""Parse tables from raw CSV file using parsing defintion.
+
+   Parsring defintion contains:
    -  parsing boundaries - start and end lines of CSV file segment
    -  link between table headers ("Объем ВВП") and variable names ("GDP")
    -  units of measurement dictionary ("мдрд.руб." -> "bln_rub")
-   
-Pseudocode:
-    1. Read inputs:
-      read csv file and wrap it as list of dictionaries 
-      read parsing definitions 
-      
-    2. Parse csv file using parsing definitions
-      apply "Procedure 1" to each parsing definition with start/end line
-      apply "Procedure 1" to default parsing defintion      
-      
-    For each parsing definition ("procedure 1"):   
-      - cut out a segment of csv file as delimited by start and end lines (1)
-      - save remaining parts of csv file for further parsing      
-      - break csv segment into tables, each table containing text headers and data rows
-      - parse table headers to obtain variable name ("GDP") and unit ("bln_rub") 
-        variable name ("GDP") and unit ("bln_rub") are a label for indicator ("GDP_bln_rub")         
-      - for defined tables with label: 
-          split datarows to obtain annual, quarter and monthly values
-          emit values as dicts (frequency-label-date-value)
-         
-    Comments:
-      (1) reason: some table headers are repeated in CSV file, eg "Добыча полезных ископаемых"       
+
+   Parsing procedure:
+   - cut out a segment of csv file as delimited by start and end lines (1)
+   - save remaining parts of csv file for further parsing      
+   - break csv segment into tables, each table containing headers and data rows
+   - parse table headers to obtain variable name ("GDP") and unit ("bln_rub")             
+   - for tables with varname and unit: 
+        split datarows to obtain annual, quarter and monthly values
+        emit values as frequency-label-date-value dicts
 """
 
 import csv
@@ -119,13 +108,13 @@ class DictStream():
     
     def pop_segment(self, start, end):
         """Pops elements of self.csv_dicts between [start, end). 
-           Recognises element occurences by index *i*."""           
-        remaining_csv_dicts = self.csv_dicts.copy()
+           Recognises element occurences by index *i*.
+           Modifies *self.csv_dicts*."""           
         we_are_in_segment = False
         segment = []
         i = 0
-        while i < len(remaining_csv_dicts):
-            row = remaining_csv_dicts[i]
+        while i < len(self.csv_dicts):
+            row = self.csv_dicts[i]
             line = row['head']
             if is_matched(start, line):
                 we_are_in_segment = True
@@ -133,11 +122,10 @@ class DictStream():
                 break
             if we_are_in_segment:
                 segment.append(row)
-                del remaining_csv_dicts[i]
+                del self.csv_dicts[i]
             else:    
                 # else is very important, wrong indexing without it
                 i += 1
-        self.csv_dicts = remaining_csv_dicts
         return segment
 
 
@@ -237,11 +225,11 @@ class DataRows():
     
 
 class Table():    
-    def __init__(self, textrows, datarows):
-        self.textrows = textrows
+    def __init__(self, headers, datarows):
+        self.headers = headers
+        self.header = Header(headers)
         self.datarows = datarows
         self.coln = max([len(d['data']) for d in self.datarows])          
-        self.header = Header(textrows)
                 
     def parse(self, pdef, units):        
         self.header.set_varname(pdef, units)       
@@ -261,9 +249,9 @@ class Table():
         self.q = []
         self.m = []        
         ds = DataRows(self.label, self.splitter_func)
-        for row in self.datarows:
-            year = get_year(row['head'])
-            if len(row['data'])>0:
+        for row in self.datarows:            
+            if row['data']:
+                year = get_year(row['head'])
                 ds.parse_row(year, row['data'])
                 self.a.append(ds.a)
                 self.q.extend(ds.q)
@@ -350,8 +338,8 @@ class Header():
                    if line.startswith(u):
                       self.processed[line] = "+"                
     
-    def unknown_lines(self):
-        return len([True for v in self.processed.values() if v == self.UNKNOWN])
+    def has_unknown_lines(self):
+        return self.UNKNOWN in self.processed.values()
     
     def __str__(self):
         show = [v+" <"+k+">" for k,v in self.processed.items()] 
@@ -364,33 +352,40 @@ def get_unit(line, units):
             return units[k]
     return None
 
-def fix_multitable_units(blocks):
-    """For those blocks which do not have parameter definition,
+def fix_multitable_units(tables):
+    """For tables which do not have parameter definition,
        but do not have any unknown rows, copy parameter 
-       from previous block
+       from previous table.
     """
-    for prev_block, block in zip(blocks, blocks[1:]):
-        if block.header.unknown_lines() == 0 and \
-           block.header.varname is None:
-           block.header.varname = prev_block.header.varname
+    for prev_table, table in zip(tables, tables[1:]):
+        if table.header.varname is None:
+           if not table.header.has_unknown_lines():
+               table.header.varname = prev_table.header.varname
             
 def get_tables(csv_dicts, pdef, units):
     tables = [t.parse(pdef, units) for t in split_to_tables(csv_dicts)]
     fix_multitable_units(tables)
-    # FIXME: move "___"-commment strings around
+    # FIXME: move around or delete commment strings starting with "___"
     return [t for t in tables if t.label and t.label not in exclude]
+
 
 def get_all_tables(csv_path, spec):
     csv_dicts = read_csv(csv_path) 
     ds = DictStream(csv_dicts)
     all_tables = []
+    # use additional parsing defintions
+    # FIXME: spec order not guaranteed
     for pdef in spec[1:]:
         csv_segment = ds.pop(pdef)
         tables = get_tables(csv_segment, pdef, units)
         all_tables.extend(tables) 
-    tables0 = get_tables(ds.remaining_csv_dicts(), spec[0], units)
-    all_tables.extend(tables0)
-    return [t for t in all_tables if t.label and t.label not in exclude] 
+    # use default parsing defintion
+    # FIXME: spec order not guaranteed
+    pdef = spec[0]
+    csv_segment = ds.remaining_csv_dicts()
+    tables = get_tables(csv_segment, pdef, units)
+    all_tables.extend(tables)
+    return all_tables
 
 class Datapoints():
     def __init__(self, tables):
@@ -459,11 +454,4 @@ if __name__=="__main__":
 ]        
 
     for x in valid_datapoints:
-        assert x in a    
-            
-    # TODO: 
-    # convert existing parsing definitions from cfg.py
-    # merge code from cell.py
-    # NOT TODO:
-    # - restore print of table values    
-        
+        assert x in a 
