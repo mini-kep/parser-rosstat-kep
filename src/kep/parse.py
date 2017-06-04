@@ -20,7 +20,7 @@ import re
 from enum import Enum, unique
 import functools
 from collections import OrderedDict as odict
-from collections import namedtuple as ndict
+import itertools
   
 
 import splitter
@@ -337,39 +337,48 @@ class RowReader():
         self.splitter_func = splitter_func
         
     def parse_row(self, year, values):
-        a, qs, ms = self.splitter_func(values)
+        a_value, q_values, m_values = self.splitter_func(values)
+        a_dict = None
+        q_dicts = []
+        m_dicts = []
         
-        self.a = []
-        if a:
-            self.a = [dict(label=self.label,
-                           freq='a',
-                           year=year, 
-                           value=filter_value(a))]
-        self.q = []
-        if qs:
-            for t, val in enumerate(qs):
+        if a_value:
+            a_dict = dict(label=self.label,
+                          freq='a',
+                          year=year, 
+                          value=filter_value(a_value))
+        if q_values:
+            for t, val in enumerate(q_values):
                 if val:
                     d = dict(label=self.label,
                              freq='q',
                              year=year, 
                              value=filter_value(val),
                              qtr=t+1)
-                    self.q.append(d)
-        self.m = []         
-        if ms:
-            for t, val in enumerate(ms):
+                    q_dicts.append(d)
+        
+        if m_values:
+            for t, val in enumerate(m_values):
                 if val:
                     d = dict(year=year,
                              label=self.label,
                              freq='m',
                              value=filter_value(val),
                              month=t+1)
-                    self.m.append(d)        
-
+                    m_dicts.append(d)        
+        return a_dict, q_dicts, m_dicts
 
 class Emitter():
-    
+    """Emitter extracts and holds annual, quarterly and monthly values
+       for a given table with label and splitter_func."""
+        
     def __init__(self, table):
+        if not table.label:
+            raise ValueError("Table label not defined, cannot create Emitter()"
+                             "for " + table.__str__())
+        if not table.splitter_func:
+            raise ValueError("Table splitter not defined, cannot create Emitter()"
+                             "for " + table.__str__())        
         self.a = []
         self.q = []
         self.m = []        
@@ -377,10 +386,13 @@ class Emitter():
         for row in table.datarows:            
             if row['data']:
                 year = get_year(row['head'])
-                rr.parse_row(year, row['data'])
-                self.a.extend(rr.a)
-                self.q.extend(rr.q)
-                self.m.extend(rr.m)
+                a, q, m = rr.parse_row(year, row['data'])
+                if a: 
+                    self.a.append(a)
+                if q:
+                    self.q.extend(q)
+                if m:
+                    self.m.extend(m)
                 
     def emit_a(self):
         return self.a
@@ -391,11 +403,10 @@ class Emitter():
     def emit_m(self):        
         return self.m
     
-import itertools
 
 class Datapoints():
     def __init__(self, tables):
-        self.emitters = [Emitter(t) for t in tables]
+        self.emitters = [Emitter(t) for t in tables if t.label and t.splitter_func]
                         
     def emit_a(self):
         for e in self.emitters:
@@ -461,6 +472,8 @@ if __name__=="__main__":
     csv_path = cfg.get_path_csv() 
     tables = get_all_valid_tables(csv_path)
     d = Datapoints(tables)
+    for v in VALID_DATAPOINTS:
+        assert d.is_included(v)
             
     approve_csv()       
     
