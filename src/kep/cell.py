@@ -4,6 +4,8 @@ COMMENT_CATCHER = re.compile("\D*([\d.,]*)\s*(?=\d\))")
 def kill_comment(text, rx=COMMENT_CATCHER):
     return rx.match(text).groups()[0]
 
+assert kill_comment('6762,31)2)') == '6762,3'     
+assert kill_comment('6762.31)2)') == '6762.3'   
 
 def as_float(text):
     try:
@@ -13,7 +15,7 @@ def as_float(text):
         raise ValueError("Cannot parse to float: <>".format(text))
     
 def filter_value(text):
-    # TODO: refactor this function
+    # TODO: refactor this function 
     """Converts *text* to float number assuming it may contain 'comment)'  
        or other unexpected contents."""
     if not text:
@@ -27,9 +29,7 @@ def filter_value(text):
     if text.endswith(","): # 97.1.
         text=text[:-1] 
     return as_float(text.replace(",", "."))
-        
-assert kill_comment('6762,31)2)') == '6762,3'     
-assert kill_comment('6762.31)2)') == '6762.3'   
+
 assert filter_value('6762,31) 6512,3 ') == 6762.3
     
 if __name__ == "__main__":
