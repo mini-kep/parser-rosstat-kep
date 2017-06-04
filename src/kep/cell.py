@@ -36,9 +36,3 @@ if __name__ == "__main__":
     from parse import all_values
     for text in all_values():
         filter_value(text)
-    
-    
-    
-    
-    
-    
