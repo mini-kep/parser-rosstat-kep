@@ -133,15 +133,18 @@ class DictStream():
 
 
 # break csv segment into tables
-def get_year(string: str):
+
+# Regex: 
+#   (\d{4})    4 digits
+#   \d+\)      comment like "1)"
+#   (\d+\))*   any number of comments 
+#   \s*        any number of whitespaces
+YEAR_CATCHER = re.compile('(\d{4})(\d+\))*\s*')
+
+def get_year(string: str, rx=YEAR_CATCHER):
     """Extract year from string *string*. 
        Return None if year is not valid or not in plausible range."""
-    # Regex: 
-    #   (\d{4})    4 digits
-    #   \d+\)      comment like "1)"
-    #   (\d+\))*   any number of comments 
-    #   \s*        any number of whitespaces
-    match = re.match(r'(\d{4})(\d+\))*\s*', string)
+    match = re.match(rx, string)
     if match:
         year = int(match.group(1))
         if year >= 1991:
@@ -209,6 +212,11 @@ class Table():
             self.splitter_func = splitter.get_custom_splitter(funcname)
         else:
             self.splitter_func = splitter.get_splitter(self.coln) 
+    
+    def __flush_datarow_values__(self):
+        for row in self.datarows:
+            for x in row['data']:
+                yield x
     
     @property
     def label(self): 
@@ -473,9 +481,20 @@ def approve_csv(year=None, month=None, valid_datapoints=VALID_DATAPOINTS):
     for x in valid_datapoints:
         assert d.is_included(x)
 
+def all_values():
+    # for debugging
+    csv_path = cfg.get_path_csv()
+    for t in get_all_tables(csv_path):
+         for x in t.__flush_datarow_values__():
+             yield x
+
 if __name__=="__main__":    
             
-    approve_csv()       
+    approve_csv()   
+    z = list(all_values())
+    
+             
+    
     
       
     # TODO: 
