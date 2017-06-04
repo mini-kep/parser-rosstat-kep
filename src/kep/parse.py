@@ -188,7 +188,7 @@ def split_to_tables(csv_dicts):
     if len(headers) > 0 and len(datarows) > 0:
         yield Table(headers, datarows)
 
-# hold and process info in table
+# hold headres and datarows n table
 
 class Table():    
     def __init__(self, headers, datarows):
@@ -218,6 +218,9 @@ class Table():
             if vn and u:
                 return vn + LABEL_SEP + u        
 
+    def is_defined(self):
+        return self.label and self.splitter_func 
+    
     @property    
     def nrows(self):
         return len(self.datarows)
@@ -311,8 +314,7 @@ def get_tables(csv_dicts, pdef, units=UNITS):
     # FIXME: move around or delete commment strings starting with "___"
     return tables 
 
-# FIXME: move some of parsing/data extraction from *get_all_tables* to *Datapoints*
-def get_all_valid_tables(csv_path, spec=SPEC, units=UNITS, exclude=EXCLUDE):
+def get_all_tables(csv_path, spec=SPEC, units=UNITS):
     csv_dicts = read_csv(csv_path) 
     ds = DictStream(csv_dicts)
     all_tables = []
@@ -328,7 +330,13 @@ def get_all_valid_tables(csv_path, spec=SPEC, units=UNITS, exclude=EXCLUDE):
     csv_segment = ds.remaining_csv_dicts()
     tables = get_tables(csv_segment, pdef, units)
     all_tables.extend(tables)
-    return [at for at in all_tables if at.label and at.label not in exclude]
+    return all_tables
+
+
+def get_all_valid_tables(csv_path, spec=SPEC, units=UNITS, exclude=EXCLUDE):
+    all_tables = get_all_tables(csv_path, spec, units)
+    return [t for t in all_tables if t.is_defined() and t.label not in exclude]
+
 
 class RowReader():
     
