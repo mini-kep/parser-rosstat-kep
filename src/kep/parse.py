@@ -319,14 +319,12 @@ def get_all_tables(csv_path, spec=SPEC, units=UNITS):
     ds = DictStream(csv_dicts)
     all_tables = []
     # use additional parsing defintions
-    # FIXME: spec order not guaranteed
-    for pdef in spec[1:]:
+    for pdef in spec.additional:
         csv_segment = ds.pop(pdef)
         tables = get_tables(csv_segment, pdef, units)
         all_tables.extend(tables)
     # use default parsing defintion
-    # FIXME: spec order not guaranteed
-    pdef = spec[0]
+    pdef = spec.main
     csv_segment = ds.remaining_csv_dicts()
     tables = get_tables(csv_segment, pdef, units)
     all_tables.extend(tables)

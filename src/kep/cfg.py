@@ -103,16 +103,38 @@ class Definition():
     
     def __repr__(self):
         return self.__str__()
-        
-spec = []
 
+class Specification:
+    def __init__(self, pdef_main):
+        self.main = pdef_main
+        self.additional = []
+        
+    def append(self, pdef):
+        self.additional.append(pdef) 
+        
+    def validate(self):
+        pass
+        
+    # TODO validate specification - order of markers 
+    # - ends are after starts
+    # - sorted starts follow each other    
+        
+    def __str__(self): 
+        msg0 = "Parsing specification"
+        msg1 = "\n- main definition: " + self.main.__str__()
+        listing = ", ".join(d.__str__() for d in self.additional)
+        msg2 = "\n- additional definitions: " + listing 
+        return msg0 + msg1 + msg2
+    
+        
+        
 d = Definition("MAIN")
 d.add_header("Объем ВВП", "GDP")
 d.add_header("Индекс физического объема произведенного ВВП, в %", "GDP")
 d.add_header("Индекс промышленного производства", "IND_PROD")
 # will be IND_PROD *n if no end specified
 d.add_marker(None, "1.2.1. Индексы производства по видам деятельности")
-spec.append(d)
+spec = Specification(d)
 
 
 d = Definition("EXIM")
@@ -154,7 +176,8 @@ d.add_header("Федеральный бюджет",       "GOV_SURPLUS_ACCUM_FED
 d.add_header("Консолидированные бюджеты субъектов Российской Федерации", "GOV_SURPLUS_ACCUM_SUBFEDERAL")
 spec.append(d)
 
-print("Current parsing definition:", spec)
+spec.validate()
+print(spec)
 
 doc = """1. Сводные показатели / Aggregated indicators					
 1.1. Валовой внутренний продукт1) / Gross domestic product1)					
