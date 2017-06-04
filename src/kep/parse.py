@@ -279,8 +279,8 @@ class Header():
                     self.varname = varname_dict[header]
                     self.unit = get_unit(line, units)
                     if self.unit is None:
-                        print("Unit not found in: " + line)
-            # known_headers must be found only once         
+                        print("WARNING: unit not found in  <" + line + ">")
+            # something from known_headers must be found only once         
             assert just_one <= 1
                     
     def set_unit(self, units):
@@ -438,7 +438,7 @@ class Datapoints():
                 yield x
                 
     def datapoints(self):
-        return itertools.chain(self.emit_a(), self.emit_q(), self.emit_q())                
+        return itertools.chain(self.emit_a(), self.emit_q(), self.emit_m())                
         
     def is_included(self, datapoint):
         """Return True if *datapoint* is in *self.datapoints*"""        
@@ -471,7 +471,10 @@ VALID_DATAPOINTS =  [
 {'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_SUBFEDERAL__bln_rub', 'value': 9353.3, 'year': 2014},
 
 {'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_FEDERAL__bln_rub', 'value': -334.7, 'year': 2014},
-{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_SUBFEDERAL__bln_rub', 'value': -447.6, 'year': 2014}
+{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_SUBFEDERAL__bln_rub', 'value': -447.6, 'year': 2014},
+
+{'freq': 'm', 'label': 'EXPORT_GOODS_TOTAL__bln_usd', 'month': 1, 'value': 4.5, 'year': 1999}
+
 ]  
  
 def approve_csv(year=None, month=None, valid_datapoints=VALID_DATAPOINTS):
@@ -480,6 +483,7 @@ def approve_csv(year=None, month=None, valid_datapoints=VALID_DATAPOINTS):
     d = Datapoints(tables)
     for x in valid_datapoints:
         assert d.is_included(x)
+    print("")    
 
 def all_values():
     # for debugging
