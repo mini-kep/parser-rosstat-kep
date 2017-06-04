@@ -264,6 +264,8 @@ class Header():
         self.varname = None
         self.unit = None      
         self.textlines = [d['head'] for d in csv_dicts]
+        # ignore comments
+        self.textlines = [x for x in self.textlines if not x.startswith("___")]
         self.processed = odict((line, self.UNKNOWN) for line in self.textlines)
         
     
@@ -422,21 +424,26 @@ class Datapoints():
     def __init__(self, tables):
         self.emitters = [Emitter(t) for t in tables if t.is_defined()]
         
-    def emit_by_method(self, method_name):
+    # label can be 'GDP__rog' and 'GDP'   
+    def emit_by_method(self, method_name, label=None):
         if method_name not in ["emit_a", "emit_q", "emit_m"]:
             raise ValueError(method_name)        
         for e in self.emitters:
             for x in getattr(e, method_name)():
-                yield x        
+                if not label:
+                    yield x
+                else:
+                    if x['label'].startswith(label):
+                        yield x
                         
-    def emit_a(self):
-        return self.emit_by_method("emit_a")
+    def emit_a(self, name=None):
+        return self.emit_by_method("emit_a", name)
     
-    def emit_q(self):
-        return self.emit_by_method("emit_q")
+    def emit_q(self, name=None):
+        return self.emit_by_method("emit_q", name)
 
-    def emit_m(self):
-        return self.emit_by_method("emit_m")
+    def emit_m(self, name=None):
+        return self.emit_by_method("emit_m", name)
                 
     def datapoints(self):
         return itertools.chain(self.emit_a(), self.emit_q(), self.emit_m())                
@@ -458,21 +465,21 @@ class Datapoints():
 # list(x for x in d.emit_a() if x['year'] in (1999, 2014, 2016))
 VALID_DATAPOINTS =  [
 {'freq': 'a', 'label': 'GDP__bln_rub', 'value': 4823.0, 'year': 1999},
-{'freq': 'a', 'label': 'GDP__rog', 'value': 106.4, 'year': 1999},
+{'freq': 'a', 'label': 'GDP__yoy', 'value': 106.4, 'year': 1999},
         
 {'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL__bln_usd', 'value': 75.6, 'year': 1999},
 {'freq': 'a', 'label': 'IMPORT_GOODS_TOTAL__bln_usd', 'value': 39.5, 'year': 1999},
         
-{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_CONSOLIDATED__bln_rub', 'value': 26766.1, 'year': 2014},
-{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_FEDERAL__bln_rub', 'value': 14496.9, 'year': 2014},
-{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_SUBFEDERAL__bln_rub', 'value': 8905.7, 'year': 2014},
+#{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_CONSOLIDATED__bln_rub', 'value': 26766.1, 'year': 2014},
+#{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_FEDERAL__bln_rub', 'value': 14496.9, 'year': 2014},
+#{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_SUBFEDERAL__bln_rub', 'value': 8905.7, 'year': 2014},
 
-{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_CONSOLIDATED__bln_rub', 'value': 30888.8, 'year': 2016},
-{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_FEDERAL__bln_rub', 'value': 14831.6, 'year': 2014},
-{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_SUBFEDERAL__bln_rub', 'value': 9353.3, 'year': 2014},
+#{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_CONSOLIDATED__bln_rub', 'value': 30888.8, 'year': 2016},
+#{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_FEDERAL__bln_rub', 'value': 14831.6, 'year': 2014},
+#{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_SUBFEDERAL__bln_rub', 'value': 9353.3, 'year': 2014},
 
-{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_FEDERAL__bln_rub', 'value': -334.7, 'year': 2014},
-{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_SUBFEDERAL__bln_rub', 'value': -447.6, 'year': 2014},
+#{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_FEDERAL__bln_rub', 'value': -334.7, 'year': 2014},
+#{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_SUBFEDERAL__bln_rub', 'value': -447.6, 'year': 2014},
 
 {'freq': 'm', 'label': 'EXPORT_GOODS_TOTAL__bln_usd', 'month': 1, 'value': 4.5, 'year': 1999}
 
@@ -484,7 +491,11 @@ def approve_csv(year=None, month=None, valid_datapoints=VALID_DATAPOINTS):
     tables = get_all_valid_tables(csv_path)
     d = Datapoints(tables)
     for x in valid_datapoints:
-        assert d.is_included(x)
+        if d.is_included(x):
+            pass
+        else: 
+            raise ValueError("Not found in dataset: {}".format(x))
+            
     print("Test values parsed OK.")    
 
 def all_values():
@@ -494,13 +505,58 @@ def all_values():
          for x in t.__flush_datarow_values__():
              yield x
 
+
+available_dates = [(2009, 4), (2009, 5), (2009, 6), (2009, 7), (2009, 8), (2009, 9), 
+             (2009, 10), (2009, 11), (2009, 12), 
+             
+             (2010, 1), (2010, 2), (2010, 3), (2010, 4), (2010, 5), (2010, 6), 
+             (2010, 7), (2010, 8), (2010, 9), (2010, 10), (2010, 11), (2010, 12),
+             
+             (2011, 1), (2011, 2), (2011, 3), (2011, 4), (2011, 5), (2011, 6),
+             (2011, 7), (2011, 8), (2011, 9), (2011, 10), (2011, 11), (2011, 12), 
+             
+             (2012, 1), (2012, 2), (2012, 3), (2012, 4), (2012, 5), (2012, 6), 
+             (2012, 7), (2012, 8), (2012, 9), (2012, 10), (2012, 11), (2012, 12), 
+             
+             (2013, 1), (2013, 2), (2013, 3), (2013, 4), (2013, 5), (2013, 6), 
+             (2013, 7), (2013, 8), (2013, 9), (2013, 10), # missing (2013, 11)
+             (2013, 12), 
+             
+             (2014, 1), (2014, 2), (2014, 3), (2014, 4), (2014, 5), (2014, 6), 
+             (2014, 7), (2014, 8), (2014, 9), (2014, 10), (2014, 11), (2014, 12), 
+             
+             (2015, 1), (2015, 2), (2015, 3), (2015, 4), (2015, 5), (2015, 6), 
+             (2015, 7), (2015, 8), (2015, 9), (2015, 10), (2015, 11), (2015, 12), 
+             
+             (2016, 1), (2016, 2), (2016, 3), (2016, 4), (2016, 5), (2016, 6), 
+             (2016, 7), (2016, 8), (2016, 9), (2016, 10), (2016, 11), (2016, 12), 
+             
+             (2017, 1), (2017, 2), (2017, 3)]
+ 
+
 if __name__=="__main__":    
-            
+    
+    # this part works for latest            
     approve_csv()               
     
-    
+    # part below works, but needs more control values      
+    for date in available_dates:
+        csv_path = cfg.get_path_csv(*date)        
+        if csv_path.exists() and csv_path.stat().st_size > 0:
+            print ("Current data:", csv_path)
+            tables = get_all_valid_tables(csv_path)
+            d = Datapoints(tables)
+            for x in VALID_DATAPOINTS:
+                if d.is_included(x):
+                    pass
+                else: 
+                    msg1 = "Not found in dataset: {}".format(x)
+                    msg2 = "\nCurrent data: {}".format(csv_path)
+                    raise ValueError(msg1+msg2)
+            print("Date checked OK:", *date)   
       
     # TODO: 
+    # write pandas requirement for Datapoints   
     # convert existing parsing definitions to cfg.py
     # -----------
     # set path to local word files
@@ -509,6 +565,4 @@ if __name__=="__main__":
     # -----------
     # add more control datapoints
     # NOT CRITICAL:
-    # write pandas requirement for Datapoints   
     # merge code from cell.py
-    # see issues
