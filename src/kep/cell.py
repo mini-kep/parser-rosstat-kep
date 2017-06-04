@@ -11,8 +11,7 @@ def as_float(text):
     try:
         return float(text)
     except ValueError:
-        print("<" + text + ">")
-        raise ValueError("Cannot parse to float: <>".format(text))
+        raise ValueError("Cannot parse to float: <{}>".format(text))
     
 def filter_value(text):
     # TODO: refactor this function 

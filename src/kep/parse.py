@@ -480,6 +480,7 @@ VALID_DATAPOINTS =  [
  
 def approve_csv(year=None, month=None, valid_datapoints=VALID_DATAPOINTS):
     csv_path = cfg.get_path_csv(year,month) 
+    print ("Current data:", csv_path)
     tables = get_all_valid_tables(csv_path)
     d = Datapoints(tables)
     for x in valid_datapoints:
@@ -495,10 +496,7 @@ def all_values():
 
 if __name__=="__main__":    
             
-    approve_csv()   
-    #z = list(all_values())
-    
-             
+    approve_csv()               
     
     
       

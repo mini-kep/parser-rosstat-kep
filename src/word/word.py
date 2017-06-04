@@ -176,7 +176,6 @@ def make_file_list(folder):
     files = ["tab.doc"] + ["tab%d.doc" % x for x in range(1, 5)]
     return [os.path.abspath(os.path.join(folder, fn)) for fn in files]
 
-
 def folder_to_csv(folder):
     """Make single csv based on 5 .doc files in *folder*. """
     print("\nFolder:\n    ", folder)
@@ -185,13 +184,8 @@ def folder_to_csv(folder):
     dump_doc_files_to_csv(file_list, csv_filename)
     print("Finished creating raw CSV file:", csv_filename)
 
-
-#def parse_doc_files():
-#    # CSV_PATH is something like "D:\\digital\\data-rosstat-kep-move_specs_2\\dep\\data\\2017\\ind02"
-#    if os.path.exists(CSV_PATH):
-#        print("File already exists: " + CSV_PATH)
-#    else:
-#        folder_to_csv(CURRENT_MONTH_DATA_FOLDER)
-
 if __name__ == "__main__":
-    parse_doc_files()
+    pass
+        
+        
+    

@@ -24,7 +24,7 @@ levels_up = 2
 data_folder = me.parents[levels_up] / 'data' 
 rosstat_folder = data_folder / 'interim'
 csv_path = rosstat_folder / "testdata.csv" 
-PREFIX = "ind"
+PREFIX = ""#"ind"
 
 
 # interim data
@@ -185,6 +185,48 @@ d.add_header("Консолидированный бюджет", "GOV_SURPLUS_ACC
 d.add_header("Федеральный бюджет",       "GOV_SURPLUS_ACCUM_FEDERAL")
 d.add_header("Консолидированные бюджеты субъектов Российской Федерации", "GOV_SURPLUS_ACCUM_SUBFEDERAL")
 spec.append(d)
+
+# TODO: next segment
+## segment information
+#start line : 
+#  - 1.13. Оборот розничной торговли, млрд.рублей
+#  - 1.12. Оборот розничной торговли, млрд.рублей
+#end line : 
+#  - 1.13.1. Оборот общественного питания, млрд.рублей
+#  - 1.12.1. Оборот общественного питания, млрд.рублей
+#special reader: null
+#
+#
+##1.13. Оборот розничной торговли, млрд.рублей           / Retail trade turnover, bln rubles
+#
+#Оборот розничной торговли :
+#  - RETAIL_SALES
+#  - bln_rub
+#  - 1.13
+
+##в % к соответствующему периоду предыдущего года (в сопоставимых ценах)  / percent of corresponding period of previous year (at constant prices)
+##20141)
+##в % к предыдущему периоду (в сопоставимых ценах) / percent of previous period (at constant prices)
+#
+##Из общего объема оборота розничной торговли:
+##пищевые продукты, включая напитки, и табачные изделия1),  млрд.рублей / Of total volume of retail trade turnover: food products, including beverages, and tobacco1),
+##bln rubles
+#
+#пищевые продукты, включая напитки, и табачные изделия : 
+# - RETAIL_SALES_FOOD_INCBEV_AND_TABACCO
+# - bln_rub 
+#
+#
+##в % к соответствующему периоду предыдущего года (в сопоставимых ценах)  / percent of corresponding period of previous year (at constant prices)
+##20142)
+##в % к предыдущему периоду (в сопоставимых ценах)  / percent of previous period (at constant prices)
+#
+##непродовольственные товары1),   млрд.рублей  / non-food goods1),  bln rubles
+## TODO:
+#
+#непродовольственные товары :
+# - RETAIL_SALES_NONFOOD_GOODS
+# - bln_rub 
 
 spec.validate()
 print("Current specification:", spec)
