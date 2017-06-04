@@ -445,6 +445,8 @@ class Datapoints():
         vh = [x.split(LABEL_SEP)[0] for x in self.unique_varnames()]
         return sorted(list(set(vh)))
 
+
+# list(x for x in d.emit_a() if x['year'] in (1999, 2014, 2016))
 VALID_DATAPOINTS =  [
 {'freq': 'a', 'label': 'GDP__bln_rub', 'value': 4823.0, 'year': 1999},
 {'freq': 'a', 'label': 'GDP__rog', 'value': 106.4, 'year': 1999},
@@ -468,18 +470,10 @@ def approve_csv(year=None, month=None, valid_datapoints=VALID_DATAPOINTS):
     csv_path = cfg.get_path_csv(year,month) 
     tables = get_all_valid_tables(csv_path)
     d = Datapoints(tables)
-    a = list(x for x in d.emit_a() if x['year'] in (1999, 2014, 2016))
     for x in valid_datapoints:
-        # FIXME: change to exception
-        assert x in a
-
+        assert d.is_included(x)
 
 if __name__=="__main__":    
-    csv_path = cfg.get_path_csv() 
-    tables = get_all_valid_tables(csv_path)
-    d = Datapoints(tables)
-    for v in VALID_DATAPOINTS:
-        assert d.is_included(v)
             
     approve_csv()       
     
