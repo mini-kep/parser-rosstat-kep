@@ -190,41 +190,6 @@ def split_to_tables(csv_dicts):
 
 # hold and process info in table
 
-class DataRows():
-    
-    def __init__(self, label, splitter_func):
-        self.label = label
-        self.splitter_func = splitter_func
-        
-    def parse_row(self, year, values):
-        a, qs, ms = self.splitter_func(values)
-        
-        self.a = []
-        if a:
-            self.a = dict(label=self.label,
-                           freq='a',
-                           year=year, 
-                           value=filter_value(a))
-        self.q = []
-        if qs:
-            for t, val in enumerate(qs):
-                if val:
-                    self.q.append(dict(label=self.label,
-                                        freq='q',
-                                        year=year, 
-                                        value=filter_value(val),
-                                        qtr=t+1))
-        self.m = []         
-        if ms:
-            for t, val in enumerate(ms):
-                if val:
-                    self.m.append(dict(year=year,
-                                        label=self.label,
-                                        freq='m',
-                                        value=filter_value(val),
-                                        month=t+1))        
-    
-
 class Table():    
     def __init__(self, headers, datarows):
         self.headers = headers
@@ -245,28 +210,6 @@ class Table():
         else:
             self.splitter_func = splitter.get_splitter(self.coln) 
     
-    def calc(self):         
-        self.a = []
-        self.q = []
-        self.m = []        
-        ds = DataRows(self.label, self.splitter_func)
-        for row in self.datarows:            
-            if row['data']:
-                year = get_year(row['head'])
-                ds.parse_row(year, row['data'])
-                self.a.append(ds.a)
-                self.q.extend(ds.q)
-                self.m.extend(ds.m)
-        return self
-                
-    def emit(self, freq):
-        assert freq in 'aqm'
-        try:        
-            values = {'a':self.a, 'q':self.q, 'm':self.m}[freq]
-        except:
-            import pdb; pdb.set_trace()
-        return iter(values)
-
     @property
     def label(self): 
         if self.header:
@@ -304,7 +247,7 @@ class Table():
 class Header():
     
     KNOWN = "+"
-    UNKNOWN = "+"
+    UNKNOWN = "-"
     
     def __init__(self, csv_dicts):
         self.varname = None
@@ -368,7 +311,7 @@ def get_tables(csv_dicts, pdef, units=UNITS):
     # FIXME: move around or delete commment strings starting with "___"
     return tables 
 
- FIXME: move some of parsing/data extraction from *get_all_tables* to *Datapoints*
+# FIXME: move some of parsing/data extraction from *get_all_tables* to *Datapoints*
 def get_all_valid_tables(csv_path, spec=SPEC, units=UNITS, exclude=EXCLUDE):
     csv_dicts = read_csv(csv_path) 
     ds = DictStream(csv_dicts)
@@ -387,35 +330,98 @@ def get_all_valid_tables(csv_path, spec=SPEC, units=UNITS, exclude=EXCLUDE):
     all_tables.extend(tables)
     return [at for at in all_tables if at.label and at.label not in exclude]
 
+class RowReader():
+    
+    def __init__(self, label, splitter_func):
+        self.label = label
+        self.splitter_func = splitter_func
+        
+    def parse_row(self, year, values):
+        a, qs, ms = self.splitter_func(values)
+        
+        self.a = []
+        if a:
+            self.a = [dict(label=self.label,
+                           freq='a',
+                           year=year, 
+                           value=filter_value(a))]
+        self.q = []
+        if qs:
+            for t, val in enumerate(qs):
+                if val:
+                    d = dict(label=self.label,
+                             freq='q',
+                             year=year, 
+                             value=filter_value(val),
+                             qtr=t+1)
+                    self.q.append(d)
+        self.m = []         
+        if ms:
+            for t, val in enumerate(ms):
+                if val:
+                    d = dict(year=year,
+                             label=self.label,
+                             freq='m',
+                             value=filter_value(val),
+                             month=t+1)
+                    self.m.append(d)        
+
+
+class Emitter():
+    
+    def __init__(self, table):
+        self.a = []
+        self.q = []
+        self.m = []        
+        rr = RowReader(table.label, table.splitter_func)
+        for row in table.datarows:            
+            if row['data']:
+                year = get_year(row['head'])
+                rr.parse_row(year, row['data'])
+                self.a.extend(rr.a)
+                self.q.extend(rr.q)
+                self.m.extend(rr.m)
+                
+    def emit_a(self):
+        return self.a
+    
+    def emit_q(self):    
+        return self.q
+    
+    def emit_m(self):        
+        return self.m
+    
+import itertools
+
 class Datapoints():
     def __init__(self, tables):
-        self.tables = tables
-        self.datapoints = list(self.walk_by_blocks())
-
-    def walk_by_blocks(self):
-        for t in self.tables:
-            t.calc()
-            for freq in "aqm":
-                 for x in t.emit(freq):
-                     if x:
-                         yield x
-
-    def emit(self, freq):
-        if freq not in 'aqm':
-            raise ValueError(freq)            
-        for p in self.datapoints:
-            if p['freq'] == freq and p['value']:
-                yield p
-
+        self.emitters = [Emitter(t) for t in tables]
+                        
+    def emit_a(self):
+        for e in self.emitters:
+            for x in e.emit_a():
+                yield x
+    
+    def emit_q(self):    
+        for e in self.emitters:
+            for x in e.emit_q():
+                yield x
+    
+    def emit_m(self):        
+        for e in self.emitters:
+            for x in e.emit_m():
+                yield x
+                
+    def datapoints(self):
+        return itertools.chain(self.emit_a(), self.emit_q(), self.emit_q())                
+        
     def is_included(self, datapoint):
-        """Return True if *datapoint* is in *self.datapoints*"""
-        return datapoint in self.datapoints
+        """Return True if *datapoint* is in *self.datapoints*"""        
+        return datapoint in list(self.datapoints())
 
     def unique_varnames(self):
-        varnames = []
-        for freq in 'aqm':
-            varnames.extend([p['varname'] for p in self.emit(freq)])
-        return sorted(list(set(varnames)))
+        datapoints = itertools.chain(self.emit_a(), self.emit_q(), self.emit_m())
+        return sorted(list(set(p['varname'] for p in datapoints)))
 
     @functools.lru_cache()
     def unique_varheads(self):
@@ -445,13 +451,16 @@ def approve_csv(year=None, month=None, valid_datapoints=VALID_DATAPOINTS):
     csv_path = cfg.get_path_csv(year,month) 
     tables = get_all_valid_tables(csv_path)
     d = Datapoints(tables)
-    a = list(x for x in d.emit('a') if x['year'] in (1999, 2014, 2016))
+    a = list(x for x in d.emit_a() if x['year'] in (1999, 2014, 2016))
     for x in valid_datapoints:
         # FIXME: change to exception
         assert x in a
 
 
 if __name__=="__main__":    
+    csv_path = cfg.get_path_csv() 
+    tables = get_all_valid_tables(csv_path)
+    d = Datapoints(tables)
             
     approve_csv()       
     
@@ -467,4 +476,4 @@ if __name__=="__main__":
     # NOT CRITICAL:
     # write pandas requirement for Datapoints   
     # merge code from cell.py
-    # see issues  
+    # see issues
