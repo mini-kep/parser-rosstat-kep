@@ -195,7 +195,8 @@ def split_to_tables(csv_dicts):
 
 class Table():    
     def __init__(self, headers, datarows):
-        self.headers = headers
+        # WONTFIX: naming deadend with three headers ;)
+        #    NOTE: header lines accessible via table.header.textrows
         self.header = Header(headers)
         self.datarows = datarows
         self.coln = max([len(d['data']) for d in self.datarows])          
@@ -220,11 +221,10 @@ class Table():
     
     @property
     def label(self): 
-        if self.header:
-            vn = self.header.varname
-            u = self.header.unit
-            if vn and u:
-                return vn + LABEL_SEP + u        
+        vn = self.header.varname
+        u = self.header.unit
+        if vn and u:
+            return vn + LABEL_SEP + u        
 
     def is_defined(self):
         return self.label and self.splitter_func 
@@ -288,7 +288,7 @@ class Header():
             unit = get_unit(line, units)
             if unit:
                 self.unit = unit
-                # if unit was found at the start of line, delete this line 
+                # if unit was found at the start of line mark this line as known
                 for u in units.keys():
                    if line.startswith(u):
                       self.processed[line] = "+"                
@@ -420,22 +420,23 @@ class Emitter():
 
 class Datapoints():
     def __init__(self, tables):
-        self.emitters = [Emitter(t) for t in tables if t.label and t.splitter_func]
+        self.emitters = [Emitter(t) for t in tables if t.is_defined()]
+        
+    def emit_by_method(self, method_name):
+        if method_name not in ["emit_a", "emit_q", "emit_m"]:
+            raise ValueError(method_name)        
+        for e in self.emitters:
+            for x in getattr(e, method_name)():
+                yield x        
                         
     def emit_a(self):
-        for e in self.emitters:
-            for x in e.emit_a():
-                yield x
+        return self.emit_by_method("emit_a")
     
-    def emit_q(self):    
-        for e in self.emitters:
-            for x in e.emit_q():
-                yield x
-    
-    def emit_m(self):        
-        for e in self.emitters:
-            for x in e.emit_m():
-                yield x
+    def emit_q(self):
+        return self.emit_by_method("emit_q")
+
+    def emit_m(self):
+        return self.emit_by_method("emit_m")
                 
     def datapoints(self):
         return itertools.chain(self.emit_a(), self.emit_q(), self.emit_m())                
@@ -483,10 +484,10 @@ def approve_csv(year=None, month=None, valid_datapoints=VALID_DATAPOINTS):
     d = Datapoints(tables)
     for x in valid_datapoints:
         assert d.is_included(x)
-    print("")    
+    print("Test values parsed OK.")    
 
 def all_values():
-    # for debugging
+    # emit all values for debugging
     csv_path = cfg.get_path_csv()
     for t in get_all_tables(csv_path):
          for x in t.__flush_datarow_values__():
@@ -495,7 +496,7 @@ def all_values():
 if __name__=="__main__":    
             
     approve_csv()   
-    z = list(all_values())
+    #z = list(all_values())
     
              
     

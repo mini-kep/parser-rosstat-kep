@@ -1,0 +1,9 @@
+# NOTE: this is requirements file for vanilla Python.
+# If you are using Anaconda, do not use this file.
+# See also:
+# http://uoa-eresearch.github.io/eresearch-cookbook/recipe/2014/11/20/conda/
+
+matplotlib
+openpyxl
+pandas
+xlwt

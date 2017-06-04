@@ -103,14 +103,18 @@ def get_splitter(coln):
     try:   
         return ROW_LENGTH_TO_FUNC_MAPPER[coln]
     except KeyError:
-        print("WARNING: unexpected row with length {}".format(coln))
+        print("WARNING: unexpected row length {}".format(coln))
         return emit_nones
+# FIXME: source of warnings?
+#WARNING: unexpected row with length 3
+#WARNING: unexpected row with length 14
+#WARNING: unexpected row with length 14    
     
 def get_custom_splitter(func_name):
     try: 
         return SPECIAL_FUNC_NAMES_TO_FUNC_MAPPER[func_name]        
     except KeyError:
-        raise KeyError("Custom function name not found:", func_name) 
+        raise KeyError("ERROR: custom function name not found:", func_name) 
 
 if __name__ == "__main__":                 
     pass

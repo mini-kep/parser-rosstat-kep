@@ -103,6 +103,9 @@ class Definition():
     
     def __repr__(self):
         return self.__str__()
+    
+    def varnames(self):
+        return list(set(v for v in self.headers.values()))
 
 class Specification:
     def __init__(self, pdef_main):
@@ -115,16 +118,23 @@ class Specification:
     def validate(self):
         pass
         
+    def varnames(self):
+        vns = set()
+        for pdef in [self.main] + self.additional:
+            for x in pdef.varnames():
+                vns.add(x)
+        return list(vns)        
+    
     # TODO validate specification - order of markers 
     # - ends are after starts
     # - sorted starts follow each other    
         
     def __str__(self): 
-        msg0 = "Parsing specification"
-        msg1 = "\n- main definition: " + self.main.__str__()
+        msg1 = "<Default parsing definition: " + self.main.__str__()
         listing = ", ".join(d.__str__() for d in self.additional)
-        msg2 = "\n- additional definitions: " + listing 
-        return msg0 + msg1 + msg2
+        msg2 = ", additional: [{}]. ".format(listing) 
+        msg3 = "Total varnames: {}>".format(len(self.varnames())) 
+        return msg1 + msg2 + msg3
     
         
         
@@ -177,7 +187,7 @@ d.add_header("Консолидированные бюджеты субъекто
 spec.append(d)
 
 spec.validate()
-print(spec)
+print("Current specification:", spec)
 
 doc = """1. Сводные показатели / Aggregated indicators					
 1.1. Валовой внутренний продукт1) / Gross domestic product1)					
