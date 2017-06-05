@@ -59,6 +59,22 @@ def init_dirs(root, available_dates=available_dates):
             if not new_folder.exists():
                new_folder.mkdir()               
 
+def accepted(path):
+    if path.exists() and path.stat().st_size > 0:
+        return True
+    else:
+        return False
+    
+def size(path):
+    return int(round(path.stat().st_size / 1024, 0))
+    
+def as_str(y, m):      
+    return str(y) + " " + str(m).zfill(2)
+
+def echo(src, dest):
+    print("    source:", src)
+    print("    destination:", dest)
+
 if __name__ == "__main__":
     import shutil
     import word
@@ -68,31 +84,37 @@ if __name__ == "__main__":
     assert set(available_dates)==set(get_available_dates(WORD_ROOT))
 
     INTERIM_ROOT = Path('C:/Users/PogrebnyakEV/Desktop/mini-kep-master/data/interim')
-    init_dirs(INTERIM_ROOT)
+    #init_dirs(INTERIM_ROOT)
     
-
-    # make all
-    #ds = reversed(available_dates[0:-2])
-    #for d in ds:
-    #    f = word_folder(*d, WORD_ROOT)
-    #    word.folder_to_csv(f)
-    def is_empty(path):
-        if path.exists():
-            return dest.stat().st_size == 0 
-          
     for d in reversed(available_dates) :
         word_folder = get_word_folder(*d, WORD_ROOT)
         src = Path(word_folder) / "tab.csv"
         interim_folder = get_csv_folder(*d, INTERIM_ROOT )
         dest =  Path(interim_folder) / "tab.csv"
-        print(src.exists(), dest.exists(), *d)
-        #if dest.exists():
-        #    shutil.copy(dest, src)
-        #if src.exists() and not is_empty(src) \
-        #                and not dest.exists():
-        #     shutil.copy(src, dest)
-        #if is_empty(src):
-        #    src.unlink()
+        # src and dest are present
+        if accepted(src) and accepted(dest):
+            s1 = size(src)              
+            s2 = size(dest)
+            # incompelte file copied
+            if s1 > s2:
+                shutil.copyfile(src, dest)
+            assert s1 == s2
+            print("Accepted", as_str(*d), s1, s2)
+            echo(src, dest)         
+        # not copied               
+        if accepted(src) and not accepted(dest):
+            shutil.copyfile(src, dest)
+            print("Copied")
+            echo(src, dest)                
+        #     
+        if not accepted(src):
+            word.folder_to_csv(word_folder)
+            shutil.copyfile(src, dest)
+            print("Created and copied")
+            pass
         
-        
+            
+    # MAYDO: - zip/rar file archive on S3
+    #        - download and unpack locally
     
+    # MAYDO: - read from rosstat

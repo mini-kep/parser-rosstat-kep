@@ -121,6 +121,7 @@ def row_iter(table):
 def query_all_tables(p, func):
     word = open_ms_word()
     doc = open_doc(p, word)
+    #import pdb; pdb.set_trace()
     total_tables = get_table_count(doc)
     for i, table in enumerate(doc.Tables):
         print("Reading table {} of {}...".format(i + 1, total_tables))
@@ -185,7 +186,8 @@ def folder_to_csv(folder):
     print("Finished creating raw CSV file:", csv_filename)
 
 if __name__ == "__main__":
-    pass
-        
-        
-    
+    from run_word import get_word_folder
+    from pathlib import Path
+    WORD_ROOT = Path("D:/digital/kep_data2")
+    word_folder = get_word_folder(2012, 11, WORD_ROOT)
+    folder_to_csv(word_folder)

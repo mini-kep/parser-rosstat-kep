@@ -487,24 +487,18 @@ VALID_DATAPOINTS =  [
  
 def approve_csv(year=None, month=None, valid_datapoints=VALID_DATAPOINTS):
     csv_path = cfg.get_path_csv(year,month) 
-    print ("Current data:", csv_path)
+    print ("File:", csv_path)
     tables = get_all_valid_tables(csv_path)
     d = Datapoints(tables)
     for x in valid_datapoints:
         if d.is_included(x):
             pass
         else: 
-            raise ValueError("Not found in dataset: {}".format(x))
-            
+            msg1 = "Not found in dataset: {}".format(x)
+            msg2 = "\nDate: {}, {}".format(year, month)
+            msg3 = "\nFile: {}".format(csv_path)
+            raise ValueError(msg1+msg2+msg3)
     print("Test values parsed OK.")    
-
-def all_values():
-    # emit all values for debugging
-    csv_path = cfg.get_path_csv()
-    for t in get_all_tables(csv_path):
-         for x in t.__flush_datarow_values__():
-             yield x
-
 
 available_dates = [(2009, 4), (2009, 5), (2009, 6), (2009, 7), (2009, 8), (2009, 9), 
              (2009, 10), (2009, 11), (2009, 12), 
@@ -532,7 +526,28 @@ available_dates = [(2009, 4), (2009, 5), (2009, 6), (2009, 7), (2009, 8), (2009,
              (2016, 7), (2016, 8), (2016, 9), (2016, 10), (2016, 11), (2016, 12), 
              
              (2017, 1), (2017, 2), (2017, 3)]
- 
+
+def approve_latest():
+    approve_csv(year=None, month=None)
+
+
+def filled_dates():
+    for date in reversed(available_dates): 
+        csv_path = cfg.get_path_csv(*date) 
+        if csv_path.exists() and csv_path.stat().st_size > 0:
+            yield date
+    
+def approve_all():
+    for date in filled_dates():
+        approve_csv(*date)   
+
+def all_values():
+    # emit all values for debugging
+    csv_path = cfg.get_path_csv()
+    for t in get_all_tables(csv_path):
+         for x in t.__flush_datarow_values__():
+             yield x
+
 
 if __name__=="__main__":    
     
@@ -540,28 +555,16 @@ if __name__=="__main__":
     approve_csv()               
     
     # part below works, but needs more control values      
-    for date in available_dates:
-        csv_path = cfg.get_path_csv(*date)        
-        if csv_path.exists() and csv_path.stat().st_size > 0:
-            print ("Current data:", csv_path)
-            tables = get_all_valid_tables(csv_path)
-            d = Datapoints(tables)
-            for x in VALID_DATAPOINTS:
-                if d.is_included(x):
-                    pass
-                else: 
-                    msg1 = "Not found in dataset: {}".format(x)
-                    msg2 = "\nCurrent data: {}".format(csv_path)
-                    raise ValueError(msg1+msg2)
-            print("Date checked OK:", *date)   
+    approve_all()
+
+    #csv_path = cfg.get_path_csv(2012, 11) 
+    #print ("File:", csv_path)
+    #tables = get_all_valid_tables(csv_path)
+    #d = Datapoints(tables)
       
     # TODO: 
     # write pandas requirement for Datapoints   
     # convert existing parsing definitions to cfg.py
-    # -----------
-    # set path to local word files
-    # make interim csv files    
-    # run parser on these csv files
     # -----------
     # add more control datapoints
     # NOT CRITICAL:
