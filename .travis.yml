@@ -8,4 +8,5 @@ install:
 script: 
   - pytest src/kep/
 #after_success:
-  - codecov
+# add codecov to requierments + add .cov to script + run locally + commit
+#  - codecov
