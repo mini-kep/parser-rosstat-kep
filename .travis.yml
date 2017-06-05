@@ -8,4 +8,4 @@ install:
 script: 
   - pytest src/kep/
 #after_success:
-#  - codecov
+  - codecov
