@@ -27,7 +27,7 @@ available_dates = [(2009, 4), (2009, 5), (2009, 6), (2009, 7), (2009, 8), (2009,
              (2016, 1), (2016, 2), (2016, 3), (2016, 4), (2016, 5), (2016, 6), 
              (2016, 7), (2016, 8), (2016, 9), (2016, 10), (2016, 11), (2016, 12), 
              
-             (2017, 1), (2017, 2), (2017, 3)]
+             (2017, 1), (2017, 2), (2017, 3), (2017, 4)]
 
 def get_available_dates(root):
     # Testing - generate available_dates
@@ -84,8 +84,8 @@ if __name__ == "__main__":
     assert set(available_dates)==set(get_available_dates(WORD_ROOT))
 
     INTERIM_ROOT = Path('C:/Users/PogrebnyakEV/Desktop/mini-kep-master/data/interim')
-    #init_dirs(INTERIM_ROOT)
-    
+    init_dirs(INTERIM_ROOT)
+            
     for d in reversed(available_dates) :
         word_folder = get_word_folder(*d, WORD_ROOT)
         src = Path(word_folder) / "tab.csv"
@@ -99,8 +99,7 @@ if __name__ == "__main__":
             if s1 > s2:
                 shutil.copyfile(src, dest)
             assert s1 == s2
-            print("Accepted", as_str(*d), s1, s2)
-            echo(src, dest)         
+            print("Accepted", as_str(*d), s1)            
         # not copied               
         if accepted(src) and not accepted(dest):
             shutil.copyfile(src, dest)
@@ -111,7 +110,7 @@ if __name__ == "__main__":
             word.folder_to_csv(word_folder)
             shutil.copyfile(src, dest)
             print("Created and copied")
-            pass
+            echo(src, dest)
         
             
     # MAYDO: - zip/rar file archive on S3

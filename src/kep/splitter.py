@@ -75,6 +75,15 @@ ROW_LENGTH_TO_FUNC_MAPPER = {1 + 4 + 12: split_row_by_periods,
                                      12: split_row_by_months,
                                       4: split_row_by_accum_qtrs}
 
+def get_splitter(coln):
+    try:   
+        return ROW_LENGTH_TO_FUNC_MAPPER[coln]
+    except KeyError:        
+        return emit_nones
+# FIXME: source of warnings?
+#WARNING: unexpected row with length 3
+#WARNING: unexpected row with length 14
+#WARNING: unexpected row with length 14  
 
 # Custom splitter functions
 
@@ -99,17 +108,6 @@ def split_row_fiscal(row):
 
 SPECIAL_FUNC_NAMES_TO_FUNC_MAPPER = {'fiscal': split_row_fiscal}
      
-def get_splitter(coln):
-    try:   
-        return ROW_LENGTH_TO_FUNC_MAPPER[coln]
-    except KeyError:
-        print("WARNING: unexpected row length {}".format(coln))
-        return emit_nones
-# FIXME: source of warnings?
-#WARNING: unexpected row with length 3
-#WARNING: unexpected row with length 14
-#WARNING: unexpected row with length 14    
-    
 def get_custom_splitter(func_name):
     try: 
         return SPECIAL_FUNC_NAMES_TO_FUNC_MAPPER[func_name]        

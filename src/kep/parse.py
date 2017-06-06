@@ -21,7 +21,7 @@ from enum import Enum, unique
 import functools
 from collections import OrderedDict as odict
 import itertools
-  
+import pandas as pd  
 
 import splitter
 from cell import filter_value
@@ -35,7 +35,7 @@ ENC = 'utf-8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
 LABEL_SEP = "__"
-
+SILENT = True
 
 # csv file access
 def to_csv(rows, path):
@@ -193,13 +193,27 @@ def split_to_tables(csv_dicts):
 
 # hold headres and datarows n table
 
+# [4, 5, 12, 13, 17]
+VALID_ROW_LENGTHS = list(splitter.ROW_LENGTH_TO_FUNC_MAPPER.keys())
+
 class Table():    
     def __init__(self, headers, datarows):
         # WONTFIX: naming deadend with three headers ;)
         #    NOTE: header lines accessible via table.header.textrows
         self.header = Header(headers)
         self.datarows = datarows
-        self.coln = max([len(d['data']) for d in self.datarows])          
+        self.coln = max([len(d['data']) for d in self.datarows])
+        self.validate_coln()
+        
+    def validate_coln(self, silent = SILENT):             
+        if self.coln not in VALID_ROW_LENGTHS:
+            for row in self.datarows:
+                if len(row) not in VALID_ROW_LENGTHS:
+                    if not silent:
+                        print("\nWARNING: "
+                                "unexpected row length {}".format(self.coln))
+                        print(self.header)   
+                        print(row['data'])      
                 
     def parse(self, pdef, units):        
         self.header.set_varname(pdef, units)       
@@ -269,7 +283,7 @@ class Header():
         self.processed = odict((line, self.UNKNOWN) for line in self.textlines)
         
     
-    def set_varname(self, pdef, units):        
+    def set_varname(self, pdef, units, silent=SILENT):        
         varname_dict = pdef.headers
         known_headers = varname_dict.keys()
         for line in self.textlines:
@@ -281,7 +295,8 @@ class Header():
                     self.varname = varname_dict[header]
                     self.unit = get_unit(line, units)
                     if self.unit is None:
-                        print("WARNING: unit not found in  <" + line + ">")
+                        if not silent:
+                            print("WARNING: unit not found in  <" + line + ">")
             # something from known_headers must be found only once         
             assert just_one <= 1
                     
@@ -321,7 +336,6 @@ def fix_multitable_units(tables):
 def get_tables(csv_dicts, pdef, units=UNITS):
     tables = [t.parse(pdef, units) for t in split_to_tables(csv_dicts)]
     fix_multitable_units(tables)
-    # FIXME: move around or delete commment strings starting with "___"
     return tables 
 
 def get_all_tables(csv_path, spec=SPEC, units=UNITS):
@@ -425,25 +439,27 @@ class Datapoints():
         self.emitters = [Emitter(t) for t in tables if t.is_defined()]
         
     # label can be 'GDP__rog' and 'GDP'   
-    def emit_by_method(self, method_name, label=None):
+    def emit_by_method(self, method_name):
         if method_name not in ["emit_a", "emit_q", "emit_m"]:
             raise ValueError(method_name)        
         for e in self.emitters:
-            for x in getattr(e, method_name)():
-                if not label:
+            for x in getattr(e, method_name)():                
                     yield x
-                else:
-                    if x['label'].startswith(label):
-                        yield x
                         
-    def emit_a(self, name=None):
-        return self.emit_by_method("emit_a", name)
+    def get(self, freq, label, year):
+        assert freq in "aqm"
+        gen = dict(a=self.emit_a, q=self.emit_q, m=self.emit_m)[freq]()                       
+        gen = filter(lambda x: x['label'].startswith(label), gen)
+        return filter(lambda x: x['year'] == year, gen)
+                        
+    def emit_a(self):
+        return self.emit_by_method("emit_a")
     
-    def emit_q(self, name=None):
-        return self.emit_by_method("emit_q", name)
+    def emit_q(self):
+        return self.emit_by_method("emit_q")
 
-    def emit_m(self, name=None):
-        return self.emit_by_method("emit_m", name)
+    def emit_m(self):
+        return self.emit_by_method("emit_m")
                 
     def datapoints(self):
         return itertools.chain(self.emit_a(), self.emit_q(), self.emit_m())                
@@ -489,57 +505,38 @@ def approve_csv(year=None, month=None, valid_datapoints=VALID_DATAPOINTS):
     csv_path = cfg.get_path_csv(year,month) 
     print ("File:", csv_path)
     tables = get_all_valid_tables(csv_path)
-    d = Datapoints(tables)
+    dps = Datapoints(tables)
     for x in valid_datapoints:
-        if d.is_included(x):
+        if dps.is_included(x):
             pass
         else: 
             msg1 = "Not found in dataset: {}".format(x)
             msg2 = "\nDate: {}, {}".format(year, month)
             msg3 = "\nFile: {}".format(csv_path)
             raise ValueError(msg1+msg2+msg3)
-    print("Test values parsed OK.")    
-
-available_dates = [(2009, 4), (2009, 5), (2009, 6), (2009, 7), (2009, 8), (2009, 9), 
-             (2009, 10), (2009, 11), (2009, 12), 
-             
-             (2010, 1), (2010, 2), (2010, 3), (2010, 4), (2010, 5), (2010, 6), 
-             (2010, 7), (2010, 8), (2010, 9), (2010, 10), (2010, 11), (2010, 12),
-             
-             (2011, 1), (2011, 2), (2011, 3), (2011, 4), (2011, 5), (2011, 6),
-             (2011, 7), (2011, 8), (2011, 9), (2011, 10), (2011, 11), (2011, 12), 
-             
-             (2012, 1), (2012, 2), (2012, 3), (2012, 4), (2012, 5), (2012, 6), 
-             (2012, 7), (2012, 8), (2012, 9), (2012, 10), (2012, 11), (2012, 12), 
-             
-             (2013, 1), (2013, 2), (2013, 3), (2013, 4), (2013, 5), (2013, 6), 
-             (2013, 7), (2013, 8), (2013, 9), (2013, 10), # missing (2013, 11)
-             (2013, 12), 
-             
-             (2014, 1), (2014, 2), (2014, 3), (2014, 4), (2014, 5), (2014, 6), 
-             (2014, 7), (2014, 8), (2014, 9), (2014, 10), (2014, 11), (2014, 12), 
-             
-             (2015, 1), (2015, 2), (2015, 3), (2015, 4), (2015, 5), (2015, 6), 
-             (2015, 7), (2015, 8), (2015, 9), (2015, 10), (2015, 11), (2015, 12), 
-             
-             (2016, 1), (2016, 2), (2016, 3), (2016, 4), (2016, 5), (2016, 6), 
-             (2016, 7), (2016, 8), (2016, 9), (2016, 10), (2016, 11), (2016, 12), 
-             
-             (2017, 1), (2017, 2), (2017, 3)]
+    print("Test values parsed OK.") 
+    
+    f = Framer(dps) 
+    dfa = f.get_dfa()
+    dfq = f.get_dfq()
+    dfm = f.get_dfm()
+    # FIXME - check control values in dataframe
+    print("Dataframes created OK.") 
+    
 
 def approve_latest():
     approve_csv(year=None, month=None)
 
 
-def filled_dates():
+def filled_dates(available_dates=cfg.DATES):
     for date in reversed(available_dates): 
         csv_path = cfg.get_path_csv(*date) 
         if csv_path.exists() and csv_path.stat().st_size > 0:
             yield date
     
-def approve_all():
+def approve_all(valid_datapoints=VALID_DATAPOINTS):
     for date in filled_dates():
-        approve_csv(*date)   
+        approve_csv(*date, valid_datapoints)   
 
 def all_values():
     # emit all values for debugging
@@ -548,24 +545,197 @@ def all_values():
          for x in t.__flush_datarow_values__():
              yield x
 
+#FIXME: maybe use just one library?
+from datetime import datetime
+from calendar import monthrange
+
+def get_end_of_monthdate(y, m):
+    dm = datetime(year=y, month=m, day=monthrange(y, m)[1])
+    return pd.Timestamp(dm) 
+
+
+def get_end_of_quarterdate(y, q):
+    dq = datetime(year=y, month=q*3, day=monthrange(y, q*3)[1])
+    return pd.Timestamp(dq)  
+
+
+class Frame():
+    """Accept datapoints and emit pandas dataframeы"""
+    
+    def __init__(self, datapoints):  
+        assert isinstance(datapoints, Datapoints) 
+        self._dfa = pd.DataFrame(datapoints.emit_a())
+        self._dfq = pd.DataFrame(datapoints.emit_q())
+        self._dfm = pd.DataFrame(datapoints.emit_m())
+        self.check_for_duplicates()
+
+    def check_for_duplicates(self):
+        for df in self._dfa, self._dfq, self._dfm:
+            #FIXME: change to raise Exception
+            assert df[df.duplicated(keep=False)].empty  
+                      
+    # TO DISCUSS: get_df*() creates data every time we call them,
+    #             may create self.dfa, etc and return.
+    
+    def get_dfa(self):
+        """Returns pandas dataframe with ANNUAL data."""                
+        return self._dfa.pivot(columns='label', values='value', index='year')        
+
+    def get_dfq(self):
+        """Returns pandas dataframe with QUARTERLY data."""
+        dfq = self._dfq
+        # add time index
+        dfq["time_index"] = dfq.apply(lambda x: get_end_of_quarterdate(x['year'], x['qtr']), axis=1)
+        # reshape
+        dfq = dfq.pivot(columns='label', values='value', index='time_index')
+        # add extra columns
+        dfq.insert(0, "year", dfq.index.year)    
+        dfq.insert(1, "qtr", dfq.index.quarter)
+        return dfq
+
+    def get_dfm(self):
+        """Returns pandas dataframe with MONTHLY data."""
+        dfm = self._dfm
+        # add time index
+        dfm["time_index"] = dfm.apply(lambda x: get_end_of_monthdate(x['year'], x['month']), axis=1)
+        # reshape
+        dfm = dfm.pivot(columns='label', values='value', index='time_index')
+        # add extra columns
+        dfm.insert(0, "year", dfm.index.year)
+        dfm.insert(1, "month", dfm.index.month)
+        return dfm     
+     
+    def save(self, folder_path):                
+        self.get_dfa().to_csv(folder_path / 'dfa.csv')
+        self.get_dfq().to_csv(folder_path / 'dfq.csv')
+        self.get_dfm().to_csv(folder_path / 'dfm.csv')  
+        print("Saved dataframes to", folder_path)
+
+#FIXME: use ths functions to catch duplicates early
+def duplicates(*items):
+    array = list(*items)
+    __occurences__ = {x:array.count(x) for x in array} 
+    return [k for k,v in __occurences__.items() if v>1]
+
+def dfs(year=None, month=None):
+    """Shorthand for obtaining latest dataframes."""
+    csv_path = cfg.get_path_csv(year, month)     
+    tables = get_all_valid_tables(csv_path)
+    dps = Datapoints(tables)
+    fr = Frame(dps)    
+    dfa = fr.get_dfa()
+    dfq = fr.get_dfq()
+    dfm = fr.get_dfm()
+    return dfa, dfq, dfm
+
+def save_dfs(year=None, month=None):
+    #FIXME: maybe rename get_interim_csv_path()
+    csv_path = cfg.get_path_csv(year, month)     
+    tables = get_all_valid_tables(csv_path)
+    dps = Datapoints(tables)
+    frame = Frame(dps)
+    processed_folder = cfg.get_processed_folder(year, month)
+    frame.save(processed_folder)   
+    
+def save_all_dfs():
+    for date in filled_dates():
+         save_dfs(*date)   
+    
+
 
 if __name__=="__main__":    
     
-    # this part works for latest            
+    # check for latest date           
     approve_csv()               
     
-    # part below works, but needs more control values      
-    approve_all()
+    # check all dates, runs slow (about 20 sec.) + may fail if dataset not complete      
+    # approve_all()
+    
+    # interim to processed data cycle: (year, month) -> 3 dataframes
+    year, month = 2017, 4 #use None, None for latest values
+    # source csv file
+    csv_path = cfg.get_path_csv(year, month)  
+    # break csv to tables with variable names
+    tables = get_all_valid_tables(csv_path)
+    # emit values from tables
+    dps = Datapoints(tables)    
+    # convert stream values to pandas dataframes     
+    frame = Frame(datapoints=dps)
+    # save dataframes to csv files  
+    folder = cfg.get_processed_folder(year, month)    
+    frame.save(folder)       
+    
+    # sample access - datapoints
+    assert list(dps.get("a", "GDP", 1999)) == [{'freq': 'a', 'label': 'GDP__bln_rub', 'value': 4823.0, 'year': 1999},
+                                               {'freq': 'a', 'label': 'GDP__yoy', 'value': 106.4, 'year': 1999}]
+    # sample access - dataframes
+    dfa = frame.get_dfa()
+    dfq = frame.get_dfq()
+    dfm = frame.get_dfm()    
+    assert dfa.loc[1999,].__str__() == """label
+EXPORT_GOODS_TOTAL__bln_usd                  75.6
+EXPORT_GOODS_TOTAL__yoy                     101.5
+GDP__bln_rub                               4823.0
+GDP__yoy                                    106.4
+GOV_EXPENSE_ACCUM_CONSOLIDATED__bln_rub    1258.0
+GOV_EXPENSE_ACCUM_FEDERAL__bln_rub          666.9
+GOV_EXPENSE_ACCUM_SUBFEDERAL__bln_rub       653.8
+GOV_REVENUE_ACCUM_CONSOLIDATED__bln_rub    1213.6
+GOV_REVENUE_ACCUM_FEDERAL__bln_rub          615.5
+GOV_REVENUE_ACCUM_SUBFEDERAL__bln_rub       660.8
+GOV_SURPLUS_ACCUM_FEDERAL__bln_rub          -51.4
+GOV_SURPLUS_ACCUM_SUBFEDERAL__bln_rub         7.0
+IMPORT_GOODS_TOTAL__bln_usd                  39.5
+IMPORT_GOODS_TOTAL__yoy                      68.1
+IND_PROD__yoy                                 NaN
+Name: 1999, dtype: float64"""
 
-    #csv_path = cfg.get_path_csv(2012, 11) 
-    #print ("File:", csv_path)
-    #tables = get_all_valid_tables(csv_path)
-    #d = Datapoints(tables)
-      
-    # TODO: 
-    # write pandas requirement for Datapoints   
-    # convert existing parsing definitions to cfg.py
-    # -----------
-    # add more control datapoints
+    assert dfm.loc["2017-01",].transpose().__str__() == """time_index                               2017-01-31
+label                                              
+year                                         2017.0
+month                                           1.0
+EXPORT_GOODS_TOTAL__bln_usd                    25.1
+EXPORT_GOODS_TOTAL__rog                        80.3
+EXPORT_GOODS_TOTAL__yoy                       146.6
+GOV_EXPENSE_ACCUM_CONSOLIDATED__bln_rub      1682.9
+GOV_EXPENSE_ACCUM_FEDERAL__bln_rub           1230.5
+GOV_EXPENSE_ACCUM_SUBFEDERAL__bln_rub         452.2
+GOV_REVENUE_ACCUM_CONSOLIDATED__bln_rub      1978.8
+GOV_REVENUE_ACCUM_FEDERAL__bln_rub           1266.0
+GOV_REVENUE_ACCUM_SUBFEDERAL__bln_rub         493.7
+GOV_SURPLUS_ACCUM_FEDERAL__bln_rub             35.5
+GOV_SURPLUS_ACCUM_SUBFEDERAL__bln_rub          41.5
+IMPORT_GOODS_TOTAL__bln_usd                    13.7
+IMPORT_GOODS_TOTAL__rog                        70.2
+IMPORT_GOODS_TOTAL__yoy                       138.8
+IND_PROD__rog                                  76.2
+IND_PROD__yoy                                 102.3
+IND_PROD__ytd                                 102.3"""
+    
+    
+    # TEST:
+    # all varnames from definition are read from csv file
+    
+    # CRITICAL PATH:    
+    # analysis: check revisions of key series by date
+    #          -> use different folder for this analysis code
+    # Russian economy by this model
+    
+    # TODO-PARSING:         
+    # save processed files for differents dates = save_all_dfs()
+    # convert more existing parsing definitions to cfg.py    
+    # add more control datapoints    
+    
+    # TODO-FRONTEND:
+    # var descriptions in cfg.py
+    # generate frontend with sparlines           
+    
     # NOT CRITICAL:
     # merge code from cell.py
+    # finilise Table-Emitter-Dataset dicsussion 
+    # diff GOV_EXPENSE_ACCUM, GOV_REVENUE_ACCUM
+    
+    # FOR REVIEW:
+    # write csv files to 'processed' via to_csv()    
+    # shuttiing warnings with SILENT flag    
+    # pandas interface for Datapoints   

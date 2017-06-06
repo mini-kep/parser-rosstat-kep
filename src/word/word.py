@@ -63,13 +63,17 @@ def delete_double_space(line):
     return " ".join(line.split())
 
 
-REPLACEMENTS = [('\r\x07', '')  # delete this symbol
-    , ('\x0c', ' ')  # sub with space
-    , ('\x0b', ' ')  # sub with space
-    , ('\r', ' ')  # sub with space
-    , ("\u201c", '"')
-    , ("\u201d", '"')
-                ]
+SPACE = " "
+VOID = ""
+APOCHAR = '"'
+REPLACEMENTS = [('\r\x07', VOID)  # delete this symbol
+    , ('\x0c', SPACE)  # sub with space
+    , ('\x0b', SPACE)  # sub with space
+    , ('\r', SPACE)  # sub with space
+    , ("\u201c", APOCHAR)
+    , ("\u201d", APOCHAR)
+    , ('\x00', VOID)
+]
 
 
 def filter_cell_contents(cell_value):
