@@ -64,8 +64,7 @@ RETAIL_SALES_NONFOODS__rog                     75.0
 RETAIL_SALES_NONFOODS__yoy                     98.7
 RETAIL_SALES__bln_rub                        2207.5
 RETAIL_SALES__rog                              75.1
-RETAIL_SALES__yoy                              97.7"""  
-    
+RETAIL_SALES__yoy                              97.7""" 
     
 
 def test_end_to_end_latest_month():
@@ -75,14 +74,12 @@ def test_end_to_end_latest_month():
 #def test_end_to_end_many_months():
     # needs cleaner data directory, will fail on incomplete files
     #pts = [{'freq': 'a', 'label': 'GDP__bln_rub', 'value': 4823.0, 'year': 1999}]
-    # FIXME approve_all too slow - suite runs for 7.9 sec! even with one control value
-    #       one control value as above, 19.68 sec with creating dataframes.
     #parse.approve_all(valid_datapoints=pts)
 
 def test_get_year():
     assert parse.get_year("19991)") == 1999
     
-    
+   
 def test_csv_has_no_null_byte():     
     csv_path = cfg.get_path_csv(2015, 2) 
     z = csv_path.read_text(encoding = parse.ENC)    
