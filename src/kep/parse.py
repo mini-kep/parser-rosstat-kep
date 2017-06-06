@@ -26,7 +26,6 @@ from calendar import monthrange
 
 
 import splitter
-from cell import filter_value
 
 import cfg
 from cfg import spec as SPEC
@@ -381,7 +380,7 @@ def get_all_valid_tables(csv_path, spec=SPEC, units=UNITS):
     return [t for t in all_tables if t.is_defined()]
 
 
-COMMENT_CATCHER = re.compile("\D*([\d., ]*)\s*(?=\d\))")     
+COMMENT_CATCHER = re.compile("\D*(\d+[.,]?\d*)\s*(?=\d\))")     
 def to_float(text, i=0):
     i += 1
     if i>5:
@@ -392,11 +391,11 @@ def to_float(text, i=0):
     try:
          return float(text)
     except ValueError:
+         if " " in text.strip():
+             return to_float(text.strip().split(" ")[0], i)
          if ")" in text: 
              text = COMMENT_CATCHER.match(text).groups()[0]
              return to_float(text, i)
-         if " " in text.strip():
-             return to_float(text.strip().split(" ")[0], i)
          if text.endswith(".") or text.endswith(",") :  # 97.1.
              return to_float(text[:-1], i)
          return False
@@ -647,7 +646,7 @@ if __name__=="__main__":
     # approve_all()
 
     # save dataframes to csv 
-    save_all_dfs()
+    # save_all_dfs()
     
     
     # interim to processed data cycle: (year, month) -> 3 dataframes

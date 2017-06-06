@@ -69,11 +69,11 @@ def to_float(text, i=0):
     try:
          return float(text)
     except ValueError:
+         if " " in text.strip():
+             return to_float(text.strip().split(" ")[0], i)
          if ")" in text: 
              text = COMMENT_CATCHER.match(text).groups()[0]
              return to_float(text, i)
-         if " " in text.strip():
-             return to_float(text.strip().split(" ")[0], i)
          if text.endswith(".") or text.endswith(",") :  # 97.1.
              return to_float(text[:-1], i)
          return False
