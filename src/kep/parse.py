@@ -516,7 +516,8 @@ def approve_csv(year=None, month=None, valid_datapoints=VALID_DATAPOINTS):
             raise ValueError(msg1+msg2+msg3)
     print("Test values parsed OK.") 
     
-    f = Framer(dps) 
+    f = Frame(dps)
+    #calls to get dataframes, values not used
     dfa = f.get_dfa()
     dfq = f.get_dfq()
     dfm = f.get_dfm()
@@ -738,4 +739,4 @@ IND_PROD__ytd                                 102.3"""
     # FOR REVIEW:
     # write csv files to 'processed' via to_csv()    
     # shuttiing warnings with SILENT flag    
-    # pandas interface for Datapoints   
+    # pandas interface for Datapoints
