@@ -18,10 +18,12 @@
 import csv
 import re
 from enum import Enum, unique
-import functools
 from collections import OrderedDict as odict
 import itertools
 import pandas as pd  
+from datetime import datetime
+from calendar import monthrange
+
 
 import splitter
 from cell import filter_value
@@ -29,13 +31,19 @@ from cell import filter_value
 import cfg
 from cfg import spec as SPEC
 from cfg import units as UNITS
-from cfg import exclude as EXCLUDE
 
 ENC = 'utf-8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
 LABEL_SEP = "__"
 SILENT = True
+
+# label handling 
+def make_label(vn, unit, sep=LABEL_SEP):
+    return vn + sep + unit
+
+def split_label(label, sep=LABEL_SEP):
+    return label.split(sep)
 
 # csv file access
 def to_csv(rows, path):
@@ -238,7 +246,7 @@ class Table():
         vn = self.header.varname
         u = self.header.unit
         if vn and u:
-            return vn + LABEL_SEP + u        
+            return make_label(vn, u)        
 
     def is_defined(self):
         return self.label and self.splitter_func 
@@ -332,11 +340,23 @@ def fix_multitable_units(tables):
         if table.header.varname is None:
            if not table.header.has_unknown_lines():
                table.header.varname = prev_table.header.varname
+
+def has_required_labels(tables, pdef):
+    labels_required = [make_label(*x) for x in pdef.required]
+    labels_in_tables = [t.label for t in tables]
+    labels_missed = [x for x in labels_required if x not in labels_in_tables]
+    if labels_missed:
+        # import pdb; pdb.set_trace()
+        raise ValueError(labels_missed)        
+    # WONTFIX: not checking if *labels_missed* contains extra parsing results  
+
             
 def get_tables(csv_dicts, pdef, units=UNITS):
     tables = [t.parse(pdef, units) for t in split_to_tables(csv_dicts)]
     fix_multitable_units(tables)
-    return tables 
+    has_required_labels(tables, pdef)
+    return tables
+
 
 def get_all_tables(csv_path, spec=SPEC, units=UNITS):
     csv_dicts = read_csv(csv_path) 
@@ -355,9 +375,9 @@ def get_all_tables(csv_path, spec=SPEC, units=UNITS):
     return all_tables
 
 
-def get_all_valid_tables(csv_path, spec=SPEC, units=UNITS, exclude=EXCLUDE):
+def get_all_valid_tables(csv_path, spec=SPEC, units=UNITS):
     all_tables = get_all_tables(csv_path, spec, units)
-    return [t for t in all_tables if t.is_defined() and t.label not in exclude]
+    return [t for t in all_tables if t.is_defined()]
 
 
 class RowReader():
@@ -400,7 +420,7 @@ class RowReader():
 
 class Emitter():
     """Emitter extracts and holds annual, quarterly and monthly values
-       for a given table with label and splitter_func."""
+       for a given Table with defined label and splitter_func."""
         
     def __init__(self, table):
         if not table.label:
@@ -437,20 +457,14 @@ class Emitter():
 class Datapoints():
     def __init__(self, tables):
         self.emitters = [Emitter(t) for t in tables if t.is_defined()]
+        self.datapoints = list(self.get_datapoints())
         
-    # label can be 'GDP__rog' and 'GDP'   
     def emit_by_method(self, method_name):
         if method_name not in ["emit_a", "emit_q", "emit_m"]:
             raise ValueError(method_name)        
         for e in self.emitters:
             for x in getattr(e, method_name)():                
                     yield x
-                        
-    def get(self, freq, label, year):
-        assert freq in "aqm"
-        gen = dict(a=self.emit_a, q=self.emit_q, m=self.emit_m)[freq]()                       
-        gen = filter(lambda x: x['label'].startswith(label), gen)
-        return filter(lambda x: x['year'] == year, gen)
                         
     def emit_a(self):
         return self.emit_by_method("emit_a")
@@ -461,47 +475,28 @@ class Datapoints():
     def emit_m(self):
         return self.emit_by_method("emit_m")
                 
-    def datapoints(self):
+    def get(self, freq, label, year):
+        assert freq in "aqm"
+        gen = dict(a=self.emit_a, q=self.emit_q, m=self.emit_m)[freq]()                       
+        gen = filter(lambda x: x['label'].startswith(label), gen)
+        return filter(lambda x: x['year'] == year, gen)
+    
+    def get_datapoints(self):
         return itertools.chain(self.emit_a(), self.emit_q(), self.emit_m())                
         
     def is_included(self, datapoint):
         """Return True if *datapoint* is in *self.datapoints*"""        
-        return datapoint in list(self.datapoints())
+        return datapoint in self.datapoints
 
-    def unique_varnames(self):
-        datapoints = itertools.chain(self.emit_a(), self.emit_q(), self.emit_m())
-        return sorted(list(set(p['varname'] for p in datapoints)))
-
-    @functools.lru_cache()
-    def unique_varheads(self):
-        vh = [x.split(LABEL_SEP)[0] for x in self.unique_varnames()]
-        return sorted(list(set(vh)))
-
-
-# list(x for x in d.emit_a() if x['year'] in (1999, 2014, 2016))
-VALID_DATAPOINTS =  [
+VALID_DATAPOINTS_SAMPLE =  [
 {'freq': 'a', 'label': 'GDP__bln_rub', 'value': 4823.0, 'year': 1999},
 {'freq': 'a', 'label': 'GDP__yoy', 'value': 106.4, 'year': 1999},
-        
 {'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL__bln_usd', 'value': 75.6, 'year': 1999},
-{'freq': 'a', 'label': 'IMPORT_GOODS_TOTAL__bln_usd', 'value': 39.5, 'year': 1999},
-        
-#{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_CONSOLIDATED__bln_rub', 'value': 26766.1, 'year': 2014},
-#{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_FEDERAL__bln_rub', 'value': 14496.9, 'year': 2014},
-#{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_SUBFEDERAL__bln_rub', 'value': 8905.7, 'year': 2014},
-
-#{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_CONSOLIDATED__bln_rub', 'value': 30888.8, 'year': 2016},
-#{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_FEDERAL__bln_rub', 'value': 14831.6, 'year': 2014},
-#{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_SUBFEDERAL__bln_rub', 'value': 9353.3, 'year': 2014},
-
-#{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_FEDERAL__bln_rub', 'value': -334.7, 'year': 2014},
-#{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_SUBFEDERAL__bln_rub', 'value': -447.6, 'year': 2014},
-
-{'freq': 'm', 'label': 'EXPORT_GOODS_TOTAL__bln_usd', 'month': 1, 'value': 4.5, 'year': 1999}
-
+{'freq': 'q', 'label': 'IMPORT_GOODS_TOTAL__bln_usd', 'qtr': 1, 'value': 9.1, 'year': 1999},
+{'freq': 'm', 'label': 'RETAIL_SALES_NONFOODS__rog', 'month': 12, 'value': 114.9, 'year': 1999}
 ]  
  
-def approve_csv(year=None, month=None, valid_datapoints=VALID_DATAPOINTS):
+def approve_csv(year, month, valid_datapoints=VALID_DATAPOINTS_SAMPLE):
     csv_path = cfg.get_path_csv(year,month) 
     print ("File:", csv_path)
     tables = get_all_valid_tables(csv_path)
@@ -515,28 +510,16 @@ def approve_csv(year=None, month=None, valid_datapoints=VALID_DATAPOINTS):
             msg3 = "\nFile: {}".format(csv_path)
             raise ValueError(msg1+msg2+msg3)
     print("Test values parsed OK.") 
-    
-    f = Frame(dps)
-    #calls to get dataframes, values not used
-    dfa = f.get_dfa()
-    dfq = f.get_dfq()
-    dfm = f.get_dfm()
-    # FIXME - check control values in dataframe
+    Frame(dps)
     print("Dataframes created OK.") 
     
 
 def approve_latest():
     approve_csv(year=None, month=None)
 
-
-def filled_dates(available_dates=cfg.DATES):
-    for date in reversed(available_dates): 
-        csv_path = cfg.get_path_csv(*date) 
-        if csv_path.exists() and csv_path.stat().st_size > 0:
-            yield date
-    
-def approve_all(valid_datapoints=VALID_DATAPOINTS):
-    for date in filled_dates():
+   
+def approve_all(valid_datapoints=VALID_DATAPOINTS_SAMPLE):
+    for date in cfg.filled_dates():
         approve_csv(*date, valid_datapoints)   
 
 def all_values():
@@ -546,9 +529,6 @@ def all_values():
          for x in t.__flush_datarow_values__():
              yield x
 
-#FIXME: maybe use just one library?
-from datetime import datetime
-from calendar import monthrange
 
 def get_end_of_monthdate(y, m):
     dm = datetime(year=y, month=m, day=monthrange(y, m)[1])
@@ -572,7 +552,7 @@ class Frame():
 
     def check_for_duplicates(self):
         for df in self._dfa, self._dfq, self._dfm:
-            #FIXME: change to raise Exception
+            #FIXME: change to raise Exception + check earlier?
             assert df[df.duplicated(keep=False)].empty  
                       
     # TO DISCUSS: get_df*() creates data every time we call them,
@@ -612,25 +592,19 @@ class Frame():
         self.get_dfm().to_csv(folder_path / 'dfm.csv')  
         print("Saved dataframes to", folder_path)
 
-#FIXME: use ths functions to catch duplicates early
-def duplicates(*items):
-    array = list(*items)
-    __occurences__ = {x:array.count(x) for x in array} 
-    return [k for k,v in __occurences__.items() if v>1]
-
 def dfs(year=None, month=None):
     """Shorthand for obtaining latest dataframes."""
     csv_path = cfg.get_path_csv(year, month)     
     tables = get_all_valid_tables(csv_path)
-    dps = Datapoints(tables)
-    fr = Frame(dps)    
-    dfa = fr.get_dfa()
-    dfq = fr.get_dfq()
-    dfm = fr.get_dfm()
+    dpoints = Datapoints(tables)
+    frame = Frame(dpoints )    
+    dfa = frame.get_dfa()
+    dfq = frame.get_dfq()
+    dfm = frame.get_dfm()
     return dfa, dfq, dfm
 
 def save_dfs(year=None, month=None):
-    #FIXME: maybe rename get_interim_csv_path()
+    #MAYBE: rename get_interim_csv_path()
     csv_path = cfg.get_path_csv(year, month)     
     tables = get_all_valid_tables(csv_path)
     dps = Datapoints(tables)
@@ -639,114 +613,119 @@ def save_dfs(year=None, month=None):
     frame.save(processed_folder)   
     
 def save_all_dfs():
-    for date in filled_dates():
-         save_dfs(*date)   
-    
+    for date in cfg.filled_dates():
+         save_dfs(*date)      
 
 
 if __name__=="__main__":    
     
     # check for latest date           
-    approve_csv()               
+    approve_latest()               
     
     # check all dates, runs slow (about 20 sec.) + may fail if dataset not complete      
     # approve_all()
+
+    # save dataframes to csv 
+    # save_all_dfs()
+    
     
     # interim to processed data cycle: (year, month) -> 3 dataframes
-    year, month = 2017, 4 #use None, None for latest values
+    #use None, None for latest values
+    year, month = 2017, 4 
     # source csv file
     csv_path = cfg.get_path_csv(year, month)  
     # break csv to tables with variable names
     tables = get_all_valid_tables(csv_path)
     # emit values from tables
-    dps = Datapoints(tables)    
+    dpoints = Datapoints(tables)    
     # convert stream values to pandas dataframes     
-    frame = Frame(datapoints=dps)
+    frame = Frame(datapoints=dpoints)
     # save dataframes to csv files  
-    folder = cfg.get_processed_folder(year, month)    
-    frame.save(folder)       
+    processed_folder = cfg.get_processed_folder(year, month)    
+    frame.save(processed_folder)       
+    # end of cycle 
     
-    # sample access - datapoints
-    assert list(dps.get("a", "GDP", 1999)) == [{'freq': 'a', 'label': 'GDP__bln_rub', 'value': 4823.0, 'year': 1999},
-                                               {'freq': 'a', 'label': 'GDP__yoy', 'value': 106.4, 'year': 1999}]
-    # sample access - dataframes
+   # sample access - dataframes
     dfa = frame.get_dfa()
     dfq = frame.get_dfq()
-    dfm = frame.get_dfm()    
-    assert dfa.loc[1999,].__str__() == """label
-EXPORT_GOODS_TOTAL__bln_usd                  75.6
-EXPORT_GOODS_TOTAL__yoy                     101.5
-GDP__bln_rub                               4823.0
-GDP__yoy                                    106.4
-GOV_EXPENSE_ACCUM_CONSOLIDATED__bln_rub    1258.0
-GOV_EXPENSE_ACCUM_FEDERAL__bln_rub          666.9
-GOV_EXPENSE_ACCUM_SUBFEDERAL__bln_rub       653.8
-GOV_REVENUE_ACCUM_CONSOLIDATED__bln_rub    1213.6
-GOV_REVENUE_ACCUM_FEDERAL__bln_rub          615.5
-GOV_REVENUE_ACCUM_SUBFEDERAL__bln_rub       660.8
-GOV_SURPLUS_ACCUM_FEDERAL__bln_rub          -51.4
-GOV_SURPLUS_ACCUM_SUBFEDERAL__bln_rub         7.0
-IMPORT_GOODS_TOTAL__bln_usd                  39.5
-IMPORT_GOODS_TOTAL__yoy                      68.1
-IND_PROD__yoy                                 NaN
-Name: 1999, dtype: float64"""
-
-    assert dfm.loc["2017-01",].transpose().__str__() == """time_index                               2017-01-31
-label                                              
-year                                         2017.0
-month                                           1.0
-EXPORT_GOODS_TOTAL__bln_usd                    25.1
-EXPORT_GOODS_TOTAL__rog                        80.3
-EXPORT_GOODS_TOTAL__yoy                       146.6
-GOV_EXPENSE_ACCUM_CONSOLIDATED__bln_rub      1682.9
-GOV_EXPENSE_ACCUM_FEDERAL__bln_rub           1230.5
-GOV_EXPENSE_ACCUM_SUBFEDERAL__bln_rub         452.2
-GOV_REVENUE_ACCUM_CONSOLIDATED__bln_rub      1978.8
-GOV_REVENUE_ACCUM_FEDERAL__bln_rub           1266.0
-GOV_REVENUE_ACCUM_SUBFEDERAL__bln_rub         493.7
-GOV_SURPLUS_ACCUM_FEDERAL__bln_rub             35.5
-GOV_SURPLUS_ACCUM_SUBFEDERAL__bln_rub          41.5
-IMPORT_GOODS_TOTAL__bln_usd                    13.7
-IMPORT_GOODS_TOTAL__rog                        70.2
-IMPORT_GOODS_TOTAL__yoy                       138.8
-IND_PROD__rog                                  76.2
-IND_PROD__yoy                                 102.3
-IND_PROD__ytd                                 102.3"""
-    
+    dfm = frame.get_dfm()        
     
     # TEST:
-    # all varnames from definition are read from csv file: 
-    # - use spec.varnames and tables varnames
-    # - exclude can be a part of specification 
-    # - may use .add_expected_label("") - more strict specification
+    # filter_value()
+    # mock_csv.py - write to temp file 
     
-    # CRITICAL PATH:  
-    # data frame for 1 variable and many vintages    
-    # analysis: check revisions of key series by date
-    #          -> use different folder for this analysis code
-    # Russian economy by this model
-    # detrendied data
+    # USAGE BANK:
+    # bank reserves vs oil    
+    # stress scenarios
+            
+    # REQUIREMENT: 
+    # pick new vars by requirement for features   
+    # var desciptions by section with latest data
+    # frontend + datalab
+    # detrended data
+    # revisions analysis
     # dataset organisation - what we want:
         # latest dataset
         # variable by vintages
         # seasonally adjusted series
-        # list of variables - maybe a spec can produce such list - by section?
+        # list of variables - maybe a spec can produce such list by section?
+        
+    # OUT OF SCOPE:
+    # read SEP + update KEP with SEP data  
     
     # TODO-PARSING:         
-    # save processed files for differents dates = save_all_dfs()
+    # test for duplicates early   
     # convert more existing parsing definitions to cfg.py    
-    # add more control datapoints    
+    # add more control datapoints        
     
     # TODO-FRONTEND:
-    # var descriptions in cfg.py
+    # var descriptions from cfg.py
     # generate frontend with sparlines           
     
     # NOT CRITICAL:
     # merge code from cell.py
-    # finilise Table-Emitter-Dataset dicsussion 
     # diff GOV_EXPENSE_ACCUM, GOV_REVENUE_ACCUM
-    
+    # src/data + src/features (on Githab local)
+"""
+src    
+│   ├── data           <- Scripts to download or generate data
+│   │   └── make_dataset.py
+│   │
+│   ├── features       <- Scripts to turn raw data into features for modeling
+│   │   └── build_features.py
+│   │
+│   ├── models         <- Scripts to train models and then use trained models to make
+│   │   │                 predictions
+│   │   ├── predict_model.py
+│   │   └── train_model.py
+│   │
+│   └── visualization
+"""        
     # FOR REVIEW:
+    # see done    
+    
+    #FIXME: generate Excel files and plots
+    #def to_excel(dfs, filename):
+    #    dfa, dfq, dfm = dfs
+    #    with pd.ExcelWriter(filename) as writer:
+    #        dfa.to_excel(writer, sheet_name='year')
+    #        dfq.to_excel(writer, sheet_name='quarter')
+    #        dfm.to_excel(writer, sheet_name='month')
+    #        #FIXME - write variable names to sheet, by section 
+    #
+    ##for file in [config.XLSX_FILE, config.XLS_FILE]:
+    ##   to_excel(file)
+    
+    #DONE:---------------------------------------------------------------------
+    # all varnames from definition are read from csv file: 
+    # - use spec.varnames and tables varnames
+    # - exclude can be a part of specification 
+    # - may use .add_expected_label("") - more strict specification
+    # data frame for 1 variable and many vintages    
+    # analysis: check revisions of key series by date
+    #          -> use different folder for this analysis code
+    # save processed files for differents dates = save_all_dfs()
+    # finilise Table-Emitter-Dataset dicsussion 
     # write csv files to 'processed' via to_csv()    
     # shuttiing warnings with SILENT flag    
     # pandas interface for Datapoints

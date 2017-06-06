@@ -36,6 +36,13 @@ DATES =     [                                 (2009, 4), (2009, 5), (2009, 6),
              
              (2017, 1), (2017, 2), (2017, 3), (2017, 4)]
 
+def filled_dates(available_dates=DATES):
+    for date in reversed(available_dates): 
+        csv_path = get_path_csv(*date) 
+        if csv_path.exists() and csv_path.stat().st_size > 0:
+            yield date
+
+
 # folder structure
 """
 \data
@@ -130,9 +137,9 @@ units = odict([('млрд.долларов', 'bln_usd'),
          ('период с начала отчетного года', 'ytd'),
          ('рублей / rubles', 'rub')])
 
-
-exclude = ["IMPORT_GOODS__TOTAL_yoy", "IMPORT__GOODS_TOTAL_rog",
-           "EXPORT_GOODS__TOTAL_yoy", "EXPORT__GOODS_TOTAL_rog"]
+#Some supplementary parsing results are ignored, e.g.
+# "IMPORT_GOODS__TOTAL_yoy", "IMPORT__GOODS_TOTAL_rog",
+# "EXPORT_GOODS__TOTAL_yoy", "EXPORT__GOODS_TOTAL_rog"
     
 class Definition():    
     def __init__(self, name):        
@@ -200,8 +207,8 @@ class Specification:
         listing = ", ".join(d.__str__() for d in self.additional)
         cnt = len(list(self.required()))
         return ("<Required variables: {}".format(cnt) +
-              "\n Parsing defintions: [{}]".format(listing) +
-              "\n Default definition: {}>".format(self.main.__str__())
+              "\nParsing defintions: {}".format(listing) +
+              "\nDefault definition: {}>".format(self.main.__str__())
               )
         
         
@@ -264,26 +271,23 @@ d = Definition("GOV_SURPLUS_ACCUM")
 d.add_reader("fiscal")
 d.add_marker("2.1.3. Превышение доходов над расходами"
            , "2.2. Сальдированный финансовый результат")
-d.add_header("Консолидированный бюджет", "GOV_SURPLUS_ACCUM_CONSOLIDATED")
 d.add_header("Федеральный бюджет", "GOV_SURPLUS_ACCUM_FEDERAL")
 d.add_header("Консолидированные бюджеты субъектов Российской Федерации", "GOV_SURPLUS_ACCUM_SUBFEDERAL")
-d.require("GOV_SURPLUS_ACCUM_CONSOLIDATED", "bln_rub") 
 d.require("GOV_SURPLUS_ACCUM_FEDERAL", "bln_rub")
 d.require("GOV_SURPLUS_ACCUM_SUBFEDERAL", "bln_rub")
 spec.append(d)
 
 d = Definition("RETAIL_SALES")
-d.add_marker("1.13. Оборот розничной торговли, млрд.рублей"
-           , "1.13.1. Оборот общественного питания, млрд.рублей")
-d.add_marker("1.12. Оборот розничной торговли, млрд.рублей"
-           , "1.12.1. Оборот общественного питания, млрд.рублей")
+d.add_marker("1.13. Оборот розничной торговли"
+           , "1.13.1. Оборот общественного питания")
+d.add_marker("1.12. Оборот розничной торговли"
+           , "1.12.1. Оборот общественного питания")
 d.add_header("Оборот розничной торговли", "RETAIL_SALES")
 d.add_header("пищевые продукты, включая напитки, и табачные изделия", "RETAIL_SALES_FOOD")
 d.add_header("непродовольственные товары", "RETAIL_SALES_NONFOODS")
 d.require("RETAIL_SALES", "bln_rub") 
 d.require("RETAIL_SALES_FOOD", "bln_rub")
 d.require("RETAIL_SALES_NONFOODS", "bln_rub")
-d.require("GOV_SURPLUS_ACCUM_SUBFEDERAL", "bln_rub")
 spec.append(d)
 
 #FIXME: does nothing yet
@@ -291,6 +295,6 @@ spec.validate()
 print(spec)
 
 if __name__ == "__main__":
-    #init_dirs(processed)
-    #init_dirs(rosstat_folder)
+    init_dirs(processed)
+    init_dirs(rosstat_folder)
     pass

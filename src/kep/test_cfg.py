@@ -9,4 +9,4 @@ def test_InterimDataLocation():
     assert mm >= 1 
     
 if __name__ == "__main__":
-    pytest.main(__file__)
+    pytest.main()
