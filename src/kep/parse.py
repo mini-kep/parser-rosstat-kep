@@ -715,12 +715,22 @@ IND_PROD__ytd                                 102.3"""
     
     
     # TEST:
-    # all varnames from definition are read from csv file
+    # all varnames from definition are read from csv file: 
+    # - use spec.varnames and tables varnames
+    # - exclude can be a part of specification 
+    # - may use .add_expected_label("") - more strict specification
     
-    # CRITICAL PATH:    
+    # CRITICAL PATH:  
+    # data frame for 1 variable and many vintages    
     # analysis: check revisions of key series by date
     #          -> use different folder for this analysis code
     # Russian economy by this model
+    # detrendied data
+    # dataset organisation - what we want:
+        # latest dataset
+        # variable by vintages
+        # seasonally adjusted series
+        # list of variables - maybe a spec can produce such list - by section?
     
     # TODO-PARSING:         
     # save processed files for differents dates = save_all_dfs()
