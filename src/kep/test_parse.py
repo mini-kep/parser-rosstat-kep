@@ -163,6 +163,23 @@ def test_end_to_end_latest_month():
     parse.approve_csv(year=None,month=None)
 
 # TESTING INDIVIDUAL FUNCTIONS
+
+def  test_to_float():
+    for x in [None, "", " ", "…", "-", "a", "ab", " - "]:
+        assert parse.to_float(x) == False
+    
+    assert parse.to_float('5.678,') == 5.678
+    assert parse.to_float('5.678,,') == 5.678
+    assert parse.to_float("5.6") == 5.6
+    assert parse.to_float("5,6") == 5.6
+    assert parse.to_float('57,0') == 57.0
+    assert parse.to_float("5,67") == 5.67
+    assert parse.to_float("5,67,") == 5.67
+    assert parse.to_float('123,0 4561)') == 123
+    assert parse.to_float('6762,31)2)') == 6762.3
+    assert parse.to_float('1734.4 1788.42)') == 1734.4
+
+
 def test_get_year():
     assert parse.get_year("19991)") == 1999
     

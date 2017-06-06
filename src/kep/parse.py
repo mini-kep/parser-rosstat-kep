@@ -381,6 +381,26 @@ def get_all_valid_tables(csv_path, spec=SPEC, units=UNITS):
     return [t for t in all_tables if t.is_defined()]
 
 
+COMMENT_CATCHER = re.compile("\D*([\d., ]*)\s*(?=\d\))")     
+def to_float(text, i=0):
+    i += 1
+    if i>5:
+        raise ValueError("Max recursion depth exceeded on '{}'".format(text))
+    if not text:
+        return False
+    text = text.replace(",", ".")  
+    try:
+         return float(text)
+    except ValueError:
+         if ")" in text: 
+             text = COMMENT_CATCHER.match(text).groups()[0]
+             return to_float(text, i)
+         if " " in text.strip():
+             return to_float(text.strip().split(" ")[0], i)
+         if text.endswith(".") or text.endswith(",") :  # 97.1.
+             return to_float(text[:-1], i)
+         return False
+     
 class RowReader():
     
     def __init__(self, label, splitter_func):
@@ -397,14 +417,14 @@ class RowReader():
             a_dict = dict(label=self.label,
                           freq='a',
                           year=year, 
-                          value=filter_value(a_value))
+                          value=to_float(a_value))
         if q_values:
             for t, val in enumerate(q_values):
                 if val:
                     d = dict(label=self.label,
                              freq='q',
                              year=year, 
-                             value=filter_value(val),
+                             value=to_float(val),
                              qtr=t+1)
                     q_dicts.append(d)
         
@@ -414,7 +434,7 @@ class RowReader():
                     d = dict(year=year,
                              label=self.label,
                              freq='m',
-                             value=filter_value(val),
+                             value=to_float(val),
                              month=t+1)
                     m_dicts.append(d)        
         return a_dict, q_dicts, m_dicts
@@ -620,14 +640,14 @@ def save_all_dfs():
 
 if __name__=="__main__":    
     
-    # check for latest date           
+    # check latest date data           
     approve_latest()               
     
     # check all dates, runs slow (about 20 sec.) + may fail if dataset not complete      
-    approve_all()
+    # approve_all()
 
     # save dataframes to csv 
-    # save_all_dfs()
+    save_all_dfs()
     
     
     # interim to processed data cycle: (year, month) -> 3 dataframes
