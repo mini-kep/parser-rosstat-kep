@@ -346,7 +346,8 @@ def has_required_labels(tables, pdef):
     labels_in_tables = [t.label for t in tables]
     labels_missed = [x for x in labels_required if x not in labels_in_tables]
     if labels_missed:
-        # import pdb; pdb.set_trace()
+        print(labels_missed)
+        import pdb; pdb.set_trace()
         raise ValueError(labels_missed)        
     # WONTFIX: not checking if *labels_missed* contains extra parsing results  
 
@@ -623,7 +624,7 @@ if __name__=="__main__":
     approve_latest()               
     
     # check all dates, runs slow (about 20 sec.) + may fail if dataset not complete      
-    # approve_all()
+    approve_all()
 
     # save dataframes to csv 
     # save_all_dfs()

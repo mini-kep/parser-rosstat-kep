@@ -2,8 +2,6 @@
 from pathlib import Path
 from collections import OrderedDict as odict   
 
-# TODO: non-csv output directory locations
-
 # csv file parameters
 ENC = 'utf8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
@@ -42,7 +40,7 @@ def filled_dates(available_dates=DATES):
         if csv_path.exists() and csv_path.stat().st_size > 0:
             yield date
 
-
+# TODO - change folder structure
 # folder structure
 """
 \data
@@ -283,6 +281,8 @@ d.add_marker("1.13. Оборот розничной торговли"
 d.add_marker("1.12. Оборот розничной торговли"
            , "1.12.1. Оборот общественного питания")
 d.add_header("Оборот розничной торговли", "RETAIL_SALES")
+d.add_header("продовольственные товары", "RETAIL_SALES_FOOD")
+d.add_header("пищевые продукты, включая напитки и табачные изделия", "RETAIL_SALES_FOOD")
 d.add_header("пищевые продукты, включая напитки, и табачные изделия", "RETAIL_SALES_FOOD")
 d.add_header("непродовольственные товары", "RETAIL_SALES_NONFOODS")
 d.require("RETAIL_SALES", "bln_rub") 
