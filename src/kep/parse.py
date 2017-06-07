@@ -391,12 +391,15 @@ def to_float(text, i=0):
     try:
          return float(text)
     except ValueError:
-         if " " in text.strip():
+         # note: order of checks  important
+         if " " in text.strip(): # get first value '542,0 5881)'
              return to_float(text.strip().split(" ")[0], i)
-         if ")" in text: 
-             text = COMMENT_CATCHER.match(text).groups()[0]
-             return to_float(text, i)
-         if text.endswith(".") or text.endswith(",") :  # 97.1.
+         if ")" in text: # catch '542,01)'
+            match_result = COMMENT_CATCHER.match(text)
+            if match_result:
+                  text = match_result.groups(0)
+                  return to_float(text, i)
+         if text.endswith(".") or text.endswith(",") :  # catch 97.1,
              return to_float(text[:-1], i)
          return False
      
