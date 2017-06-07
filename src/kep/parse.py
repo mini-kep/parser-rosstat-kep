@@ -387,6 +387,8 @@ def to_float(text, i=0):
         raise ValueError("Max recursion depth exceeded on '{}'".format(text))
     if not text:
         return False
+    if isinstance(text, tuple):
+        import pdb; pdb.set_trace()
     text = text.replace(",", ".")  
     try:
          return float(text)
@@ -397,7 +399,7 @@ def to_float(text, i=0):
          if ")" in text: # catch '542,01)'
             match_result = COMMENT_CATCHER.match(text)
             if match_result:
-                  text = match_result.groups(0)
+                  text = match_result.groups()[0]
                   return to_float(text, i)
          if text.endswith(".") or text.endswith(",") :  # catch 97.1,
              return to_float(text[:-1], i)
