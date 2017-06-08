@@ -77,7 +77,7 @@ class InterimDataLocation():
     
     def __init__(self, folder=rosstat_folder):
         self.folder = folder
-        self.dirs = self.listing(folder)
+        self.dirs = InterimDataLocation.listing(folder)
 
     @staticmethod
     def listing(_folder):
