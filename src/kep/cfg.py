@@ -206,7 +206,7 @@ class Specification:
         listing = ", ".join(d.__str__() for d in self.additional)
         cnt = len(list(self.required()))
         return ("<Required variables: {}".format(cnt) +
-              "\nParsing defintions: {}".format(listing) +
+              "\nParsing definitions: {}".format(listing) +
               "\nDefault definition: {}>".format(self.main.__str__())
               )
         

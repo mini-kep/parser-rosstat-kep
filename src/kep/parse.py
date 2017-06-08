@@ -340,7 +340,7 @@ def fix_multitable_units(tables):
            if not table.header.has_unknown_lines():
                table.header.varname = prev_table.header.varname
 
-def has_required_labels(tables, pdef):
+def check_required_labels(tables, pdef):
     labels_required = [make_label(*x) for x in pdef.required]
     labels_in_tables = [t.label for t in tables]
     labels_missed = [x for x in labels_required if x not in labels_in_tables]
@@ -354,7 +354,7 @@ def has_required_labels(tables, pdef):
 def get_tables(csv_dicts, pdef, units=UNITS):
     tables = [t.parse(pdef, units) for t in split_to_tables(csv_dicts)]
     fix_multitable_units(tables)
-    has_required_labels(tables, pdef)
+    check_required_labels(tables, pdef)
     return tables
 
 
@@ -481,6 +481,7 @@ class Datapoints():
     def __init__(self, tables):
         self.emitters = [Emitter(t) for t in tables if t.is_defined()]
         self.datapoints = list(self.get_datapoints())
+        self.emitters_dict = dict(a=self.emit_a, q=self.emit_q, m=self.emit_m)
         
     def emit_by_method(self, method_name):
         if method_name not in ["emit_a", "emit_q", "emit_m"]:
@@ -500,7 +501,7 @@ class Datapoints():
                 
     def get(self, freq, label, year):
         assert freq in "aqm"
-        gen = dict(a=self.emit_a, q=self.emit_q, m=self.emit_m)[freq]()                       
+        gen = self.emitters_dict[freq]()
         gen = filter(lambda x: x['label'].startswith(label), gen)
         return filter(lambda x: x['year'] == year, gen)
     
@@ -543,8 +544,8 @@ def approve_latest():
 
    
 def approve_all(valid_datapoints=VALID_DATAPOINTS_SAMPLE):
-    for date in cfg.filled_dates():
-        approve_csv(*date, valid_datapoints)   
+    for (year, month) in cfg.filled_dates():
+        approve_csv(year, month, valid_datapoints)
 
 def all_values():
     # emit all values for debugging to_float()
@@ -565,7 +566,7 @@ def get_end_of_quarterdate(y, q):
 
 
 class Frame():
-    """Accept datapoints and emit pandas dataframeы"""
+    """Accept datapoints and emit pandas dataframes"""
     
     def __init__(self, datapoints):  
         assert isinstance(datapoints, Datapoints) 
