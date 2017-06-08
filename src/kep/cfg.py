@@ -79,7 +79,8 @@ class InterimDataLocation():
         self.folder = folder
         self.dirs = self.listing(folder)
 
-    def listing(self, _folder):
+    @staticmethod
+    def listing(_folder):
         return [f.name for f in _folder.iterdir() if f.is_dir()]
     
     def max_year(self):
