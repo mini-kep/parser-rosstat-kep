@@ -203,7 +203,7 @@ def split_to_tables(csv_dicts):
 VALID_ROW_LENGTHS = list(splitter.ROW_LENGTH_TO_FUNC_MAPPER.keys())
 
 class Table(): 
-   """Holds headers textlines and datarows/"""
+    """Holds headers textlines and datarows"""
     def __init__(self, headers, datarows):
         # WONTFIX: naming deadend with three headers in one line 
         self.header = Header(headers)
