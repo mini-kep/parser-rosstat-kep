@@ -1,6 +1,6 @@
 """Parse tables from raw CSV file using parsing defintion.
 
-   Parsring defintion contains:
+   Parsing defintion contains:
    -  parsing boundaries - start and end lines of CSV file segment
    -  link between table headers ("Объем ВВП") and variable names ("GDP")
    -  units of measurement dictionary ("мдрд.руб." -> "bln_rub")
@@ -26,7 +26,6 @@ from calendar import monthrange
 
 
 import splitter
-
 import cfg
 from cfg import spec as SPEC
 from cfg import units as UNITS
@@ -74,7 +73,7 @@ def read_csv(path):
     return filter(lambda x: x is not None, csv_dicts) 
 
 
-# DictStream() - holder for csv rows
+# DictStream class is holder for csv rows
 def is_matched(pat, textline):
     # kill " in both strings
     pat = pat.replace('"','') 
@@ -139,7 +138,7 @@ class DictStream():
         return segment
 
 
-# break csv segment into tables
+# split_to_tables(csv_dicts) breaks csv segment into Table instances
 
 # Regex: 
 #   (\d{4})    4 digits
@@ -198,15 +197,15 @@ def split_to_tables(csv_dicts):
     if len(headers) > 0 and len(datarows) > 0:
         yield Table(headers, datarows)
 
-# hold headres and datarows n table
+# 
 
 # [4, 5, 12, 13, 17]
 VALID_ROW_LENGTHS = list(splitter.ROW_LENGTH_TO_FUNC_MAPPER.keys())
 
-class Table():    
+class Table(): 
+   """Holds headers textlines and datarows/"""
     def __init__(self, headers, datarows):
-        # WONTFIX: naming deadend with three headers ;)
-        #    NOTE: header lines accessible via table.header.textrows
+        # WONTFIX: naming deadend with three headers in one line 
         self.header = Header(headers)
         self.datarows = datarows
         self.coln = max([len(d['data']) for d in self.datarows])
@@ -236,9 +235,10 @@ class Table():
             self.splitter_func = splitter.get_splitter(self.coln) 
     
     def __flush_datarow_values__(self):
-        for row in self.datarows:
+         """Used in testing to get all values from datarows"""
+         for row in self.datarows:
             for x in row['data']:
-                yield x
+               yield x
     
     @property
     def label(self): 
@@ -260,8 +260,8 @@ class Table():
             return len(self.a) + len(self.q) + len(self.m)
         except:
             return 0
-        
-    def __str__(self):
+         
+def __str__(self):
         msg = "\nTable with {} header(s) and {} datarow(s)".format(len(self.textrows),
                                                                  self.nrows)
         if self.header:
@@ -275,8 +275,8 @@ class Table():
                                    self.npoints,
                                    self.nrows)     
 
-# hold and process info in table header
 class Header():
+   """Table header, capable to extract variable label from header text rows."""
     
     KNOWN = "+"
     UNKNOWN = "-"
@@ -332,7 +332,7 @@ def get_unit(line, units):
     return None
 
 def fix_multitable_units(tables):
-    """For tables without _varname_ copy _varname_ from previous table.
+    """For tables without *header.varname* copy *header.varname* from previous table.
        Apply to tables that do not have any unknown rows.
     """
     for prev_table, table in zip(tables, tables[1:]):
@@ -348,7 +348,7 @@ def has_required_labels(tables, pdef):
         print(labels_missed)
         import pdb; pdb.set_trace()
         raise ValueError(labels_missed)        
-    # WONTFIX: not checking if *labels_missed* contains extra parsing results  
+    # WONTFIX: not checking if *labels_missed* contains extra parsing results ("_rog", "_yoy", etc)
 
             
 def get_tables(csv_dicts, pdef, units=UNITS):
@@ -511,6 +511,7 @@ class Datapoints():
         """Return True if *datapoint* is in *self.datapoints*"""        
         return datapoint in self.datapoints
 
+# short check control values
 VALID_DATAPOINTS_SAMPLE =  [
 {'freq': 'a', 'label': 'GDP__bln_rub', 'value': 4823.0, 'year': 1999},
 {'freq': 'a', 'label': 'GDP__yoy', 'value': 106.4, 'year': 1999},
@@ -529,9 +530,9 @@ def approve_csv(year, month, valid_datapoints=VALID_DATAPOINTS_SAMPLE):
             pass
         else: 
             msg1 = "Not found in dataset: {}".format(x)
-            msg2 = "\nDate: {}, {}".format(year, month)
-            msg3 = "\nFile: {}".format(csv_path)
-            raise ValueError(msg1+msg2+msg3)
+            msg2 = "Date: {}, {}".format(year, month)
+            msg3 = "File: {}".format(csv_path)
+            raise ValueError("\n".join([msg1+msg2+msg3]))
     print("Test values parsed OK.") 
     Frame(dps)
     print("Dataframes created OK.") 
@@ -546,7 +547,7 @@ def approve_all(valid_datapoints=VALID_DATAPOINTS_SAMPLE):
         approve_csv(*date, valid_datapoints)   
 
 def all_values():
-    # emit all values for debugging
+    # emit all values for debugging to_float()
     csv_path = cfg.get_path_csv()
     for t in get_all_tables(csv_path):
          for x in t.__flush_datarow_values__():
@@ -616,7 +617,7 @@ class Frame():
         print("Saved dataframes to", folder_path)
 
 def dfs(year=None, month=None):
-    """Shorthand for obtaining latest dataframes."""
+    """Shorthand for obtaining dataframes."""
     csv_path = cfg.get_path_csv(year, month)     
     tables = get_all_valid_tables(csv_path)
     dpoints = Datapoints(tables)
@@ -640,17 +641,15 @@ def save_all_dfs():
          save_dfs(*date)      
 
 
-if __name__=="__main__":    
-    
+if __name__=="__main__":        
     # check latest date data           
-    approve_latest()               
+    # approve_latest()               
     
     # check all dates, runs slow (about 20 sec.) + may fail if dataset not complete      
     # approve_all()
 
     # save dataframes to csv 
-    # save_all_dfs()
-    
+    # save_all_dfs()    
     
     # interim to processed data cycle: (year, month) -> 3 dataframes
     #use None, None for latest values
@@ -673,72 +672,7 @@ if __name__=="__main__":
     dfq = frame.get_dfq()
     dfm = frame.get_dfm()        
     
-    # TEST:
-    # filter_value()
-    # mock_csv.py - write to temp file 
-    
-    # USAGE BANK:
-    # bank reserves vs oil    
-    # stress scenarios
-            
-    # REQUIREMENT: 
-    # pick new vars by requirement for features   
-    # var desciptions by section with latest data
-    # frontend + datalab
-    # detrended data
-    # revisions analysis
-    # dataset organisation - what we want:
-        # latest dataset
-        # variable by vintages
-        # seasonally adjusted series
-        # list of variables - maybe a spec can produce such list by section?
-        
-    # OUT OF SCOPE:
-    # read SEP + update KEP with SEP data  
-    
-    # TODO-PARSING:         
-    # test for duplicates early   
-    # convert more existing parsing definitions to cfg.py    
-    # add more control datapoints        
-    
-    # TODO-FRONTEND:
-    # var descriptions from cfg.py
-    # generate frontend with sparlines           
-    
-    # NOT CRITICAL:
-    # merge code from cell.py
-    # diff GOV_EXPENSE_ACCUM, GOV_REVENUE_ACCUM
-    # src/data + src/features (on Githab local)
-"""
-src    
-│   ├── data           <- Scripts to download or generate data
-│   │   └── make_dataset.py
-│   │
-│   ├── features       <- Scripts to turn raw data into features for modeling
-│   │   └── build_features.py
-│   │
-│   ├── models         <- Scripts to train models and then use trained models to make
-│   │   │                 predictions
-│   │   ├── predict_model.py
-│   │   └── train_model.py
-│   │
-│   └── visualization
-"""        
-    # FOR REVIEW:
-    # see done    
-    
-    #FIXME: generate Excel files and plots
-    #def to_excel(dfs, filename):
-    #    dfa, dfq, dfm = dfs
-    #    with pd.ExcelWriter(filename) as writer:
-    #        dfa.to_excel(writer, sheet_name='year')
-    #        dfq.to_excel(writer, sheet_name='quarter')
-    #        dfm.to_excel(writer, sheet_name='month')
-    #        #FIXME - write variable names to sheet, by section 
-    #
-    ##for file in [config.XLSX_FILE, config.XLS_FILE]:
-    ##   to_excel(file)
-    
+
     #DONE:---------------------------------------------------------------------
     # all varnames from definition are read from csv file: 
     # - use spec.varnames and tables varnames
