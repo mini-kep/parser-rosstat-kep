@@ -261,7 +261,7 @@ class Table():
         except:
             return 0
          
-def __str__(self):
+    def __str__(self):
         msg = "\nTable with {} header(s) and {} datarow(s)".format(len(self.textrows),
                                                                  self.nrows)
         if self.header:
