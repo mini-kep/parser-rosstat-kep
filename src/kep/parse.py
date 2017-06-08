@@ -276,7 +276,7 @@ def __str__(self):
                                    self.nrows)     
 
 class Header():
-   """Table header, capable to extract variable label from header text rows."""
+    """Table header, capable to extract variable label from header text rows."""
     
     KNOWN = "+"
     UNKNOWN = "-"
