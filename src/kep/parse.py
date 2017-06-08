@@ -36,6 +36,50 @@ CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 LABEL_SEP = "__"
 SILENT = True
 
+#checks and warnings
+class Check:
+    """Assertions on some arguements"""
+            
+    def table_defined(table):        
+        if not table.is_defined():
+            txt = table.__str__()
+            if not table.label:
+                raise ValueError("Label not defined for:\n" + txt)
+            if not table.splitter_func:
+                raise ValueError("Splitter func not defined for:\n" + txt)
+
+    def allowed_method_name(method_name):
+        if method_name not in ["emit_a", "emit_q", "emit_m"]:
+            raise ValueError(method_name) 
+
+    def no_duplicates(df):
+        #WONTFIX: change to raise Exception 
+        assert df[df.duplicated(keep=False)].empty  
+                      
+            
+
+class IssueWarning():
+    
+    def __init__(self):
+        self.echo()
+        
+    def echo(self, *args, silent=SILENT):
+        if not silent:
+            print(*args)
+            
+    def bad_row_length(self, table):
+        """Trying to parse a wierd table without <year> <values> structure. 
+           Severity: minor 
+           Reason: such tables are currently out of scope of parsing defintion."""
+        self.echo("WARNING: unexpected row length {}".format(table.coln))
+        self.echo(table)
+    
+    def unit_not_found(self, line):    
+        """Trying to extract unit of measurement from a header without it.
+           Severity: minor
+           Reason: usually a proper unit is found in next few header textlines."""
+        self.echo("WARNING: unit not found in  <" + line + ">")
+
 # label handling 
 def make_label(vn, unit, sep=LABEL_SEP):
     return vn + sep + unit
@@ -72,25 +116,30 @@ def read_csv(path):
     csv_dicts = map(to_dict, raw)    
     return filter(lambda x: x is not None, csv_dicts) 
 
-
-# DictStream class is holder for csv rows
-def is_matched(pat, textline):
-    # kill " in both strings
-    pat = pat.replace('"','') 
-    textline = textline.replace('"','')
-    if pat:
-        return textline.startswith(pat)
-    else:
-        return False 
+# handling CSV stream
 
 class DictStream():    
+    """Holder for CSV rows"""
     def __init__(self, csv_dicts):
         # consume *csv_dicts*, maybe it is a generator
         self.csv_dicts = [x for x in csv_dicts]
     
+    @staticmethod
+    def is_matched(pat, textline):
+        """Return True if *textline* starts with *pat*
+           Ignores \" 
+        """
+        # kill " in both strings
+        pat = pat.replace('"','') 
+        textline = textline.replace('"','')
+        if pat:
+            return textline.startswith(pat)
+        else:
+            return False     
+    
     def is_found(self, pat):
         for csv_dict in self.csv_dicts:
-            if is_matched(pat, csv_dict['head']):
+            if self.is_matched(pat, csv_dict['head']):
                 return True
         return False
           
@@ -125,9 +174,9 @@ class DictStream():
         while i < len(self.csv_dicts):
             row = self.csv_dicts[i]
             line = row['head']
-            if is_matched(start, line):
+            if self.is_matched(start, line):
                 we_are_in_segment = True
-            if is_matched(end, line):
+            if self.is_matched(end, line):
                 break
             if we_are_in_segment:
                 segment.append(row)
@@ -138,27 +187,22 @@ class DictStream():
         return segment
 
 
-# split_to_tables(csv_dicts) breaks csv segment into Table instances
-
-# Regex: 
-#   (\d{4})    4 digits
-#   \d+\)      comment like "1)"
-#   (\d+\))*   any number of comments 
-#   \s*        any number of whitespaces
-YEAR_CATCHER = re.compile('(\d{4})(\d+\))*\s*')
-
+# functions for split_to_tables()
+YEAR_CATCHER = re.compile('\s*(\d{4}).*')
+    
 def get_year(string: str, rx=YEAR_CATCHER):
     """Extract year from string *string*. 
        Return None if year is not valid or not in plausible range."""
-    match = re.match(rx, string)
+    match = re.match('(\d{4})', string)
     if match:
         year = int(match.group(1))
         if year >= 1991:
             return year
     return None
 
-def is_year(s: str) -> bool:
-    return get_year(s) is not None
+
+def is_year(string: str) -> bool:
+    return get_year(string) is not None
 
 
 def is_data_row(row):
@@ -179,6 +223,7 @@ class State(Enum):
     UNKNOWN = 3    
     
 def split_to_tables(csv_dicts):
+    """Yield Table() instances from *csv_dicts* stream."""
     datarows = []
     headers = []
     state = State.INIT
@@ -197,30 +242,32 @@ def split_to_tables(csv_dicts):
     if len(headers) > 0 and len(datarows) > 0:
         yield Table(headers, datarows)
 
-# 
 
-# [4, 5, 12, 13, 17]
-VALID_ROW_LENGTHS = list(splitter.ROW_LENGTH_TO_FUNC_MAPPER.keys())
-
+    
+def repr_datarows(datarows):        
+    def row_to_str(row):
+       return "{} | {}".format(row['head'], ' '.join(row['data']))
+    break_line = '-'*30        
+    txt =[break_line, 
+          '\n'.join(row_to_str(row) for row in datarows),
+          break_line]
+    return "\n".join(txt)
+        
+       
 class Table(): 
     """Holds headers textlines and datarows"""
+    
+     # [4, 5, 12, 13, 17]
+    VALID_ROW_LENGTHS = list(splitter.ROW_LENGTH_TO_FUNC_MAPPER.keys())
+
     def __init__(self, headers, datarows):
         # WONTFIX: naming deadend with three headers in one line 
         self.header = Header(headers)
         self.datarows = datarows
         self.coln = max([len(d['data']) for d in self.datarows])
-        self.validate_coln()
-        
-    def validate_coln(self, silent = SILENT):             
-        if self.coln not in VALID_ROW_LENGTHS:
-            for row in self.datarows:
-                if len(row) not in VALID_ROW_LENGTHS:
-                    if not silent:
-                        print("\nWARNING: "
-                                "unexpected row length {}".format(self.coln))
-                        print(self.header)   
-                        print(row['data'])      
-                
+        if self.coln not in self.VALID_ROW_LENGTHS:
+            IssueWarning().bad_row_length(self)
+                        
     def parse(self, pdef, units):        
         self.header.set_varname(pdef, units)       
         self.header.set_unit(units)
@@ -237,7 +284,7 @@ class Table():
     def __flush_datarow_values__(self):
          """Used in testing to get all values from datarows"""
          for row in self.datarows:
-            for x in row['data']:
+            for x in row:
                yield x
     
     @property
@@ -247,36 +294,22 @@ class Table():
         if vn and u:
             return make_label(vn, u)        
 
+
     def is_defined(self):
-        return self.label and self.splitter_func 
+        return self.label and self.splitter_func     
     
-    @property    
-    def nrows(self):
-        return len(self.datarows)
+    def __str__(self):        
+        return "\n".join(["Table label: {}".format(self.label), 
+                          "columns: {}".format(self.coln),
+                          self.header.__str__(), 
+                          repr_datarows(self.datarows)])
     
-    @property
-    def npoints(self):
-        try:
-            return len(self.a) + len(self.q) + len(self.m)
-        except:
-            return 0
-         
-    def __str__(self):
-        msg = "\nTable with {} header(s) and {} datarow(s)".format(len(self.textrows),
-                                                                 self.nrows)
-        if self.header:
-              msg += "\n"+self.header.__str__() 
-        if self.label:                               
-              msg += "\nlabel: {}".format(self.label) 
-        return msg 
-        
     def __repr__(self):
-        return "{} ({}/{})".format(self.label, 
-                                   self.npoints,
-                                   self.nrows)     
+        return "Table {} of {} datarows".format(self.label,
+                                                len(self.datarows))     
 
 class Header():
-    """Table header, capable to extract variable label from header text rows."""
+    """Table header, capable to extract variable label from header textrows."""
     
     KNOWN = "+"
     UNKNOWN = "-"
@@ -290,7 +323,7 @@ class Header():
         self.processed = odict((line, self.UNKNOWN) for line in self.textlines)
         
     
-    def set_varname(self, pdef, units, silent=SILENT):        
+    def set_varname(self, pdef, units):        
         varname_dict = pdef.headers
         known_headers = varname_dict.keys()
         for line in self.textlines:
@@ -300,11 +333,12 @@ class Header():
                     just_one += 1
                     self.processed[line] = self.KNOWN
                     self.varname = varname_dict[header]
-                    self.unit = get_unit(line, units)
-                    if self.unit is None:
-                        if not silent:
-                            print("WARNING: unit not found in  <" + line + ">")
-            # something from known_headers must be found only once         
+                    unit = get_unit(line, units)
+                    if unit:
+                        self.unit = unit
+                    else:    
+                        IssueWarning().unit_not_found(line)
+            # anything from known_headers must be found only once         
             assert just_one <= 1
                     
     def set_unit(self, units):
@@ -322,8 +356,8 @@ class Header():
     
     def __str__(self):
         show = [v+" <"+k+">" for k,v in self.processed.items()] 
-        return ("\n".join(show) +
-                "\nvarname: {}, unit: {}".format(self.varname, self.unit))
+        return ("varname: {}, unit: {}\n".format(self.varname, self.unit)
+                + "\n".join(show))
                
 def get_unit(line, units):
     for k in units.keys():
@@ -349,7 +383,6 @@ def check_required_labels(tables, pdef):
         import pdb; pdb.set_trace()
         raise ValueError(labels_missed)        
     # WONTFIX: not checking if *labels_missed* contains extra parsing results ("_rog", "_yoy", etc)
-
             
 def get_tables(csv_dicts, pdef, units=UNITS):
     tables = [t.parse(pdef, units) for t in split_to_tables(csv_dicts)]
@@ -391,7 +424,7 @@ def to_float(text, i=0):
     try:
          return float(text)
     except ValueError:
-         # note: order of checks  important
+         # note: order of checks important
          if " " in text.strip(): # get first value '542,0 5881)'
              return to_float(text.strip().split(" ")[0], i)
          if ")" in text: # catch '542,01)'
@@ -441,17 +474,13 @@ class RowReader():
                     m_dicts.append(d)        
         return a_dict, q_dicts, m_dicts
 
+
 class Emitter():
     """Emitter extracts and holds annual, quarterly and monthly values
        for a given Table with defined label and splitter_func."""
         
     def __init__(self, table):
-        if not table.label:
-            raise ValueError("Table label not defined, cannot create Emitter()"
-                             "for " + table.__str__())
-        if not table.splitter_func:
-            raise ValueError("Table splitter not defined, cannot create Emitter()"
-                             "for " + table.__str__())        
+        Check.table_defined(table)
         self.a = []
         self.q = []
         self.m = []        
@@ -484,8 +513,7 @@ class Datapoints():
         self.emitters_dict = dict(a=self.emit_a, q=self.emit_q, m=self.emit_m)
         
     def emit_by_method(self, method_name):
-        if method_name not in ["emit_a", "emit_q", "emit_m"]:
-            raise ValueError(method_name)        
+        Check.allowed_method_name(method_name)
         for e in self.emitters:
             for x in getattr(e, method_name)():                
                     yield x
@@ -538,23 +566,7 @@ def approve_csv(year, month, valid_datapoints=VALID_DATAPOINTS_SAMPLE):
     Frame(dps)
     print("Dataframes created OK.") 
     
-
-def approve_latest():
-    approve_csv(year=None, month=None)
-
-   
-def approve_all(valid_datapoints=VALID_DATAPOINTS_SAMPLE):
-    for (year, month) in cfg.filled_dates():
-        approve_csv(year, month, valid_datapoints)
-
-def all_values():
-    # emit all values for debugging to_float()
-    csv_path = cfg.get_path_csv()
-    for t in get_all_tables(csv_path):
-         for x in t.__flush_datarow_values__():
-             yield x
-
-
+#dataframe dates handling    
 def get_end_of_monthdate(y, m):
     dm = datetime(year=y, month=m, day=monthrange(y, m)[1])
     return pd.Timestamp(dm) 
@@ -570,90 +582,106 @@ class Frame():
     
     def __init__(self, datapoints):  
         assert isinstance(datapoints, Datapoints) 
-        self._dfa = pd.DataFrame(datapoints.emit_a())
-        self._dfq = pd.DataFrame(datapoints.emit_q())
-        self._dfm = pd.DataFrame(datapoints.emit_m())
-        self.check_for_duplicates()
-
-    def check_for_duplicates(self):
-        for df in self._dfa, self._dfq, self._dfm:
-            #FIXME: change to raise Exception + check earlier?
-            assert df[df.duplicated(keep=False)].empty  
-                      
-    # TO DISCUSS: get_df*() creates data every time we call them,
-    #             may create self.dfa, etc and return.
+        dfa = pd.DataFrame(datapoints.emit_a())
+        dfq = pd.DataFrame(datapoints.emit_q())
+        dfm = pd.DataFrame(datapoints.emit_m())       
+        for df in dfa, dfq, dfm:
+            Check.no_duplicates(df)
+        self.dfa = self.reshape_a(dfa) 
+        self.dfq = self.reshape_q(dfq) 
+        self.dfm = self.reshape_m(dfm) 
+        
+    @staticmethod
+    def reshape_a(dfa):
+        """Returns pandas dataframe with ANNUAL data."""
+        return dfa.pivot(columns='label', values='value', index='year')        
     
-    def get_dfa(self):
-        """Returns pandas dataframe with ANNUAL data."""                
-        return self._dfa.pivot(columns='label', values='value', index='year')        
-
-    def get_dfq(self):
+    @staticmethod
+    def reshape_q(dfq):
         """Returns pandas dataframe with QUARTERLY data."""
-        dfq = self._dfq
-        # add time index
         dfq["time_index"] = dfq.apply(lambda x: get_end_of_quarterdate(x['year'], x['qtr']), axis=1)
-        # reshape
         dfq = dfq.pivot(columns='label', values='value', index='time_index')
-        # add extra columns
         dfq.insert(0, "year", dfq.index.year)    
         dfq.insert(1, "qtr", dfq.index.quarter)
         return dfq
 
-    def get_dfm(self):
+    @staticmethod
+    def reshape_m(dfm):
         """Returns pandas dataframe with MONTHLY data."""
-        dfm = self._dfm
-        # add time index
         dfm["time_index"] = dfm.apply(lambda x: get_end_of_monthdate(x['year'], x['month']), axis=1)
-        # reshape
         dfm = dfm.pivot(columns='label', values='value', index='time_index')
-        # add extra columns
         dfm.insert(0, "year", dfm.index.year)
         dfm.insert(1, "month", dfm.index.month)
         return dfm     
      
     def save(self, folder_path):                
-        self.get_dfa().to_csv(folder_path / 'dfa.csv')
-        self.get_dfq().to_csv(folder_path / 'dfq.csv')
-        self.get_dfm().to_csv(folder_path / 'dfm.csv')  
+        self.dfa.to_csv(folder_path / 'dfa.csv')
+        self.dfq.to_csv(folder_path / 'dfq.csv')
+        self.dfm.to_csv(folder_path / 'dfm.csv')  
         print("Saved dataframes to", folder_path)
 
-def dfs(year=None, month=None):
-    """Shorthand for obtaining dataframes."""
+
+def get_frame(year=None, month=None):
     csv_path = cfg.get_path_csv(year, month)     
     tables = get_all_valid_tables(csv_path)
     dpoints = Datapoints(tables)
-    frame = Frame(dpoints )    
-    dfa = frame.get_dfa()
-    dfq = frame.get_dfq()
-    dfm = frame.get_dfm()
-    return dfa, dfq, dfm
+    return Frame(dpoints)
+
+    
+def dfs(year=None, month=None):
+    """Shorthand for obtaining dataframes."""
+    frame = get_frame(year, month)  
+    return frame.dfa, frame.dfq, frame.dfm
+
 
 def save_dfs(year=None, month=None):
-    #MAYBE: rename get_interim_csv_path()
-    csv_path = cfg.get_path_csv(year, month)     
-    tables = get_all_valid_tables(csv_path)
-    dps = Datapoints(tables)
-    frame = Frame(dps)
+    """Save dataframes to CSVs.""" 
+    frame = get_frame(year, month) 
     processed_folder = cfg.get_processed_folder(year, month)
-    frame.save(processed_folder)   
+    frame.save(folder_path=processed_folder)   
+    
     
 def save_all_dfs():
-    for date in cfg.filled_dates():
-         save_dfs(*date)      
+    for (year, month) in cfg.filled_dates():
+         save_dfs(year, month)      
 
 
-if __name__=="__main__":        
-    # check latest date data           
-    # approve_latest()               
+def approve_latest():
+    """Quick check for algorithm on latest available data."""
+    approve_csv(year=None, month=None)
+
+   
+def approve_all(valid_datapoints=VALID_DATAPOINTS_SAMPLE):
+    """Check all dates, runs slow (about 20 sec.) 
+       May fail if dataset not complete.      
+    """
+    for (year, month) in cfg.filled_dates():
+        approve_csv(year, month, valid_datapoints)
+
+
+def all_values():
+    # emit all values for debugging to_float()
+    csv_path = cfg.get_path_csv()
+    for t in get_all_tables(csv_path):
+         for x in t.__flush_datarow_values__():
+             yield x
+             
+def all_heads():   
+     # emit all heads for debugging get_year()
+    csv_path = cfg.get_path_csv()          
+    csv_dicts = read_csv(csv_path)
+    for d in csv_dicts:
+      yield d['head']              
+
+
+def __for_testing__():
+    """Holder of boilerplate code for __main__"""
     
-    # check all dates, runs slow (about 20 sec.) + may fail if dataset not complete      
+    # approve_latest()               
     # approve_all()
-
-    # save dataframes to csv 
     # save_all_dfs()    
     
     # interim to processed data cycle: (year, month) -> 3 dataframes
-    #use None, None for latest values
     year, month = 2017, 4 
     # source csv file
     csv_path = cfg.get_path_csv(year, month)  
@@ -667,23 +695,8 @@ if __name__=="__main__":
     processed_folder = cfg.get_processed_folder(year, month)    
     frame.save(processed_folder)       
     # end of cycle 
-    
-   # sample access - dataframes
-    dfa = frame.get_dfa()
-    dfq = frame.get_dfq()
-    dfm = frame.get_dfm()        
-    
 
-    #DONE:---------------------------------------------------------------------
-    # all varnames from definition are read from csv file: 
-    # - use spec.varnames and tables varnames
-    # - exclude can be a part of specification 
-    # - may use .add_expected_label("") - more strict specification
-    # data frame for 1 variable and many vintages    
-    # analysis: check revisions of key series by date
-    #          -> use different folder for this analysis code
-    # save processed files for differents dates = save_all_dfs()
-    # finilise Table-Emitter-Dataset dicsussion 
-    # write csv files to 'processed' via to_csv()    
-    # shuttiing warnings with SILENT flag    
-    # pandas interface for Datapoints
+if __name__=="__main__":        
+    approve_latest()               
+    # approve_all()
+    # save_all_dfs()  

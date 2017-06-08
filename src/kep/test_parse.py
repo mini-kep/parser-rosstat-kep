@@ -13,88 +13,36 @@ tables = parse.get_all_valid_tables(csv_path)
 dpoints = parse.Datapoints(tables)    
 # convert stream values to pandas dataframes     
 frame = parse.Frame(datapoints=dpoints)
-# sample access - dataframes
-dfa = frame.get_dfa()
-dfq = frame.get_dfq()
-dfm = frame.get_dfm() 
 
-def test_Datapoints_is_included():
-    test_datapoints = [            
-        {'freq': 'm', 'label': 'EXPORT_GOODS_TOTAL__bln_usd', 'month': 1, 'value': 4.5, 'year': 1999}, 
-        {'freq': 'a',
-  'label': 'EXPORT_GOODS_TOTAL__bln_usd',
-  'value': 75.6,
-  'year': 1999},
- {'freq': 'a',
-  'label': 'EXPORT_GOODS_TOTAL__yoy',
-  'value': 101.5,
-  'year': 1999},
- {'freq': 'a',
-  'label': 'IMPORT_GOODS_TOTAL__bln_usd',
-  'value': 39.5,
-  'year': 1999},
- {'freq': 'a',
-  'label': 'IMPORT_GOODS_TOTAL__yoy',
-  'value': 68.1,
-  'year': 1999},
- {'freq': 'a',
-  'label': 'GOV_REVENUE_ACCUM_CONSOLIDATED__bln_rub',
-  'value': 1213.6,
-  'year': 1999},
- {'freq': 'a',
-  'label': 'GOV_REVENUE_ACCUM_FEDERAL__bln_rub',
-  'value': 615.5,
-  'year': 1999},
- {'freq': 'a',
-  'label': 'GOV_REVENUE_ACCUM_SUBFEDERAL__bln_rub',
-  'value': 660.8,
-  'year': 1999},
- {'freq': 'a',
-  'label': 'GOV_EXPENSE_ACCUM_CONSOLIDATED__bln_rub',
-  'value': 1258.0,
-  'year': 1999},
- {'freq': 'a',
-  'label': 'GOV_EXPENSE_ACCUM_FEDERAL__bln_rub',
-  'value': 666.9,
-  'year': 1999},
- {'freq': 'a',
-  'label': 'GOV_EXPENSE_ACCUM_SUBFEDERAL__bln_rub',
-  'value': 653.8,
-  'year': 1999},
- {'freq': 'a',
-  'label': 'GOV_SURPLUS_ACCUM_FEDERAL__bln_rub',
-  'value': -51.4,
-  'year': 1999},
- {'freq': 'a',
-  'label': 'GOV_SURPLUS_ACCUM_SUBFEDERAL__bln_rub',
-  'value': 7.0,
-  'year': 1999},
- {'freq': 'a',
-  'label': 'RETAIL_SALES__bln_rub',
-  'value': 1797.4,
-  'year': 1999},
- {'freq': 'a', 'label': 'RETAIL_SALES__yoy', 'value': 94.2, 'year': 1999},
- {'freq': 'a',
-  'label': 'RETAIL_SALES_FOOD__bln_rub',
-  'value': 866.1,
-  'year': 1999},
- {'freq': 'a', 'label': 'RETAIL_SALES_FOOD__yoy', 'value': 93.6, 'year': 1999},
- {'freq': 'a',
-  'label': 'RETAIL_SALES_NONFOODS__bln_rub',
-  'value': 931.3,
-  'year': 1999},
- {'freq': 'a',
-  'label': 'RETAIL_SALES_NONFOODS__yoy',
-  'value': 94.7,
-  'year': 1999},
- {'freq': 'a', 'label': 'GDP__bln_rub', 'value': 4823.0, 'year': 1999},
- {'freq': 'a', 'label': 'GDP__yoy', 'value': 106.4, 'year': 1999}]
+
+def test_Datapoints_is_included_annual_1999_valuesin_2017_4():
+    test_datapoints = [{'freq': 'm', 'label': 'EXPORT_GOODS_TOTAL__bln_usd', 'month': 1, 'value': 4.5, 'year': 1999},
+{'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL__bln_usd', 'value': 75.6, 'year': 1999},
+{'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL__yoy', 'value': 101.5, 'year': 1999},
+{'freq': 'a', 'label': 'IMPORT_GOODS_TOTAL__bln_usd', 'value': 39.5, 'year': 1999},
+{'freq': 'a', 'label': 'IMPORT_GOODS_TOTAL__yoy', 'value': 68.1, 'year': 1999},
+{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_CONSOLIDATED__bln_rub', 'value': 1213.6, 'year': 1999},
+{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_FEDERAL__bln_rub', 'value': 615.5, 'year': 1999},
+{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_SUBFEDERAL__bln_rub', 'value': 660.8, 'year': 1999},
+{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_CONSOLIDATED__bln_rub', 'value': 1258.0, 'year': 1999},
+{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_FEDERAL__bln_rub', 'value': 666.9, 'year': 1999},
+{'freq': 'a', 'label': 'GOV_EXPENSE_ACCUM_SUBFEDERAL__bln_rub', 'value': 653.8, 'year': 1999},
+{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_FEDERAL__bln_rub', 'value': -51.4, 'year': 1999},
+{'freq': 'a', 'label': 'GOV_SURPLUS_ACCUM_SUBFEDERAL__bln_rub', 'value': 7.0, 'year': 1999},
+{'freq': 'a', 'label': 'RETAIL_SALES__bln_rub', 'value': 1797.4, 'year': 1999},
+{'freq': 'a', 'label': 'RETAIL_SALES__yoy', 'value': 94.2, 'year': 1999},
+{'freq': 'a', 'label': 'RETAIL_SALES_FOOD__bln_rub', 'value': 866.1, 'year': 1999},
+{'freq': 'a', 'label': 'RETAIL_SALES_FOOD__yoy', 'value': 93.6, 'year': 1999},
+{'freq': 'a', 'label': 'RETAIL_SALES_NONFOODS__bln_rub', 'value': 931.3, 'year': 1999},
+{'freq': 'a', 'label': 'RETAIL_SALES_NONFOODS__yoy', 'value': 94.7, 'year': 1999},
+{'freq': 'a', 'label': 'GDP__bln_rub', 'value': 4823.0, 'year': 1999},
+{'freq': 'a', 'label': 'GDP__yoy', 'value': 106.4, 'year': 1999}]
 
     for x in test_datapoints:
        assert dpoints.is_included(x)
 
 def test_dfa():    
-    assert dfa.loc[1999,].__str__() == """label
+    assert frame.dfa.loc[1999,].__str__() == """label
 EXPORT_GOODS_TOTAL__bln_usd                  75.6
 EXPORT_GOODS_TOTAL__yoy                     101.5
 GDP__bln_rub                               4823.0
@@ -122,7 +70,7 @@ def test_dfq():
     pass  
 
 def test_dfm():    
-    assert dfm.loc["2017-01",].transpose().__str__() == """time_index                               2017-01-31
+    assert frame.dfm.loc["2017-01",].transpose().__str__() == """time_index                               2017-01-31
 label                                              
 year                                         2017.0
 month                                           1.0
@@ -164,6 +112,12 @@ def test_end_to_end_latest_month():
 
 # TESTING INDIVIDUAL FUNCTIONS
 
+def test_Dict_Stream_is_matched():
+    assert parse.DictStream.is_matched(pat="Объем ВВП", 
+                                       textline="Объем ВВП текущего года") == True
+    assert parse.DictStream.is_matched(pat="Объем ВВП", 
+                                       textline="1.1 Объем ВВП") == False
+
 def  test_to_float():
     for x in [None, "", " ", "…", "-", "a", "ab", " - "]:
         assert parse.to_float(x) == False
@@ -172,7 +126,6 @@ def  test_to_float():
     assert parse.to_float('5.678,,') == 5.678
     assert parse.to_float("5.6") == 5.6
     assert parse.to_float("5,6") == 5.6
-    assert parse.to_float('57,0') == 57.0
     assert parse.to_float("5,67") == 5.67
     assert parse.to_float("5,67,") == 5.67
     assert parse.to_float('123,0 4561)') == 123
@@ -182,12 +135,26 @@ def  test_to_float():
 
 def test_get_year():
     assert parse.get_year("19991)") == 1999
-    
+    assert parse.get_year("1999") == 1999
+    assert parse.get_year("1812") is None    
    
 def test_csv_has_no_null_byte():     
     csv_path = cfg.get_path_csv(2015, 2) 
     z = csv_path.read_text(encoding = parse.ENC)    
     assert "\0" not in z    
-    
+
+
+TABLE = parse.Table(headers=[{'head':"Объем ВВП"}], 
+                    datarows=[dict(data=['10','20','30','40'], head='1991')])
+def test_Table_str():
+    assert TABLE.__repr__() == "Table None of 1 datarows"
+    assert TABLE.__str__() == """Table label: None
+columns: 4
+varname: None, unit: None
+- <Объем ВВП>
+------------------------------
+1991 | 10 20 30 40
+------------------------------"""
+
 if __name__ == "__main__":
     pytest.main()
