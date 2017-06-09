@@ -5,7 +5,6 @@ import pytest
 
 
 # TESTING END TO END
-
 csv_path = cfg.get_path_csv(2017, 4)  
 # break csv to tables with variable names
 tables = parse.get_all_valid_tables(csv_path)
@@ -40,7 +39,7 @@ def test_Datapoints_is_included_annual_1999_values_in_2017_4():
     for x in test_datapoints:
        assert dpoints.is_included(x)
 
-def test_dfa():    
+def test_dfa_in_2017_4():    
     assert frame.dfa.loc[1999,].__str__() == """label
 EXPORT_GOODS_TOTAL__bln_usd                  75.6
 EXPORT_GOODS_TOTAL__yoy                     101.5
@@ -66,7 +65,7 @@ RETAIL_SALES__yoy                            94.2
 Name: 1999, dtype: float64"""
 
 
-def test_dfq():
+def test_dfq_in_2017_4():
     assert frame.dfq.loc["2017-03",].transpose().__str__()  == """time_index                               2017-03-31
 label                                              
 year                                         2017.0
@@ -100,7 +99,7 @@ RETAIL_SALES__rog                              82.8
 RETAIL_SALES__yoy                              98.2"""
 
 
-def test_dfm():    
+def test_dfm_in_2017_4():    
     assert frame.dfm.loc["2017-01",].transpose().__str__() == """time_index                               2017-01-31
 label                                              
 year                                         2017.0
@@ -147,12 +146,11 @@ def test_Header():
      assert parse.Header.KNOWN != parse.Header.UNKNOWN 
 
 def test_Dict_Stream_is_matched():
-    assert parse.DictStream.is_matched(pat="Объем ВВП", 
-                                       textline="Объем ВВП текущего года") == True
-    assert parse.DictStream.is_matched(pat="Объем ВВП", 
-                                       textline="1.1 Объем ВВП") == False
+    im = parse.DictStream.is_matched
+    assert im(pat="Объем ВВП", textline="Объем ВВП текущего года") == True
+    assert im(pat="Объем ВВП", textline="1.1 Объем ВВП") == False
 
-def  test_to_float():
+def test_to_float():
     for x in [None, "", " ", "…", "-", "a", "ab", " - "]:
         assert parse.to_float(x) == False    
     assert parse.to_float('5.678,') == 5.678
@@ -176,13 +174,11 @@ def test_csv_has_no_null_byte():
     z = csv_path.read_text(encoding = parse.ENC)    
     assert "\0" not in z 
 
-
 TABLE = parse.Table(headers=[{'head':"Объем ВВП"}], 
                     datarows=[dict(data=['10','20','30','40'], 
                                    head='1991')])
 TABLE.header.varname = 'GDP'
 TABLE.header.unit = 'rog'
-
 
 def test_Table_str():
     assert TABLE.__repr__() == 'Table GDP__rog (1 headers, 1 datarows)'
