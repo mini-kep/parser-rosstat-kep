@@ -15,12 +15,14 @@
         emit values as frequency-label-date-value dicts
 """
 
+
+import warnings
 import csv
 import re
-from enum import Enum, unique
-from collections import OrderedDict as odict
 import itertools
 import pandas as pd  
+from enum import Enum, unique
+from collections import OrderedDict as odict
 from datetime import datetime
 from calendar import monthrange
 
@@ -30,55 +32,13 @@ import cfg
 from cfg import spec as SPEC
 from cfg import units as UNITS
 
+warnings.simplefilter('ignore', UserWarning)
+#warnings.simplefilter('always', UserWarning)
+
 ENC = 'utf-8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
 LABEL_SEP = "__"
-SILENT = True
-
-#checks and warnings
-class Check:
-    """Assertions on some arguements"""
-            
-    def table_defined(table):        
-        if not table.is_defined():
-            txt = table.__str__()
-            if not table.label:
-                raise ValueError("Label not defined for:\n" + txt)
-            if not table.splitter_func:
-                raise ValueError("Splitter func not defined for:\n" + txt)
-
-    def allowed_method_name(method_name):
-        if method_name not in ["emit_a", "emit_q", "emit_m"]:
-            raise ValueError(method_name) 
-
-    def no_duplicates(df):
-        #WONTFIX: change to raise Exception 
-        assert df[df.duplicated(keep=False)].empty  
-                      
-            
-
-class IssueWarning():
-    
-    def __init__(self):
-        self.echo()
-        
-    def echo(self, *args, silent=SILENT):
-        if not silent:
-            print(*args)
-            
-    def bad_row_length(self, table):
-        """Trying to parse a wierd table without <year> <values> structure. 
-           Severity: minor 
-           Reason: such tables are currently out of scope of parsing defintion."""
-        self.echo("WARNING: unexpected row length {}".format(table.coln))
-        self.echo(table)
-    
-    def unit_not_found(self, line):    
-        """Trying to extract unit of measurement from a header without it.
-           Severity: minor
-           Reason: usually a proper unit is found in next few header textlines."""
-        self.echo("WARNING: unit not found in  <" + line + ">")
 
 # label handling 
 def make_label(vn, unit, sep=LABEL_SEP):
@@ -188,12 +148,12 @@ class DictStream():
 
 
 # functions for split_to_tables()
-YEAR_CATCHER = re.compile('\s*(\d{4}).*')
+YEAR_CATCHER = re.compile('(\d{4}).*')
     
 def get_year(string: str, rx=YEAR_CATCHER):
     """Extract year from string *string*. 
        Return None if year is not valid or not in plausible range."""
-    match = re.match('(\d{4})', string)
+    match = re.match(rx, string)
     if match:
         year = int(match.group(1))
         if year >= 1991:
@@ -242,18 +202,8 @@ def split_to_tables(csv_dicts):
     if len(headers) > 0 and len(datarows) > 0:
         yield Table(headers, datarows)
 
-
     
-def repr_datarows(datarows):        
-    def row_to_str(row):
-       return "{} | {}".format(row['head'], ' '.join(row['data']))
-    break_line = '-'*30        
-    txt =[break_line, 
-          '\n'.join(row_to_str(row) for row in datarows),
-          break_line]
-    return "\n".join(txt)
-        
-       
+      
 class Table(): 
     """Holds headers textlines and datarows"""
     
@@ -266,7 +216,9 @@ class Table():
         self.datarows = datarows
         self.coln = max([len(d['data']) for d in self.datarows])
         if self.coln not in self.VALID_ROW_LENGTHS:
-            IssueWarning().bad_row_length(self)
+            """Trying to parse a wierd table without <year> <values> structure. 
+               Such tables are currently out of scope of parsing defintion."""
+            warnings.warn("Unexpected row length {}\n{}".format(self.coln, self))
                         
     def parse(self, pdef, units):        
         self.header.set_varname(pdef, units)       
@@ -281,32 +233,40 @@ class Table():
         else:
             self.splitter_func = splitter.get_splitter(self.coln) 
     
-    def __flush_datarow_values__(self):
-         """Used in testing to get all values from datarows"""
-         for row in self.datarows:
-            for x in row:
-               yield x
-    
     @property
     def label(self): 
         vn = self.header.varname
         u = self.header.unit
         if vn and u:
-            return make_label(vn, u)        
-
-
+            return make_label(vn, u)
+        
     def is_defined(self):
         return self.label and self.splitter_func     
     
+    def validate(self):
+        if not self.label:
+            raise ValueError("Label not defined for:\n{}".format(self))
+        if not self.splitter_func:
+            raise ValueError("Splitter func not defined for:\n{}".format(self))
+    
+    
     def __str__(self):        
-        return "\n".join(["Table label: {}".format(self.label), 
+        return "\n".join(["Table {}".format(self.label), 
                           "columns: {}".format(self.coln),
                           self.header.__str__(), 
-                          repr_datarows(self.datarows)])
+                          self.repr_datarows()])
     
+    def repr_datarows(self):        
+        def to_str(row):
+           return "{} | {}".format(row['head'], ' '.join(row['data']))
+        text = [to_str(row) for row in self.datarows]
+        w = max([len(t) for t in text])
+        return "\n".join(['-'*w, '\n'.join(text), '-'*w])
+
     def __repr__(self):
-        return "Table {} of {} datarows".format(self.label,
-                                                len(self.datarows))     
+        return "Table {} ".format(self.label) + \
+               "({} headers, {} datarows)".format(len(self.header.textlines),
+                                                  len(self.datarows))     
 
 class Header():
     """Table header, capable to extract variable label from header textrows."""
@@ -317,12 +277,10 @@ class Header():
     def __init__(self, csv_dicts):
         self.varname = None
         self.unit = None      
-        self.textlines = [d['head'] for d in csv_dicts]
-        # ignore comments
-        self.textlines = [x for x in self.textlines if not x.startswith("___")]
+        # ignore comments with "___"
+        self.textlines = [d['head'] for d in csv_dicts if not d['head'].startswith("___")]
         self.processed = odict((line, self.UNKNOWN) for line in self.textlines)
         
-    
     def set_varname(self, pdef, units):        
         varname_dict = pdef.headers
         known_headers = varname_dict.keys()
@@ -333,37 +291,41 @@ class Header():
                     just_one += 1
                     self.processed[line] = self.KNOWN
                     self.varname = varname_dict[header]
-                    unit = get_unit(line, units)
+                    unit = self.get_unit(line, units)
                     if unit:
                         self.unit = unit
                     else:    
-                        IssueWarning().unit_not_found(line)
+                        """Trying to extract unit of measurement from a header without it.
+                           Usually a proper unit is found in next few header textlines."""
+                        warnings.warn("unit not found in  <{}>".format(line))
             # anything from known_headers must be found only once         
             assert just_one <= 1
-                    
+    
+    @staticmethod
+    def get_unit(line, units):
+        for k in units.keys():
+            if k in line:  
+                return units[k]
+        return None 
+
     def set_unit(self, units):
         for line in self.textlines:            
-            unit = get_unit(line, units)
+            unit = self.get_unit(line, units)
             if unit:
                 self.unit = unit
                 # if unit was found at the start of line mark this line as known
                 for u in units.keys():
                    if line.startswith(u):
-                      self.processed[line] = "+"                
+                      self.processed[line] = self.KNOWN               
     
     def has_unknown_lines(self):
         return self.UNKNOWN in self.processed.values()
     
     def __str__(self):
-        show = [v+" <"+k+">" for k,v in self.processed.items()] 
-        return ("varname: {}, unit: {}\n".format(self.varname, self.unit)
-                + "\n".join(show))
+        show = ["varname: {}, unit: {}".format(self.varname, self.unit)] + \
+               ["{} <{}>".format(v,k) for k,v in self.processed.items()]               
+        return "\n".join(show)
                
-def get_unit(line, units):
-    for k in units.keys():
-        if k in line:  
-            return units[k]
-    return None
 
 def fix_multitable_units(tables):
     """For tables without *header.varname* copy *header.varname* from previous table.
@@ -414,6 +376,8 @@ def get_all_valid_tables(csv_path, spec=SPEC, units=UNITS):
 
 
 COMMENT_CATCHER = re.compile("\D*(\d+[.,]?\d*)\s*(?=\d\))")     
+            
+            
 def to_float(text, i=0):
     i += 1
     if i>5:
@@ -476,11 +440,14 @@ class RowReader():
 
 
 class Emitter():
-    """Emitter extracts and holds annual, quarterly and monthly values
-       for a given Table with defined label and splitter_func."""
+    """Emitter extracts and holds annual, quarterly and monthly values 
+       for a given Table.
+       
+       Table must have defined *label* and *splitter_func*."""
         
     def __init__(self, table):
-        Check.table_defined(table)
+        if not table.label or not table.splitter_func:
+            table.validate()
         self.a = []
         self.q = []
         self.m = []        
@@ -512,8 +479,9 @@ class Datapoints():
         self.datapoints = list(self.get_datapoints())
         self.emitters_dict = dict(a=self.emit_a, q=self.emit_q, m=self.emit_m)
         
-    def emit_by_method(self, method_name):
-        Check.allowed_method_name(method_name)
+    def emit_by_method(self, method_name: str):
+        if method_name not in ["emit_a", "emit_q", "emit_m"]:
+            raise ValueError("Method name not valid: {}".format(method_name)) 
         for e in self.emitters:
             for x in getattr(e, method_name)():                
                     yield x
@@ -555,9 +523,7 @@ def approve_csv(year, month, valid_datapoints=VALID_DATAPOINTS_SAMPLE):
     tables = get_all_valid_tables(csv_path)
     dps = Datapoints(tables)
     for x in valid_datapoints:
-        if dps.is_included(x):
-            pass
-        else: 
+        if not dps.is_included(x):
             msg1 = "Not found in dataset: {}".format(x)
             msg2 = "Date: {}, {}".format(year, month)
             msg3 = "File: {}".format(csv_path)
@@ -578,7 +544,7 @@ def get_end_of_quarterdate(y, q):
 
 
 class Frame():
-    """Accept datapoints and emit pandas dataframes"""
+    """Accept Datapoints() instance and emit pandas DataFrames."""
     
     def __init__(self, datapoints):  
         assert isinstance(datapoints, Datapoints) 
@@ -586,7 +552,9 @@ class Frame():
         dfq = pd.DataFrame(datapoints.emit_q())
         dfm = pd.DataFrame(datapoints.emit_m())       
         for df in dfa, dfq, dfm:
-            Check.no_duplicates(df)
+            # df must have no duplicate rows
+            assert df[df.duplicated(keep=False)].empty  
+
         self.dfa = self.reshape_a(dfa) 
         self.dfq = self.reshape_q(dfq) 
         self.dfm = self.reshape_m(dfm) 
@@ -663,15 +631,16 @@ def all_values():
     # emit all values for debugging to_float()
     csv_path = cfg.get_path_csv()
     for t in get_all_tables(csv_path):
-         for x in t.__flush_datarow_values__():
-             yield x
+         for row in t.datarows:
+            for x in row:
+               yield x
              
 def all_heads():   
      # emit all heads for debugging get_year()
     csv_path = cfg.get_path_csv()          
     csv_dicts = read_csv(csv_path)
     for d in csv_dicts:
-      yield d['head']              
+         yield d['head']              
 
 
 def __for_testing__():
@@ -699,4 +668,4 @@ def __for_testing__():
 if __name__=="__main__":        
     approve_latest()               
     # approve_all()
-    # save_all_dfs()  
+    # save_all_dfs() 
