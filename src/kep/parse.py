@@ -104,12 +104,41 @@ class Row:
     
     def is_datarow(self):
         return is_year(self.name)
-        
+    
     def __str__(self):        
         return "{} | {}".format(self.name, ' '.join(self.data))
     
     def __repr__(self):
         return self.__str__() 
+    
+    def get_dicts(self, label, splitter_func):
+        base_dict = dict(label=label, year=get_year(self.name))
+        a_value, q_values, m_values = splitter_func(self.data)
+        a_dict = None
+        q_dicts = []
+        m_dicts = []
+        if a_value:            
+            a_dict = {**base_dict, 
+                       'freq': 'a',
+                      'value': to_float(a_value)}
+        if q_values:
+            for t, val in enumerate(q_values):
+                if val:
+                    d = {**base_dict, 
+                       'freq': 'q',
+                      'value': to_float(val),
+                        'qtr': t + 1}
+                    q_dicts.append(d)
+
+        if m_values:
+            for t, val in enumerate(m_values):
+                if val:
+                    d = {**base_dict, 
+                       'freq': 'm',
+                      'value': to_float(val),
+                      'month': t + 1}
+                    m_dicts.append(d)
+        return a_dict, q_dicts, m_dicts
 
 
 class RowHolder():
@@ -280,7 +309,7 @@ class Table():
     def __repr__(self):
         return "Table {} ".format(self.label) + \
                "({} headers,".format(len(self.header.textlines)) + \
-               "{} datarows)".format(len(self.datarows))
+               " {} datarows)".format(len(self.datarows))
 
 
 class Header():
@@ -415,44 +444,6 @@ def to_float(text, i=0):
         return False
 
 
-class RowReader():
-    def __init__(self, label, splitter_func):
-        self.label = label
-        self.splitter_func = splitter_func
-
-    def parse_row(self, year, values):
-        a_value, q_values, m_values = self.splitter_func(values)
-        a_dict = None
-        q_dicts = []
-        m_dicts = []
-
-        if a_value:
-            a_dict = dict(label=self.label,
-                          freq='a',
-                          year=year,
-                          value=to_float(a_value))
-        if q_values:
-            for t, val in enumerate(q_values):
-                if val:
-                    d = dict(label=self.label,
-                             freq='q',
-                             year=year,
-                             value=to_float(val),
-                             qtr=t + 1)
-                    q_dicts.append(d)
-
-        if m_values:
-            for t, val in enumerate(m_values):
-                if val:
-                    d = dict(year=year,
-                             label=self.label,
-                             freq='m',
-                             value=to_float(val),
-                             month=t + 1)
-                    m_dicts.append(d)
-        return a_dict, q_dicts, m_dicts
-
-
 class Emitter():
     """Emitter extracts and holds annual, quarterly and monthly values 
        for a given Table.
@@ -465,17 +456,14 @@ class Emitter():
         self.a = []
         self.q = []
         self.m = []
-        rr = RowReader(table.label, table.splitter_func)
         for row in table.datarows:
-            if row.data:
-                year = get_year(row.name)
-                a, q, m = rr.parse_row(year, row.data)
-                if a:
-                    self.a.append(a)
-                if q:
-                    self.q.extend(q)
-                if m:
-                    self.m.extend(m)
+            a, q, m = row.get_dicts(table.label, table.splitter_func)
+            if a:
+                self.a.append(a)
+            if q:
+                self.q.extend(q)
+            if m:
+                self.m.extend(m)
 
     def emit_a(self):
         return self.a
@@ -684,6 +672,6 @@ def __for_testing__():
 
 
 if __name__ == "__main__":
-    #approve_latest()
+    approve_latest()
     #approve_all()
     #save_all_dfs()
