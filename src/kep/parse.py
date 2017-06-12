@@ -26,7 +26,7 @@ from datetime import datetime
 from calendar import monthrange
 
 import splitter
-import cfg
+import files
 from cfg import spec as SPEC
 from cfg import units as UNITS
 
@@ -522,7 +522,7 @@ VALID_DATAPOINTS_SAMPLE = [
 
 
 def approve_csv(year, month, valid_datapoints=VALID_DATAPOINTS_SAMPLE):
-    csv_path = cfg.get_path_csv(year, month)
+    csv_path = files.get_path_csv(year, month)
     print("File:", csv_path)
     tables = get_all_valid_tables(csv_path)
     dps = Datapoints(tables)
@@ -594,7 +594,7 @@ class Frame():
 
 
 def get_frame(year=None, month=None):
-    csv_path = cfg.get_path_csv(year, month)
+    csv_path = files.get_path_csv(year, month)
     tables = get_all_valid_tables(csv_path)
     dpoints = Datapoints(tables)
     return Frame(dpoints)
@@ -609,12 +609,12 @@ def dfs(year=None, month=None):
 def save_dfs(year=None, month=None):
     """Save dataframes to CSVs."""
     frame = get_frame(year, month)
-    processed_folder = cfg.get_processed_folder(year, month)
+    processed_folder = files.get_processed_folder(year, month)
     frame.save(folder_path=processed_folder)
 
 
 def save_all_dfs():
-    for (year, month) in cfg.filled_dates():
+    for (year, month) in files.filled_dates():
         save_dfs(year, month)
 
 
@@ -627,13 +627,13 @@ def approve_all(valid_datapoints=VALID_DATAPOINTS_SAMPLE):
     """Check all dates, runs slow (about 20 sec.) 
        May fail if dataset not complete.      
     """
-    for (year, month) in cfg.filled_dates():
+    for (year, month) in files.filled_dates():
         approve_csv(year, month, valid_datapoints)
 
 
 def all_values():
     # emit all values for debugging to_float()
-    csv_path = cfg.get_path_csv()
+    csv_path = files.get_path_csv()
     for t in get_all_tables(csv_path):
         for row in t.datarows:
             for x in row:
@@ -642,7 +642,7 @@ def all_values():
 
 def all_heads():
     # emit all heads for debugging get_year()
-    csv_path = cfg.get_path_csv()
+    csv_path = files.get_path_csv()
     csv_dicts = read_csv(csv_path)
     for d in csv_dicts:
         yield d['head']
@@ -658,7 +658,7 @@ def __for_testing__():
     # interim to processed data cycle: (year, month) -> 3 dataframes
     year, month = 2017, 4
     # source csv file
-    csv_path = cfg.get_path_csv(year, month)
+    csv_path = files.get_path_csv(year, month)
     # break csv to tables with variable names
     tables = get_all_valid_tables(csv_path)
     # emit values from tables
@@ -666,7 +666,7 @@ def __for_testing__():
     # convert stream values to pandas dataframes     
     frame = Frame(datapoints=dpoints)
     # save dataframes to csv files  
-    processed_folder = cfg.get_processed_folder(year, month)
+    processed_folder = files.get_processed_folder(year, month)
     frame.save(processed_folder)
     # end of cycle 
 

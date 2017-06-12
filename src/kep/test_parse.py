@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-import parse
-import cfg
 import pytest
+
+import parse
+import files
 
 
 # TESTING END TO END
-csv_path = cfg.get_path_csv(2017, 4)  
+csv_path = files.get_path_csv(2017, 4)  
 # break csv to tables with variable names
 tables = parse.get_all_valid_tables(csv_path)
 # emit values from tables
@@ -176,7 +177,7 @@ def test_get_year():
     assert parse.get_year("1812") is None    
    
 def test_csv_has_no_null_byte():     
-    csv_path = cfg.get_path_csv(2015, 2) 
+    csv_path = files.get_path_csv(2015, 2) 
     z = csv_path.read_text(encoding = parse.ENC)    
     assert "\0" not in z 
 
