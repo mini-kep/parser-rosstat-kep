@@ -41,7 +41,6 @@
 - непериодическая или ошибочная работа администратора с новыми данными 
 - нет более старых историчесикх данных 
 
-
 Описание последовательности операций
 ====================================
 
@@ -72,6 +71,18 @@ Frontend:
 - [ ] build forecasting models
 - [ ] generate reports (PDF/presentations)
 
+
+Список дальнейших работ 
+=======================
+Make *notebook/README.MD*:
+- vintages / revisions (make markdown based on MS Word)
+- [datalab](https://github.com/epogrebnyak/data-lab) 
+- inflation components
+- oil vs fx
+- bank reserves 
+- correlations between detrended variables
+- macro assumptions for stress testing 
+
 Прочие комментарии 
 ==================
 - longer (but unmaintainable) version: <https://github.com/epogrebnyak/data-rosstat-kep>
@@ -83,3 +94,7 @@ Main idea:
 
 See ```src/word/run_word.py``` for converting Word files to CSV files 
 and ```src/kep/parse.py``` for parsing CSV to dataframes.
+
+OUT OF SCOPE:
+-  read SEP + update KEP with SEP data  
+-  prior to 1999
