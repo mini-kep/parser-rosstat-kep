@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import shutil 
 
 # csv file parameters
 ENC = 'utf8'
@@ -59,6 +59,7 @@ levels_up = 2
 data_folder = Path(__file__).parents[levels_up] / 'data' 
 rosstat_folder = data_folder / 'interim'
 processed = data_folder / 'processed'
+latest = processed / 'latest'
 
 
 def init_dirs(root, available_dates=DATES):
@@ -77,6 +78,7 @@ class InterimDataLocation():
     def __init__(self, folder=rosstat_folder):
         self.folder = folder
         self.dirs = InterimDataLocation.listing(folder)
+        assert self.get_latest() == DATES[-1]
 
     @staticmethod
     def listing(_folder):
@@ -91,10 +93,7 @@ class InterimDataLocation():
     
     def get_latest(self):
         return int(self.max_year()), int(self.max_month())
-
-
-assert InterimDataLocation().get_latest() == DATES[-1]
-
+    
 
 def loc(year, month, root):
     if not year and not month:
@@ -112,3 +111,17 @@ def get_path_csv(year=None, month=None):
 def get_processed_folder(year=None, month=None):  
     """Return processed CSV file path based on year and month"""
     return loc(year, month, root=processed)
+
+def copy_latest_csv_to_separate_folder(dst_folder=latest):
+    # copy all files from 
+    year, month = InterimDataLocation().get_latest()
+    src_folder = get_processed_folder(year, month) 
+    for src in [f for f in src_folder.iterdir() if f.is_file()]:
+        dst = dst_folder / src.name
+        shutil.copyfile(src, dst)      
+
+
+if __name__ == "__main__":
+    init_dirs(processed)
+    init_dirs(rosstat_folder)
+    copy_latest_csv_to_separate_folder()

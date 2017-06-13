@@ -49,10 +49,10 @@ class Definition():
     
     def __repr__(self):
         return self.__str__()
-    
-    # FIXME: may depreciate?    
-#    def varnames(self):
-#        return list(set(v for v in self.headers.values()))    
+  
+    def varnames(self):
+        gen = self.headers.values()
+        return list(set(v for v in gen))
     
     def require(self, varname, unit):
         self.required.append((varname, unit))
@@ -68,13 +68,12 @@ class Specification:
     def append(self, pdef):
         self.additional.append(pdef) 
         
-    # FIXME: may depreciate?    
-#    def varnames(self):
-#        vns = set()
-#        for pdef in [self.main] + self.additional:
-#            for x in pdef.varnames():
-#                vns.add(x)
-#        return list(vns)        
+    def varnames(self):
+        varnames = set()
+        for pdef in [self.main] + self.additional:
+            for x in pdef.varnames():
+                varnames.add(x)
+        return sorted(list(varnames))
 
     def validate(self):
         pass
