@@ -71,7 +71,8 @@ Frontend:
 - [ ] build forecasting models
 - [ ] generate reports (PDF/presentations)
 
-Notes:
+Прочие комментарии 
+==================
 - longer (but unmaintainable) version: <https://github.com/epogrebnyak/data-rosstat-kep>
 
 Main idea: 
