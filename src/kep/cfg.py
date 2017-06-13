@@ -95,7 +95,23 @@ class Specification:
               "\nParsing definitions: {}".format(listing) +
               "\nDefault definition: {}>".format(self.main.__str__())
               )
-        
+
+sect1 = ("ВВП и производство", [        
+        ("Валовой внутренний продукт", "GDP"),
+        ("Промышленное производство", "IND_PROD")
+        ])
+sect2 = ("Внешняя торговля", [
+        ("Экспорт товаров - всего", "EXPORT_GOODS_TOTAL"),
+        ("Импорт товаров - всего", "IMPORT_GOODS_TOTAL")
+        ])
+sect3 = ("Розничная торговля", [  
+        ("Оборот розничной торговли - всего", "RETAIL_SALES"),
+        ("Оборот розничной торговли - продовольственные товары", "RETAIL_SALES_FOOD"),
+        ("Оборот розничной торговли - непродовольственные товары", "RETAIL_SALES_NONFOODS")
+        ])
+    
+desc = odict([sect1, sect2, sect3])
+
         
 d = Definition("MAIN")
 d.add_header("Объем ВВП", "GDP")

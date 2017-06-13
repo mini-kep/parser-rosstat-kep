@@ -39,8 +39,7 @@ def filled_dates(available_dates=DATES):
         if csv_path.exists() and csv_path.stat().st_size > 0:
             yield date
 
-# TODO - change folder structure
-# folder structure
+# TODO - accoutn for latest in folder structure
 """
 \data
   (\raw      
@@ -72,32 +71,35 @@ def init_dirs(root, available_dates=DATES):
                new_folder.mkdir() 
 
 
-class InterimDataLocation():
+class InterimDataFolder():
     """Find latest month available in interim data folder"""
+    
+    @staticmethod
+    def list_subfolders(folder):
+        return [f.name for f in folder.iterdir() if f.is_dir()]
     
     def __init__(self, folder=rosstat_folder):
         self.folder = folder
-        self.dirs = InterimDataLocation.listing(folder)
-        assert self.get_latest() == DATES[-1]
+        assert self.get_latest_date() == DATES[-1]
 
-    @staticmethod
-    def listing(_folder):
-        return [f.name for f in _folder.iterdir() if f.is_dir()]
-    
     def max_year(self):
-        return max(self.dirs)
+        return max(self.list_subfolders(self.folder))
         
     def max_month(self):
         subfolder = self.folder / self.max_year()
-        return max(self.listing(subfolder))
+        return max(self.list_subfolders(subfolder))
     
-    def get_latest(self):
+    def get_latest_date(self):
         return int(self.max_year()), int(self.max_month())
     
+    def get_latest_folder(self):
+        year, month = self.get_latest_date()
+        return __loc__(year, month, root=self.folder)
 
-def loc(year, month, root):
+    
+def __loc__(year, month, root):
     if not year and not month:
-        year, month = InterimDataLocation().get_latest()    
+        year, month = InterimDataFolder().get_latest_date()    
     if year and month:
         month_dir = str(month).zfill(2)
         return root / str(year) / month_dir 
@@ -105,16 +107,17 @@ def loc(year, month, root):
 
 def get_path_csv(year=None, month=None):
     """Return interim CSV file path based on year and month"""
-    return loc(year, month, root=rosstat_folder) / 'tab.csv'
+    return __loc__(year, month, root=rosstat_folder) / 'tab.csv'
 
 
 def get_processed_folder(year=None, month=None):  
     """Return processed CSV file path based on year and month"""
-    return loc(year, month, root=processed)
+    return __loc__(year, month, root=processed)
+
 
 def copy_latest_csv_to_separate_folder(dst_folder=latest):
     # copy all files from 
-    year, month = InterimDataLocation().get_latest()
+    year, month = InterimDataFolder().get_latest_date()
     src_folder = get_processed_folder(year, month) 
     for src in [f for f in src_folder.iterdir() if f.is_file()]:
         dst = dst_folder / src.name
