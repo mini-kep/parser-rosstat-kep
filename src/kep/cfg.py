@@ -1,5 +1,12 @@
 # -*- coding: utf-8 -*-
+"""
+units
+spec 
+desc
+sections
+"""
 from collections import OrderedDict as odict   
+
 
 # parsing specification
 units = odict([('млрд.долларов', 'bln_usd'),
@@ -13,8 +20,9 @@ units = odict([('млрд.долларов', 'bln_usd'),
          ('в % к предыдущему периоду', 'rog'),
          # this...
          ('период с начала отчетного года в % к соответствующему периоду предыдущего года', 'ytd'),
-         # ... must preceed this because 'в % к предыдущему периоду' is  found
-         # in 'период с начала отчетного года в % к соответствующему периоду предыдущего года'
+         #       ... must preceed this 
+         # because 'в % к предыдущему периоду' is found in 
+         # 'период с начала отчетного года в % к соответствующему периоду предыдущего года'
          ('в % к соответствующему периоду предыдущего года', 'yoy'),
          ('в % к соответствующему месяцу предыдущего года', 'yoy'),
          ('млн.рублей', 'mln_rub'),
@@ -23,9 +31,17 @@ units = odict([('млрд.долларов', 'bln_usd'),
          ('период с начала отчетного года', 'ytd'),
          ('рублей / rubles', 'rub')])
 
-#Some supplementary parsing results are ignored, e.g.
-# "IMPORT_GOODS__TOTAL_yoy", "IMPORT__GOODS_TOTAL_rog",
-# "EXPORT_GOODS__TOTAL_yoy", "EXPORT__GOODS_TOTAL_rog"
+unit_names = {'bln_rub': 'млрд.руб.', 
+ 'bln_usd': 'млрд.долл.', 
+ 'gdp_percent': '% ВВП', 
+ 'mln_rub': 'млн.руб.',  
+ 'rub': 'руб.', 
+ 'rog': '% к предыдущему периоду',
+ 'yoy': '% к соответствующему месяцу предыдущего года', 
+ 'ytd': 'период с начала отчетного года'}
+
+# check 1: all units have a common name 
+assert set(unit_names.keys()) == set(units.values())
     
 class Definition():    
     def __init__(self, name):        
@@ -78,11 +94,6 @@ class Specification:
     def validate(self):
         pass
     
-    # TODO validate specification - order of markers 
-    # - ends are after starts
-    # - sorted starts follow each other 
-    # - varnames match .required()
-    
     def required(self):
         for pdef in [self.main] + self.additional:
             for req in pdef.required:
@@ -96,23 +107,6 @@ class Specification:
               "\nDefault definition: {}>".format(self.main.__str__())
               )
 
-sect1 = ("ВВП и производство", [        
-        ("Валовой внутренний продукт", "GDP"),
-        ("Промышленное производство", "IND_PROD")
-        ])
-sect2 = ("Внешняя торговля", [
-        ("Экспорт товаров - всего", "EXPORT_GOODS_TOTAL"),
-        ("Импорт товаров - всего", "IMPORT_GOODS_TOTAL")
-        ])
-sect3 = ("Розничная торговля", [  
-        ("Оборот розничной торговли - всего", "RETAIL_SALES"),
-        ("Оборот розничной торговли - продовольственные товары", "RETAIL_SALES_FOOD"),
-        ("Оборот розничной торговли - непродовольственные товары", "RETAIL_SALES_NONFOODS")
-        ])
-    
-desc = odict([sect1, sect2, sect3])
-
-        
 d = Definition("MAIN")
 d.add_header("Объем ВВП", "GDP")
 d.add_header("Валовой внутренний продукт", "GDP")
@@ -193,11 +187,74 @@ d.require("RETAIL_SALES_FOOD", "bln_rub")
 d.require("RETAIL_SALES_NONFOODS", "bln_rub")
 spec.append(d)
 
-#FIXME: does nothing yet
+#WONTFIX: some supplementary parsing results are ignored, e.g.
+# "IMPORT_GOODS_TOTAL_yoy", "IMPORT_GOODS_TOTAL_rog",
+# "EXPORT_GOODS_TOTAL_yoy", "EXPORT_GOODS_TOTAL_rog"
+
+#FIXME: spec.validate() does nothing yet
+    # TODO validate specification - order of markers 
+    # - ends are after starts
+    # - sorted starts follow each other 
+    # - varnames match .required()
+
 spec.validate()
 print(spec)
+    
+
+desc_list = [["Валовой внутренний продукт", "GDP"],
+        ["Промышленное производство", "IND_PROD"],
+        ["Экспорт товаров - всего", "EXPORT_GOODS_TOTAL"],
+        ["Импорт товаров - всего", "IMPORT_GOODS_TOTAL"],
+        ["Оборот розничной торговли - всего", "RETAIL_SALES"],
+        ["Оборот розничной торговли - продовольственные товары", "RETAIL_SALES_FOOD"],
+        ["Оборот розничной торговли - непродовольственные товары", "RETAIL_SALES_NONFOODS"]
+]
+
+desc = {d[1]:d[0] for d in desc_list} 
+
+#check 2: check all spec.required are listed in desc_dict and vice versus
+# assert set(desc.keys()) == set(x for x, y in spec.required())
+
+a = set(desc.keys())
+b = set(x for x, y in spec.required())
+not_in_a = set(x for x in b if x not in a)
+not_in_b = set(x for x in a if x not in b)
+
+# FIXME: in final version not_in_a must equal to set()
+assert not_in_a == set(['GOV_EXPENSE_ACCUM_CONSOLIDATED',
+ 'GOV_EXPENSE_ACCUM_FEDERAL',
+ 'GOV_EXPENSE_ACCUM_SUBFEDERAL',
+ 'GOV_REVENUE_ACCUM_CONSOLIDATED',
+ 'GOV_REVENUE_ACCUM_FEDERAL',
+ 'GOV_REVENUE_ACCUM_SUBFEDERAL',
+ 'GOV_SURPLUS_ACCUM_FEDERAL',
+ 'GOV_SURPLUS_ACCUM_SUBFEDERAL'])
+assert not_in_b == set() 
+
+
+sections = odict([
+           ("ВВП и производство", ["GDP", "IND_PROD"]),             
+           ("Внешняя торговля",   ["EXPORT_GOODS_TOTAL",
+                                   "IMPORT_GOODS_TOTAL"]),       
+           ("Розничная торговля", ["RETAIL_SALES",
+                                   "RETAIL_SALES_FOOD",
+                                   "RETAIL_SALES_NONFOODS"])
+])
+    
+#check 3: sections includes all items in description 
+# FIXME: maybe more elegant unpacking below (?)
+z = list()
+[z.extend(labels) for labels in sections.values()]
+assert set(z) == set(desc.keys())
+
+def bold(s):
+    return "**{}**".format(s)
+
+def yield_variable_descriptions_with_subheaders(sections = sections):
+    for section_name, labels in sections.items(): 
+         yield([bold(section_name), ""])            
+         for label in labels: 
+              yield([desc[label], label])           
 
 if __name__ == "__main__":
-    init_dirs(processed)
-    init_dirs(rosstat_folder)
     pass

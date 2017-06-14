@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
-from collections import OrderedDict as odict
-from pathlib import Path  
-# Parts of code form https://github.com/mplewis/csvtomd/blob/master/csvtomd/csvtomd.py
+
+# Parts of code from 
+# https://github.com/mplewis/csvtomd/blob/master/csvtomd/csvtomd.py
+# skipped column normalisation, assumes good number of columns 
 
 def pad_cells(table):
     """Pad each cell to the size of the largest cell in its column."""
     col_sizes = [max(map(len, col)) for col in zip(*table)]
     for row in table:
+        # allow table to contain tuples
+        #row = [x for x in row]
         for cell_num, cell in enumerate(row):
             row[cell_num] = pad_to(cell, col_sizes[cell_num])
     return table
@@ -27,10 +30,12 @@ def add_dividers(row):
     return '| {} |'.format(div.join(row))
 
 def horiz_div(col_widths):
+    """Divider line like |:---|:----|:--|"""
     row = ['-' * x for x in col_widths]
     return '|:{}-|'.format('-|:'.join(row))
 
 def tabulate(table):
+    """Use first row as header"""
     table = pad_cells(table)
     header = table[0]
     body = table[1:]
@@ -45,59 +50,19 @@ def tabulate(table):
     return '\n'.join(table)
 
 def to_markdown(body, header):
+    """Return markdown table as string."""
     table = [header] + [row for row in body]
     return tabulate(table)
 
-class Descriptions():
-
-    header = ["Показатель", "Код"]
-    
-    def __init__(self, sections = ["ВВП и производство",
-                         "Внешняя торговля",
-                         "Розничная торговля"]):
-        self.desc = odict()
-        self.add("ВВП и производство",        
-            ["Валовой внутренний продукт", "GDP"],
-            ["Промышленное производство", "IND_PROD"])
-        self.add("Внешняя торговля",        
-            ["Экспорт товаров - всего", "EXPORT_GOODS_TOTAL"],
-            ["Импорт товаров - всего", "IMPORT_GOODS_TOTAL"])       
-        self.add("Розничная торговля", 
-            ["Оборот розничной торговли - всего", "RETAIL_SALES"],
-            ["Оборот розничной торговли - продовольственные товары", "RETAIL_SALES_FOOD"],
-            ["Оборот розничной торговли - непродовольственные товары", "RETAIL_SALES_NONFOODS"])
-        
-    def add(self, section, *args):
-        desc_and_lables = [[arg[0], arg[1]] for arg in args]
-        self.desc.update([(section, desc_and_lables)])
-
-    def as_markdown(self):
-        table = []
-        for k,v in self.desc.items(): 
-            table_segment = ([["**{}**".format(k), ""]] + v)
-            table.extend(table_segment)
-        return to_markdown(table, self.header)
-    
-    def to_file(self, file="frontpage1.md")     :
-        path = Path(__file__).parent / file
-        path.write_text(self.as_markdown())           
-            
-
 if __name__ == "__main__":
-    # move to tests
-    #table = [["a", "bbb", "c"], ["zz", "z", "c"]]    
-    #print(tabulate(table))
-    #table = ['35462356', 'wrt', "a", 'wergwetrgwegwetg'], ['qrgfwertgwqert', 'abc', "22", "zzz"]
-    #print(tabulate(table))
-    #TABLE_HEADER = ["Код", "Описание", "Ед.изм.", "Частота"]
-    #print()
-    #print(to_markdown(table, TABLE_HEADER))    
-    #tabulate ([('Валовой внутренний продукт', 'GDP'), ('Промышленное производство', 'IND_PROD')])   
-    print(Descriptions().as_markdown())
-    Descriptions().to_file()
-    
-    # TODO:
-    # Accum
-    # read latest values
-    # latest values
-    # rog/yoy  - see required variables  
+    #TODO: move to test_to_markdown.py
+    table = ["a", "bbb", "c"], ["zz", "z", "c"]    
+    print(tabulate(table))
+    table = ['kkk462356', 'wrt', "11", 'wergwetrgwegwetg'], \
+            ['qrgfwertgwqert', 'abc', "22", "zzz"]
+    print()
+    print(tabulate(table))
+    #TABLE_HEADER = ["Описание", "Код"]
+    print()
+    print(to_markdown(body=table
+                    , header=["a", "b", "c", "d"]))

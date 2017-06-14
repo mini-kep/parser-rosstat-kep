@@ -673,5 +673,6 @@ def __for_testing__():
 
 if __name__ == "__main__":
     approve_latest()
+    _,_, dfm = dfs()
     #approve_all()
     #save_all_dfs()
