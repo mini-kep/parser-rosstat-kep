@@ -5,7 +5,7 @@ spec
 desc
 sections
 """
-from collections import OrderedDict as odict   
+from collections import OrderedDict as odict
 
 
 # parsing specification
@@ -221,14 +221,9 @@ not_in_a = set(x for x in b if x not in a)
 not_in_b = set(x for x in a if x not in b)
 
 # FIXME: in final version not_in_a must equal to set()
-assert not_in_a == set(['GOV_EXPENSE_ACCUM_CONSOLIDATED',
- 'GOV_EXPENSE_ACCUM_FEDERAL',
- 'GOV_EXPENSE_ACCUM_SUBFEDERAL',
- 'GOV_REVENUE_ACCUM_CONSOLIDATED',
- 'GOV_REVENUE_ACCUM_FEDERAL',
- 'GOV_REVENUE_ACCUM_SUBFEDERAL',
- 'GOV_SURPLUS_ACCUM_FEDERAL',
- 'GOV_SURPLUS_ACCUM_SUBFEDERAL'])
+assert not_in_a == {'GOV_EXPENSE_ACCUM_CONSOLIDATED', 'GOV_EXPENSE_ACCUM_FEDERAL', 'GOV_EXPENSE_ACCUM_SUBFEDERAL',
+                    'GOV_REVENUE_ACCUM_CONSOLIDATED', 'GOV_REVENUE_ACCUM_FEDERAL', 'GOV_REVENUE_ACCUM_SUBFEDERAL',
+                    'GOV_SURPLUS_ACCUM_FEDERAL', 'GOV_SURPLUS_ACCUM_SUBFEDERAL'}
 assert not_in_b == set() 
 
 
@@ -245,6 +240,12 @@ sections = odict([
 # FIXME: maybe more elegant unpacking below (?)
 z = list()
 [z.extend(labels) for labels in sections.values()]
+
+#алтернативный вариант:
+#from operator import concat
+#from functools import reduce
+#z = reduce(concat, sections.values())
+
 assert set(z) == set(desc.keys())
 
 def bold(s):
