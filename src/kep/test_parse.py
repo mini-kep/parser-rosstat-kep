@@ -3,7 +3,6 @@ import pytest
 
 import parse
 import files
-from kep.parse import Driver
 
 
 # TESTING END TO END
@@ -142,7 +141,7 @@ def test_Datapoints_get():
 
 def test_end_to_end_latest_month():
     #parse.approve_csv(year=None,month=None)
-    Driver(year=None,month=None).approve_csv(valid_datapoints=Driver.VALID_DATAPOINTS_SAMPLE)
+    parse.Driver(year=None,month=None).approve_csv(valid_datapoints=parse.Driver.VALID_DATAPOINTS_SAMPLE)
 
 # TESTING INDIVIDUAL FUNCTIONS
 
