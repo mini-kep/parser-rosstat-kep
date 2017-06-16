@@ -204,5 +204,22 @@ varname: GDP, unit: rog
 1991 | 10 20 30 40
 ------------------"""
 
+
+def all_values():
+    # emit all values for debugging to_float()
+    csv_path = files.get_path_csv()
+    for t in parse.get_all_tables(csv_path):
+        for row in t.datarows:
+            for x in row:
+                yield
+
+
+def all_heads():
+    # emit all heads for debugging get_year()
+    csv_path = files.get_path_csv()
+    csv_dicts = parse.read_csv(csv_path)
+    for d in csv_dicts:
+        yield d['head']
+
 if __name__ == "__main__":
     pytest.main()

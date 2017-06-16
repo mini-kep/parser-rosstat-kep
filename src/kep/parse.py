@@ -520,7 +520,7 @@ class Datapoints():
 #    {'freq': 'm', 'label': 'RETAIL_SALES_NONFOODS_rog', 'month': 12, 'value': 114.9, 'year': 1999}
 #]
 
-# убрано. см класс Vintage
+# убрано. см класс Validator
 #def approve_csv(year, month, valid_datapoints=VALID_DATAPOINTS_SAMPLE):
 #    csv_path = files.get_path_csv(year, month)
 #    print("File:", csv_path)
@@ -608,23 +608,6 @@ def dfs(year=None, month=None):
     v = Vintage(year, month)
     return v.frame.dfa, v.frame.dfq, v.frame.dfm
 
-#TODO: не нашел где используется, может стоит удалить?
-def all_values():
-    # emit all values for debugging to_float()
-    csv_path = files.get_path_csv()
-    for t in get_all_tables(csv_path):
-        for row in t.datarows:
-            for x in row:
-                yield x
-
-#TODO: не нашел где используется, может стоит удалить?
-def all_heads():
-    # emit all heads for debugging get_year()
-    csv_path = files.get_path_csv()
-    csv_dicts = read_csv(csv_path)
-    for d in csv_dicts:
-        yield d['head']
-
 
 class Vintage:
     """Dataset release at a given year and month"""
@@ -647,21 +630,12 @@ class Vintage:
         self.dpoints = Datapoints(self.tables)
         # convert stream values to pandas dataframes
         self.frame = Frame(datapoints=self.dpoints)
-        print("Dataframes created OK for {}.{}".format(month,year))
+        print("Dataframes created OK for {}.{}".format(month, year))
 
     def save_dfs(self):
         """Save dataframes to CSVs."""
         processed_folder = files.get_processed_folder(self.year, self.month)
         self.frame.save(processed_folder)
-
-    def approve_csv(self, valid_datapoints=VALID_DATAPOINTS_SAMPLE):
-        for x in valid_datapoints:
-            if not self.dpoints.is_included(x):
-                msg1 = "Not found in dataset: {}".format(x)
-                msg2 = "Date: {}, {}".format(self.year, self.month)
-                msg3 = "File: {}".format(self.csv_path)
-                raise ValueError("\n".join([msg1 + msg2 + msg3]))
-        print("Test values parsed OK.")
 
     def __str__(self):
         return "{} {}".format(self.year, self.month)
@@ -670,7 +644,7 @@ class Vintage:
         return "{0!s}({1!r}, {2!r})".format(self.__class__, self.year, self.month)
 
 
-class VintageSet():
+class Collection():
     # all methods to manipulate entire set of releases
 
     @staticmethod
@@ -678,13 +652,12 @@ class VintageSet():
         for (year, month) in files.filled_dates():
             Vintage(year, month).save_dfs()
 
-
     @staticmethod
     def approve_latest(valid_datapoints=Vintage.VALID_DATAPOINTS_SAMPLE):
         """Quick check for algorithm on latest available data."""
 
-        Vintage(year=None, month=None).approve_csv(valid_datapoints)
-
+        vintage = Vintage(year=None, month=None)
+        Validator.approve_csv(vintage, valid_datapoints)
 
     @staticmethod
     def approve_all(valid_datapoints=Vintage.VALID_DATAPOINTS_SAMPLE):
@@ -693,7 +666,21 @@ class VintageSet():
         """
 
         for (year, month) in files.filled_dates():
-            Vintage(year, month).approve_csv(valid_datapoints)
+            vintage = Vintage(year, month)
+            Validator.approve_csv(vintage, valid_datapoints)
+
+
+class Validator:
+
+    @staticmethod
+    def approve_csv(vintage, valid_datapoints):
+        for x in valid_datapoints:
+            if not vintage.dpoints.is_included(x):
+                msg1 = "Not found in dataset: {}".format(x)
+                msg2 = "Date: {}, {}".format(vintage.year, vintage.month)
+                msg3 = "File: {}".format(vintage.csv_path)
+                raise ValueError("\n".join([msg1 + msg2 + msg3]))
+        print("Test values parsed OK.")
 
 
 def __for_testing__():
@@ -720,11 +707,11 @@ def __for_testing__():
     # end of cycle
 
     # переписано на это:
-    VintageSet.approve_latest()
+    Collection.approve_latest()
 
-    VintageSet.approve_all()
+    Collection.approve_all()
 
-    VintageSet.save_all_dfs()
+    Collection.save_all_dfs()
 
     # interim to processed data cycle: (year, month) -> 3 dataframes
     year, month = 2017, 4
@@ -734,10 +721,10 @@ def __for_testing__():
 
 if __name__ == "__main__":
 
-    VintageSet.approve_latest()
+    Collection.approve_latest()
 
     print("\n")
     _, _, dfm = dfs()
 
-    #VintageSet.approve_all()
-    #VintageSet.save_all_dfs()
+    #Collection.approve_all()
+    #Collection.save_all_dfs()
