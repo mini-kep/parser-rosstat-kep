@@ -140,8 +140,8 @@ def test_Datapoints_get():
     
 
 def test_end_to_end_latest_month():
-    #parse.approve_csv(year=None,month=None)
-    parse.Vintage(year=None,month=None).approve_csv()
+    vintage = parse.Vintage(year=None,month=None)
+    parse.Validator.approve_csv(vintage)
 
 # TESTING INDIVIDUAL FUNCTIONS
 
