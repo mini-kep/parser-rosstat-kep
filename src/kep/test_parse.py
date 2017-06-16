@@ -141,7 +141,7 @@ def test_Datapoints_get():
 
 def test_end_to_end_latest_month():
     #parse.approve_csv(year=None,month=None)
-    parse.Driver(year=None,month=None).approve_csv(valid_datapoints=parse.Driver.VALID_DATAPOINTS_SAMPLE)
+    parse.Vintage(year=None,month=None).approve_csv()
 
 # TESTING INDIVIDUAL FUNCTIONS
 
