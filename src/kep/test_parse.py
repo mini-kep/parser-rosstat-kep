@@ -3,10 +3,12 @@ import pytest
 
 import parse
 import files
+from kep.parse import Driver
 
 
 # TESTING END TO END
-csv_path = files.get_path_csv(2017, 4)  
+
+csv_path = files.get_path_csv(2017, 4)
 # break csv to tables with variable names
 tables = parse.get_all_valid_tables(csv_path)
 # emit values from tables
@@ -139,7 +141,8 @@ def test_Datapoints_get():
     
 
 def test_end_to_end_latest_month():
-    parse.approve_csv(year=None,month=None)
+    #parse.approve_csv(year=None,month=None)
+    Driver(year=None,month=None).approve_csv(valid_datapoints=Driver.VALID_DATAPOINTS_SAMPLE)
 
 # TESTING INDIVIDUAL FUNCTIONS
 
