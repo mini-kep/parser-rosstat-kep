@@ -515,6 +515,7 @@ class Datapoints():
         return datapoint in self.datapoints
 
 # dataframe dates handling
+# FIXME: shoter, pandas-native function?
 def get_end_of_monthdate(year, month):
     dm = datetime(year=year, month=month, day=monthrange(year, month)[1])
     return pd.Timestamp(dm)
@@ -616,7 +617,7 @@ class Vintage:
         print("Test values parsed OK for", self)
 
 class Collection():
-    # Methods to manipulate entire set of releases
+    # Methods to manipulate entire set of data releases
     
     @staticmethod
     def save_all_dataframes_to_csv():
@@ -637,6 +638,8 @@ class Collection():
         for (year, month) in files.filled_dates():
             vintage = Vintage(year, month)
             vintage.validate()
+
+# FIXME: review __str__, and __repr__?
 
 if __name__ == "__main__":
     Collection.approve_latest()

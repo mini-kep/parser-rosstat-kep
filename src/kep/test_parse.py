@@ -6,14 +6,14 @@ import files
 
 
 # TESTING END TO END
-
-csv_path = files.get_path_csv(2017, 4)
+year, month = 2017, 4
+vint = parse.Vintage(2017, 4)
 # break csv to tables with variable names
-tables = parse.get_all_valid_tables(csv_path)
+tables = vint.tables
 # emit values from tables
-dpoints = parse.Datapoints(tables)    
+dpoints = vint.dpoints    
 # convert stream values to pandas dataframes     
-frame = parse.Frame(datapoints=dpoints)
+frame = vint.frames
 
 
 def test_Datapoints_is_included_annual_1999_values_in_2017_4():
@@ -141,7 +141,7 @@ def test_Datapoints_get():
 
 def test_end_to_end_latest_month():
     vintage = parse.Vintage(year=None,month=None)
-    parse.Validator.approve_csv(vintage, parse.Vintage.VALID_DATAPOINTS_SAMPLE)
+    vintage.validate()
 
 # TESTING INDIVIDUAL FUNCTIONS
 
@@ -155,7 +155,7 @@ def test_Header():
      assert parse.Header.KNOWN != parse.Header.UNKNOWN 
 
 def test_RowHolder_is_matched():
-    foo = parse.RowHolder.is_matched
+    foo = parse.RowStack.is_matched
     assert foo(pat="Объем ВВП", textline="Объем ВВП текущего года") == True
     assert foo(pat="Объем ВВП", textline="1.1 Объем ВВП") == False
 
