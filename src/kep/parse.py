@@ -6,7 +6,7 @@
    -  units of measurement dictionary ("мдрд.руб." -> "bln_rub")
 
    Parsing procedure:
-   - cut out a segment of csv file as delimited by start and end lines (1)
+   - cut out a segment of csv file as delimited by start and end lines
    - save remaining parts of csv file for further parsing
    - break csv segment into tables, each table containing headers and data rows
    - parse table headers to obtain variable name ("GDP") and unit ("bln_rub")
@@ -15,15 +15,16 @@
         emit values as frequency-label-date-value dicts
 """
 
-import warnings
-import csv
-import re
-import itertools
-import pandas as pd
 from enum import Enum, unique
 from collections import OrderedDict as odict
+import csv
+import itertools
+import re
+import warnings
+
 from datetime import datetime
 from calendar import monthrange
+import pandas as pd
 
 import splitter
 import files
@@ -79,6 +80,26 @@ def read_csv(path):
     raw_csv_rows = from_csv(path)
     filled_csv_rows = filter(lambda row: row and row[0], raw_csv_rows)
     return map(Row, filled_csv_rows)
+
+
+class RowsFromCSV():      
+    def __init__(self, csv_path):
+        rows = read_csv(csv_path)
+        self.row_stack = RowStack(rows)
+        
+    def get_tables(self, spec=SPEC, units=UNITS):
+        all_tables = []
+        # use additional parsing defintions first
+        for pdef in spec.additional:
+            csv_segment = self.row_stack.pop(pdef)
+            tables = get_tables_from_rows_segment(csv_segment, pdef, units)
+            all_tables.extend(tables)
+        # use default parsing defintion on remaining rows
+        pdef = spec.main
+        csv_segment = self.row_stack.remaining_rows()
+        tables = get_tables_from_rows_segment(csv_segment, pdef, units)
+        all_tables.extend(tables)
+        return all_tables
 
 
 YEAR_CATCHER = re.compile('(\d{4}).*')
@@ -145,8 +166,7 @@ class Row:
                     m_dicts.append(d)
         return a_dict, q_dicts, m_dicts
 
-
-class RowHolder():
+class RowStack:
     """Holder for CSV rows"""
 
     def __init__(self, rows):
@@ -156,7 +176,7 @@ class RowHolder():
     @staticmethod
     def is_matched(pat, textline):
         """Return True if *textline* starts with *pat*
-           Ignores \"
+           Ignores "
         """
         # kill " in both args
         pat = pat.replace('"', '')
@@ -166,9 +186,9 @@ class RowHolder():
         else:
             return False
 
-    def is_found(self, pat):
+    def is_found(self, text):
         for row in self.rows:
-            if self.is_matched(pat, row.name):
+            if self.is_matched(text, row.name):
                 return True
         return False
 
@@ -196,7 +216,7 @@ class RowHolder():
     def pop_segment(self, start, end):
         """Pops elements of self.row between [start, end).
            Recognises element occurences by index *i*.
-           Modifies *self.csv_dicts*."""
+           Modifies *self.rows*."""
         we_are_in_segment = False
         segment = []
         i = 0
@@ -318,7 +338,8 @@ class Table():
 
 
 class Header():
-    """Table header, capable to extract variable label from header textrows."""
+    """Table header.
+       Capable to extract variable label from header textrows."""
 
     KNOWN = "+"
     UNKNOWN = "-"
@@ -394,37 +415,14 @@ def check_required_labels(tables, pdef):
         raise ValueError("Missed labels:" + labels_missed.__str__())
 
 
-def get_tables(rows, pdef, units=UNITS):
-    tables = [t.parse(pdef, units) for t in split_to_tables(rows)]
+def get_tables_from_rows_segment(rows_segment, pdef, units=UNITS):
+    tables = [t.parse(pdef, units) for t in split_to_tables(rows_segment)]
     fix_multitable_units(tables)
     check_required_labels(tables, pdef)
     return tables
 
 
-def get_all_tables(csv_path, spec=SPEC, units=UNITS):
-    rows = read_csv(csv_path)
-    row_holder = RowHolder(rows)
-    all_tables = []
-    # use additional parsing defintions first
-    for pdef in spec.additional:
-        csv_segment = row_holder.pop(pdef)
-        tables = get_tables(csv_segment, pdef, units)
-        all_tables.extend(tables)
-    # use default parsing defintion first
-    pdef = spec.main
-    csv_segment = row_holder.remaining_rows()
-    tables = get_tables(csv_segment, pdef, units)
-    all_tables.extend(tables)
-    return all_tables
-
-
-def get_all_valid_tables(csv_path, spec=SPEC, units=UNITS):
-    all_tables = get_all_tables(csv_path, spec, units)
-    return [t for t in all_tables if t.is_defined()]
-
-
 COMMENT_CATCHER = re.compile("\D*(\d+[.,]?\d*)\s*(?=\d\))")
-
 
 def to_float(text, i=0):
     i += 1
@@ -481,6 +479,7 @@ class Emitter():
 
 
 class Datapoints():
+    
     def __init__(self, tables):
         self.emitters = [Emitter(t) for t in tables if t.is_defined()]
         self.datapoints = list(self.get_datapoints())
@@ -515,47 +514,17 @@ class Datapoints():
         """Return True if *datapoint* is in *self.datapoints*"""
         return datapoint in self.datapoints
 
-        # убрано. см класс Vintage
-
-
-# short check control values
-# VALID_DATAPOINTS_SAMPLE = [
-#    {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
-#    {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999},
-#    {'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL_bln_usd', 'value': 75.6, 'year': 1999},
-#    {'freq': 'q', 'label': 'IMPORT_GOODS_TOTAL_bln_usd', 'qtr': 1, 'value': 9.1, 'year': 1999},
-#    {'freq': 'm', 'label': 'RETAIL_SALES_NONFOODS_rog', 'month': 12, 'value': 114.9, 'year': 1999}
-# ]
-
-# убрано. см класс Validator
-# def approve_csv(year, month, valid_datapoints=VALID_DATAPOINTS_SAMPLE):
-#    csv_path = files.get_path_csv(year, month)
-#    print("File:", csv_path)
-#    tables = get_all_valid_tables(csv_path)
-#    dps = Datapoints(tables)
-#    for x in valid_datapoints:
-#        if not dps.is_included(x):
-#            msg1 = "Not found in dataset: {}".format(x)
-#            msg2 = "Date: {}, {}".format(year, month)
-#            msg3 = "File: {}".format(csv_path)
-#            raise ValueError("\n".join([msg1 + msg2 + msg3]))
-#    print("Test values parsed OK.")
-#    Frame(dps)
-#    print("Dataframes created OK.")
-
-
 # dataframe dates handling
-def get_end_of_monthdate(y, m):
-    dm = datetime(year=y, month=m, day=monthrange(y, m)[1])
+def get_end_of_monthdate(year, month):
+    dm = datetime(year=year, month=month, day=monthrange(year, month)[1])
     return pd.Timestamp(dm)
 
 
-def get_end_of_quarterdate(y, q):
-    dq = datetime(year=y, month=q * 3, day=monthrange(y, q * 3)[1])
+def get_end_of_quarterdate(year, qtr):
+    dq = datetime(year=year, month=qtr * 3, day=monthrange(year, qtr * 3)[1])
     return pd.Timestamp(dq)
 
-
-class Frame():
+class Frames():
     """Accept Datapoints() instance and emit pandas DataFrames."""
 
     def __init__(self, datapoints):
@@ -600,138 +569,80 @@ class Frame():
         print("Saved dataframes to", folder_path)
 
 
-# убрано. см класс Vintage
-# def get_frame(year=None, month=None):
-#    csv_path = files.get_path_csv(year, month)
-#    tables = get_all_valid_tables(csv_path)
-#    dpoints = Datapoints(tables)
-#    return Frame(dpoints)
-
-# TODO: неособо нужен, но если очень хочется можно оставить
-def dfs(year=None, month=None):
-    """Shorthand for obtaining dataframes."""
-    # frame = get_frame(year, month)
-    # return frame.dfa, frame.dfq, frame.dfm
-
-    v = Vintage(year, month)
-    return v.frame.dfa, v.frame.dfq, v.frame.dfm
-
+VALID_DATAPOINTS = [
+            {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
+            {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999},
+            {'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL_bln_usd', 'value': 75.6, 'year': 1999},
+            {'freq': 'q', 'label': 'IMPORT_GOODS_TOTAL_bln_usd', 'qtr': 1, 'value': 9.1, 'year': 1999},
+            {'freq': 'm', 'label': 'RETAIL_SALES_NONFOODS_rog', 'month': 12, 'value': 114.9, 'year': 1999}
+        ]
 
 class Vintage:
-    """Dataset release at a given year and month"""
-
-    # short check control values
-    VALID_DATAPOINTS_SAMPLE = [
-        {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
-        {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999},
-        {'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL_bln_usd', 'value': 75.6, 'year': 1999},
-        {'freq': 'q', 'label': 'IMPORT_GOODS_TOTAL_bln_usd', 'qtr': 1, 'value': 9.1, 'year': 1999},
-        {'freq': 'm', 'label': 'RETAIL_SALES_NONFOODS_rog', 'month': 12, 'value': 114.9, 'year': 1999}
-    ]
+    """Dataset release at a given year and month."""
 
     def __init__(self, year, month):
-        self.year, self.month = year, month
+        self.year, self.month = files.filter_date(year, month)
+        # get csv source
         self.csv_path = files.get_path_csv(year, month)
         # break csv to tables with variable names
-        self.tables = get_all_valid_tables(self.csv_path)
+        self.__all_tables__ = RowsFromCSV(self.csv_path).get_tables()
+        self.tables = [t for t in self.__all_tables__ if t.is_defined()]
         # emit values from tables
         self.dpoints = Datapoints(self.tables)
         # convert stream values to pandas dataframes
-        self.frame = Frame(datapoints=self.dpoints)
-        print("Dataframes created OK for {}.{}".format(month, year))
+        self.frames = Frames(datapoints=self.dpoints)
+        print("Dataframes created OK for", self)
 
     def save_dfs(self):
         """Save dataframes to CSVs."""
         processed_folder = files.get_processed_folder(self.year, self.month)
         self.frame.save(processed_folder)
-
+        
+    def dfs(self, year=None, month=None):
+        """Shorthand for obtaining dataframes."""
+        return  self.frames.dfa,  self.frames.dfq,  self.frames.dfm
+    
     def __str__(self):
         return "{} {}".format(self.year, self.month)
 
     def __repr__(self):
         return "{0!s}({1!r}, {2!r})".format(self.__class__, self.year, self.month)
 
+    def validate(self, valid_datapoints=VALID_DATAPOINTS):
+        for x in valid_datapoints:
+            if not self.dpoints.is_included(x):
+                raise ValueError("Not found in dataset: {}".format(x) +
+                                 "File: {}".format(vintage.csv_path))
+        print("Test values parsed OK for", self)
 
 class Collection():
-    # all methods to manipulate entire set of releases
-
+    # Methods to manipulate entire set of releases
+    
     @staticmethod
-    def save_all_dfs():
+    def save_all_dataframes_to_csv():
         for (year, month) in files.filled_dates():
             Vintage(year, month).save_dfs()
 
     @staticmethod
-    def approve_latest(valid_datapoints=Vintage.VALID_DATAPOINTS_SAMPLE):
+    def approve_latest():
         """Quick check for algorithm on latest available data."""
-
         vintage = Vintage(year=None, month=None)
-        Validator.approve_csv(vintage, valid_datapoints)
-
+        vintage.validate()
+        
     @staticmethod
-    def approve_all(valid_datapoints=Vintage.VALID_DATAPOINTS_SAMPLE):
+    def approve_all():
         """Check all dates, runs slow (about 20 sec.)
            May fail if dataset not complete.
         """
-
         for (year, month) in files.filled_dates():
             vintage = Vintage(year, month)
-            Validator.approve_csv(vintage, valid_datapoints)
-
-
-class Validator:
-    @staticmethod
-    def approve_csv(vintage, valid_datapoints):
-        for x in valid_datapoints:
-            if not vintage.dpoints.is_included(x):
-                msg1 = "Not found in dataset: {}".format(x)
-                msg2 = "Date: {}, {}".format(vintage.year, vintage.month)
-                msg3 = "File: {}".format(vintage.csv_path)
-                raise ValueError("\n".join([msg1 + msg2 + msg3]))
-        print("Test values parsed OK.")
-
-
-def __for_testing__():
-    """Holder of boilerplate code for __main__"""
-
-    # всё ниже:
-    # approve_latest()
-    # approve_all()
-    # save_all_dfs()
-
-    # interim to processed data cycle: (year, month) -> 3 dataframes
-    # year, month = 2017, 4
-    # source csv file
-    # csv_path = files.get_path_csv(year, month)
-    # break csv to tables with variable names
-    # tables = get_all_valid_tables(csv_path)
-    # emit values from tables
-    # dpoints = Datapoints(tables)
-    # convert stream values to pandas dataframes
-    # frame = Frame(datapoints=dpoints)
-    # save dataframes to csv files
-    # processed_folder = files.get_processed_folder(year, month)
-    # frame.save(processed_folder)
-    # end of cycle
-
-    # переписано на это:
-    Collection.approve_latest()
-
-    Collection.approve_all()
-
-    Collection.save_all_dfs()
-
-    # interim to processed data cycle: (year, month) -> 3 dataframes
-    year, month = 2017, 4
-    vintage = Vintage(year, month)
-    vintage.save_dfs()
-    # end of cycle
-
+            vintage.validate()
 
 if __name__ == "__main__":
     Collection.approve_latest()
-
-    print("\n")
-    _, _, dfm = dfs()
-
-    # Collection.approve_all()
-    # Collection.save_all_dfs()
+    #Collection.approve_all()
+    #Collection.save_all_dataframes_to_csv()
+    
+    year, month = 2017, 4
+    vintage = Vintage(year, month)
+    _, _, dfm = vintage.dfs()

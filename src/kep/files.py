@@ -5,6 +5,7 @@ import shutil
 ENC = 'utf8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
+
 #FIXME: hardcoded constant will not update to new months
 DATES =     [                                 (2009, 4), (2009, 5), (2009, 6), 
              (2009, 7), (2009, 8), (2009, 9), (2009, 10), (2009, 11), (2009, 12), 
@@ -38,6 +39,15 @@ def filled_dates(available_dates=DATES):
         csv_path = get_path_csv(*date) 
         if csv_path.exists() and csv_path.stat().st_size > 0:
             yield date
+
+def filter_date(year, month):
+    if not year and not month:
+        year, month = InterimDataFolder().get_latest_date()
+        return year, month
+    elif (year, month) in list(filled_dates()):
+        return year, month
+    else:
+        raise ValueError("Date not found: {} {}".format(year, month))
 
 # TODO - accoutn for latest in folder structure
 """
