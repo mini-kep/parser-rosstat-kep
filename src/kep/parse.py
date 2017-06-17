@@ -41,16 +41,20 @@ CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 def make_label(vn, unit, sep="_"):
     return vn + sep + unit
 
+
 def split_label(label):
     return extract_varname(label), extract_unit(label)
+
 
 def extract_varname(label):
     words = label.split('_')
     return '_'.join(itertools.takewhile(lambda word: word.isupper(), words))
 
+
 def extract_unit(label):
     words = label.split('_')
     return '_'.join(itertools.dropwhile(lambda word: word.isupper(), words))
+
 
 # csv file access
 def to_csv(rows, path):
@@ -68,6 +72,7 @@ def from_csv(path):
         csvreader = csv.reader(csvfile, **CSV_FORMAT)
         for row in csvreader:
             yield row
+
 
 def read_csv(path):
     """Yield non-empty dictionaries with 'head' and 'data' keys from *path*"""
@@ -119,24 +124,24 @@ class Row:
         m_dicts = []
         if a_value:
             a_dict = {**base_dict,
-                       'freq': 'a',
+                      'freq': 'a',
                       'value': to_float(a_value)}
         if q_values:
             for t, val in enumerate(q_values):
                 if val:
                     d = {**base_dict,
-                       'freq': 'q',
-                      'value': to_float(val),
-                        'qtr': t + 1}
+                         'freq': 'q',
+                         'value': to_float(val),
+                         'qtr': t + 1}
                     q_dicts.append(d)
 
         if m_values:
             for t, val in enumerate(m_values):
                 if val:
                     d = {**base_dict,
-                       'freq': 'm',
-                      'value': to_float(val),
-                      'month': t + 1}
+                         'freq': 'm',
+                         'value': to_float(val),
+                         'month': t + 1}
                     m_dicts.append(d)
         return a_dict, q_dicts, m_dicts
 
@@ -510,18 +515,20 @@ class Datapoints():
         """Return True if *datapoint* is in *self.datapoints*"""
         return datapoint in self.datapoints
 
- # убрано. см класс Vintage
+        # убрано. см класс Vintage
+
+
 # short check control values
-#VALID_DATAPOINTS_SAMPLE = [
+# VALID_DATAPOINTS_SAMPLE = [
 #    {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
 #    {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999},
 #    {'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL_bln_usd', 'value': 75.6, 'year': 1999},
 #    {'freq': 'q', 'label': 'IMPORT_GOODS_TOTAL_bln_usd', 'qtr': 1, 'value': 9.1, 'year': 1999},
 #    {'freq': 'm', 'label': 'RETAIL_SALES_NONFOODS_rog', 'month': 12, 'value': 114.9, 'year': 1999}
-#]
+# ]
 
 # убрано. см класс Validator
-#def approve_csv(year, month, valid_datapoints=VALID_DATAPOINTS_SAMPLE):
+# def approve_csv(year, month, valid_datapoints=VALID_DATAPOINTS_SAMPLE):
 #    csv_path = files.get_path_csv(year, month)
 #    print("File:", csv_path)
 #    tables = get_all_valid_tables(csv_path)
@@ -592,18 +599,19 @@ class Frame():
         self.dfm.to_csv(folder_path / 'dfm.csv')
         print("Saved dataframes to", folder_path)
 
+
 # убрано. см класс Vintage
-#def get_frame(year=None, month=None):
+# def get_frame(year=None, month=None):
 #    csv_path = files.get_path_csv(year, month)
 #    tables = get_all_valid_tables(csv_path)
 #    dpoints = Datapoints(tables)
 #    return Frame(dpoints)
 
-#TODO: неособо нужен, но если очень хочется можно оставить
+# TODO: неособо нужен, но если очень хочется можно оставить
 def dfs(year=None, month=None):
     """Shorthand for obtaining dataframes."""
-    #frame = get_frame(year, month)
-    #return frame.dfa, frame.dfq, frame.dfm
+    # frame = get_frame(year, month)
+    # return frame.dfa, frame.dfq, frame.dfm
 
     v = Vintage(year, month)
     return v.frame.dfa, v.frame.dfq, v.frame.dfm
@@ -671,7 +679,6 @@ class Collection():
 
 
 class Validator:
-
     @staticmethod
     def approve_csv(vintage, valid_datapoints):
         for x in valid_datapoints:
@@ -692,18 +699,18 @@ def __for_testing__():
     # save_all_dfs()
 
     # interim to processed data cycle: (year, month) -> 3 dataframes
-    #year, month = 2017, 4
+    # year, month = 2017, 4
     # source csv file
-    #csv_path = files.get_path_csv(year, month)
+    # csv_path = files.get_path_csv(year, month)
     # break csv to tables with variable names
-    #tables = get_all_valid_tables(csv_path)
+    # tables = get_all_valid_tables(csv_path)
     # emit values from tables
-    #dpoints = Datapoints(tables)
+    # dpoints = Datapoints(tables)
     # convert stream values to pandas dataframes
-    #frame = Frame(datapoints=dpoints)
+    # frame = Frame(datapoints=dpoints)
     # save dataframes to csv files
-    #processed_folder = files.get_processed_folder(year, month)
-    #frame.save(processed_folder)
+    # processed_folder = files.get_processed_folder(year, month)
+    # frame.save(processed_folder)
     # end of cycle
 
     # переписано на это:
@@ -719,12 +726,12 @@ def __for_testing__():
     vintage.save_dfs()
     # end of cycle
 
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     Collection.approve_latest()
 
     print("\n")
     _, _, dfm = dfs()
 
-    #Collection.approve_all()
-    #Collection.save_all_dfs()
+    # Collection.approve_all()
+    # Collection.save_all_dfs()
