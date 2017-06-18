@@ -1,18 +1,9 @@
-"""Parse tables from raw CSV file using parsing defintion.
+"""Parse raw CSV file using parsing specification.
 
-   Parsing defintion contains:
-   -  parsing boundaries - start and end lines of CSV file segment
-   -  link between table headers ("Объем ВВП") and variable names ("GDP")
-   -  units of measurement dictionary ("мдрд.руб." -> "bln_rub")
+Main call: 
+    
+   Vintage(year, month).save()
 
-   Parsing procedure:
-   - cut out a segment of csv file as delimited by start and end lines
-   - save remaining parts of csv file for further parsing
-   - break csv segment into tables, each table containing headers and data rows
-   - parse table headers to obtain variable name ("GDP") and unit ("bln_rub")
-   - for tables with varname and unit:
-        split datarows to obtain annual, quarter and monthly values
-        emit values as frequency-label-date-value dicts
 """
 
 from enum import Enum, unique
@@ -83,6 +74,8 @@ def read_csv(path):
 
 
 class RowsFromCSV():      
+    """Return tables from *csv_path* by .get_tables() method."""
+    
     def __init__(self, csv_path):
         rows = read_csv(csv_path)
         self.row_stack = RowStack(rows)
@@ -121,6 +114,8 @@ def is_year(string: str) -> bool:
 
 
 class Row:
+    """Single CSV row representation."""
+    
     def __init__(self, row):
         self.name = row[0]
         self.data = row[1:]
@@ -167,7 +162,7 @@ class Row:
         return a_dict, q_dicts, m_dicts
 
 class RowStack:
-    """Holder for CSV rows"""
+    """Holder for CSV rows."""
 
     def __init__(self, rows):
         # consume *rows*, maybe it is a generator
@@ -253,7 +248,7 @@ class State(Enum):
 
 
 def split_to_tables(rows):
-    """Yield Table() instances from *csv_dicts* stream."""
+    """Yield Table() instances from *rows*."""
     datarows = []
     headers = []
     state = State.INIT
@@ -274,7 +269,7 @@ def split_to_tables(rows):
 
 
 class Table():
-    """Holds headers textlines and datarows"""
+    """Headers and datarows."""
 
     # [4, 5, 12, 13, 17]
     VALID_ROW_LENGTHS = list(splitter.ROW_LENGTH_TO_FUNC_MAPPER.keys())
@@ -299,10 +294,9 @@ class Table():
         elif self.coln in self.VALID_ROW_LENGTHS:
             # use standard splitters for standard number of columns
             self.splitter_func = splitter.get_splitter(self.coln)
-        else:
-            #
-            """Trying to parse a table without <year> <values> structure.
-               Such tables are currently out of scope of parsing defintion."""
+        else:            
+            # Trying to parse a table without <year> <values> structure.
+            # Such tables are currently out of scope of parsing defintion.
             warnings.warn("Unexpected row length {}\n{}".format(self.coln, self))
 
     @property
@@ -338,8 +332,7 @@ class Table():
 
 
 class Header():
-    """Table header.
-       Capable to extract variable label from header textrows."""
+    """Table header. Can extract variable label."""
 
     KNOWN = "+"
     UNKNOWN = "-"
@@ -592,16 +585,15 @@ class Vintage:
         self.dpoints = Datapoints(self.tables)
         # convert stream values to pandas dataframes
         self.frames = Frames(datapoints=self.dpoints)
-        print("Dataframes created OK for", self)
 
-    def save_dfs(self):
+    def save(self):
         """Save dataframes to CSVs."""
         processed_folder = files.get_processed_folder(self.year, self.month)
-        self.frame.save(processed_folder)
+        self.frames.save(processed_folder)
         
-    def dfs(self, year=None, month=None):
+    def dfs(self):
         """Shorthand for obtaining dataframes."""
-        return  self.frames.dfa,  self.frames.dfq,  self.frames.dfm
+        return self.frames.dfa,  self.frames.dfq,  self.frames.dfm
     
     def __str__(self):
         return "{} {}".format(self.year, self.month)
@@ -649,3 +641,19 @@ if __name__ == "__main__":
     year, month = 2017, 4
     vintage = Vintage(year, month)
     _, _, dfm = vintage.dfs()
+    
+    """     
+    Parsing defintion contains:
+   -  parsing boundaries - start and end lines of CSV file segment
+   -  link between table headers ("Объем ВВП") and variable names ("GDP")
+   -  units of measurement dictionary ("мдрд.руб." -> "bln_rub")
+
+   Parsing procedure:
+   - cut out a segment of csv file as delimited by start and end lines
+   - save remaining parts of csv file for further parsing
+   - break csv segment into tables, each table containing headers and data rows
+   - parse table headers to obtain variable name ("GDP") and unit ("bln_rub")
+   - for tables with varname and unit:
+        split datarows to obtain annual, quarter and monthly values
+        emit values as frequency-label-date-value dicts
+"""
