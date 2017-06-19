@@ -208,10 +208,10 @@ varname: GDP, unit: rog
 def all_values():
     # emit all values for debugging to_float()
     csv_path = files.get_path_csv()
-    for t in parse.get_all_tables(csv_path):
-        for row in t.datarows:
-            for x in row:
-                yield
+    for table in parse.RowsFromCSV(csv_path).get_tables():
+        for row in table.datarows:
+            for value in row.data:
+                yield value
 
 
 def all_heads():
@@ -219,7 +219,7 @@ def all_heads():
     csv_path = files.get_path_csv()
     csv_dicts = parse.read_csv(csv_path)
     for d in csv_dicts:
-        yield d['head']
+        yield d.name
 
 if __name__ == "__main__":
     pytest.main()
