@@ -74,7 +74,7 @@ def read_csv(path):
 
 
 class RowsFromCSV():      
-    """Return tables from *csv_path* by .get_tables() method."""
+    """Returns tables from *csv_path* by .get_tables() method."""
     
     def __init__(self, csv_path):
         rows = read_csv(csv_path)
@@ -82,12 +82,12 @@ class RowsFromCSV():
         
     def get_tables(self, spec=SPEC, units=UNITS):
         all_tables = []
-        # use additional parsing defintions first
+        # use additional parsing definitions first
         for pdef in spec.additional:
             csv_segment = self.row_stack.pop(pdef)
             tables = get_tables_from_rows_segment(csv_segment, pdef, units)
             all_tables.extend(tables)
-        # use default parsing defintion on remaining rows
+        # use default parsing definition on remaining rows
         pdef = spec.main
         csv_segment = self.row_stack.remaining_rows()
         tables = get_tables_from_rows_segment(csv_segment, pdef, units)
@@ -99,8 +99,8 @@ YEAR_CATCHER = re.compile('(\d{4}).*')
 
 
 def get_year(string: str, rx=YEAR_CATCHER):
-    """Extract year from string *string*.
-       Return None if year is not valid or not in plausible range."""
+    """Extracts year from string *string*.
+       Returns None if year is not valid or not in plausible range."""
     match = re.match(rx, string)
     if match:
         year = int(match.group(1))
@@ -161,6 +161,7 @@ class Row:
                     m_dicts.append(d)
         return a_dict, q_dicts, m_dicts
 
+
 class RowStack:
     """Holder for CSV rows."""
 
@@ -170,13 +171,13 @@ class RowStack:
 
     @staticmethod
     def is_matched(pat, textline):
-        """Return True if *textline* starts with *pat*
+        """Returns True if *textline* starts with *pat*, False otherwise
            Ignores "
         """
         # kill " in both args
         pat = pat.replace('"', '')
-        textline = textline.replace('"', '')
         if pat:
+            textline = textline.replace('"', '')
             return textline.startswith(pat)
         else:
             return False
@@ -191,7 +192,7 @@ class RowStack:
         return self.rows
 
     def pop(self, pdef):
-        # walk by different versions of start/end lines eg 1.10... or 1.9...
+        # walks by different versions of start/end lines eg 1.10... or 1.9...
         for marker in pdef.markers:
             s = marker['start']
             e = marker['end']
@@ -210,7 +211,7 @@ class RowStack:
 
     def pop_segment(self, start, end):
         """Pops elements of self.row between [start, end).
-           Recognises element occurences by index *i*.
+           Recognises element occurrences by index *i*.
            Modifies *self.rows*."""
         we_are_in_segment = False
         segment = []
@@ -248,7 +249,7 @@ class State(Enum):
 
 
 def split_to_tables(rows):
-    """Yield Table() instances from *rows*."""
+    """Yields Table() instances from *rows*."""
     datarows = []
     headers = []
     state = State.INIT
@@ -296,7 +297,7 @@ class Table():
             self.splitter_func = splitter.get_splitter(self.coln)
         else:            
             # Trying to parse a table without <year> <values> structure.
-            # Such tables are currently out of scope of parsing defintion.
+            # Such tables are currently out of scope of parsing definition.
             warnings.warn("Unexpected row length {}\n{}".format(self.coln, self))
 
     @property
@@ -392,7 +393,7 @@ class Header():
 
 def fix_multitable_units(tables):
     """For tables without *header.varname* copy *header.varname* from previous table.
-       Apply to tables that do not have any unknown rows.
+       Applies to tables that do not have any unknown rows.
     """
     for prev_table, table in zip(tables, tables[1:]):
         if table.header.varname is None:
@@ -416,6 +417,7 @@ def get_tables_from_rows_segment(rows_segment, pdef, units=UNITS):
 
 
 COMMENT_CATCHER = re.compile("\D*(\d+[.,]?\d*)\s*(?=\d\))")
+
 
 def to_float(text, i=0):
     i += 1
@@ -472,7 +474,8 @@ class Emitter():
 
 
 class Datapoints():
-    
+    """Produces datapoints using emitters"""
+
     def __init__(self, tables):
         self.emitters = [Emitter(t) for t in tables if t.is_defined()]
         self.datapoints = list(self.get_datapoints())
@@ -504,7 +507,7 @@ class Datapoints():
         return itertools.chain(self.emit_a(), self.emit_q(), self.emit_m())
 
     def is_included(self, datapoint):
-        """Return True if *datapoint* is in *self.datapoints*"""
+        """Returns True if *datapoint* is in *self.datapoints*, False otherwise"""
         return datapoint in self.datapoints
 
 # dataframe dates handling
@@ -518,8 +521,9 @@ def get_end_of_quarterdate(year, qtr):
     dq = datetime(year=year, month=qtr * 3, day=monthrange(year, qtr * 3)[1])
     return pd.Timestamp(dq)
 
+
 class Frames():
-    """Accept Datapoints() instance and emit pandas DataFrames."""
+    """Accepts Datapoints() instance and emits pandas DataFrames."""
 
     def __init__(self, datapoints):
         assert isinstance(datapoints, Datapoints)
@@ -571,8 +575,9 @@ VALID_DATAPOINTS = [
             {'freq': 'm', 'label': 'RETAIL_SALES_NONFOODS_rog', 'month': 12, 'value': 114.9, 'year': 1999}
         ]
 
+
 class Vintage:
-    """Dataset release at a given year and month."""
+    """Represents dataset release at a given year and month."""
 
     def __init__(self, year, month):
         self.year, self.month = files.filter_date(year, month)
@@ -608,13 +613,14 @@ class Vintage:
                                  "File: {}".format(vintage.csv_path))
         print("Test values parsed OK for", self)
 
+
 class Collection():
     # Methods to manipulate entire set of data releases
     
     @staticmethod
     def save_all_dataframes_to_csv():
         for (year, month) in files.filled_dates():
-            Vintage(year, month).save_dfs()
+            Vintage(year, month).save()
 
     @staticmethod
     def approve_latest():
@@ -624,7 +630,7 @@ class Collection():
         
     @staticmethod
     def approve_all():
-        """Check all dates, runs slow (about 20 sec.)
+        """Checks all dates, runs slow (about 20 sec.)
            May fail if dataset not complete.
         """
         for (year, month) in files.filled_dates():
@@ -635,15 +641,15 @@ class Collection():
 
 if __name__ == "__main__":
     Collection.approve_latest()
-    #Collection.approve_all()
-    #Collection.save_all_dataframes_to_csv()
+    # Collection.approve_all()
+    # Collection.save_all_dataframes_to_csv()
     
     year, month = 2017, 4
     vintage = Vintage(year, month)
     _, _, dfm = vintage.dfs()
     
     """     
-    Parsing defintion contains:
+    Parsing definition contains:
    -  parsing boundaries - start and end lines of CSV file segment
    -  link between table headers ("Объем ВВП") and variable names ("GDP")
    -  units of measurement dictionary ("мдрд.руб." -> "bln_rub")
@@ -656,4 +662,4 @@ if __name__ == "__main__":
    - for tables with varname and unit:
         split datarows to obtain annual, quarter and monthly values
         emit values as frequency-label-date-value dicts
-"""
+    """
