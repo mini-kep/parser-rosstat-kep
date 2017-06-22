@@ -73,7 +73,7 @@ def read_csv(path):
     return map(Row, filled_csv_rows)
 
 
-class RowsFromCSV():      
+class RowsFromCSV:
     """Returns tables from *csv_path* by .get_tables() method."""
     
     def __init__(self, csv_path):
@@ -269,7 +269,7 @@ def split_to_tables(rows):
         yield Table(headers, datarows)
 
 
-class Table():
+class Table:
     """Headers and datarows."""
 
     # [4, 5, 12, 13, 17]
@@ -332,7 +332,7 @@ class Table():
                " {} datarows)".format(len(self.datarows))
 
 
-class Header():
+class Header:
     """Table header. Can extract variable label."""
 
     KNOWN = "+"
@@ -442,7 +442,7 @@ def to_float(text, i=0):
         return False
 
 
-class Emitter():
+class Emitter:
     """Emitter extracts and holds annual, quarterly and monthly values
        for a given Table.
 
@@ -473,7 +473,7 @@ class Emitter():
         return self.m
 
 
-class Datapoints():
+class Datapoints:
     """Produces datapoints using emitters"""
 
     def __init__(self, tables):
@@ -510,6 +510,7 @@ class Datapoints():
         """Returns True if *datapoint* is in *self.datapoints*, False otherwise"""
         return datapoint in self.datapoints
 
+
 # dataframe dates handling
 # FIXME: shoter, pandas-native function?
 def get_end_of_monthdate(year, month):
@@ -522,7 +523,7 @@ def get_end_of_quarterdate(year, qtr):
     return pd.Timestamp(dq)
 
 
-class Frames():
+class Frames:
     """Accepts Datapoints() instance and emits pandas DataFrames."""
 
     def __init__(self, datapoints):
@@ -614,7 +615,7 @@ class Vintage:
         print("Test values parsed OK for", self)
 
 
-class Collection():
+class Collection:
     # Methods to manipulate entire set of data releases
     
     @staticmethod
