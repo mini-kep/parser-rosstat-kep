@@ -1,7 +1,7 @@
 """Parse raw CSV file using parsing specification.
 
-Main call: 
-    
+Main call:
+
    Vintage(year, month).save()
 
 """
@@ -75,11 +75,11 @@ def read_csv(path):
 
 class Tables:
     """Returns tables from *csv_path* by .get_all() method."""
-    
+
     def __init__(self, csv_path):
         rows = read_csv(csv_path)
         self.row_stack = RowStack(rows)
-        
+
     def get_all(self, spec=SPEC, units=UNITS):
         all_tables = []
         # use additional parsing definitions first
@@ -93,7 +93,7 @@ class Tables:
         tables = get_tables_from_rows_segment(csv_segment, pdef, units)
         all_tables.extend(tables)
         return all_tables
-    
+
     def get_defined(self):
         return [t for t in self.get_all() if t.is_defined()]
 
@@ -116,56 +116,29 @@ def is_year(string: str) -> bool:
     return get_year(string) is not None
 
 
-class DictMaker:    
+class DictMaker:
     def __init__(self, year):
         self.basedict = {'year': year}
-        
-    def a_dict(self, val): 
-        return {**self.basedict, 'freq':'a', 'value': to_float(val)}     
-        
-    def q_dict(self, val, q): 
-        return {**self.basedict, 'freq':'q', 'value': to_float(val), 'qtr': q}
+
+    def a_dict(self, val):
+        return {**self.basedict, 'freq': 'a', 'value': to_float(val)}
+
+    def q_dict(self, val, q):
+        return {**self.basedict, 'freq': 'q', 'value': to_float(val), 'qtr': q}
 
     def m_dict(self, val, m):
-        return {**self.basedict, 'freq':'m', 'value': to_float(val), 'month': m}
-    
+        return {**self.basedict, 'freq': 'm', 'value': to_float(val),
+                'month': m}
 
-def not_none(func):
-    def wrapper(*args):
-        result = func(*args)
-        if result is None:
-            return []
-        else:
-            return result
-    return wrapper
 
-  
 class Row:
     """Single CSV row representation."""
-    
+
     def __init__(self, row):
         self.name = row[0]
         self.data = row[1:]
-        self.maker = DictMaker(get_year(self.name))
+        
 
-    @not_none
-    def a_dict(self):
-        if self.a_value:
-            return [self.maker.a_dict(self.a_value)]
-
-    @not_none
-    def q_dicts(self):
-        if self.q_values:
-            return [self.maker.q_dict(val, t+1) for t, val in enumerate(self.q_values) if val]
-
-    @not_none
-    def m_dicts(self):
-        if self.m_values: 
-            return [self.maker.m_dict(val, t+1) for t, val in enumerate(self.m_values) if val]
-
-    def set_splitter(self, splitter_func):
-        self.a_value, self.q_values, self.m_values = splitter_func(self.data)
-         
     def len(self):
         return len(self.data)
 
@@ -178,6 +151,37 @@ class Row:
     def __repr__(self):
         return self.__str__()
 
+def not_none(func):
+    def wrapper(*args):
+        result = func(*args)
+        if result is None:
+            return []
+        else:
+            return result
+    return wrapper
+
+class RowSplitter():
+    
+    def __init__(self, row, splitter_func):
+        self.maker = DictMaker(get_year(row.name))
+        self.a_value, self.q_values, self.m_values = splitter_func(row.data)
+        
+    @not_none
+    def a_dict(self):
+        if self.a_value:
+            return [self.maker.a_dict(self.a_value)]
+
+    @not_none
+    def q_dicts(self):
+        if self.q_values:
+            return [self.maker.q_dict(val, t+1) 
+                    for t, val in enumerate(self.q_values) if val]
+
+    @not_none
+    def m_dicts(self):
+        if self.m_values:
+            return [self.maker.m_dict(val, t+1) 
+                    for t, val in enumerate(self.m_values) if val]
 
 class RowStack:
     """Holder for CSV rows."""
@@ -311,7 +315,7 @@ class Table:
         elif self.coln in self.VALID_ROW_LENGTHS:
             # use standard splitters for standard number of columns
             self.splitter_func = splitter.get_splitter(self.coln)
-        else:            
+        else:
             # Trying to parse a table without <year> <values> structure.
             # Such tables are currently out of scope of parsing definition.
             warnings.warn("Unexpected row length {}\n{}".format(self.coln, self))
@@ -393,7 +397,7 @@ class Header:
             unit = self.get_unit(line, units)
             if unit:
                 self.unit = unit
-                # if unit was found at the start of line mark this line as known
+                # if unit was found at the start of line, mark line as known
                 for u in units.keys():
                     if line.startswith(u):
                         self.processed[line] = self.KNOWN
@@ -459,25 +463,25 @@ def to_float(text, i=0):
 
 
 class Array:
-    
+
     def __init__(self, label):
         self.label = label
         self.array = []
-        
+
     def add_iter(self, dicts):
-        ext = [{**d, 'label':self.label} for d in dicts if d['value']]  
+        ext = [{**d, 'label':self.label} for d in dicts if d['value']]
         self.array.extend(ext)
-    
+
     def get(self):
         return self.array
-        
-        
+
+
 class Emitter:
     """Emitter extracts and holds annual, quarterly and monthly values
        for a given Table.
 
        Table must have defined *label* and *splitter_func*."""
-    
+
     def __init__(self, table):
         if not table.label or not table.splitter_func:
             table.echo_error_table_not_valid()
@@ -485,9 +489,9 @@ class Emitter:
         self.q = Array(table.label)
         self.m = Array(table.label)
         for row in table.datarows:
-            row.set_splitter(table.splitter_func)
-            self.a.add_iter(row.a_dict()) 
-            self.q.add_iter(row.q_dicts()) 
+            row = RowSplitter(row, table.splitter_func)
+            self.a.add_iter(row.a_dict())
+            self.q.add_iter(row.q_dicts())
             self.m.add_iter(row.m_dicts())
 
     def emit_a(self):
@@ -624,11 +628,11 @@ class Vintage:
         """Save dataframes to CSVs."""
         processed_folder = files.get_processed_folder(self.year, self.month)
         self.frames.save(processed_folder)
-        
+
     def dfs(self):
         """Shorthand for obtaining dataframes."""
         return self.frames.dfa,  self.frames.dfq,  self.frames.dfm
-    
+
     def __str__(self):
         return "{} {}".format(self.year, self.month)
 
@@ -645,7 +649,7 @@ class Vintage:
 
 class Collection:
     # Methods to manipulate entire set of data releases
-    
+
     @staticmethod
     def save_all_dataframes_to_csv():
         for (year, month) in files.filled_dates():
@@ -656,7 +660,7 @@ class Collection:
         """Quick check for algorithm on latest available data."""
         vintage = Vintage(year=None, month=None)
         vintage.validate()
-        
+
     @staticmethod
     def approve_all():
         """Checks all dates, runs slow (about 20 sec.)
@@ -672,12 +676,12 @@ if __name__ == "__main__":
     Collection.approve_latest()
     # Collection.approve_all()
     # Collection.save_all_dataframes_to_csv()
-    
+
     year, month = 2017, 4
     vintage = Vintage(year, month)
     _, _, dfm = vintage.dfs()
-    
-    """     
+
+    """
     Parsing definition contains:
    -  parsing boundaries - start and end lines of CSV file segment
    -  link between table headers ("Объем ВВП") and variable names ("GDP")
