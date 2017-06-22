@@ -129,7 +129,17 @@ class DictMaker:
     def m_dict(self, val, m):
         return {**self.basedict, 'freq':'m', 'value': to_float(val), 'month': m}
     
-   
+
+def not_none(func):
+    def wrapper(*args):
+        result = func(*args)
+        if result is None:
+            return []
+        else:
+            return result
+    return wrapper
+
+  
 class Row:
     """Single CSV row representation."""
     
@@ -138,23 +148,20 @@ class Row:
         self.data = row[1:]
         self.maker = DictMaker(get_year(self.name))
 
+    @not_none
     def a_dict(self):
         if self.a_value:
             return [self.maker.a_dict(self.a_value)]
-        else:
-            return []            
 
+    @not_none
     def q_dicts(self):
         if self.q_values:
             return [self.maker.q_dict(val, t+1) for t, val in enumerate(self.q_values) if val]
-        else:
-            return []
 
+    @not_none
     def m_dicts(self):
         if self.m_values: 
             return [self.maker.m_dict(val, t+1) for t, val in enumerate(self.m_values) if val]
-        else:
-            return []                    
 
     def set_splitter(self, splitter_func):
         self.a_value, self.q_values, self.m_values = splitter_func(self.data)
