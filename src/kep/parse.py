@@ -349,9 +349,9 @@ class Header:
         varname_dict = pdef.headers
         known_headers = varname_dict.keys()
         for line in self.textlines:
+            just_one = 0
             for header in known_headers:
-                just_one = 0
-                if header in line:
+                if re.search(r"\b" + header, line) is not None:
                     just_one += 1
                     self.processed[line] = self.KNOWN
                     self.varname = varname_dict[header]
