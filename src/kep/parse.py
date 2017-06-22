@@ -73,14 +73,14 @@ def read_csv(path):
     return map(Row, filled_csv_rows)
 
 
-class RowsFromCSV:
-    """Returns tables from *csv_path* by .get_tables() method."""
+class Tables:
+    """Returns tables from *csv_path* by .get_all() method."""
     
     def __init__(self, csv_path):
         rows = read_csv(csv_path)
         self.row_stack = RowStack(rows)
         
-    def get_tables(self, spec=SPEC, units=UNITS):
+    def get_all(self, spec=SPEC, units=UNITS):
         all_tables = []
         # use additional parsing definitions first
         for pdef in spec.additional:
@@ -93,6 +93,9 @@ class RowsFromCSV:
         tables = get_tables_from_rows_segment(csv_segment, pdef, units)
         all_tables.extend(tables)
         return all_tables
+    
+    def get_defined(self):
+        return [t for t in self.get_all() if t.is_defined()]
 
 
 YEAR_CATCHER = re.compile('(\d{4}).*')
@@ -113,13 +116,49 @@ def is_year(string: str) -> bool:
     return get_year(string) is not None
 
 
+class DictMaker:    
+    def __init__(self, year):
+        self.basedict = {'year': year}
+        
+    def a_dict(self, val): 
+        return {**self.basedict, 'freq':'a', 'value': to_float(val)}     
+        
+    def q_dict(self, val, q): 
+        return {**self.basedict, 'freq':'q', 'value': to_float(val), 'qtr': q}
+
+    def m_dict(self, val, m):
+        return {**self.basedict, 'freq':'m', 'value': to_float(val), 'month': m}
+    
+   
 class Row:
     """Single CSV row representation."""
     
     def __init__(self, row):
         self.name = row[0]
         self.data = row[1:]
+        self.maker = DictMaker(get_year(self.name))
 
+    def a_dict(self):
+        if self.a_value:
+            return [self.maker.a_dict(self.a_value)]
+        else:
+            return []            
+
+    def q_dicts(self):
+        if self.q_values:
+            return [self.maker.q_dict(val, t+1) for t, val in enumerate(self.q_values) if val]
+        else:
+            return []
+
+    def m_dicts(self):
+        if self.m_values: 
+            return [self.maker.m_dict(val, t+1) for t, val in enumerate(self.m_values) if val]
+        else:
+            return []                    
+
+    def set_splitter(self, splitter_func):
+        self.a_value, self.q_values, self.m_values = splitter_func(self.data)
+         
     def len(self):
         return len(self.data)
 
@@ -131,35 +170,6 @@ class Row:
 
     def __repr__(self):
         return self.__str__()
-
-    def get_dicts(self, label, splitter_func):
-        base_dict = dict(label=label, year=get_year(self.name))
-        a_value, q_values, m_values = splitter_func(self.data)
-        a_dict = None
-        q_dicts = []
-        m_dicts = []
-        if a_value:
-            a_dict = {**base_dict,
-                      'freq': 'a',
-                      'value': to_float(a_value)}
-        if q_values:
-            for t, val in enumerate(q_values):
-                if val:
-                    d = {**base_dict,
-                         'freq': 'q',
-                         'value': to_float(val),
-                         'qtr': t + 1}
-                    q_dicts.append(d)
-
-        if m_values:
-            for t, val in enumerate(m_values):
-                if val:
-                    d = {**base_dict,
-                         'freq': 'm',
-                         'value': to_float(val),
-                         'month': t + 1}
-                    m_dicts.append(d)
-        return a_dict, q_dicts, m_dicts
 
 
 class RowStack:
@@ -174,7 +184,6 @@ class RowStack:
         """Returns True if *textline* starts with *pat*, False otherwise
            Ignores "
         """
-        # kill " in both args
         pat = pat.replace('"', '')
         if pat:
             textline = textline.replace('"', '')
@@ -442,35 +451,46 @@ def to_float(text, i=0):
         return False
 
 
+class Array:
+    
+    def __init__(self, label):
+        self.label = label
+        self.array = []
+        
+    def add_iter(self, dicts):
+        ext = [{**d, 'label':self.label} for d in dicts if d['value']]  
+        self.array.extend(ext)
+    
+    def get(self):
+        return self.array
+        
+        
 class Emitter:
     """Emitter extracts and holds annual, quarterly and monthly values
        for a given Table.
 
        Table must have defined *label* and *splitter_func*."""
-
+    
     def __init__(self, table):
         if not table.label or not table.splitter_func:
             table.echo_error_table_not_valid()
-        self.a = []
-        self.q = []
-        self.m = []
+        self.a = Array(table.label)
+        self.q = Array(table.label)
+        self.m = Array(table.label)
         for row in table.datarows:
-            a, q, m = row.get_dicts(table.label, table.splitter_func)
-            if a:
-                self.a.append(a)
-            if q:
-                self.q.extend(q)
-            if m:
-                self.m.extend(m)
+            row.set_splitter(table.splitter_func)
+            self.a.add_iter(row.a_dict()) 
+            self.q.add_iter(row.q_dicts()) 
+            self.m.add_iter(row.m_dicts())
 
     def emit_a(self):
-        return self.a
+        return self.a.get()
 
     def emit_q(self):
-        return self.q
+        return self.q.get()
 
     def emit_m(self):
-        return self.m
+        return self.m.get()
 
 
 class Datapoints:
@@ -533,7 +553,9 @@ class Frames:
         dfm = pd.DataFrame(datapoints.emit_m())
         for df in dfa, dfq, dfm:
             # df must have no duplicate rows
-            assert df[df.duplicated(keep=False)].empty
+            dups = df[df.duplicated(keep=False)]
+            if not dups.empty:
+                import pdb; pdb.set_trace()
         self.dfa = self.reshape_a(dfa)
         self.dfq = self.reshape_q(dfq)
         self.dfm = self.reshape_m(dfm)
@@ -585,8 +607,7 @@ class Vintage:
         # get csv source
         self.csv_path = files.get_path_csv(year, month)
         # break csv to tables with variable names
-        self.__all_tables__ = RowsFromCSV(self.csv_path).get_tables()
-        self.tables = [t for t in self.__all_tables__ if t.is_defined()]
+        self.tables = Tables(self.csv_path).get_defined()
         # emit values from tables
         self.dpoints = Datapoints(self.tables)
         # convert stream values to pandas dataframes
@@ -611,7 +632,7 @@ class Vintage:
         for x in valid_datapoints:
             if not self.dpoints.is_included(x):
                 raise ValueError("Not found in dataset: {}".format(x) +
-                                 "File: {}".format(vintage.csv_path))
+                                 "File: {}".format(self.csv_path))
         print("Test values parsed OK for", self)
 
 
