@@ -332,8 +332,8 @@ class Header:
                     if unit:
                         self.unit = unit
                     else:
-                        """Trying to extract unit of measurement from a header without it.
-                           Usually a proper unit is found in next few header textlines."""
+                        # Trying to extract unit of measurement from a header without it.
+                        # Usually a proper unit is found in next few header textlines.
                         warnings.warn("unit not found in  <{}>".format(line))
             # anything from known_headers must be found only once
             assert just_one <= 1
@@ -415,21 +415,9 @@ def to_float(text, i=0):
         return False
 
 
-class Array:
-    def __init__(self, label):
-        self.label = label
-        self.array = []
-
-    def add_iter(self, dicts):
-        ext = [{**d, 'label':self.label} for d in dicts if d['value']]
-        self.array.extend(ext)
-
-    def get(self):
-        return self.array
-
 class DictMaker:
-    def __init__(self, year):
-        self.basedict = {'year': year}
+    def __init__(self, year, label):
+        self.basedict = {'year': year, 'label':label}
 
     def a_dict(self, val):
         return {**self.basedict, 'freq': 'a', 'value': to_float(val)}
@@ -440,6 +428,11 @@ class DictMaker:
     def m_dict(self, val, m):
         return {**self.basedict, 'freq': 'm', 'value': to_float(val),
                 'month': m}
+        
+    def __str__(self):
+        return self.basedict.__str__()   
+        
+
 
 class Emitter:
     """Emitter extracts and holds annual, quarterly and monthly values
@@ -450,31 +443,29 @@ class Emitter:
     def __init__(self, table):
         if not table.label or not table.splitter_func:
             table.echo_error_table_not_valid()
-        self.a = Array(table.label)
-        self.q = Array(table.label)
-        self.m = Array(table.label)
+        self.a = []
+        self.q = []
+        self.m = []
         for row in table.datarows:
-            dmaker = DictMaker(get_year(row.name))
+            dmaker = DictMaker(get_year(row.name), table.label)
             a_value, q_values, m_values = table.splitter_func(row.data)
             if a_value:                
-                self.a.add_iter([dmaker.a_dict(a_value)])
+                self.a.append(dmaker.a_dict(a_value))
             if q_values:
-                q_dicts = [dmaker.q_dict(val, t+1) 
-                           for t, val in enumerate(q_values) if val]
-                self.q.add_iter(q_dicts)
+                self.q.extend([dmaker.q_dict(val, t+1) 
+                               for t, val in enumerate(q_values) if val])                
             if m_values:
-                m_dicts = [dmaker.m_dict(val, t+1) 
-                           for t, val in enumerate(m_values) if val]
-                self.m.add_iter(m_dicts)
+                self.m.extend([dmaker.m_dict(val, t+1) 
+                               for t, val in enumerate(m_values) if val])
 
     def emit_a(self):
-        return self.a.get()
+        return self.a
 
     def emit_q(self):
-        return self.q.get()
+        return self.q
 
     def emit_m(self):
-        return self.m.get()
+        return self.m
 
 
 class Datapoints:
