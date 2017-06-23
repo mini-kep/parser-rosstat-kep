@@ -208,7 +208,7 @@ varname: GDP, unit: rog
 def all_values():
     # emit all values for debugging to_float()
     csv_path = files.get_path_csv()
-    for table in parse.RowsFromCSV(csv_path).get_tables():
+    for table in parse.Tables(csv_path).get_all():
         for row in table.datarows:
             for value in row.data:
                 yield value
