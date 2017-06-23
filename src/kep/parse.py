@@ -116,28 +116,12 @@ def is_year(string: str) -> bool:
     return get_year(string) is not None
 
 
-class DictMaker:
-    def __init__(self, year):
-        self.basedict = {'year': year}
-
-    def a_dict(self, val):
-        return {**self.basedict, 'freq': 'a', 'value': to_float(val)}
-
-    def q_dict(self, val, q):
-        return {**self.basedict, 'freq': 'q', 'value': to_float(val), 'qtr': q}
-
-    def m_dict(self, val, m):
-        return {**self.basedict, 'freq': 'm', 'value': to_float(val),
-                'month': m}
-
-
 class Row:
     """Single CSV row representation."""
 
     def __init__(self, row):
         self.name = row[0]
-        self.data = row[1:]
-        
+        self.data = row[1:]        
 
     def len(self):
         return len(self.data)
@@ -151,37 +135,6 @@ class Row:
     def __repr__(self):
         return self.__str__()
 
-def not_none(func):
-    def wrapper(*args):
-        result = func(*args)
-        if result is None:
-            return []
-        else:
-            return result
-    return wrapper
-
-class RowSplitter():
-    
-    def __init__(self, row, splitter_func):
-        self.maker = DictMaker(get_year(row.name))
-        self.a_value, self.q_values, self.m_values = splitter_func(row.data)
-        
-    @not_none
-    def a_dict(self):
-        if self.a_value:
-            return [self.maker.a_dict(self.a_value)]
-
-    @not_none
-    def q_dicts(self):
-        if self.q_values:
-            return [self.maker.q_dict(val, t+1) 
-                    for t, val in enumerate(self.q_values) if val]
-
-    @not_none
-    def m_dicts(self):
-        if self.m_values:
-            return [self.maker.m_dict(val, t+1) 
-                    for t, val in enumerate(self.m_values) if val]
 
 class RowStack:
     """Holder for CSV rows."""
@@ -463,7 +416,6 @@ def to_float(text, i=0):
 
 
 class Array:
-
     def __init__(self, label):
         self.label = label
         self.array = []
@@ -475,6 +427,19 @@ class Array:
     def get(self):
         return self.array
 
+class DictMaker:
+    def __init__(self, year):
+        self.basedict = {'year': year}
+
+    def a_dict(self, val):
+        return {**self.basedict, 'freq': 'a', 'value': to_float(val)}
+
+    def q_dict(self, val, q):
+        return {**self.basedict, 'freq': 'q', 'value': to_float(val), 'qtr': q}
+
+    def m_dict(self, val, m):
+        return {**self.basedict, 'freq': 'm', 'value': to_float(val),
+                'month': m}
 
 class Emitter:
     """Emitter extracts and holds annual, quarterly and monthly values
@@ -489,10 +454,18 @@ class Emitter:
         self.q = Array(table.label)
         self.m = Array(table.label)
         for row in table.datarows:
-            row = RowSplitter(row, table.splitter_func)
-            self.a.add_iter(row.a_dict())
-            self.q.add_iter(row.q_dicts())
-            self.m.add_iter(row.m_dicts())
+            dmaker = DictMaker(get_year(row.name))
+            a_value, q_values, m_values = table.splitter_func(row.data)
+            if a_value:                
+                self.a.add_iter([dmaker.a_dict(a_value)])
+            if q_values:
+                q_dicts = [dmaker.q_dict(val, t+1) 
+                           for t, val in enumerate(q_values) if val]
+                self.q.add_iter(q_dicts)
+            if m_values:
+                m_dicts = [dmaker.m_dict(val, t+1) 
+                           for t, val in enumerate(m_values) if val]
+                self.m.add_iter(m_dicts)
 
     def emit_a(self):
         return self.a.get()
@@ -510,13 +483,13 @@ class Datapoints:
     def __init__(self, tables):
         self.emitters = [Emitter(t) for t in tables if t.is_defined()]
         self.datapoints = list(self.get_datapoints())
-        self.emitters_dict = dict(a=self.emit_a, q=self.emit_q, m=self.emit_m)
 
     def emit_by_method(self, method_name: str):
         if method_name not in ["emit_a", "emit_q", "emit_m"]:
             raise ValueError("Method name not valid: {}".format(method_name))
         for e in self.emitters:
-            for x in getattr(e, method_name)():
+            emitter_func = getattr(e, method_name)
+            for x in emitter_func():
                 yield x
 
     def emit_a(self):
@@ -530,7 +503,8 @@ class Datapoints:
 
     def get(self, freq, label, year):
         assert freq in "aqm"
-        gen = self.emitters_dict[freq]()
+        emitters_dict = dict(a=self.emit_a, q=self.emit_q, m=self.emit_m)
+        gen = emitters_dict[freq]()
         gen = filter(lambda x: x['label'].startswith(label), gen)
         return filter(lambda x: x['year'] == year, gen)
 
