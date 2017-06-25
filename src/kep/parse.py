@@ -648,7 +648,7 @@ class Collection:
 
 if __name__ == "__main__":
     #Collection.approve_latest()
-    Collection.approve_all()
+    #Collection.approve_all()
     Collection.save_all_dataframes_to_csv()
 
     year, month = 2017, 4
