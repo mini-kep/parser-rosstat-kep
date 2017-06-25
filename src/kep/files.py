@@ -49,7 +49,7 @@ def filter_date(year, month):
     else:
         raise ValueError("Date not found: {} {}".format(year, month))
 
-# TODO - accoutn for latest in folder structure
+# TODO - account for latest in folder structure
 """
 \data
   \raw      

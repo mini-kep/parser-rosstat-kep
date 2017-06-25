@@ -4,14 +4,14 @@ import pytest
 import parse
 import files
 
-def test_get_date_funcs_retrun_pd_Timestamps():
+def test_get_date_funcs_return_pd_Timestamps():
     import pandas as pd
     from datetime import date    
     assert parse.get_date_month_end(2015, 8) == pd.Timestamp('2015-08-31 00:00:00')
     assert parse.get_date_quarter_end(2015, 1) == pd.Timestamp('2015-03-31 00:00:00')
     assert parse.get_date_quarter_end(2015, 4) == pd.Timestamp('2015-12-31 00:00:00')
     assert parse.get_date_year_end(2015) == pd.Timestamp('2015-12-31 00:00:00')
-    # shoter, pandas-native functions
+    # shorter, pandas-native functions
     assert parse.get_date_month_end(2015, 1) == \
            pd.Timestamp(date(2015, 1, 1)) + pd.offsets.MonthEnd()
     assert parse.get_date_quarter_end(2015, 4) == \

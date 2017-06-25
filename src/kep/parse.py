@@ -250,7 +250,7 @@ class Table:
     VALID_ROW_LENGTHS = list(splitter.ROW_LENGTH_TO_FUNC_MAPPER.keys())
 
     def __init__(self, headers, datarows):
-        # WONTFIX: naming deadend with three headers in one line
+        # WONTFIX: naming dead end with three headers in one line
         self.header = Header(headers)
         self.datarows = datarows
         self.coln = max(row.len() for row in self.datarows)
