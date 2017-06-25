@@ -13,8 +13,9 @@ import itertools
 import re
 import warnings
 
-from datetime import datetime
-from calendar import monthrange
+from datetime import date
+import calendar 
+
 import pandas as pd
 
 import splitter
@@ -508,16 +509,21 @@ class Datapoints:
 
 
 # dataframe dates handling
-# FIXME: shoter, pandas-native function?
-def get_end_of_monthdate(year, month):
-    dm = datetime(year=year, month=month, day=monthrange(year, month)[1])
-    return pd.Timestamp(dm)
+def month_end_day(year, month):
+    return calendar.monthrange(year, month)[1]
 
+def get_date_month_end(year, month):
+    day = month_end_day(year, month)
+    return pd.Timestamp(date(year, month, day))
 
-def get_end_of_quarterdate(year, qtr):
-    dq = datetime(year=year, month=qtr * 3, day=monthrange(year, qtr * 3)[1])
-    return pd.Timestamp(dq)
+def get_date_quarter_end(year, qtr):
+    # quarter number should be based at 1
+    assert qtr <=4 and qtr >=1  
+    month = qtr * 3
+    return get_date_month_end(year, month)
 
+def get_date_year_end(year):
+    return pd.Timestamp(date(year, 12, 31))
 
 class Frames:
     """Accepts Datapoints() instance and emits pandas DataFrames."""
@@ -539,12 +545,15 @@ class Frames:
     @staticmethod
     def reshape_a(dfa):
         """Returns pandas dataframe with ANNUAL data."""
-        return dfa.pivot(columns='label', values='value', index='year')
+        dfa["time_index"] = dfa.apply(lambda x: get_date_year_end(x['year']), axis=1)
+        dfa = dfa.pivot(columns='label', values='value', index='time_index')
+        dfa.insert(0, "year", dfa.index.year)
+        return dfa
 
     @staticmethod
     def reshape_q(dfq):
         """Returns pandas dataframe with QUARTERLY data."""
-        dfq["time_index"] = dfq.apply(lambda x: get_end_of_quarterdate(x['year'], x['qtr']), axis=1)
+        dfq["time_index"] = dfq.apply(lambda x: get_date_quarter_end(x['year'], x['qtr']), axis=1)
         dfq = dfq.pivot(columns='label', values='value', index='time_index')
         dfq.insert(0, "year", dfq.index.year)
         dfq.insert(1, "qtr", dfq.index.quarter)
@@ -553,7 +562,7 @@ class Frames:
     @staticmethod
     def reshape_m(dfm):
         """Returns pandas dataframe with MONTHLY data."""
-        dfm["time_index"] = dfm.apply(lambda x: get_end_of_monthdate(x['year'], x['month']), axis=1)
+        dfm["time_index"] = dfm.apply(lambda x: get_date_month_end(x['year'], x['month']), axis=1)
         dfm = dfm.pivot(columns='label', values='value', index='time_index')
         dfm.insert(0, "year", dfm.index.year)
         dfm.insert(1, "month", dfm.index.month)
@@ -639,12 +648,12 @@ class Collection:
 
 if __name__ == "__main__":
     #Collection.approve_latest()
-    #Collection.approve_all()
-    # Collection.save_all_dataframes_to_csv()
+    Collection.approve_all()
+    Collection.save_all_dataframes_to_csv()
 
     year, month = 2017, 4
     vintage = Vintage(year, month)
-    _, _, dfm = vintage.dfs()
+    dfa, _, dfm = vintage.dfs()
 
     """
     Parsing definition contains:

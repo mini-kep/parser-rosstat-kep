@@ -4,6 +4,21 @@ import pytest
 import parse
 import files
 
+def test_get_date_funcs_retrun_pd_Timestamps():
+    import pandas as pd
+    from datetime import date    
+    assert parse.get_date_month_end(2015, 8) == pd.Timestamp('2015-08-31 00:00:00')
+    assert parse.get_date_quarter_end(2015, 1) == pd.Timestamp('2015-03-31 00:00:00')
+    assert parse.get_date_quarter_end(2015, 4) == pd.Timestamp('2015-12-31 00:00:00')
+    assert parse.get_date_year_end(2015) == pd.Timestamp('2015-12-31 00:00:00')
+    # shoter, pandas-native functions
+    assert parse.get_date_month_end(2015, 1) == \
+           pd.Timestamp(date(2015, 1, 1)) + pd.offsets.MonthEnd()
+    assert parse.get_date_quarter_end(2015, 4) == \
+           pd.Timestamp(date(2015, 4*3, 1)) + pd.offsets.QuarterEnd() 
+    assert parse.get_date_year_end(2015) == \
+           pd.Timestamp(str(2015)) + pd.offsets.YearEnd()
+
 
 # TESTING END TO END
 year, month = 2017, 4
@@ -42,29 +57,32 @@ def test_Datapoints_is_included_annual_1999_values_in_2017_4():
        assert dpoints.is_included(x)
 
 def test_dfa_in_2017_4():    
-    assert frame.dfa.loc[1999,].__str__() == """label
-EXPORT_GOODS_TOTAL_bln_usd                  75.6
-EXPORT_GOODS_TOTAL_yoy                     101.5
-GDP_bln_rub                               4823.0
-GDP_yoy                                    106.4
-GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub    1258.0
-GOV_EXPENSE_ACCUM_FEDERAL_bln_rub          666.9
-GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub       653.8
-GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub    1213.6
-GOV_REVENUE_ACCUM_FEDERAL_bln_rub          615.5
-GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub       660.8
-GOV_SURPLUS_ACCUM_FEDERAL_bln_rub          -51.4
-GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub         7.0
-IMPORT_GOODS_TOTAL_bln_usd                  39.5
-IMPORT_GOODS_TOTAL_yoy                      68.1
-IND_PROD_yoy                                 NaN
-RETAIL_SALES_FOOD_bln_rub                  866.1
-RETAIL_SALES_FOOD_yoy                       93.6
-RETAIL_SALES_NONFOODS_bln_rub              931.3
-RETAIL_SALES_NONFOODS_yoy                   94.7
-RETAIL_SALES_bln_rub                      1797.4
-RETAIL_SALES_yoy                            94.2
-Name: 1999, dtype: float64"""
+    assert frame.dfa['1999'].transpose().__str__() == \
+"""time_index                              1999-12-31
+label                                             
+year                                        1999.0
+EXPORT_GOODS_TOTAL_bln_usd                    75.6
+EXPORT_GOODS_TOTAL_yoy                       101.5
+GDP_bln_rub                                 4823.0
+GDP_yoy                                      106.4
+GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub      1258.0
+GOV_EXPENSE_ACCUM_FEDERAL_bln_rub            666.9
+GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub         653.8
+GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub      1213.6
+GOV_REVENUE_ACCUM_FEDERAL_bln_rub            615.5
+GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub         660.8
+GOV_SURPLUS_ACCUM_FEDERAL_bln_rub            -51.4
+GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub           7.0
+IMPORT_GOODS_TOTAL_bln_usd                    39.5
+IMPORT_GOODS_TOTAL_yoy                        68.1
+IND_PROD_yoy                                   NaN
+RETAIL_SALES_FOOD_bln_rub                    866.1
+RETAIL_SALES_FOOD_yoy                         93.6
+RETAIL_SALES_NONFOODS_bln_rub                931.3
+RETAIL_SALES_NONFOODS_yoy                     94.7
+RETAIL_SALES_bln_rub                        1797.4
+RETAIL_SALES_yoy                              94.2"""
+
 
 
 def test_dfq_in_2017_4():
