@@ -6,7 +6,7 @@ from pathlib import Path
 
 # if in package, can import this from src.kep.cfg.py
 FOLDER_LATEST_CSV  = Path(__file__).parents[2] / "data" / "processed" / "latest"
-FOLDER_LATEST_JSON = FOLDER_LATEST_CSV / "json"
+FOLDER_LATEST_JSON = Path(__file__).parents[2] / "data" / "processed" / "json"
 
 
 def json_path(freq, folder=FOLDER_LATEST_JSON):
