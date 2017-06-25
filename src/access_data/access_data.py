@@ -6,19 +6,17 @@ from pathlib import Path
 
 # if in package, can import this from src.kep.cfg.py
 FOLDER_LATEST_CSV  = Path(__file__).parents[2] / "data" / "processed" / "latest"
-FOLDER_LATEST_JSON = Path(__file__).parents[2] / "data" / "processed" / "latest_json"
-FILENAMES = {freq:"df{}.csv".format(freq) for freq in "aqm"}
+FOLDER_LATEST_JSON = FOLDER_LATEST_CSV / "json"
 
-def error_frequency(freq):
-    raise KeyError("Supported frequencies are 'a', 'q' or 'm'."
-                   "\nProvided: {}".format(freq))    
+
+def json_path(freq, folder=FOLDER_LATEST_JSON):
+    # FIXME: something nice than .__str__()
+    return (folder / "df{}.json".format(freq)).__str__()  
 
 def csv_path(freq, folder = FOLDER_LATEST_CSV):
-    try:
-        return folder / FILENAMES[freq]
-    except KeyError:
-        error_frequency(freq)
+    return folder / "df{}.csv".format(freq) 
 
+        
 def read_csv(source):
     """Canonical wrapper for pd.read_csv"""
     return pd.read_csv(source, converters = {'time_index':pd.to_datetime}, 
@@ -30,6 +28,7 @@ def read_csv_safe_long_name(source):
     with source.open() as buf:
         return read_csv(buf)
  
+    
 def get_dfs():        
     """Get three dataframes from local csv files"""
     dfa = read_csv_safe_long_name(csv_path('a'))
@@ -37,13 +36,12 @@ def get_dfs():
     dfm = read_csv_safe_long_name(csv_path('m'))
     return dfa, dfq, dfm
     
+
 def get_url(freq):
     """Make URL for CSV files"""
     url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
-    try:                                                                                                   
-        return url_base.format(FILENAMES[freq])
-    except KeyError:
-        error_frequency(freq)        
+    filename = "df{}.csv".format(freq)
+    return url_base.format(filename)
 
 def get_dfs_from_web():
     """Get three dataframes from local csv files"""
@@ -55,12 +53,12 @@ def get_dfs_from_web():
 # IDEA: import local copy of "df*.csv" and update from web if necessary 
 #       see oil and CBR repositories for that 
 
-def save_json(self, folder_path):
-    ext = ".json"
+def save_json(folder_path):
     param = dict(orient="records")
-    self.dfa.to_csv(folder_path / 'dfa'+ ext, **param)
-    self.dfq.to_csv(folder_path / 'dfq'+ ext, **param)
-    self.dfm.to_csv(folder_path / 'dfm'+ ext, **param)
+    dfa, dfq, dfm = get_dfs()
+    dfa.to_json(json_path('a'), **param)
+    dfq.to_json(json_path('q'), **param)
+    dfm.to_json(json_path('m'), **param)
     print("Saved dataframes as json to", folder_path)
 
 if __name__ == "__main__":
@@ -72,3 +70,5 @@ if __name__ == "__main__":
     assert dfa1.equals(dfa)
     assert dfq1.equals(dfq)
     assert dfm1.equals(dfm)   
+    
+    save_json(FOLDER_LATEST_JSON)
