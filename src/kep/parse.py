@@ -20,8 +20,8 @@ import pandas as pd
 
 import splitter
 import files
-from cfg import spec as SPEC
-from cfg import units as UNITS
+from cfg import SPEC
+from cfg import UNITS
 
 # use'always' or 'ignore'
 warnings.simplefilter('ignore', UserWarning)
@@ -656,12 +656,7 @@ if __name__ == "__main__":
     dfa, _, dfm = vintage.dfs()
 
     """
-    Parsing definition contains:
-   -  parsing boundaries - start and end lines of CSV file segment
-   -  link between table headers ("Объем ВВП") and variable names ("GDP")
-   -  units of measurement dictionary ("мдрд.руб." -> "bln_rub")
-
-   Parsing procedure:
+    Parsing procedure:
    - cut out a segment of csv file as delimited by start and end lines
    - save remaining parts of csv file for further parsing
    - break csv segment into tables, each table containing headers and data rows

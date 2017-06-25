@@ -1,15 +1,24 @@
 # -*- coding: utf-8 -*-
+"""Parsing specification is *units* dict and *spec*, Specification() instance.
+
+*UNITS* is to detect units of measurement in table headers (like "мдрд.руб.") 
+
+*spec* is Specification() instance, containing main and additional parsing 
+definitions. 
+                                                                  
+A parsing definition consists of:
+ (a) parsing boundaries - start and end lines CSV file segment 
+     where defintion applies (self.markers)
+ (b) a dictionary linking table headers ("Объем ВВП") and variable names 
+     ("GDP")
+ (с) reader function name, for some unusual tables.    
+
 """
-units
-spec 
-desc
-sections
-"""
+
 from collections import OrderedDict as odict
 
-
-# parsing specification
-units = odict([('млрд.долларов', 'bln_usd'),
+# units of measurement
+UNITS = odict([('млрд.долларов', 'bln_usd'),
          ('млрд. долларов', 'bln_usd'),
          ('млрд, долларов', 'bln_usd'),
          ('млрд.рублей', 'bln_rub'),
@@ -31,7 +40,7 @@ units = odict([('млрд.долларов', 'bln_usd'),
          ('период с начала отчетного года', 'ytd'),
          ('рублей / rubles', 'rub')])
 
-unit_names = {'bln_rub': 'млрд.руб.', 
+UNIT_NAMES = {'bln_rub': 'млрд.руб.', 
  'bln_usd': 'млрд.долл.', 
  'gdp_percent': '% ВВП', 
  'mln_rub': 'млн.руб.',  
@@ -40,9 +49,10 @@ unit_names = {'bln_rub': 'млрд.руб.',
  'yoy': '% к соответствующему месяцу предыдущего года', 
  'ytd': 'период с начала отчетного года'}
 
-# check 1: all units have a common name 
-assert set(unit_names.keys()) == set(units.values())
+# check 1: all units have a common short name 
+assert set(UNIT_NAMES.keys()) == set(UNITS.values())
     
+
 class Definition():    
     def __init__(self, name):        
         self.name = name
@@ -52,12 +62,15 @@ class Definition():
         self.required = []
         
     def add_header(self, text, varname):
+        # linking table headers ("Объем ВВП") and variable names ("GDP")
         self.headers.update(odict({text: varname})) 
 
     def add_marker(self, _start, _end):
+        #start and end lines CSV file segment  where defintion applies 
         self.markers.append(odict(start=_start, end=_end))
     
     def add_reader(self, funcname):
+        # reader function name, for some unusual tables
         self.reader = funcname
         
     def __str__(self):
@@ -71,11 +84,10 @@ class Definition():
         return list(set(v for v in gen))
     
     def require(self, varname, unit):
+        # require occurence of varname, unit, eg 'GDP', 'rog'
+        # only required variables will be imported to final dataset
         self.required.append((varname, unit))
-        
-    def validate(self):
-        pass
-
+     
 class Specification:
     def __init__(self, pdef_main):
         self.main = pdef_main
@@ -91,9 +103,18 @@ class Specification:
                 varnames.add(x)
         return sorted(list(varnames))
 
-    def validate(self):
+    def __get_markers__(self):
         pass
-    
+
+    def validate(self):
+        # FIXME: make sure markers are sorted
+        pass
+        # TODO 1 validate specification - order of markers 
+        # - ends are after starts
+        # - sorted starts follow each other 
+        # TODO 2 
+        # - varnames match .required()
+        
     def required(self):
         for pdef in [self.main] + self.additional:
             for req in pdef.required:
@@ -119,7 +140,7 @@ d.require("GDP", "yoy")
 d.require("IND_PROD", "yoy")
 d.require("IND_PROD", "rog")
 d.require("IND_PROD", "ytd")
-spec = Specification(d)
+SPEC = Specification(d)
 
 
 d = Definition("EXIM")
@@ -133,7 +154,7 @@ d.add_header("экспорт товаров – всего", "EXPORT_GOODS_TOTAL
 d.add_header("импорт товаров – всего", "IMPORT_GOODS_TOTAL")
 d.require("EXPORT_GOODS_TOTAL", "bln_usd")
 d.require("IMPORT_GOODS_TOTAL", "bln_usd")
-spec.append(d)
+SPEC.append(d)
 
 
 d = Definition("GOV_REVENUE_ACCUM")
@@ -146,7 +167,7 @@ d.add_header("Консолидированные бюджеты субъекто
 d.require("GOV_REVENUE_ACCUM_CONSOLIDATED", "bln_rub") 
 d.require("GOV_REVENUE_ACCUM_FEDERAL", "bln_rub")
 d.require("GOV_REVENUE_ACCUM_SUBFEDERAL", "bln_rub")
-spec.append(d)
+SPEC.append(d)
 
 
 d = Definition("GOV_EXPENSE_ACCUM")
@@ -159,7 +180,7 @@ d.add_header("Консолидированные бюджеты субъекто
 d.require("GOV_EXPENSE_ACCUM_CONSOLIDATED", "bln_rub") 
 d.require("GOV_EXPENSE_ACCUM_FEDERAL", "bln_rub")
 d.require("GOV_EXPENSE_ACCUM_SUBFEDERAL", "bln_rub")
-spec.append(d)
+SPEC.append(d)
 
 
 d = Definition("GOV_SURPLUS_ACCUM")
@@ -170,7 +191,7 @@ d.add_header("Федеральный бюджет", "GOV_SURPLUS_ACCUM_FEDERAL")
 d.add_header("Консолидированные бюджеты субъектов Российской Федерации", "GOV_SURPLUS_ACCUM_SUBFEDERAL")
 d.require("GOV_SURPLUS_ACCUM_FEDERAL", "bln_rub")
 d.require("GOV_SURPLUS_ACCUM_SUBFEDERAL", "bln_rub")
-spec.append(d)
+SPEC.append(d)
 
 d = Definition("RETAIL_SALES")
 d.add_marker("1.13. Оборот розничной торговли"
@@ -185,38 +206,29 @@ d.add_header("непродовольственные товары", "RETAIL_SALE
 d.require("RETAIL_SALES", "bln_rub") 
 d.require("RETAIL_SALES_FOOD", "bln_rub")
 d.require("RETAIL_SALES_NONFOODS", "bln_rub")
-spec.append(d)
+SPEC.append(d)
 
-#WONTFIX: some supplementary parsing results are ignored, e.g.
-# "IMPORT_GOODS_TOTAL_yoy", "IMPORT_GOODS_TOTAL_rog",
-# "EXPORT_GOODS_TOTAL_yoy", "EXPORT_GOODS_TOTAL_rog"
-
-#FIXME: spec.validate() does nothing yet
-    # TODO validate specification - order of markers 
-    # - ends are after starts
-    # - sorted starts follow each other 
-    # - varnames match .required()
-
-spec.validate()
-print(spec)
+#FIXME: does nothing yet
+SPEC.validate()
+# units and spec are ready to use are parsing inputs
+print(SPEC)
     
 
-desc_list = [["Валовой внутренний продукт", "GDP"],
-        ["Промышленное производство", "IND_PROD"],
-        ["Экспорт товаров - всего", "EXPORT_GOODS_TOTAL"],
-        ["Импорт товаров - всего", "IMPORT_GOODS_TOTAL"],
-        ["Оборот розничной торговли - всего", "RETAIL_SALES"],
-        ["Оборот розничной торговли - продовольственные товары", "RETAIL_SALES_FOOD"],
-        ["Оборот розничной торговли - непродовольственные товары", "RETAIL_SALES_NONFOODS"]
-]
-
-desc = {d[1]:d[0] for d in desc_list} 
+# variable descriptions for frontend 
+DESC = {"GDP": "Валовой внутренний продукт",
+        "IND_PROD": "Промышленное производство", 
+        "EXPORT_GOODS_TOTAL": "Экспорт товаров - всего",
+        "IMPORT_GOODS_TOTAL": "Импорт товаров - всего",
+        "RETAIL_SALES": "Оборот розничной торговли - всего",
+        "RETAIL_SALES_FOOD": "Оборот розничной торговли - продовольственные товары", 
+        "RETAIL_SALES_NONFOODS": "Оборот розничной торговли - непродовольственные товары"
+}
 
 #check 2: check all spec.required are listed in desc_dict and vice versus
 # assert set(desc.keys()) == set(x for x, y in spec.required())
 
-a = set(desc.keys())
-b = set(x for x, y in spec.required())
+a = set(DESC.keys())
+b = set(x for x, y in SPEC.required())
 not_in_a = set(x for x in b if x not in a)
 not_in_b = set(x for x in a if x not in b)
 
@@ -226,8 +238,8 @@ assert not_in_a == {'GOV_EXPENSE_ACCUM_CONSOLIDATED', 'GOV_EXPENSE_ACCUM_FEDERAL
                     'GOV_SURPLUS_ACCUM_FEDERAL', 'GOV_SURPLUS_ACCUM_SUBFEDERAL'}
 assert not_in_b == set() 
 
-
-sections = odict([
+# groups of variables for frontend 
+SECTIONS = odict([
            ("ВВП и производство", ["GDP", "IND_PROD"]),             
            ("Внешняя торговля",   ["EXPORT_GOODS_TOTAL",
                                    "IMPORT_GOODS_TOTAL"]),       
@@ -235,23 +247,20 @@ sections = odict([
                                    "RETAIL_SALES_FOOD",
                                    "RETAIL_SALES_NONFOODS"])
 ])
+
+# TODO:can make it a class  
+#class Sections:
+#    """Grouping of variables to report at frontend"""
     
 #check 3: sections includes all items in description 
-# FIXME: maybe more elegant unpacking below (?)
 z = list()
-[z.extend(labels) for labels in sections.values()]
+[z.extend(labels) for labels in SECTIONS.values()]
+assert set(z) == set(DESC.keys())
 
-#алтернативный вариант:
-#from operator import concat
-#from functools import reduce
-#z = reduce(concat, sections.values())
-
-assert set(z) == set(desc.keys())
-
-def bold(s):
-    return "**{}**".format(s)
-
-def yield_variable_descriptions_with_subheaders(sections = sections):
+def yield_variable_descriptions_with_subheaders(sections = SECTIONS,
+                                                desc = DESC):
+    def bold(s):
+        return"**{}**".format(s)
     for section_name, labels in sections.items(): 
          yield([bold(section_name), ""])            
          for label in labels: 
