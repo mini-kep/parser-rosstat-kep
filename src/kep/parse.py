@@ -564,7 +564,7 @@ class Frames:
         self.dfq.to_csv(folder_path / 'dfq.csv')
         self.dfm.to_csv(folder_path / 'dfm.csv')
         print("Saved dataframes to", folder_path)
-
+        
 
 VALID_DATAPOINTS = [
             {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
@@ -576,7 +576,7 @@ VALID_DATAPOINTS = [
 
 
 class Vintage:
-    """Represents dataset release at a given year and month."""
+    """Represents dataset release for a given year and month."""
 
     def __init__(self, year, month):
         self.year, self.month = files.filter_date(year, month)
@@ -638,8 +638,8 @@ class Collection:
 # FIXME: review __str__, and __repr__?
 
 if __name__ == "__main__":
-    Collection.approve_latest()
-    # Collection.approve_all()
+    #Collection.approve_latest()
+    #Collection.approve_all()
     # Collection.save_all_dataframes_to_csv()
 
     year, month = 2017, 4

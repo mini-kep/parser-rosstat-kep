@@ -52,13 +52,15 @@ def filter_date(year, month):
 # TODO - accoutn for latest in folder structure
 """
 \data
-  (\raw      
-      \word)
+  \raw      
+      \2017
+      \...
   \interim
-      \2017          
+      \2017
+      \...          
   \processed
-      \latest_nsa
-      \latest_sa
+      \latest
+      \latest_json
       \vintages
       \2017
       \...
@@ -69,7 +71,7 @@ data_folder = Path(__file__).parents[levels_up] / 'data'
 rosstat_folder = data_folder / 'interim'
 processed = data_folder / 'processed'
 latest = processed / 'latest'
-
+latest_json = processed / 'latest_json'
 
 def init_dirs(root, available_dates=DATES):
     for d in available_dates:
@@ -126,7 +128,7 @@ def get_processed_folder(year=None, month=None):
 
 
 def copy_latest_csv_to_separate_folder(dst_folder=latest):
-    # copy all files from 
+    # copy all files from folder like 2017/4 to 'latest'
     year, month = InterimDataFolder().get_latest_date()
     src_folder = get_processed_folder(year, month) 
     for src in [f for f in src_folder.iterdir() if f.is_file()]:
