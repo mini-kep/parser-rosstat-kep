@@ -43,8 +43,7 @@ def get_url(freq):
     try:                                                                                                   
         return url_base.format(FILENAMES[freq])
     except KeyError:
-        error_frequency(freq)    
-    
+        error_frequency(freq)        
 
 def get_dfs_from_web():
     """Get three dataframes from local csv files"""
@@ -65,7 +64,11 @@ def save_json(self, folder_path):
     print("Saved dataframes as json to", folder_path)
 
 if __name__ == "__main__":
-    #IDEA: get_dfs_from_web() is slow, otherwise could be a good test to compare dfa1 to dfa, etc    
+    # FIXME: must quarantee 'latest' is updated 
     dfa1, dfq1, dfm1 = get_dfs_from_web()
     dfa, dfq, dfm = get_dfs()
-    #TODO: compare to webs
+    
+    # FIXME get_dfs_from_web() may be slow, otherwise could be a good test to compare dfa1 to dfa, etc    
+    assert dfa1.equals(dfa)
+    assert dfq1.equals(dfq)
+    assert dfm1.equals(dfm)   
