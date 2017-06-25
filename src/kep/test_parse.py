@@ -4,9 +4,10 @@ import pytest
 import parse
 import files
 
+
 def test_get_date_funcs_return_pd_Timestamps():
     import pandas as pd
-    from datetime import date    
+    from datetime import date
     assert parse.get_date_month_end(2015, 8) == pd.Timestamp('2015-08-31 00:00:00')
     assert parse.get_date_quarter_end(2015, 1) == pd.Timestamp('2015-03-31 00:00:00')
     assert parse.get_date_quarter_end(2015, 4) == pd.Timestamp('2015-12-31 00:00:00')
@@ -15,7 +16,7 @@ def test_get_date_funcs_return_pd_Timestamps():
     assert parse.get_date_month_end(2015, 1) == \
            pd.Timestamp(date(2015, 1, 1)) + pd.offsets.MonthEnd()
     assert parse.get_date_quarter_end(2015, 4) == \
-           pd.Timestamp(date(2015, 4*3, 1)) + pd.offsets.QuarterEnd() 
+           pd.Timestamp(date(2015, 4*3, 1)) + pd.offsets.QuarterEnd()
     assert parse.get_date_year_end(2015) == \
            pd.Timestamp(str(2015)) + pd.offsets.YearEnd()
 
@@ -26,8 +27,8 @@ vint = parse.Vintage(2017, 4)
 # break csv to tables with variable names
 tables = vint.tables
 # emit values from tables
-dpoints = vint.dpoints    
-# convert stream values to pandas dataframes     
+dpoints = vint.dpoints
+# convert stream values to pandas dataframes
 frame = vint.frames
 
 
@@ -54,9 +55,10 @@ def test_Datapoints_is_included_annual_1999_values_in_2017_4():
 {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
 {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999}]
     for x in test_datapoints:
-       assert dpoints.is_included(x)
+        assert dpoints.is_included(x)
 
-def test_dfa_in_2017_4():    
+
+def test_dfa_in_2017_4():
     assert frame.dfa['1999'].transpose().__str__() == \
 """time_index                              1999-12-31
 label                                             
@@ -84,9 +86,8 @@ RETAIL_SALES_bln_rub                        1797.4
 RETAIL_SALES_yoy                              94.2"""
 
 
-
 def test_dfq_in_2017_4():
-    assert frame.dfq.loc["2017-03",].transpose().__str__()  == """time_index                              2017-03-31
+    assert frame.dfq.loc["2017-03", ].transpose().__str__() == """time_index                              2017-03-31
 label                                             
 year                                        2017.0
 qtr                                            1.0
@@ -119,8 +120,8 @@ RETAIL_SALES_rog                              82.8
 RETAIL_SALES_yoy                              98.2"""
 
 
-def test_dfm_in_2017_4():    
-    assert frame.dfm.loc["2017-01",].transpose().__str__() == """time_index                              2017-01-31
+def test_dfm_in_2017_4():
+    assert frame.dfm.loc["2017-01", ].transpose().__str__() == """time_index                              2017-01-31
 label                                             
 year                                        2017.0
 month                                          1.0
@@ -149,37 +150,41 @@ RETAIL_SALES_NONFOODS_rog                     75.0
 RETAIL_SALES_NONFOODS_yoy                     98.7
 RETAIL_SALES_bln_rub                        2207.5
 RETAIL_SALES_rog                              75.1
-RETAIL_SALES_yoy                              97.7""" 
+RETAIL_SALES_yoy                              97.7"""
+
 
 def test_Datapoints_get():
     testpoints_1999a = [{'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
-                        {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999}] 
+                        {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999}]
     assert list(dpoints.get("a", "GDP", 1999)) == testpoints_1999a
-    
+
 
 def test_end_to_end_latest_month():
-    vintage = parse.Vintage(year=None,month=None)
+    vintage = parse.Vintage(year=None, month=None)
     vintage.validate()
 
-# TESTING INDIVIDUAL FUNCTIONS
 
+# TESTING INDIVIDUAL FUNCTIONS
 def test_labels_funcs():
     assert parse.extract_unit("GDP_mln_rub") == "mln_rub"
     assert parse.extract_varname("GDP_mln_rub") == "GDP"
     assert parse.split_label("GDP_mln_rub") == ("GDP", "mln_rub")
     assert parse.make_label("GDP", "mln_rub") == "GDP_mln_rub"
 
+
 def test_Header():
-     assert parse.Header.KNOWN != parse.Header.UNKNOWN 
+    assert parse.Header.KNOWN != parse.Header.UNKNOWN
+
 
 def test_RowHolder_is_matched():
     foo = parse.RowStack.is_matched
-    assert foo(pat="Объем ВВП", textline="Объем ВВП текущего года") == True
-    assert foo(pat="Объем ВВП", textline="1.1 Объем ВВП") == False
+    assert foo(pat="Объем ВВП", textline="Объем ВВП текущего года") is True
+    assert foo(pat="Объем ВВП", textline="1.1 Объем ВВП") is False
+
 
 def test_to_float():
     for x in [None, "", " ", "…", "-", "a", "ab", " - "]:
-        assert parse.to_float(x) == False    
+        assert parse.to_float(x) is False
     assert parse.to_float('5.678,') == 5.678
     assert parse.to_float('5.678,,') == 5.678
     assert parse.to_float("5.6") == 5.6
@@ -194,20 +199,22 @@ def test_to_float():
 def test_get_year():
     assert parse.get_year("19991)") == 1999
     assert parse.get_year("1999") == 1999
-    assert parse.get_year("1812") is None    
-   
-def test_csv_has_no_null_byte():     
-    csv_path = files.get_path_csv(2015, 2) 
-    z = csv_path.read_text(encoding = parse.ENC)    
-    assert "\0" not in z 
+    assert parse.get_year("1812") is None
+
+
+def test_csv_has_no_null_byte():
+    csv_path = files.get_path_csv(2015, 2)
+    z = csv_path.read_text(encoding=parse.ENC)
+    assert "\0" not in z
 
 header_row = parse.Row(['Объем ВВП', ''])
-data_row = parse.Row(['1991','10','20','30','40'])
+data_row = parse.Row(['1991', '10', '20', '30', '40'])
 
-TABLE = parse.Table(headers=[header_row], 
+TABLE = parse.Table(headers=[header_row],
                     datarows=[data_row])
 TABLE.header.varname = 'GDP'
 TABLE.header.unit = 'rog'
+
 
 def test_Table_str():
     assert TABLE.__repr__() == 'Table GDP_rog (1 headers, 1 datarows)'
