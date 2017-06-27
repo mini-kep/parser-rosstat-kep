@@ -254,6 +254,7 @@ class Table:
         self.header = Header(headers)
         self.datarows = datarows
         self.coln = max(row.len() for row in self.datarows)
+        self.splitter_func = None
 
     def parse(self, pdef, units):
         self.header.set_varname(pdef, units)
@@ -282,7 +283,7 @@ class Table:
             return make_label(vn, u)
 
     def is_defined(self):
-        return self.label and self.splitter_func
+        return bool(self.label and self.splitter_func)
 
     def echo_error_table_not_valid(self):
         if not self.label:
@@ -429,10 +430,9 @@ class DictMaker:
     def m_dict(self, val, m):
         return {**self.basedict, 'freq': 'm', 'value': to_float(val),
                 'month': m}
-        
+
     def __str__(self):
         return self.basedict.__str__()   
-        
 
 
 class Emitter:
@@ -524,6 +524,7 @@ def get_date_quarter_end(year, qtr):
 
 def get_date_year_end(year):
     return pd.Timestamp(date(year, 12, 31))
+
 
 class Frames:
     """Accepts Datapoints() instance and emits pandas DataFrames."""
