@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 import pytest
+import copy
 
 import parse
 import files
+import splitter
 
 
 def test_get_date_funcs_return_pd_Timestamps():
@@ -228,6 +230,16 @@ varname: GDP, unit: rog
 ------------------
 1991 | 10 20 30 40
 ------------------"""
+
+
+def test_Table_is_defined():
+    # table has label, but misses splitter_func specified
+    assert TABLE.is_defined() is False
+
+    # table has both label and splitter_func
+    table = copy.deepcopy(TABLE)
+    table.splitter_func = splitter.SPECIAL_FUNC_NAMES_TO_FUNC_MAPPER['fiscal']
+    assert table.is_defined() is True
 
 
 def all_values():
