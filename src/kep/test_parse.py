@@ -238,7 +238,7 @@ def test_Table_is_defined():
 
     # table has both label and splitter_func
     table = copy.deepcopy(TABLE)
-    table.splitter_func = splitter.SPECIAL_FUNC_NAMES_TO_FUNC_MAPPER['fiscal']
+    table.splitter_func = splitter.get_custom_splitter('fiscal')
     assert table.is_defined() is True
 
     # test tables from "TESTING END TO END" section
