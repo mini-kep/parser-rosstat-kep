@@ -84,7 +84,7 @@ class Definition():
         return list(set(v for v in gen))
     
     def require(self, varname, unit):
-        # require occurence of varname, unit, eg 'GDP', 'rog'
+        # require occurrence of varname, unit, eg 'GDP', 'rog'
         # only required variables will be imported to final dataset
         self.required.append((varname, unit))
 
