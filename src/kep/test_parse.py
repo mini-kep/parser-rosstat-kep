@@ -241,6 +241,10 @@ def test_Table_is_defined():
     table.splitter_func = splitter.SPECIAL_FUNC_NAMES_TO_FUNC_MAPPER['fiscal']
     assert table.is_defined() is True
 
+    # test tables from "TESTING END TO END" section
+    for table in tables:
+        assert table.is_defined() is True
+
 
 def all_values():
     # emit all values for debugging to_float()
