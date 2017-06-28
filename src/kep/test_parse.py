@@ -136,11 +136,6 @@ def test_Table_is_defined():
     table.splitter_func = splitter.get_custom_splitter('fiscal')
     assert table.is_defined() is True
 
-    # test tables from "TESTING END TO END" section
-    #for table in tables:
-    #    assert table.is_defined() is True
-
-
 # -----------------------------------------------------------------------------
 
 def test_csv_has_no_null_byte():
