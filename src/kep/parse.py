@@ -73,7 +73,8 @@ def read_csv(path):
     filled_csv_rows = filter(lambda row: row and row[0], raw_csv_rows)
     return map(Row, filled_csv_rows)
 
-
+"""
+"""
 class Tables:
     """Returns tables from *csv_path* by .get_all() method."""
 
