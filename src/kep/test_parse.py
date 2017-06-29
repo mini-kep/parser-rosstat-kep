@@ -123,7 +123,7 @@ class Test_Header:
 # -----------------------------------------------------------------------------
 
 #FIXME: more testing for RowStack
-def test_RowHolder_is_matched():
+def test_RowStack_is_matched():
     foo = parse.RowStack.is_matched
     assert foo(pat="Объем ВВП", textline="Объем ВВП текущего года") is True
     assert foo(pat="Объем ВВП", textline="1.1 Объем ВВП") is False
