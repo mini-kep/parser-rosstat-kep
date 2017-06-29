@@ -129,32 +129,47 @@ def test_RowStack_is_matched():
     assert foo(pat="Объем ВВП", textline="1.1 Объем ВВП") is False
 
 # -----------------------------------------------------------------------------
-#TODO: make test Table class 
-    
-header_row = parse.Row(['Объем ВВП', ''])
-data_row = parse.Row(['1991', '10', '20', '30', '40'])
+class Test_Table:
 
-TABLE = parse.Table(headers=[header_row],
-                    datarows=[data_row])
+    def test_Table_create(self):
+        table = gdp_table()
+        assert table.coln == 17
+        assert table.label == "GDP_bln_rub"
+        # """table.splitter_func"" is not None because table's """parse"" method has already been invoked (see gdb_table)
+        assert table.splitter_func is not None
+        assert len(table.datarows) == 1
+        row = table.datarows[0]
+        assert row.name == '1991 1)'
+        assert row.data == ['100', '20', '20', '40', '40', '10', '10', '10', '10', '10', '10', '10', '10', '10', '10', '10', '10']
 
-#TODO: can extract this information and check
-TABLE.header.varname = 'GDP'
-TABLE.header.unit = 'rog'
-TABLE.splitter_func = splitter.get_custom_splitter('fiscal')
+    def test_Table_is_defined(self):
+        table = gdp_table()
+        assert table.is_defined() is True
 
-def test_Table_repr():
-    assert TABLE.__repr__() == 'Table GDP_rog (headers: 1, datarows: 1)'
+    def test_Table_Header(self):
+        table = gdp_table()
+        header = table.header
+        assert header.varname == 'GDP'
+        assert header.unit == 'bln_rub'
+        assert header.processed == odict([('Объем ВВП', '+'), ('млрд.рублей', '+')])
+        assert header.textlines == ['Объем ВВП', 'млрд.рублей']
 
+    def test_Table_label(self):
+        table = gdp_table()
+        assert table.label == 'GDP_bln_rub'
 
-def test_Table_str():
-    assert TABLE.__str__() == """Table GDP_rog
-columns: 4
-varname: GDP, unit: rog
-- <Объем ВВП>
-<1991 | 10 20 30 40>"""
+    def test_Table_repr(self):
+        table = gdp_table()
+        assert table.__repr__() == 'Table GDP_bln_rub (headers: 2, datarows: 1)'
 
-def test_Table_is_defined():
-    assert TABLE.is_defined() is True
+    def test_Table_str(self):
+        table = gdp_table()
+        assert table.__str__() == """Table GDP_bln_rub
+columns: 17
+varname: GDP, unit: bln_rub
++ <Объем ВВП>
++ <млрд.рублей>
+<1991 1) | 100 20 20 40 40 10 10 10 10 10 10 10 10 10 10 10 10>"""
 
 # -----------------------------------------------------------------------------
 
