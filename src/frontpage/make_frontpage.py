@@ -13,7 +13,7 @@ sys.path.extend([path.__str__() for path in [kep_dir, access_dir]])
 
 import cfg
 from to_markdown import to_markdown
-from access_data import get_dfs_from_local
+from access_data import get_dfs
 
 # TABLE 1 - Sections with required varnames
 md1 = to_markdown(body=cfg.yield_variable_descriptions_with_subheaders(), 
@@ -27,7 +27,7 @@ print(md1)
 # https://github.com/epogrebnyak/data-rosstat-kep/blob/47229a4e668dbaee31dfb6419f510abe13d0d9a3/frontpage.py#L120-L153
 # or local old/frontpage.py#L120-L153
 
-dfa, dfq, dfm = get_dfs_from_local()
+dfa, dfq, dfm = get_dfs()
 
 #generate with latest values from monthly dataframe
 def stream_table_rows(dfm=dfm):
