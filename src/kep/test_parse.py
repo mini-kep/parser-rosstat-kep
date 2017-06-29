@@ -5,6 +5,7 @@ import pandas as pd
 from datetime import date
 
 import pytest
+from collections import OrderedDict as odict
 
 import parse
 import files
@@ -86,9 +87,39 @@ class Test_Function_get_year():
 # -----------------------------------------------------------------------------
 
 #FIXME: more testing for header
-def test_Header():
-    assert parse.Header.KNOWN != parse.Header.UNKNOWN
+class Test_Header:
 
+    def test_Header_KNOWN_UNKNOWN_sanity(self):
+        assert parse.Header.KNOWN != parse.Header.UNKNOWN
+
+    def test_Header_creation(self):
+        header = gdp_table_header()
+        assert header.unit is None
+        assert header.varname is None
+        assert header.processed == odict([('Объем ВВП', '-'), ('млрд.рублей', '-'), ('1991 1)', '-')])
+        assert header.textlines == ['Объем ВВП', 'млрд.рублей', '1991 1)']
+
+    def test_Header_has_unknown_lines_after_creation(self):
+        header = gdp_table_header()
+        assert header.has_unknown_lines() is True
+
+    def test_Header_set_unit(self):
+        header = gdp_table_header()
+        assert header.unit is None
+        assert header.processed['млрд.рублей'] == parse.Header.UNKNOWN
+        header.set_unit(units())
+        assert header.unit is not None
+        assert header.processed['млрд.рублей'] == parse.Header.KNOWN
+
+    def test_Header_set_varname(self):
+        header = gdp_table_header()
+        assert header.varname is None
+        header.set_varname(pdef_gdp(), units())
+        assert header.varname is not None
+
+    def test_Header_str(self):
+        header = gdp_table_header()
+        assert header.__str__() == 'varname: None, unit: None\n- <Объем ВВП>\n- <млрд.рублей>\n- <1991 1)>'
 # -----------------------------------------------------------------------------
 
 #FIXME: more testing for RowStack
@@ -183,7 +214,12 @@ def gdp_emitter():
 def gdp_frames():
     dpoints = parse.Datapoints([gdp_table()])
     return parse.Frames(dpoints)
-  
+
+@pytest.fixture
+def gdp_table_header():
+    rows = gdp_rows()
+    return parse.Header(rows)
+
 def test_read_csv(gdp_rows):
     assert gdp_rows.__repr__() == \
     "[<Объем ВВП>, " \
