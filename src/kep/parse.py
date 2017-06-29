@@ -73,8 +73,7 @@ def read_csv(path):
     filled_csv_rows = filter(lambda row: row and row[0], raw_csv_rows)
     return map(Row, filled_csv_rows)
 
-"""
-"""
+
 class Tables:
     """Returns tables from *csv_path* by .get_all() method."""
 
@@ -132,7 +131,10 @@ class Row:
         return is_year(self.name)
 
     def __str__(self):
-        return "{} | {}".format(self.name, ' '.join(self.data))
+        if "".join(self.data):
+            return "<{} | {}>".format(self.name, ' '.join(self.data))
+        else:
+            return "<{}>".format(self.name)
 
     def __repr__(self):
         return self.__str__()
@@ -251,7 +253,7 @@ class Table:
     VALID_ROW_LENGTHS = list(splitter.ROW_LENGTH_TO_FUNC_MAPPER.keys())
 
     def __init__(self, headers, datarows):
-        # WONTFIX: naming dead end with three headers in one line
+        # WONTFIX: naming deadend with three headers in one line
         self.header = Header(headers)
         self.datarows = datarows
         self.coln = max(row.len() for row in self.datarows)
@@ -293,19 +295,16 @@ class Table:
             raise ValueError("Splitter func not defined for:\n{}".format(self))
 
     def __str__(self):
-        text = [row.__str__() for row in self.datarows]
-        horizontal_break = "-" * max(len(t) for t in text)
-        return "\n".join(["Table for variable {}".format(self.label),
-                          "Number of columns: {}".format(self.coln),
+        return "\n".join(["Table {}".format(self.label),
+                          "columns: {}".format(self.coln),
                           self.header.__str__(),
-                          horizontal_break,
-                          '\n'.join(text),
-                          horizontal_break])
+                          '\n'.join([row.__str__() for row in self.datarows]),
+                          ])
 
     def __repr__(self):
         return "Table {} ".format(self.label) + \
-               "({} headers,".format(len(self.header.textlines)) + \
-               " {} datarows)".format(len(self.datarows))
+               "(headers: {}, ".format(len(self.header.textlines)) + \
+               "datarows: {})".format(len(self.datarows))
 
 
 class Header:
@@ -537,9 +536,10 @@ class Frames:
         dfm = pd.DataFrame(datapoints.emit_m())
         for df in dfa, dfq, dfm:
             # df must have no duplicate rows
-            dups = df[df.duplicated(keep=False)]
-            if not dups.empty:
-                import pdb; pdb.set_trace()
+            if not df.empty:
+                dups = df[df.duplicated(keep=False)]
+                if not dups.empty:
+                    import pdb; pdb.set_trace()
         self.dfa = self.reshape_a(dfa)
         self.dfq = self.reshape_q(dfq)
         self.dfm = self.reshape_m(dfm)
@@ -649,9 +649,9 @@ class Collection:
 # FIXME: review __str__, and __repr__?
 
 if __name__ == "__main__":
-    #Collection.approve_latest()
+    Collection.approve_latest()
     #Collection.approve_all()
-    Collection.save_all_dataframes_to_csv()
+    #Collection.save_all_dataframes_to_csv()
 
     year, month = 2017, 4
     vintage = Vintage(year, month)
