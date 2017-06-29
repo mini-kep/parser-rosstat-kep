@@ -5,7 +5,6 @@ import pandas as pd
 from datetime import date
 
 import pytest
-import copy
 
 import parse
 import files
