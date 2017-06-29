@@ -99,7 +99,8 @@ def test_RowHolder_is_matched():
     assert foo(pat="Объем ВВП", textline="1.1 Объем ВВП") is False
 
 # -----------------------------------------------------------------------------
-
+#TODO: make test Table class 
+    
 header_row = parse.Row(['Объем ВВП', ''])
 data_row = parse.Row(['1991', '10', '20', '30', '40'])
 
@@ -109,6 +110,7 @@ TABLE = parse.Table(headers=[header_row],
 #TODO: can extract this information and check
 TABLE.header.varname = 'GDP'
 TABLE.header.unit = 'rog'
+TABLE.splitter_func = splitter.get_custom_splitter('fiscal')
 
 def test_Table_repr():
     assert TABLE.__repr__() == 'Table GDP_rog (headers: 1, datarows: 1)'
@@ -121,6 +123,10 @@ varname: GDP, unit: rog
 - <Объем ВВП>
 <1991 | 10 20 30 40>"""
 
+def test_Table_is_defined():
+    assert TABLE.is_defined() is True
+
+# -----------------------------------------------------------------------------
 
 from tempfile import NamedTemporaryFile
 from pathlib import Path
