@@ -5,13 +5,15 @@ import pandas as pd
 from datetime import date
 
 import pytest
+import copy
 
 import parse
 import files
+import splitter
 
 # risk areas: annual values, class of timestamps
-class Test_DateFunctions():    
-    
+class Test_DateFunctions():
+
     def test_quarter_end_returns_pd_Timestamp(self):
         assert parse.get_date_quarter_end(2015, 1) == \
                pd.Timestamp('2015-03-31 00:00:00')
@@ -50,7 +52,7 @@ class Test_Function_to_float:
         assert parse.to_float('5.678,') == 5.678
         assert parse.to_float('5.678,,') == 5.678
         assert parse.to_float("5.6") == 5.6
-        assert parse.to_float("5,6") == 5.6                     
+        assert parse.to_float("5,6") == 5.6
         assert parse.to_float("5,67") == 5.67
         assert parse.to_float("5,67,") == 5.67
                              
@@ -69,18 +71,18 @@ class Test_Function_to_float:
 
 
 class Test_Function_get_year():
-    
+
     def test_get_year(self):
         assert parse.get_year("19991)") == 1999
         assert parse.get_year("1999") == 1999
         assert parse.get_year("1812") is None
-        
+
     def all_heads():
         # emit all heads for debugging get_year()
         csv_path = files.get_path_csv()
         csv_dicts = parse.read_csv(csv_path)
         for d in csv_dicts:
-            yield d.name    
+            yield d.name
 
 # -----------------------------------------------------------------------------
 
@@ -119,6 +121,7 @@ varname: GDP, unit: rog
 - <Объем ВВП>
 <1991 | 10 20 30 40>"""
 
+
 from tempfile import NamedTemporaryFile
 from pathlib import Path
 
@@ -135,7 +138,6 @@ CSV_TEXT = """Объем ВВП\t\t\t\t
 млрд.рублей\t\t\t\t
 \t
 1991 1)\t100\t20\t20\t40\t40""" + "\t10" * 12
-
 
 @pytest.fixture
 def csv_path(text=CSV_TEXT):
