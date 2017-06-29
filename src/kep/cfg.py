@@ -8,7 +8,7 @@ definitions.
                                                                   
 A parsing definition consists of:
  (a) parsing boundaries - start and end lines CSV file segment 
-     where defintion applies (self.markers)
+     where definition applies (self.markers)
  (b) a dictionary linking table headers ("Объем ВВП") and variable names 
      ("GDP")
  (с) reader function name, for some unusual tables.    
@@ -84,10 +84,10 @@ class Definition():
         return list(set(v for v in gen))
     
     def require(self, varname, unit):
-        # require occurence of varname, unit, eg 'GDP', 'rog'
+        # require occurrence of varname, unit, eg 'GDP', 'rog'
         # only required variables will be imported to final dataset
         self.required.append((varname, unit))
-     
+
 class Specification:
     def __init__(self, pdef_main):
         self.main = pdef_main
