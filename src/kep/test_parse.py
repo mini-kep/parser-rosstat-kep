@@ -370,7 +370,8 @@ def sample_frames():
 
 @pytest.fixture
 def gdp_table_header():
-    rows = sample_rows()[:2]
+    #FIXME: [:3] is volatile
+    rows = sample_rows()[:3]
     return parse.Header(rows)
 
 def test_read_csv(sample_rows):
