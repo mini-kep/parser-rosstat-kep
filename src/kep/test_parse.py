@@ -98,6 +98,7 @@ from pathlib import Path
 import pandas as pd
 
 import pytest
+from collections import OrderedDict as odict
 
 import parse
 import files
@@ -179,13 +180,46 @@ class Test_Function_get_year():
             yield d.name
 
 
+
 # Part 2. Testing some classes (not all)
 
-# -----------------------------------------------------------------------------
-# TODO: test Headers class
-# FIXME: more testing for header
-def test_Header():
-    assert parse.Header.KNOWN != parse.Header.UNKNOWN
+class Test_Header:
+    
+    def setup_method(self):
+        self.header = gdp_table_header()
+        
+    def test_KNOWN_UNKNOWN_sanity(self):
+        # risk area: this was actual error that happened
+        assert parse.Header.KNOWN != parse.Header.UNKNOWN
+
+    def test_creation(self):
+        assert self.header.unit is None
+        assert self.header.varname is None
+        assert self.header.processed['Объем ВВП'] == parse.Header.UNKNOWN 
+        assert self.header.processed['млрд.рублей'] == parse.Header.UNKNOWN 
+        assert self.header.textlines == ['Объем ВВП', 'млрд.рублей', '1991 1)']
+
+    def test_has_unknown_lines_after_creation(self):
+        header = gdp_table_header()
+        assert header.has_unknown_lines() is True
+
+    def test_set_unit(self):
+        header = gdp_table_header()
+        assert header.unit is None
+        assert header.processed['млрд.рублей'] == parse.Header.UNKNOWN
+        header.set_unit(units())
+        assert header.unit is not None
+        assert header.processed['млрд.рублей'] == parse.Header.KNOWN
+
+    def test_set_varname(self):
+        header = gdp_table_header()
+        assert header.varname is None
+        header.set_varname(sample_pdef(), units())
+        assert header.varname is not None
+
+    def test_str(self):
+        header = gdp_table_header()
+        assert header.__str__() == 'varname: None, unit: None\n- <Объем ВВП>\n- <млрд.рублей>\n- <1991 1)>'
 
 
 # -----------------------------------------------------------------------------
@@ -196,39 +230,52 @@ def test_RowHolder_is_matched():
     assert foo(pat="Объем ВВП", textline="Объем ВВП текущего года") is True
     assert foo(pat="Объем ВВП", textline="1.1 Объем ВВП") is False
 
-
 # -----------------------------------------------------------------------------
-# TODO: make test Table class
+class Test_Table_sample_gdp():
+    
+    def setup_method(self):
+        self.table = sample_table_gdp()
 
-header_row = parse.Row(['Объем ВВП', ''])
-data_row = parse.Row(['1991', '10', '20', '30', '40'])
+    def test_Table_instance_column_number(self):
+        assert self.table.coln == 17
 
-TABLE = parse.Table(headers=[header_row],
-                    datarows=[data_row])
+    def test_Table_instance_datarows(self):
+        assert len(self.table.datarows) == 1
+        row = self.table.datarows[0]
+        assert row.name == '1991 1)'
+        assert row.data == ['100', '20', '20', '40', '40'] + ['10'] * 12
+        
+    def test_Table_instance_has_splitter_after_processing_pdef(self):     
+        # """table.splitter_func"" is not None because table's """parse"" method has already been invoked (see sample_table_gdp())
+        # TODO: change to specific splitter.* function
+        assert self.table.splitter_func == splitter.split_row_by_periods     
+                
+    def test_Table_is_defined(self):
+        assert self.table.is_defined() is True
 
-# TODO: can extract this information and check
-TABLE.header.varname = 'GDP'
-TABLE.header.unit = 'rog'
-TABLE.splitter_func = splitter.get_custom_splitter('fiscal')
+    def test_Table_Header(self):
+        header = self.table.header
+        assert header.varname == 'GDP'
+        assert header.unit == 'bln_rub'
+        assert header.processed['Объем ВВП'] == parse.Header.KNOWN 
+        assert header.processed['млрд.рублей'] == parse.Header.KNOWN 
+        # we need do testlines?
+        assert header.textlines == ['Объем ВВП', 'млрд.рублей']
 
+    def test_Table_label(self):
+        assert self.table.label == 'GDP_bln_rub'
 
-def test_Table_repr():
-    assert TABLE.__repr__() == 'Table GDP_rog (headers: 1, datarows: 1)'
+    def test_Table_repr(self):
+        assert self.table.__repr__() == 'Table GDP_bln_rub (headers: 2, datarows: 1)'
 
+    def test_Table_str(self):
+        assert self.table.__str__() == """Table GDP_bln_rub
+columns: 17
+varname: GDP, unit: bln_rub
++ <Объем ВВП>
++ <млрд.рублей>
+<1991 1) | 100 20 20 40 40 10 10 10 10 10 10 10 10 10 10 10 10>"""
 
-def test_Table_str():
-    assert TABLE.__str__() == """Table GDP_rog
-columns: 4
-varname: GDP, unit: rog
-- <Объем ВВП>
-<1991 | 10 20 30 40>"""
-
-
-def test_Table_is_defined():
-    assert TABLE.is_defined() is True
-
-
-# -----------------------------------------------------------------------------
 
 # Part 3. Sample data pipeline 
 
@@ -321,6 +368,11 @@ def sample_frames():
     return parse.Frames(dpoints)
 
 
+@pytest.fixture
+def gdp_table_header():
+    rows = sample_rows()[:2]
+    return parse.Header(rows)
+
 def test_read_csv(sample_rows):
     assert sample_rows.__repr__() == \
            "[<Объем ВВП>, " \
@@ -380,7 +432,6 @@ def test_csv_has_no_null_byte():
     csv_path = files.get_path_csv(2015, 2)
     z = csv_path.read_text(encoding=parse.ENC)
     assert "\0" not in z
-
 
 if __name__ == "__main__":
     pytest.main(["test_parse.py"])
