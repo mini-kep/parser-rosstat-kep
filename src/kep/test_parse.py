@@ -1,4 +1,89 @@
 # -*- coding: utf-8 -*-
+"""
+Testing status
+==============
+splitters.py - covered by doctests
+cfg.py - requires some additinal testing/validation, see Tasks
+parse.py - has two test suits:
+   test_parse.py - testing parts of algorithmusing mock data
+   test_parse_by_datapoints.py - checks for actual testing results,
+   will expand with along with cfg.py definitions expansion
+
+Testing goals
+=============
+Tests should help to: 
+
+    G.1 ensure we read all data we wanted (everything from parsing defnition 
+        was read)
+ 
+    G.2 this is actually the data requested (one table was not confused for 
+        another)
+ 
+    G.3 parts of algorithm return what is expected (helps to do refactoring, 
+        once we change something in algorithm or data structures or else, 
+        some tests break and we have to put in new ones)
+ 
+    G.4 some functions return expected results on actual data (like to_float())
+
+
+Test ideas
+==========
+
+(1) Some part of checks are implemented as validation procedures
+    inside code, eg. check all required variables were read from csv
+
+(2) Non-goal: 100% formal coverage by unit tests is not a target. Fixtures 
+    for intermedaite results can grow very big and untransparent. Some tests
+    in 'skeleton' may remain empty.    
+ 
+(3) Must combine eye code review with unit tests and other types of tests. 
+
+(4) Want to avoid too much testing of obvious easy-to test things. This will 
+    not make this program better. 
+    
+(5) Testing provides ideas for refactoring - can leave comments about that. 
+
+(6) Mentioning risk area in comments for the test is encouraged
+
+(7) repr and str methds are used extensively, sometimes they retrun the same 
+    in this program, repr is preferred
+
+Tasks
+======
+    
+general 
+-------
+- what is the coverage tool to use?
+
+- some useful tests died at https://github.com/epogrebnyak/data-rosstat-kep
+ 
+test_parse.py 
+-------------
+ 
+- introduce skeleton from , mark tests to enhance and not-to-do tests
+
+- complete fixtures list, sample csv must include at least two tables
+
+
+test_parse_by_datapoints.py
+----------------------------
+
+- change dataframe dumps constants when new parsing definitons are added in 
+  cfg.py    
+    
+test_cfg.py 
+-----------
+- the algorithm will break if markers (start and end lines) are not in order
+    
+    to check for that:
+      - must read csv file rows, use a reference csv file 
+      - use first pair in start and end markers 
+      - make sure the order of markers in specification is the same order as in 
+        csv file
+      - can be done as a test or as vaidator method
+- Maybe a new name instead of 'markers', it has to be something 
+     indicating the parsing definitoin boundary start and end line
+"""
 # TESTING INDIVIDUAL FUNCTIONS
 
 import pandas as pd
