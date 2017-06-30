@@ -64,6 +64,7 @@ test_parse.py
 
 - complete fixtures list, sample csv must include at least two tables
 
+- go to individual todo/fixme in tests 
 
 test_parse_by_datapoints.py
 ----------------------------
@@ -302,7 +303,7 @@ def test_frames(gdp_frames):
     assert f.dfq.GDP_bln_rub.sum() == f.dfm.GDP_bln_rub.sum()
     assert f.dfa.GDP_bln_rub.sum() == 100
     
-# testing on occasional errors
+# regression testing on occasional errors
 def test_csv_has_no_null_byte():
     csv_path = files.get_path_csv(2015, 2)
     z = csv_path.read_text(encoding=parse.ENC)
