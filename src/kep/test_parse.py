@@ -434,5 +434,32 @@ def test_csv_has_no_null_byte():
     z = csv_path.read_text(encoding=parse.ENC)
     assert "\0" not in z
 
+
+def test_RowStack_pop_not_crashes_on_definition_with_None_markers():
+    row_stack = parse.RowStack(sample_rows())
+
+    from cfg import Definition
+    pdef = Definition("MAIN")
+    pdef.add_header("Объем ВВП", "GDP")
+    pdef.add_marker(None, None)
+
+    csv_segment = row_stack.pop(pdef)
+    assert len(csv_segment) == 0
+
+
+def test_RowStack_is_found_not_crashes_on_None_as_text():
+    row_stack = parse.RowStack(sample_rows())
+    assert row_stack.is_found(None) is False
+
+
+def test_RowStack_is_matched_not_crashes_on_None_as_pat_argument():
+    row_stack = parse.RowStack(sample_rows())
+    assert row_stack.is_matched(None, row_stack.rows[0].name) is False
+
+
+def test_RowStack_is_matched_not_crashes_on_None_as_textline_argument():
+    row_stack = parse.RowStack(sample_rows())
+    assert row_stack.is_matched("abc", None) is False
+
 if __name__ == "__main__":
     pytest.main(["test_parse.py"])

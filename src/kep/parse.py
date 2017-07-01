@@ -152,8 +152,12 @@ class RowStack:
         """Returns True if *textline* starts with *pat*, False otherwise
            Ignores "
         """
+        if not pat:
+            return False
         pat = pat.replace('"', '')
         if pat:
+            if not textline:
+                return False
             textline = textline.replace('"', '')
             return textline.startswith(pat)
         else:
