@@ -13,6 +13,18 @@ dpoints = vint.dpoints
 frame = vint.frames
 
 
+def test_Datapoints_emit_by_method_checks():
+    with pytest.raises(ValueError):
+        next(dpoints.emit_by_method("some_other_method_name"))
+
+    for name in ["emit_a", "emit_q", "emit_m"]:
+        try:
+            next(dpoints.emit_by_method(name))
+            assert True
+        except ValueError:
+            assert False
+
+
 def test_Datapoints_get_annual_values_():
     testpoints_1999a = [{'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
                         {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999}]
