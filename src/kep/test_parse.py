@@ -157,6 +157,10 @@ class Test_Function_to_float:
         assert parse.to_float('6762,31)2)') == 6762.3
         assert parse.to_float('1734.4 1788.42)') == 1734.4
 
+    def test_on_max_recursion_depth_throws_exception(self):
+        with pytest.raises(ValueError):
+            parse.to_float("1.2,,,,,")
+
     def all_values():
         """Emit all values for debugging to_float()"""
         csv_path = files.get_path_csv()
