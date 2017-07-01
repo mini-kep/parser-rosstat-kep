@@ -130,7 +130,7 @@ class Test_DateFunctions():
 
 
 # risk area: underscore as a separator may change
-def Test_Label_Handling_Functions():
+class Test_Label_Handling_Functions:
     def test_multiple_functions(self):
         assert parse.extract_unit("GDP_mln_rub") == "mln_rub"
         assert parse.extract_varname("GDP_mln_rub") == "GDP"
