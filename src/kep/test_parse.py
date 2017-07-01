@@ -204,26 +204,22 @@ class Test_Header:
         assert self.header.textlines == ['Объем ВВП', 'млрд.рублей', '1991 1)']
 
     def test_has_unknown_lines_after_creation(self):
-        header = gdp_table_header()
-        assert header.has_unknown_lines() is True
+        assert self.header.has_unknown_lines() is True
 
     def test_set_unit(self):
-        header = gdp_table_header()
-        assert header.unit is None
-        assert header.processed['млрд.рублей'] == parse.Header.UNKNOWN
-        header.set_unit(units())
-        assert header.unit is not None
-        assert header.processed['млрд.рублей'] == parse.Header.KNOWN
+        assert self.header.unit is None
+        assert self.header.processed['млрд.рублей'] == parse.Header.UNKNOWN
+        self.header.set_unit(units())
+        assert self.header.unit is not None
+        assert self.header.processed['млрд.рублей'] == parse.Header.KNOWN
 
     def test_set_varname(self):
-        header = gdp_table_header()
-        assert header.varname is None
-        header.set_varname(sample_pdef(), units())
-        assert header.varname is not None
+        assert self.header.varname is None
+        self.header.set_varname(sample_pdef(), units())
+        assert self.header.varname is not None
 
     def test_str(self):
-        header = gdp_table_header()
-        assert header.__str__() == 'varname: None, unit: None\n- <Объем ВВП>\n- <млрд.рублей>\n- <1991 1)>'
+        assert self.header.__str__() == 'varname: None, unit: None\n- <Объем ВВП>\n- <млрд.рублей>\n- <1991 1)>'
 
 
 # -----------------------------------------------------------------------------
