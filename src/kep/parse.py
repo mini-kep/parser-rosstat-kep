@@ -70,8 +70,9 @@ def from_csv(path):
 def read_csv(path):
     """Yield non-empty dictionaries with 'head' and 'data' keys from *path*"""
     raw_csv_rows = from_csv(path)
-    filled_csv_rows = filter(lambda row: row and row[0], raw_csv_rows)
-    return map(Row, filled_csv_rows)
+    filled = filter(lambda row: row and row[0], raw_csv_rows)
+    no_comments = filter(lambda row: not row[0].startswith("___"), filled)
+    return map(Row, no_comments)
 
 
 class Tables:
@@ -316,8 +317,7 @@ class Header:
     def __init__(self, rows):
         self.varname = None
         self.unit = None
-        self.textlines = [row.name for row in rows
-                          if not row.name.startswith("___")]
+        self.textlines = [row.name for row in rows]
         self.processed = odict((line, self.UNKNOWN) for line in self.textlines)
 
     def set_varname(self, pdef, units):
@@ -330,7 +330,7 @@ class Header:
                     just_one += 1
                     self.processed[line] = self.KNOWN
                     self.varname = varname_dict[header]
-                    unit = self.get_unit(line, units)
+                    unit = self.extract_unit(line, units)
                     if unit:
                         self.unit = unit
                     else:
@@ -341,7 +341,7 @@ class Header:
             assert just_one <= 1
 
     @staticmethod
-    def get_unit(line, units):
+    def extract_unit(line, units):
         for k in units.keys():
             if k in line:
                 return units[k]
@@ -349,7 +349,7 @@ class Header:
 
     def set_unit(self, units):
         for line in self.textlines:
-            unit = self.get_unit(line, units)
+            unit = self.extract_unit(line, units)
             if unit:
                 self.unit = unit
                 # if unit was found at the start of line, mark line as known
