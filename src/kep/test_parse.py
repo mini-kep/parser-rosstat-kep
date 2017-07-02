@@ -131,7 +131,7 @@ class Test_DateFunctions():
 
 
 # risk area: underscore as a separator may change
-def Test_Label_Handling_Functions():
+class Test_Label_Handling_Functions:
     def test_multiple_functions(self):
         assert parse.extract_unit("GDP_mln_rub") == "mln_rub"
         assert parse.extract_varname("GDP_mln_rub") == "GDP"
@@ -157,6 +157,10 @@ class Test_Function_to_float:
         assert parse.to_float('123,0 4561)') == 123
         assert parse.to_float('6762,31)2)') == 6762.3
         assert parse.to_float('1734.4 1788.42)') == 1734.4
+
+    def test_on_max_recursion_depth_throws_exception(self):
+        with pytest.raises(ValueError):
+            parse.to_float("1.2,,,,,")
 
     def all_values():
         """Emit all values for debugging to_float()"""
@@ -200,26 +204,22 @@ class Test_Header:
         assert self.header.textlines == ['Объем ВВП', 'млрд.рублей', '1991 1)']
 
     def test_has_unknown_lines_after_creation(self):
-        header = gdp_table_header()
-        assert header.has_unknown_lines() is True
+        assert self.header.has_unknown_lines() is True
 
     def test_set_unit(self):
-        header = gdp_table_header()
-        assert header.unit is None
-        assert header.processed['млрд.рублей'] == parse.Header.UNKNOWN
-        header.set_unit(units())
-        assert header.unit is not None
-        assert header.processed['млрд.рублей'] == parse.Header.KNOWN
+        assert self.header.unit is None
+        assert self.header.processed['млрд.рублей'] == parse.Header.UNKNOWN
+        self.header.set_unit(units())
+        assert self.header.unit is not None
+        assert self.header.processed['млрд.рублей'] == parse.Header.KNOWN
 
     def test_set_varname(self):
-        header = gdp_table_header()
-        assert header.varname is None
-        header.set_varname(sample_pdef(), units())
-        assert header.varname is not None
+        assert self.header.varname is None
+        self.header.set_varname(sample_pdef(), units())
+        assert self.header.varname is not None
 
     def test_str(self):
-        header = gdp_table_header()
-        assert header.__str__() == 'varname: None, unit: None\n- <Объем ВВП>\n- <млрд.рублей>\n- <1991 1)>'
+        assert self.header.__str__() == 'varname: None, unit: None\n- <Объем ВВП>\n- <млрд.рублей>\n- <1991 1)>'
 
 
 # -----------------------------------------------------------------------------
@@ -434,6 +434,33 @@ def test_csv_has_no_null_byte():
     csv_path = files.get_path_csv(2015, 2)
     z = csv_path.read_text(encoding=parse.ENC)
     assert "\0" not in z
+
+
+def test_RowStack_pop_not_crashes_on_definition_with_None_markers():
+    row_stack = parse.RowStack(sample_rows())
+
+    from cfg import Definition
+    pdef = Definition("MAIN")
+    pdef.add_header("Объем ВВП", "GDP")
+    pdef.add_marker(None, None)
+
+    csv_segment = row_stack.pop(pdef)
+    assert len(csv_segment) == 0
+
+
+def test_RowStack_is_found_not_crashes_on_None_as_text():
+    row_stack = parse.RowStack(sample_rows())
+    assert row_stack.is_found(None) is False
+
+
+def test_RowStack_is_matched_not_crashes_on_None_as_pat_argument():
+    row_stack = parse.RowStack(sample_rows())
+    assert row_stack.is_matched(None, row_stack.rows[0].name) is False
+
+
+def test_RowStack_is_matched_not_crashes_on_None_as_textline_argument():
+    row_stack = parse.RowStack(sample_rows())
+    assert row_stack.is_matched("abc", None) is False
 
 if __name__ == "__main__":
     pytest.main(["test_parse.py"])
