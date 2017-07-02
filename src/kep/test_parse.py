@@ -107,7 +107,8 @@ import splitter
 
 # Part 1. Testing statless functions
 
-# risk areas: annual values were not similar to other freq + class of timestamps
+# risk areas: annual values were not similar to other freq 
+#             class of timestamps
 class Test_DateFunctions():
     def test_quarter_end_returns_pd_Timestamp(self):
         assert parse.get_date_quarter_end(2015, 1) == \
@@ -180,7 +181,6 @@ class Test_Function_get_year():
             yield d.name
 
 
-
 # Part 2. Testing some classes (not all)
 
 class Test_Header:
@@ -189,7 +189,7 @@ class Test_Header:
         self.header = gdp_table_header()
         
     def test_KNOWN_UNKNOWN_sanity(self):
-        # risk area: this was actual error that happened
+        # actual error that happened before class constant were introduced
         assert parse.Header.KNOWN != parse.Header.UNKNOWN
 
     def test_creation(self):
@@ -292,6 +292,7 @@ def get_temp_filename(contents):
 # not implemented / not todo: parts of program may fail if there is no values  
 #                             at particular frequecy
 # not implemented: testing for start end line markers 
+
 
 CSV_TEXT = """Объем ВВП\t\t\t\t
 млрд.рублей\t\t\t\t

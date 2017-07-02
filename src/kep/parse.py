@@ -130,11 +130,11 @@ class Row:
     def is_datarow(self):
         return is_year(self.name)
 
-    def __str__(self):
+    def __str__(self):        
         if "".join(self.data):
-            return "<{} | {}>".format(self.name, ' '.join(self.data))
+            return "Row <{} | {}>".format(self.name, ' '.join(self.data))
         else:
-            return "<{}>".format(self.name)
+            return "Row <{}>".format(self.name)
 
     def __repr__(self):
         return self.__str__()
