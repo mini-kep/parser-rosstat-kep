@@ -59,11 +59,11 @@ CSV_TEXT = "\n".join([TABLE_TEXT, SAMPLE_HEADER_2, SAMPLE_DATA_2])
                       
 class MockCSV():
     def __init__(self, contents):
-       with NamedTemporaryFile('w') as f:
+        with NamedTemporaryFile('w') as f:
             self.path = f.name
-       Path(self.path).write_text(contents, encoding='utf-8')
+        Path(self.path).write_text(contents, encoding='utf-8')
     def close(self):
-       Path(self.path).unlink()
+        Path(self.path).unlink()
 
 @pytest.fixture
 def csv_path():
@@ -106,7 +106,7 @@ class Test_Header_Rows:
 def header(header_rows):
     return parse.Header(header_rows)
 
-class Test_Header:        
+class Test_Header:
     
     def test_KNOWN_UNKNOWN_sanity(self):
         # actual error before class constants were introduced
@@ -120,7 +120,7 @@ class Test_Header:
         
     def test_on_creation_textlines_is_list_of_strings(self, header):
         # IDEA: why to we still need .textlines? can access them from .processed
-        header.textlines == ['Объем ВВП', 
+        assert header.textlines == ['Объем ВВП',
                              '(уточненная оценка)', 
                              'млрд.рублей']
 
