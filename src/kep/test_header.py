@@ -96,7 +96,7 @@ def header_rows():
     mock.close()
 
 class Test_Header_Rows:        
-    def test_str_method_retruns_representation_string(self, header_rows):
+    def test_str_method_returns_representation_string(self, header_rows):
         hrows = [r.__str__() for r in header_rows]
         assert hrows[0] == "Row <Объем ВВП>"
         assert hrows[1] == "Row <(уточненная оценка)>"
