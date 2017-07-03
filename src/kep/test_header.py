@@ -116,7 +116,7 @@ class Test_Header:
     
     def test_on_creation_varname_and_unit_is_none(self, header):
         assert header.varname is None
-        assert header.varname is None
+        assert header.unit is None
         
     def test_on_creation_textlines_is_list_of_strings(self, header):
         # IDEA: why to we still need .textlines? can access them from .processed
