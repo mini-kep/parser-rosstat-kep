@@ -130,6 +130,11 @@ class Row:
 
     def is_datarow(self):
         return is_year(self.name)
+    
+    def matches(self, text):
+        r = self.name.replace('"', '')
+        text = text.replace('"', '')
+        return r.startswith(text)        
 
     def __str__(self):        
         if "".join(self.data):
@@ -138,7 +143,7 @@ class Row:
             return "Row <{}>".format(self.name)
 
     def __repr__(self):
-        return self.__str__()
+        return dict(name=self.name, data=self.data).__str__()
 
 
 class RowStack:
@@ -148,25 +153,9 @@ class RowStack:
         # consume *rows*, maybe it is a generator
         self.rows = [r for r in rows]
 
-    @staticmethod
-    def is_matched(pat, textline):
-        """Returns True if *textline* starts with *pat*, False otherwise
-           Ignores "
-        """
-        if not pat:
-            return False
-        pat = pat.replace('"', '')
-        if pat:
-            if not textline:
-                return False
-            textline = textline.replace('"', '')
-            return textline.startswith(pat)
-        else:
-            return False
-
     def is_found(self, text):
         for row in self.rows:
-            if self.is_matched(text, row.name):
+            if row.matches(text):
                 return True
         return False
 
@@ -178,7 +167,10 @@ class RowStack:
         for marker in pdef.markers:
             s = marker['start']
             e = marker['end']
-            if self.is_found(s) and self.is_found(e):
+            if not s and not e:
+                return self.remaining_rows()
+            # FIXME: will fail on (None, something) or (something, None)
+            elif self.is_found(s) and self.is_found(e):
                 return self.pop_segment(s, e)
         self.echo_error_ends_not_found(pdef)
         return []
@@ -200,10 +192,9 @@ class RowStack:
         i = 0
         while i < len(self.rows):
             row = self.rows[i]
-            line = row.name
-            if self.is_matched(start, line):
+            if row.matches(start):
                 we_are_in_segment = True
-            if self.is_matched(end, line):
+            if row.matches(end):
                 break
             if we_are_in_segment:
                 segment.append(row)
@@ -258,7 +249,7 @@ class Table:
     VALID_ROW_LENGTHS = list(splitter.ROW_LENGTH_TO_FUNC_MAPPER.keys())
 
     def __init__(self, headers, datarows):
-        # WONTFIX: naming deadend with three headers in one line
+        # WONTFIX: naming with three headers in one line
         self.header = Header(headers)
         self.datarows = datarows
         self.coln = max(row.len() for row in self.datarows)
@@ -437,7 +428,6 @@ class DictMaker:
 
     def __str__(self):
         return self.basedict.__str__()   
-
 
 class Emitter:
     """Emitter extracts and holds annual, quarterly and monthly values

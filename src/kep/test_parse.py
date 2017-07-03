@@ -92,308 +92,63 @@ test_cfg.py
      indicating the parsing definitoin boundary start and end line
 """
 
-from datetime import date
-from tempfile import NamedTemporaryFile
-from pathlib import Path
-import pandas as pd
-
 import pytest
 
 import parse
 import files
-import splitter
 
-
-# Part 1. Testing statless functions
-
-# risk areas: annual values were not similar to other freq 
-#             class of timestamps
-class Test_DateFunctions():
-    def test_quarter_end_returns_pd_Timestamp(self):
-        assert parse.get_date_quarter_end(2015, 1) == \
-               pd.Timestamp('2015-03-31 00:00:00')
-        assert parse.get_date_quarter_end(2015, 4) == \
-               pd.Timestamp('2015-12-31 00:00:00')
-        assert parse.get_date_quarter_end(2015, 4) == \
-               pd.Timestamp(date(2015, 4 * 3, 1)) + pd.offsets.QuarterEnd()
-
-    def test_month_end_returns_pd_Timestamp(self):
-        assert parse.get_date_month_end(2015, 8) == \
-               pd.Timestamp('2015-08-31 00:00:00')
-        assert parse.get_date_month_end(2015, 1) == \
-               pd.Timestamp(date(2015, 1, 1)) + pd.offsets.MonthEnd()
-
-    def test_year_end_returns_pd_Timestamp(self):
-        assert parse.get_date_year_end(2015) == pd.Timestamp('2015-12-31 00:00:00')
-        assert parse.get_date_year_end(2015) == \
-               pd.Timestamp('2015') + pd.offsets.YearEnd()
-
-
-# risk area: underscore as a separator may change
-class Test_Label_Handling_Functions:
-    def test_multiple_functions(self):
-        assert parse.extract_unit("GDP_mln_rub") == "mln_rub"
-        assert parse.extract_varname("GDP_mln_rub") == "GDP"
-        assert parse.split_label("GDP_mln_rub") == ("GDP", "mln_rub")
-        assert parse.make_label("GDP", "mln_rub") == "GDP_mln_rub"
-
-
-class Test_Function_to_float:
-    # risk area: may be None instead of False, to discuss
-    def test_on_invalid_characters_returns_False(self):
-        for x in [None, "", " ", "…", "-", "a", "ab", " - "]:
-            assert parse.to_float(x) is False
-
-    def test_on_single_value_returns_float(self):
-        assert parse.to_float('5.678,') == 5.678
-        assert parse.to_float('5.678,,') == 5.678
-        assert parse.to_float("5.6") == 5.6
-        assert parse.to_float("5,6") == 5.6
-        assert parse.to_float("5,67") == 5.67
-        assert parse.to_float("5,67,") == 5.67
-
-    def test_on_comments_returns_float(self):
-        assert parse.to_float('123,0 4561)') == 123
-        assert parse.to_float('6762,31)2)') == 6762.3
-        assert parse.to_float('1734.4 1788.42)') == 1734.4
-
-    def test_on_max_recursion_depth_throws_exception(self):
-        with pytest.raises(ValueError):
-            parse.to_float("1.2,,,,,")
-
-    def all_values():
-        """Emit all values for debugging to_float()"""
-        csv_path = files.get_path_csv()
-        for table in parse.Tables(csv_path).get_all():
-            for row in table.datarows:
-                for value in row.data:
-                    yield value
-
-
-class Test_Function_get_year():
-    def test_get_year(self):
-        assert parse.get_year("19991)") == 1999
-        assert parse.get_year("1999") == 1999
-        assert parse.get_year("1812") is None
-
-    def all_heads():
-        # emit all heads for debugging get_year()
-        csv_path = files.get_path_csv()
-        csv_dicts = parse.read_csv(csv_path)
-        for d in csv_dicts:
-            yield d.name
 
 
 # Part 2. Testing some classes (not all)
 
-## TestHeader class moved to test_header.py
+# Many classes moved to test_header.py
 
-##
-# -----------------------------------------------------------------------------
+# TODO: more to Rows test
+#def test_RowStack_is_matched():
+#    foo = parse.RowStack.is_matched
+#    assert foo(pat="Объем ВВП", textline="Объем ВВП текущего года") is True
+#    assert foo(pat="Объем ВВП", textline="1.1 Объем ВВП") is False
 
-# FIXME: more testing for RowStack
-def test_RowHolder_is_matched():
-    foo = parse.RowStack.is_matched
-    assert foo(pat="Объем ВВП", textline="Объем ВВП текущего года") is True
-    assert foo(pat="Объем ВВП", textline="1.1 Объем ВВП") is False
+ROWS = [{'name': 'Объем ВВП', 'data': ['', '', '', '']},
+ {'name': '(уточненная оценка)', 'data': []},
+ {'name': 'млрд.рублей', 'data': ['', '', '', '']},
+ {'name': '1991 1)', 'data': ['100', '20', '30', '40', '10']},
+ {'name': 'Индекс промышленного производства', 'data': []},
+ {'name': 'в % к соответствующему периоду предыдущего года', 'data': []},
+ {'name': '1991', 'data': ['102,7', '101,1', '102,2', '103,3', '104,3', '101,1', '101,1', '101,1', '102,2', '102,2', '102,2', '103,3', '103,3', '103,3', '104,3', '104,3', '104,3']}]
 
-# -----------------------------------------------------------------------------
-class Test_Table_sample_gdp():
+def to_row(d):
+    return parse.Row([d['name']] + d['data'])
     
-    def setup_method(self):
-        self.table = sample_table_gdp()
-
-    def test_Table_instance_column_number(self):
-        assert self.table.coln == 17
-
-    def test_Table_instance_datarows(self):
-        assert len(self.table.datarows) == 1
-        row = self.table.datarows[0]
-        assert row.name == '1991 1)'
-        assert row.data == ['100', '20', '20', '40', '40'] + ['10'] * 12
-        
-    def test_Table_instance_has_splitter_after_processing_pdef(self):     
-        # """table.splitter_func"" is not None because table's """parse"" method has already been invoked (see sample_table_gdp())
-        # TODO: change to specific splitter.* function
-        assert self.table.splitter_func == splitter.split_row_by_periods     
-                
-    def test_Table_is_defined(self):
-        assert self.table.is_defined() is True
-
-    def test_Table_Header(self):
-        header = self.table.header
-        assert header.varname == 'GDP'
-        assert header.unit == 'bln_rub'
-        assert header.processed['Объем ВВП'] == parse.Header.KNOWN 
-        assert header.processed['млрд.рублей'] == parse.Header.KNOWN 
-        # we need do testlines?
-        assert header.textlines == ['Объем ВВП', 'млрд.рублей']
-
-    def test_Table_label(self):
-        assert self.table.label == 'GDP_bln_rub'
-
-    def test_Table_repr(self):
-        assert self.table.__repr__() == 'Table GDP_bln_rub (headers: 2, datarows: 1)'
-
-    def test_Table_str(self):
-        assert self.table.__str__() == """Table GDP_bln_rub
-columns: 17
-varname: GDP, unit: bln_rub
-+ <Объем ВВП>
-+ <млрд.рублей>
-Row <1991 1) | 100 20 20 40 40 10 10 10 10 10 10 10 10 10 10 10 10>"""
-
-
-# Part 3. Sample data pipeline 
-
-def get_temp_filename(contents):
-    with NamedTemporaryFile('w') as f:
-        # get path like C:\\Users\\EP\\AppData\\Local\\Temp\\tmp40stxmaj'
-        filename = f.name
-    # recreate file based on its bath - helps avoid PermissionError
-    path = Path(filename)
-    path.write_text(contents, encoding=parse.ENC)
-    return path
-
-# CSV text includes two variables and mock data for 1991
-# not implemented / not todo: parts of program may fail if there is no values  
-#                             at particular frequecy
-# not implemented: testing for start end line markers 
-
-
-CSV_TEXT = """Объем ВВП\t\t\t\t
-млрд.рублей\t\t\t\t
-\t----this line will be read ----
-
-1991 1)\t100\t20\t20\t40\t40""" + "\t10" * 12 + \
-"""\n
-Индекс промышленного производства
-в % к соответствующему периоду предыдущего года
-1991\t103,2\t101,1\t102,2\t103,5\t104,9""" + \
-"\t101,1" * 3 + "\t102,2" * 3 + "\t103,5" * 3 + "\t104,9" * 3
-
+@pytest.fixture
+def row_stack():    
+    rows = [to_row(d) for d in ROWS]
+    return parse.RowStack(rows)
 
 @pytest.fixture
-def csv_path(text=CSV_TEXT):
-    filename = get_temp_filename(text)
-    yield filename
-    # QUESTION: does next(csv_path()) take us here? is temp file deleted?
-    Path(filename).unlink()
-
-
-@pytest.fixture
-def sample_rows():
-    # FIXME: maybe generator is not consumed and temp file not deleted
-    path = next(csv_path())
-    return list(parse.read_csv(path))
-
-
-@pytest.fixture
-def sample_pdef():
+def pdef2():
     from cfg import Definition
-    # WONTFIX: name MAIN is rather useless for Definition instance
     pdef = Definition("MAIN")
     pdef.add_header("Объем ВВП", "GDP")
+    #parsing defintion with none markers
     pdef.add_marker(None, None)
-    pdef.require("GDP", "bln_rub")
-    pdef.add_header("Индекс промышленного производства", "IND_PROD")
-    pdef.require("IND_PROD", "yoy")
     return pdef
 
+def test_row_stack_fixture_self_test(row_stack):
+    for s, r in zip(row_stack.rows, ROWS):
+        assert s.name == r['name']
+        assert s.data == r['data']
 
-def units():
-    from cfg import UNITS
-    return UNITS
-
-
-@pytest.fixture
-def sample_tables():
-    rows = sample_rows()
-    return parse.get_tables_from_rows_segment(rows, sample_pdef(), units())
-
-
-@pytest.fixture
-def sample_table_gdp():
-    return sample_tables()[0]
-
-
-@pytest.fixture
-def gdp_emitter():
-    t = sample_tables()[0]
-    return parse.Emitter(t)
-
-
-@pytest.fixture
-def sample_datapoints():
-    tables = sample_tables()
-    return parse.Datapoints(tables)
-
-
-@pytest.fixture
-def sample_frames():
-    tables = sample_tables()
-    dpoints = parse.Datapoints(tables)
-    return parse.Frames(dpoints)
-
-
-@pytest.fixture
-def gdp_table_header():
-    #FIXME: [:3] is volatile
-    rows = sample_rows()[:3]
-    return parse.Header(rows)
-
-def test_read_csv(sample_rows):
-    assert sample_rows.__repr__() == \
-           "[Row <Объем ВВП>, " \
-           "Row <млрд.рублей>, " \
-           "Row <1991 1) | 100 20 20 40 40 10 10 10 10 10 10 10 10 10 10 10 10>, " \
-           "Row <Индекс промышленного производства>, " \
-           "Row <в % к соответствующему периоду предыдущего года>, " \
-           "Row <1991 | 103,2 101,1 102,2 103,5 104,9 " \
-           "101,1 101,1 101,1 102,2 102,2 102,2 103,5 103,5 103,5 104,9 104,9 104,9>]"
-
-
-def test_table_gdp(sample_table_gdp):
-    t = sample_table_gdp
-    assert t.__str__() == """Table GDP_bln_rub
-columns: 17
-varname: GDP, unit: bln_rub
-+ <Объем ВВП>
-+ <млрд.рублей>
-Row <1991 1) | 100 20 20 40 40 10 10 10 10 10 10 10 10 10 10 10 10>"""
-
-
-def test_gdp_emitter(gdp_emitter):
-    e = gdp_emitter
-    assert e.emit_a() == [{'freq': 'a', 'label': 'GDP_bln_rub', 'value': 100.0, 'year': 1991}]
-    assert {'freq': 'q', 'label': 'GDP_bln_rub', 'qtr': 1, 'value': 20.0,
-            'year': 1991} in e.emit_q()
-    assert {'freq': 'm', 'label': 'GDP_bln_rub', 'month': 1, 'value': 10.0,
-            'year': 1991} in e.emit_m()
-
-
-def test_datapoints(sample_datapoints):
-    pts = sample_datapoints
-    assert pts.is_included({'freq': 'a', 'label': 'GDP_bln_rub', 'value': 100.0,
-                            'year': 1991})
-    assert pts.is_included({'freq': 'a', 'label': 'IND_PROD_yoy', 'value': 103.2,
-                            'year': 1991})
-    assert pts.is_included({'freq': 'q', 'label': 'GDP_bln_rub', 'qtr': 1,
-                            'value': 20.0, 'year': 1991})
-    assert pts.is_included({'freq': 'q', 'label': 'IND_PROD_yoy', 'qtr': 4,
-                            'value': 104.9, 'year': 1991})
-    assert pts.is_included({'freq': 'm', 'label': 'GDP_bln_rub', 'month': 1,
-                            'value': 10.0, 'year': 1991})
-    assert pts.is_included({'freq': 'm', 'label': 'IND_PROD_yoy', 'month': 12,
-                            'value': 104.9, 'year': 1991})
-
-
-def test_frames(sample_frames):
-    f = sample_frames
-    assert f.dfq.GDP_bln_rub.sum() == f.dfm.GDP_bln_rub.sum()
-    assert f.dfa.GDP_bln_rub.sum() == 100
-    # FIXME: add IND_yoy
-
+class Test_RowStack_stable_on_definition_with_None_markers:
+    
+    def test_pop_returns_segment(self, row_stack, pdef2):
+        csv_segment = row_stack.pop(pdef2)
+        assert len(csv_segment) == 7
+    
+    def test_is_found_raises_error(self, row_stack):
+        with pytest.raises(AttributeError):
+            # error found in Rows
+            row_stack.is_found(None)
 
 # Part 4. Regression tests - after bug fixes on occasional errors
 
@@ -401,33 +156,6 @@ def test_csv_has_no_null_byte():
     csv_path = files.get_path_csv(2015, 2)
     z = csv_path.read_text(encoding=parse.ENC)
     assert "\0" not in z
-
-
-def test_RowStack_pop_not_crashes_on_definition_with_None_markers():
-    row_stack = parse.RowStack(sample_rows())
-
-    from cfg import Definition
-    pdef = Definition("MAIN")
-    pdef.add_header("Объем ВВП", "GDP")
-    pdef.add_marker(None, None)
-
-    csv_segment = row_stack.pop(pdef)
-    assert len(csv_segment) == 0
-
-
-def test_RowStack_is_found_not_crashes_on_None_as_text():
-    row_stack = parse.RowStack(sample_rows())
-    assert row_stack.is_found(None) is False
-
-
-def test_RowStack_is_matched_not_crashes_on_None_as_pat_argument():
-    row_stack = parse.RowStack(sample_rows())
-    assert row_stack.is_matched(None, row_stack.rows[0].name) is False
-
-
-def test_RowStack_is_matched_not_crashes_on_None_as_textline_argument():
-    row_stack = parse.RowStack(sample_rows())
-    assert row_stack.is_matched("abc", None) is False
 
 if __name__ == "__main__":
     pytest.main(["test_parse.py"])
