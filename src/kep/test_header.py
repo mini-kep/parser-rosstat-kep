@@ -70,24 +70,55 @@ def _units():
 
 class Test_Header:        
     
-    def test_textlines_property_is_list_of_strings(self, header):
+    def test_KNOWN_UNKNOWN_sanity(self):
+        # actual error before class constants were introduced
+        assert parse.Header.KNOWN != parse.Header.UNKNOWN
+    
+    # on creation
+    
+    def test_on_creation_varname_and_unit_is_none(self, header):
+        assert header.varname is None
+        assert header.varname is None
+        
+    def test_on_creation_textlines_is_list_of_strings(self, header):
+        # IDEA: why to we still need .textlines? can access them from .processed
         header.textlines == ['Объем ВВП', 
                              '(уточненная оценка)', 
                              'млрд.рублей']
-        
-    def test_set_unit_results_in_bln_rub(self, header, _units):
-        header.set_unit(units=_units)
-        assert header.unit == 'bln_rub'        
 
+    def test_on_creation_processed_is_unknown(self, header):
+        assert header.processed['Объем ВВП'] == parse.Header.UNKNOWN 
+        assert header.processed['млрд.рублей'] == parse.Header.UNKNOWN 
+
+    def test_on_creation_has_unknown_lines(self, header):
+        assert header.has_unknown_lines() is True
+
+    def test_on_creation_str(self, header):
+        assert header.__str__() == 'varname: None, unit: None\n- <Объем ВВП>\n- <(уточненная оценка)>\n- <млрд.рублей>'
+
+    # after parsing 
+        
     def test_set_varname_results_in_GDP(self, header, _pdef, _units):
         header.set_varname(pdef=_pdef, units=_units)
         # IDEA: isolate work with units in set_varname() method 
         assert header.varname == 'GDP'        
+        assert header.processed['Объем ВВП'] == parse.Header.KNOWN  
+     
+    def test_set_unit_results_in_bln_rub(self, header, _units):
+        header.set_unit(units=_units)
+        assert header.unit == 'bln_rub' 
+        assert header.processed['млрд.рублей'] == parse.Header.KNOWN  
 
-    def test_has_unknown_lines(self, header, _pdef, _units):
+    def test_after_parsing_has_unknown_lines(self, header, _pdef, _units):
         header.set_unit(units=_units)
         header.set_varname(pdef=_pdef, units=_units)
         assert header.has_unknown_lines() is True
+
+    def test_after_parsing_str(self, header):
+        assert header.__str__() == ('varname: None, unit: None\n'
+                                    '- <Объем ВВП>\n'
+                                    '- <(уточненная оценка)>\n'
+                                    '- <млрд.рублей>')
 
 if __name__ == "__main__":
     pytest.main(["test_header.py"])      

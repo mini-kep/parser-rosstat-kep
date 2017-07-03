@@ -98,7 +98,6 @@ from pathlib import Path
 import pandas as pd
 
 import pytest
-from collections import OrderedDict as odict
 
 import parse
 import files
@@ -187,41 +186,9 @@ class Test_Function_get_year():
 
 # Part 2. Testing some classes (not all)
 
-class Test_Header:
-    
-    def setup_method(self):
-        self.header = gdp_table_header()
-        
-    def test_KNOWN_UNKNOWN_sanity(self):
-        # actual error that happened before class constant were introduced
-        assert parse.Header.KNOWN != parse.Header.UNKNOWN
+## TestHeader class moved to test_header.py
 
-    def test_creation(self):
-        assert self.header.unit is None
-        assert self.header.varname is None
-        assert self.header.processed['Объем ВВП'] == parse.Header.UNKNOWN 
-        assert self.header.processed['млрд.рублей'] == parse.Header.UNKNOWN 
-        assert self.header.textlines == ['Объем ВВП', 'млрд.рублей', '1991 1)']
-
-    def test_has_unknown_lines_after_creation(self):
-        assert self.header.has_unknown_lines() is True
-
-    def test_set_unit(self):
-        assert self.header.unit is None
-        assert self.header.processed['млрд.рублей'] == parse.Header.UNKNOWN
-        self.header.set_unit(units())
-        assert self.header.unit is not None
-        assert self.header.processed['млрд.рублей'] == parse.Header.KNOWN
-
-    def test_set_varname(self):
-        assert self.header.varname is None
-        self.header.set_varname(sample_pdef(), units())
-        assert self.header.varname is not None
-
-    def test_str(self):
-        assert self.header.__str__() == 'varname: None, unit: None\n- <Объем ВВП>\n- <млрд.рублей>\n- <1991 1)>'
-
-
+##
 # -----------------------------------------------------------------------------
 
 # FIXME: more testing for RowStack
