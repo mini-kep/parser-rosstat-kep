@@ -63,7 +63,7 @@ FRONTPAGE_FOLDER, _ = os.path.split(__file__)
 # пока временно так, предполагается что папка src/frontpage/pngs существует
 PNG_FOLDER = os.path.join(FRONTPAGE_FOLDER, 'pngs')
 
-GITHUB_PNG_FOLDER = "https://github.com/epogrebnyak/data-rosstat-kep/raw/master/output/png/"
+GITHUB_PNG_FOLDER = "https://github.com/epogrebnyak/mini-kep/raw/master/output/png/"
 
 def write_sparkline_pngs(df, folder=PNG_FOLDER):
     df = df.drop(['year', 'month'], 1)
