@@ -63,6 +63,7 @@ FRONTPAGE_FOLDER, _ = os.path.split(__file__)
 # пока временно так, предполагается что папка src/frontpage/pngs существует
 PNG_FOLDER = os.path.join(FRONTPAGE_FOLDER, 'pngs')
 
+GITHUB_PNG_FOLDER = "https://github.com/epogrebnyak/data-rosstat-kep/raw/master/output/png/"
 
 def write_sparkline_pngs(df, folder=PNG_FOLDER):
     df = df.drop(['year', 'month'], 1)
@@ -104,7 +105,7 @@ def insert_image_to_md(name, folder=PNG_FOLDER):
 def stream_table_rows_images(dfm=dfm):
     dfm = dfm.drop(['year', 'month'], 1)
     for name in dfm.columns:
-        img = insert_image_to_md(name)
+        img = insert_image_to_md(name, folder=GITHUB_PNG_FOLDER)
         yield [img]
 
 # создаем сами файлы с изображениями
