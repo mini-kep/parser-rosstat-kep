@@ -7,23 +7,9 @@ year, month = 2017, 4
 vint = parse.Vintage(2017, 4)
 # break csv to tables with variable names
 tables = vint.tables
-# emit values from tables
-dpoints = vint.dpoints
 # convert stream values to pandas dataframes
 frame = vint.frames
-
-
-def test_Datapoints_emit_by_method_checks():
-    with pytest.raises(ValueError):
-        next(dpoints.emit_by_method("some_other_method_name"))
-
-    for name in ["emit_a", "emit_q", "emit_m"]:
-        try:
-            next(dpoints.emit_by_method(name))
-            assert True
-        except ValueError:
-            assert False
-
+dpoints = parse.Datapoints(tables)
 
 def test_Datapoints_get_annual_values_():
     testpoints_1999a = [{'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
@@ -59,7 +45,7 @@ def test_Datapoints_is_included_annual_1999_values_in_2017_4():
 {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
 {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999}]
     for x in test_datapoints:
-        assert dpoints.is_included(x)
+        assert dpoints.includes(x)
 
 
 def test_dfa_in_2017_4():

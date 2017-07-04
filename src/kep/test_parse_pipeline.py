@@ -193,7 +193,7 @@ def csv_path_header():
     return Path(mock_csv_header.path)
     
 # Info pipline:
-# CSV -> Row() list -> RowStack() -> Tables -> Emitter -> Frames
+# CSV -> Row() list -> RowStack() -> Tables -> Emitter list -> Frames
 
 ## testing CSV -> Row() list
 
@@ -212,16 +212,14 @@ def test_read_csv_returns_row_instances(rows):
  {'name': 'в % к соответствующему периоду предыдущего года', 'data': []},
  {'name': '2015', 'data': ['99,2', '99,9', '98,3', '99,5', '99,1', '100,0', '98,2', '101,2', '98,2', '97,6', '99,1', '98,5', '100,2', '99,7', '98,4', '101,0', '98,1']}]
     assert len(rows) == len(rows_dicts) 
-    assert rows[0].equals_dict(rows_dicts[0])
     for r, d in zip(rows, rows_dicts):
         assert r.equals_dict(d) is True
-
 
 # Row() list -> RowStack()
 # WONTFIX: not tested separately
 
 # RowStack() -> Tables 
-# WONTFIX: not tested separately
+# FIXME: test functions like split_to_tables(), parse.get_tables_from_rows_segment(rows, _pdef(), _units())
 
 
 @pytest.fixture
@@ -302,7 +300,7 @@ def test_datapoints(datapoints):
         assert datapoints.includes(x)    
  
 
-# DataPoints -> Frames
+# Tables -> Frames
 @pytest.fixture
 def frames():
     return parse.Frames(tables())
@@ -310,9 +308,8 @@ def frames():
 def test_frames(frames):
     f = frames
     assert f.dfa['GDP_bln_rub'].sum() == f.dfq['GDP_bln_rub'].sum()
-    # FIXME: test differently
-    assert f.dfa['GDP_bln_rub'].sum() == 4823
-    # FIXME: add IND_yoy
+    assert frames.dfa.GDP_bln_rub['1991-12-31'] == 4823.0
+
     
 # regression tests - after bug fixes on occasional errors
 def test_csv_has_no_null_byte():
