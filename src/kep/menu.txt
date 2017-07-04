@@ -1,0 +1,34 @@
+	def extract_unit(label):
+	def extract_varname(label):
+	def make_label(vn, unit, sep="_"):
+	def split_label(label):
+
+	def get_year(string: str, rx=YEAR_CATCHER):
+	def is_year(string: str) -> bool:
+
+	def to_float(text, i=0):
+
+	def month_end_day(year, month):
+	def get_date_month_end(year, month):
+	def get_date_quarter_end(year, qtr):
+	def get_date_year_end(year):
+	
+	def from_csv(path):
+	def read_csv(path):
+	def to_csv(rows, path):
+	
+	class Row:
+	class RowStack:
+	class Table:
+	class Header:
+	class Tables:
+	class DictMaker:
+	class Emitter:
+	class Datapoints:
+	class Frames:
+	class Vintage:
+
+	def check_required_labels(tables, pdef):
+	def fix_multitable_units(tables):
+	def get_tables_from_rows_segment(rows_segment, pdef, units=UNITS):
+	def split_to_tables(rows):

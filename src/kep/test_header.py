@@ -3,12 +3,107 @@
 """
 import pytest
 
-import itertools
-from tempfile import NamedTemporaryFile
-from pathlib import Path
+
 
 import parse
-import splitter
+
+# standalone tests for classes:
+#    Row
+#    Header
+
+# not covered:
+#    RowStack    
+#    TODO: list other classes
+
+@pytest.fixture
+def rows_for_header():
+    csv_rows = [['Объем ВВП', '', '', '', ''],
+                ['(уточненная оценка)', '', '', '', ''],
+                ['млрд.рублей', '', '', '', '']]
+    return [parse.Row(row) for row in csv_rows]
+
+class Test_Row:
+    
+    def setup_method(self):
+        pass
+    
+    def test_equals_dict_method(self):
+        row = parse.Row(['Объем ВВП', 'a', 'b', 'c', '10'])
+        d =  {'name': 'Объем ВВП', 'data': ['a', 'b', 'c', '10']}
+        assert row.equals_dict(d) is True
+                              
+    def test_Row_matches_returns_bool(self):
+        assert parse.Row(["Объем ВВП текущего года"]).matches("Объем ВВП") is True
+        assert parse.Row(["1.1 Объем ВВП"]).matches("Объем ВВП") is False
+
+    # TODO: more testing for methods single instance
+
+    def test_str_method_returns_representation_string(self, rows_for_header):
+        strs = [r.__str__() for r in rows_for_header]
+        assert strs[0] == "Row <Объем ВВП>"
+        assert strs[1] == "Row <(уточненная оценка)>"
+        assert strs[2] == "Row <млрд.рублей>"   
+
+    def test_name_property_returns_string(self, rows_for_header):
+        assert rows_for_header[0].name == "Объем ВВП"
+        assert rows_for_header[1].name == "(уточненная оценка)"
+        assert rows_for_header[2].name == "млрд.рублей"
+
+# testing RowStack class
+
+ROWS = [{'name': 'Объем ВВП', 'data': ['', '', '', '']},
+ {'name': '(уточненная оценка)', 'data': []},
+ {'name': 'млрд.рублей', 'data': ['', '', '', '']},
+ {'name': '1991 1)', 'data': ['100', '20', '30', '40', '10']},
+ {'name': 'Индекс промышленного производства', 'data': []},
+ {'name': 'в % к соответствующему периоду предыдущего года', 'data': []},
+ {'name': '1991', 'data': ['102,7', '101,1', '102,2', '103,3', '104,3', '101,1', '101,1', '101,1', '102,2', '102,2', '102,2', '103,3', '103,3', '103,3', '104,3', '104,3', '104,3']}]
+
+def to_row(d):
+    elements = [d['name']] + d['data']
+    return parse.Row(elements)
+    
+@pytest.fixture
+def row_stack():    
+    rows = [to_row(d) for d in ROWS]
+    return parse.RowStack(rows)
+
+class RowStack():
+    def test_row_stack_fixture_self_test(row_stack):
+        for s, r in zip(row_stack.rows, ROWS):
+            assert s.name == r['name']
+            assert s.data == r['data']
+
+
+from cfg import Definition
+class Test_RowStack_stable_on_definition_with_None_markers:
+    
+    def setup_method(self):
+        # pdef_with_two_None_markers
+        self.pdef1 = Definition("MAIN")
+        self.pdef1.add_marker(None, None)
+
+        # pdef_with_one_None_markers
+        self.pdef2 = Definition("MAIN")
+        self.pdef2.add_marker(None, "endline")
+    
+    def test_pop_returns_segment(self, row_stack):
+        csv_segment = row_stack.pop(self.pdef1)
+        assert len(csv_segment) == 7
+
+    def test_pop_raises_ValueError_on_unsupported_def(self, row_stack):
+        with pytest.raises(ValueError):
+            row_stack.pop(self.pdef2)
+    
+    def test_is_found_raises_error(self, row_stack):
+        with pytest.raises(AttributeError):
+            # error found in Rows
+            row_stack.is_found(None)
+
+
+@pytest.fixture
+def header():
+    return parse.Header(rows_for_header())
 
 @pytest.fixture
 def _pdef():
@@ -28,83 +123,6 @@ def _units():
     # IDEA: may use explicit hardcoded constant with less units
     from cfg import UNITS
     return UNITS
-
-SAMPLE_HEADER = "\n".join([
-    # junk below
-    # skip empty rows
-    "",    
-    # skip comment
-    "_____ Примечание",    
-    # skip empty first cell
-    "\t----this line will not be read ----",    
-    # end junk
-    # parse variable name 'GDP' from here
-    "Объем ВВП" + "\t" * 4,
-    # parse nothing from here, has "undefined lines" flag is raised
-    "(уточненная оценка)",
-    # parse unit 'bln_rub' form here
-    "млрд.рублей" + "\t" * 4])    
-SAMPLE_DATA = "\t".join(["1991 1)", "100", "20", "30", "40", "10"])
-TABLE_TEXT = "\n".join([SAMPLE_HEADER, SAMPLE_DATA]) 
-
-# FIXME: maybe use a more simple csv for second header
-SAMPLE_HEADER_2 = "\n".join(['Индекс промышленного производства', 
-                             'в % к соответствующему периоду предыдущего года'])
-q_values = ['101,1', '102,2', '103,3', '104,3']
-m_values = list(itertools.chain.from_iterable([x] * 3 for x in q_values))
-SAMPLE_DATA_2 = "\t".join(['1991'] + ['102,7'] + q_values +  m_values)
-# END FIXME -----------------
-
-CSV_TEXT = "\n".join([TABLE_TEXT, SAMPLE_HEADER_2, SAMPLE_DATA_2])                      
-                      
-class MockCSV():
-    def __init__(self, contents):
-        with NamedTemporaryFile('w') as f:
-            self.path = f.name
-        Path(self.path).write_text(contents, encoding='utf-8')
-    def close(self):
-        Path(self.path).unlink()
-
-@pytest.fixture
-def csv_path():
-    mock = MockCSV(CSV_TEXT) 
-    yield Path(mock.path)
-    mock.close()
-
-def test_csv_path_fixture(csv_path):
-    assert csv_path.exists()
-    assert CSV_TEXT == csv_path.read_text(encoding='utf-8')
-
-def test_read_csv(csv_path):    
-    rows = parse.read_csv(csv_path)
-    row_strings = ["Row <Объем ВВП>",
-                   "Row <(уточненная оценка)>",
-                   "Row <млрд.рублей>",
-                   "Row <1991 1) | 100 20 30 40 10>",
-                   "Row <Индекс промышленного производства>",
-                   "Row <в % к соответствующему периоду предыдущего года>",
-                   "Row <1991 | 102,7 101,1 102,2 103,3 104,3 101,1 101,1 101,1 102,2 102,2 102,2 103,3 103,3 103,3 104,3 104,3 104,3>"]
-    for r, string in zip(rows, row_strings):
-        assert r.__str__() == string
-
-
-@pytest.fixture
-def header_rows():
-    mock = MockCSV(SAMPLE_HEADER) 
-    header_path = Path(mock.path)
-    yield parse.read_csv(header_path)
-    mock.close()
-
-class Test_Header_Rows:        
-    def test_str_method_returns_representation_string(self, header_rows):
-        hrows = [r.__str__() for r in header_rows]
-        assert hrows[0] == "Row <Объем ВВП>"
-        assert hrows[1] == "Row <(уточненная оценка)>"
-        assert hrows[2] == "Row <млрд.рублей>"   
-
-@pytest.fixture
-def header(header_rows):
-    return parse.Header(header_rows)
 
 class Test_Header:
     
@@ -157,88 +175,6 @@ class Test_Header:
                                     '- <Объем ВВП>\n'
                                     '- <(уточненная оценка)>\n'
                                     '- <млрд.рублей>')
-
-@pytest.fixture
-def tables(csv_path, _pdef, _units):
-    rows = parse.read_csv(csv_path)
-    return parse.get_tables_from_rows_segment(rows, _pdef, _units)
-
-@pytest.fixture
-def table(tables):
-    return tables[0]
-
-class Test_Table_except_header():
     
-    # FIXME: apparently cannot pass fixture to a setup_mathod in pytest
-    #def setup_method(self):
-    #    self.table = sample_table_gdp()
-
-    def test_Table_instance_column_number(self, table):
-        assert table.coln == 5
-
-    def test_Table_instance_datarows(self, table):
-        assert len(table.datarows) == 1
-        row = table.datarows[0]
-        assert row.name == '1991 1)'
-        assert row.data == ["100", "20", "30", "40", "10"]        
-        
-    def test_Table_instance_has_splitter(self, table):     
-        assert table.splitter_func == splitter.split_row_by_year_and_qtr
-                
-    def test_Table_is_defined(self, table):
-        assert table.is_defined() is True
-
-    def test_Table_label(self, table):
-        assert table.label == 'GDP_bln_rub'
-
-    def test_Table_repr(self, table):
-        assert table.__repr__() == 'Table GDP_bln_rub (headers: 3, datarows: 1)'
-
-    def test_Table_str(self, table):
-        print(table)
-        assert table.__str__() == """Table GDP_bln_rub
-columns: 5
-varname: GDP, unit: bln_rub
-+ <Объем ВВП>
-- <(уточненная оценка)>
-+ <млрд.рублей>
-Row <1991 1) | 100 20 30 40 10>"""
-            
-
-@pytest.fixture
-def emitter(tables):    
-    return parse.Emitter(tables[0])
-
-@pytest.fixture
-def datapoints(tables):    
-    return parse.Datapoints(tables)
-
-@pytest.fixture
-def frames(datapoints):
-    return parse.Frames(datapoints)
-            
-def test_emitter(emitter):
-    e = emitter
-    assert e.emit_a() == [{'freq': 'a', 'label': 'GDP_bln_rub', 'value': 100.0, 'year': 1991}]
-    assert {'freq': 'q', 'label': 'GDP_bln_rub', 'qtr': 1, 'value': 20.0,
-            'year': 1991} in e.emit_q()
-    assert [] == e.emit_m()
-
-def test_datapoints(datapoints):
-    pts = datapoints    
-    # gdp
-    assert pts.is_included({'year': 1991, 'label': 'GDP_bln_rub', 'freq': 'a', 'value': 100.0})
-    assert pts.is_included({'year': 1991, 'label': 'GDP_bln_rub', 'freq': 'q', 'value': 40.0, 'qtr': 3})    
-    # ind_prod    
-    assert pts.is_included({'year': 1991, 'label': 'IND_PROD_yoy', 'freq': 'a', 'value': 102.7})    
-    assert pts.is_included({'year': 1991, 'label': 'IND_PROD_yoy', 'freq': 'q', 'value': 102.2, 'qtr': 2})
-    assert pts.is_included({'year': 1991, 'label': 'IND_PROD_yoy', 'freq': 'm', 'value': 104.3, 'month': 12})
-
-def test_frames(frames):
-    f = frames
-    assert f.dfa['GDP_bln_rub'].sum() == f.dfq['GDP_bln_rub'].sum()
-    assert f.dfa['GDP_bln_rub'].sum() == 100
-    # FIXME: add IND_yoy                        
-
 if __name__ == "__main__":
     pytest.main(["test_header.py"])      

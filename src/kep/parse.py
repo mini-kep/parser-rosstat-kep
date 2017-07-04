@@ -4,6 +4,16 @@ Main call:
 
    Vintage(year, month).save()
 
+    Parsing procedure:
+   - cut out a segment of csv file as delimited by start and end lines
+   - hold remaining parts of csv file for further parsing
+   - break csv segment into tables, each table containing headers and data rows
+   
+   - parse table headers to obtain variable name ("GDP") and unit ("bln_rub")
+   - for tables with varname and unit:
+        split datarows to obtain annual, quarter and monthly values
+        emit values as frequency-label-date-value dicts
+
 """
 
 from enum import Enum, unique
@@ -99,6 +109,30 @@ class Tables:
     def get_defined(self):
         return [t for t in self.get_all() if t.is_defined()]
 
+def get_tables_from_rows_segment(rows_segment, pdef, units=UNITS):
+    tables = [t.parse(pdef, units) for t in split_to_tables(rows_segment)]
+    fix_multitable_units(tables)
+    check_required_labels(tables, pdef)
+    return tables
+
+def fix_multitable_units(tables):
+    """For tables without *header.varname* copy *header.varname* from previous table.
+       Applies to tables that do not have any unknown rows.
+    """
+    for prev_table, table in zip(tables, tables[1:]):
+        if table.header.varname is None:
+            if not table.header.has_unknown_lines():
+                table.header.varname = prev_table.header.varname
+
+
+def check_required_labels(tables, pdef):
+    labels_required = [make_label(varname, unit) for varname, unit in pdef.required]
+    labels_in_tables = [t.label for t in tables]
+    labels_missed = [x for x in labels_required if x not in labels_in_tables]
+    if labels_missed:
+        raise ValueError("Missed labels:" + labels_missed.__str__())
+
+
 
 YEAR_CATCHER = re.compile('(\d{4}).*')
 
@@ -145,6 +179,8 @@ class Row:
     def __repr__(self):
         return dict(name=self.name, data=self.data).__str__()
 
+    def equals_dict(self, d):
+        return self.name == d['name'] and self.data == d['data']  
 
 class RowStack:
     """Holder for CSV rows."""
@@ -169,7 +205,8 @@ class RowStack:
             e = marker['end']
             if not s and not e:
                 return self.remaining_rows()
-            # FIXME: will fail on (None, something) or (something, None)
+            elif not s or not e:
+                raise ValueError("Single None as a marker cannot be processed")
             elif self.is_found(s) and self.is_found(e):
                 return self.pop_segment(s, e)
         self.echo_error_ends_not_found(pdef)
@@ -360,32 +397,6 @@ class Header:
                ["{} <{}>".format(v, k) for k, v in self.processed.items()]
         return "\n".join(show)
 
-
-def fix_multitable_units(tables):
-    """For tables without *header.varname* copy *header.varname* from previous table.
-       Applies to tables that do not have any unknown rows.
-    """
-    for prev_table, table in zip(tables, tables[1:]):
-        if table.header.varname is None:
-            if not table.header.has_unknown_lines():
-                table.header.varname = prev_table.header.varname
-
-
-def check_required_labels(tables, pdef):
-    labels_required = [make_label(varname, unit) for varname, unit in pdef.required]
-    labels_in_tables = [t.label for t in tables]
-    labels_missed = [x for x in labels_required if x not in labels_in_tables]
-    if labels_missed:
-        raise ValueError("Missed labels:" + labels_missed.__str__())
-
-
-def get_tables_from_rows_segment(rows_segment, pdef, units=UNITS):
-    tables = [t.parse(pdef, units) for t in split_to_tables(rows_segment)]
-    fix_multitable_units(tables)
-    check_required_labels(tables, pdef)
-    return tables
-
-
 COMMENT_CATCHER = re.compile("\D*(\d+[.,]?\d*)\s*(?=\d\))")
 
 
@@ -453,54 +464,30 @@ class Emitter:
                 self.m.extend([dmaker.m_dict(val, t+1) 
                                for t, val in enumerate(m_values) if val])
 
-    def emit_a(self):
-        return self.a
-
-    def emit_q(self):
-        return self.q
-
-    def emit_m(self):
-        return self.m
-
-
 class Datapoints:
-    """Produces datapoints using emitters"""
+    """Inspection into datapoints using emitters"""
 
     def __init__(self, tables):
         self.emitters = [Emitter(t) for t in tables if t.is_defined()]
-        self.datapoints = list(self.get_datapoints())
+        self.datapoints = (self.emit_by_freq("a") + 
+                           self.emit_by_freq("q") + 
+                           self.emit_by_freq("m"))
 
-    def emit_by_method(self, method_name: str):
-        if method_name not in ["emit_a", "emit_q", "emit_m"]:
-            raise ValueError("Method name not valid: {}".format(method_name))
-        for e in self.emitters:
-            emitter_func = getattr(e, method_name)
-            for x in emitter_func():
-                yield x
-
-    def emit_a(self):
-        return self.emit_by_method("emit_a")
-
-    def emit_q(self):
-        return self.emit_by_method("emit_q")
-
-    def emit_m(self):
-        return self.emit_by_method("emit_m")
-
-    def get(self, freq, label, year):
+    def emit_by_freq(self, freq: str):
         assert freq in "aqm"
-        emitters_dict = dict(a=self.emit_a, q=self.emit_q, m=self.emit_m)
-        gen = emitters_dict[freq]()
-        gen = filter(lambda x: x['label'].startswith(label), gen)
-        return filter(lambda x: x['year'] == year, gen)
+        gen = [getattr(e, freq) for e in self.emitters]
+        return list(itertools.chain.from_iterable(gen))  
 
-    def get_datapoints(self):
-        return itertools.chain(self.emit_a(), self.emit_q(), self.emit_m())
+    def get(self, freq, label=None, year=None):
+        gen = self.emit_by_freq(freq)
+        if label:
+            gen = filter(lambda x: x['label'].startswith(label), gen)
+        if year:
+            gen = filter(lambda x: x['year'] == year, gen)
+        return list(gen) 
 
-    def is_included(self, datapoint):
-        """Returns True if *datapoint* is in *self.datapoints*, False otherwise"""
-        return datapoint in self.datapoints
-
+    def includes(self, x):
+        return x in self.datapoints
 
 # dataframe dates handling
 def month_end_day(year, month):
@@ -521,19 +508,25 @@ def get_date_year_end(year):
 
 
 class Frames:
-    """Accepts Datapoints() instance and emits pandas DataFrames."""
+    """Create pandas DataFrames."""
+    
+    def collect(self, freq):
+        return [x for x in self.datapoints if x['freq'] == freq]
 
-    def __init__(self, datapoints):
-        assert isinstance(datapoints, Datapoints)
-        dfa = pd.DataFrame(datapoints.emit_a())
-        dfq = pd.DataFrame(datapoints.emit_q())
-        dfm = pd.DataFrame(datapoints.emit_m())
+    def validate(self, df):        
+        if not df.empty:
+            dups = df[df.duplicated(keep=False)]
+            if not dups.empty:
+                # df must have no duplicate rows
+                raise ValueError(dups)
+
+    def __init__(self, tables):
+        self.datapoints = Datapoints(tables).datapoints
+        dfa = pd.DataFrame(self.collect("a"))
+        dfq = pd.DataFrame(self.collect("q"))
+        dfm = pd.DataFrame(self.collect("m"))
         for df in dfa, dfq, dfm:
-            # df must have no duplicate rows
-            if not df.empty:
-                dups = df[df.duplicated(keep=False)]
-                if not dups.empty:
-                    import pdb; pdb.set_trace()
+            self.validate(df)            
         self.dfa = self.reshape_a(dfa)
         self.dfq = self.reshape_q(dfq)
         self.dfm = self.reshape_m(dfm)
@@ -589,10 +582,8 @@ class Vintage:
         self.csv_path = files.get_path_csv(year, month)
         # break csv to tables with variable names
         self.tables = Tables(self.csv_path).get_defined()
-        # emit values from tables
-        self.dpoints = Datapoints(self.tables)
         # convert stream values to pandas dataframes
-        self.frames = Frames(datapoints=self.dpoints)
+        self.frames = Frames(tables=self.tables)
 
     def save(self):
         """Save dataframes to CSVs."""
@@ -611,7 +602,7 @@ class Vintage:
 
     def validate(self, valid_datapoints=VALID_DATAPOINTS):
         for x in valid_datapoints:
-            if not self.dpoints.is_included(x):
+            if x not in self.frames.datapoints:
                 raise ValueError("Not found in dataset: {}".format(x) +
                                  "File: {}".format(self.csv_path))
         print("Test values parsed OK for", self)
@@ -650,14 +641,3 @@ if __name__ == "__main__":
     year, month = 2017, 4
     vintage = Vintage(year, month)
     dfa, _, dfm = vintage.dfs()
-
-    """
-    Parsing procedure:
-   - cut out a segment of csv file as delimited by start and end lines
-   - save remaining parts of csv file for further parsing
-   - break csv segment into tables, each table containing headers and data rows
-   - parse table headers to obtain variable name ("GDP") and unit ("bln_rub")
-   - for tables with varname and unit:
-        split datarows to obtain annual, quarter and monthly values
-        emit values as frequency-label-date-value dicts
-    """
