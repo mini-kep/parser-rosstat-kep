@@ -5,9 +5,6 @@ import cfg
 import parse
 import files
 
-# see test_cfg_markers_valid method below
-IGNORE_MARKERS_WITH_NONES_IN_TEST = True
-
 
 def all_heads_first_rows():
     """Emits all heads first rows for debugging markers starts/ends"""
@@ -56,27 +53,35 @@ def check_marker(marker):
         return False
 
 
-def test_cfg_markers_valid():
-    """checks that all definitions markers are found in the latest CSV file.
-       Also tests that each marker's `start` and `end` fields are located in a proper order in the latest CSV file:
-       start comes first, end comes second
+def test_cfg_main_marker_valid():
+    """Checks that main definition has only one marker specified and that its start and end fields are None"""
+
+    main_definition = cfg.SPEC.main
+    assert len(main_definition.markers) == 1
+
+    marker = main_definition.markers[0]
+    assert marker["start"] is None and marker["end"] is None
+
+
+def test_cfg_additional_markers_valid():
+    """checks that all additional definitions markers are found in the latest CSV file.
+       Also tests that each marker's `start` and `end` fields are located in a proper order
+       in the latest CSV file, i.e.: start comes first, end comes second
     """
 
     markers_with_nones_items = []
     markers_not_found_items = []
 
-    all_definitions = [cfg.SPEC.main] + cfg.SPEC.additional
+    additional_definitions = cfg.SPEC.additional
 
-    for definition in all_definitions:
-        for marker in definition.markers:
-            if not check_marker(marker):
-                if marker["start"] is None or marker["end"] is None:
-                    if not IGNORE_MARKERS_WITH_NONES_IN_TEST:
-                        markers_with_nones_items.append("definition: '{}'; marker: '{}';".format(definition, marker))
-                else:
-                    markers_not_found_items.append("definition '{}'; marker not found: '{}'".format(definition, marker))
-            # take first markers only
-            break
+    for definition in additional_definitions:
+        # for each definition take first marker only
+        marker = definition.markers[0]
+        if not check_marker(marker):
+            if marker["start"] is None or marker["end"] is None:
+                markers_with_nones_items.append("definition: '{}'; marker: '{}';".format(definition, marker))
+            else:
+                markers_not_found_items.append("definition '{}'; marker not found: '{}'".format(definition, marker))
 
     if markers_with_nones_items or markers_not_found_items:
 
