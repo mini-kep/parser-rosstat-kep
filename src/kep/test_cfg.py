@@ -6,7 +6,7 @@ import parse
 import files
 
 # see test_cfg_markers_valid method below
-IGNORE_MARKERS_WITH_NONES_IN_TEST = False
+IGNORE_MARKERS_WITH_NONES_IN_TEST = True
 
 
 def all_heads_first_rows():
@@ -75,6 +75,8 @@ def test_cfg_markers_valid():
                         markers_with_nones_items.append("definition: '{}'; marker: '{}';".format(definition, marker))
                 else:
                     markers_not_found_items.append("definition '{}'; marker not found: '{}'".format(definition, marker))
+            # take first markers only
+            break
 
     if markers_with_nones_items or markers_not_found_items:
 

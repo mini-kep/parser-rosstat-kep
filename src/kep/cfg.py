@@ -197,10 +197,10 @@ d.require("GOV_SURPLUS_ACCUM_SUBFEDERAL", "bln_rub")
 SPEC.append(d)
 
 d = Definition("RETAIL_SALES")
-d.add_marker("1.13. Оборот розничной торговли"
-           , "1.13.1. Оборот общественного питания")
 d.add_marker("1.12. Оборот розничной торговли"
            , "1.12.1. Оборот общественного питания")
+d.add_marker("1.13. Оборот розничной торговли"
+           , "1.13.1. Оборот общественного питания")
 d.add_header("Оборот розничной торговли", "RETAIL_SALES")
 d.add_header("продовольственные товары", "RETAIL_SALES_FOOD")
 d.add_header("пищевые продукты, включая напитки и табачные изделия", "RETAIL_SALES_FOOD")
