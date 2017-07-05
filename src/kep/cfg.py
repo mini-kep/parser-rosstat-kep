@@ -65,9 +65,9 @@ class Definition():
         # linking table headers ("Объем ВВП") and variable names ("GDP")
         self.headers.update(odict({text: varname})) 
 
-    def add_marker(self, _start, _end, force=False):
+    def add_marker(self, _start, _end, must_check=True):
         #start and end lines CSV file segment  where defintion applies 
-        if not Force:
+        if must_check:
             if _start is None and _end is not None:
                 raise ValueError("Markers not supported")
             if _start is not None and _end is None:    
