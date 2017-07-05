@@ -20,6 +20,8 @@ def test_Datapoints_get_annual_values_():
 def test_end_to_end_latest_month():
     vintage = parse.Vintage(year=None, month=None)
     vintage.validate()
+    
+    
 
 
 def test_Datapoints_is_included_annual_1999_values_in_2017_4():

@@ -4,7 +4,7 @@
 *UNITS* is to detect units of measurement in table headers (like "мдрд.руб.") 
 
 *spec* is Specification() instance, containing main and additional parsing 
-definitions. 
+definitions. Yes, it seems to be a singleton.
                                                                   
 A parsing definition consists of:
  (a) parsing boundaries - start and end lines CSV file segment 
@@ -67,6 +67,10 @@ class Definition():
 
     def add_marker(self, _start, _end):
         #start and end lines CSV file segment  where defintion applies 
+        if _start is None and _end is not None:
+            raise ValueError("Markers not supported")
+        if _start is not None and _end is None:    
+            raise ValueError("Markers not supported")            
         self.markers.append(odict(start=_start, end=_end))
     
     def add_reader(self, funcname):
@@ -112,8 +116,7 @@ class Specification:
         # TODO 1 validate specification - order of markers 
         # - ends are after starts
         # - sorted starts follow each other 
-        # TODO 2 
-        # - varnames match .required()
+
         
     def required(self):
         for pdef in [self.main] + self.additional:
@@ -133,8 +136,7 @@ d.add_header("Объем ВВП", "GDP")
 d.add_header("Валовой внутренний продукт", "GDP")
 d.add_header("Индекс физического объема произведенного ВВП, в %", "GDP")
 d.add_header("Индекс промышленного производства", "IND_PROD")
-# WARNING: may add many IND_PROD if no end specified below
-d.add_marker(None, "1.2.1. Индексы производства по видам деятельности")
+d.add_marker(None, None)
 d.require("GDP", "bln_rub")
 d.require("GDP", "yoy")
 d.require("IND_PROD", "yoy")

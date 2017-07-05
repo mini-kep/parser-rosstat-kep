@@ -569,8 +569,9 @@ VALID_DATAPOINTS = [
             {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999},
             {'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL_bln_usd', 'value': 75.6, 'year': 1999},
             {'freq': 'q', 'label': 'IMPORT_GOODS_TOTAL_bln_usd', 'qtr': 1, 'value': 9.1, 'year': 1999},
-            {'freq': 'm', 'label': 'RETAIL_SALES_NONFOODS_rog', 'month': 12, 'value': 114.9, 'year': 1999}
-        ]
+            {'freq': 'm', 'label': 'RETAIL_SALES_NONFOODS_rog', 'month': 12, 'value': 114.9, 'year': 1999},
+            {'freq': 'm', 'label': 'IND_PROD_yoy', 'month': 4, 'value': 102.3, 'year': 2017}            
+]
 
 
 class Vintage:
