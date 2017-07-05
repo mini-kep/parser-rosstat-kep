@@ -16,41 +16,38 @@ def all_heads_first_rows():
             yield row.name
 
 
-def check_marker(marker):
+def validate_marker(marker):
     """Helper function for testing marker"""
 
     s = marker['start']
     e = marker['end']
-    if s is not None and e is not None:
 
-        start_found = False
-        end_found = False
+    start_found = False
+    end_found = False
 
-        start_head = None
-        end_head = None
+    start_head = None
+    end_head = None
 
-        start_pos = None
-        end_pos = None
+    start_pos = None
+    end_pos = None
 
-        for head in all_heads_first_rows():
-            if not start_found:
-                start_pos = head.find(s)
-                start_found = start_pos != -1
-                if start_found:
-                    start_head = head
+    for head in all_heads_first_rows():
+        if not start_found:
+            start_pos = head.find(s)
+            start_found = start_pos != -1
             if start_found:
-                if not end_found:
-                    end_pos = head.find(e)
-                    end_found = end_pos != -1
-                    if end_found:
-                        end_head = head
+                start_head = head
+        if start_found:
+            if not end_found:
+                end_pos = head.find(e)
+                end_found = end_pos != -1
+                if end_found:
+                    end_head = head
 
-            if start_found and end_found:
-                break
+        if start_found and end_found:
+            break
 
-        return start_found and end_found and ((start_head != end_head) or (start_pos < end_pos))
-    else:
-        return False
+    return start_found and end_found and ((start_head != end_head) or (start_pos < end_pos))
 
 
 def test_cfg_main_marker_valid():
@@ -64,43 +61,43 @@ def test_cfg_main_marker_valid():
 
 
 def test_cfg_additional_markers_valid():
-    """checks that all additional definitions markers are found in the latest CSV file.
-       Also tests that each marker's `start` and `end` fields are located in a proper order
-       in the latest CSV file, i.e.: start comes first, end comes second
+    """Tests that all additional definitions markers are not None.
+       Also tests that:
+         * markers starts/ends are not None
+         * each marker's `start` and `end` fields are located in a proper order
+           in the latest CSV file, i.e.: start comes first, end comes second
     """
 
-    markers_with_nones_items = []
-    markers_not_found_items = []
+    none_markers_notices = []
+    invalid_markers_notices = []
 
     additional_definitions = cfg.SPEC.additional
 
     for definition in additional_definitions:
+        for marker in definition.markers:
+            if marker["start"] is None or marker["end"] is None:
+                none_markers_notices.append("definition: '{}'; marker: '{}';".format(definition, marker))
+
+    for definition in additional_definitions:
         # for each definition take first marker only
         marker = definition.markers[0]
-        if not check_marker(marker):
-            if marker["start"] is None or marker["end"] is None:
-                markers_with_nones_items.append("definition: '{}'; marker: '{}';".format(definition, marker))
-            else:
-                markers_not_found_items.append("definition '{}'; marker not found: '{}'".format(definition, marker))
+        if not validate_marker(marker):
+            invalid_markers_notices.append("definition '{}'; marker not found: '{}'".format(definition, marker))
 
-    if markers_with_nones_items or markers_not_found_items:
+    if none_markers_notices or invalid_markers_notices:
 
-        if markers_with_nones_items:
+        if none_markers_notices:
             print("markers with Nones:\n{}\n".format("-"*len("markers with Nones:")))
-            for m in markers_with_nones_items:
-                print(m)
+            print("\n".join(none_markers_notices))
 
-        if markers_not_found_items:
-            if markers_with_nones_items:
+        if invalid_markers_notices:
+            if none_markers_notices:
                 print("\n")
 
-            print("markers not found:\n{}\n".format("-"*len("markers not found:")))
-            for m in markers_not_found_items:
-                print(m)
+            print("invalid markers:\n{}\n".format("-"*len("invalid markers:")))
+            print("\n".join(invalid_markers_notices))
 
-        assert False
-    else:
-        assert True
+    assert (not none_markers_notices and not invalid_markers_notices) is True
 
 
 if __name__ == "__main__":
