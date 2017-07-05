@@ -68,8 +68,8 @@ def row_stack():
     rows = [to_row(d) for d in ROWS]
     return parse.RowStack(rows)
 
-class RowStack():
-    def test_row_stack_fixture_self_test(row_stack):
+class Test_RowStack():
+    def test_row_stack_fixture_self_test(self, row_stack):
         for s, r in zip(row_stack.rows, ROWS):
             assert s.name == r['name']
             assert s.data == r['data']
