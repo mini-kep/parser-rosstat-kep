@@ -84,8 +84,8 @@ class Test_RowStack_stable_on_definition_with_None_markers:
         self.pdef1.add_marker(None, None)
 
         # pdef_with_one_None_markers
-        self.pdef2 = Definition("MAIN", must_check=False)
-        self.pdef2.add_marker(None, "endline")
+        self.pdef2 = Definition("MAIN")
+        self.pdef2.add_marker(None, "endline", must_check=False)
     
     def test_pop_returns_segment(self, row_stack):
         csv_segment = row_stack.pop(self.pdef1)
