@@ -2,7 +2,7 @@ REM Generates coverage results
 coverage run --source=. -m pytest
 
 REM From the results generates human readable report
-coverage report -m > coverage.output
+coverage report -m --omit=test_*.py,tst_draft.py > coverage.output 
 
 REM Make annotations
 coverage annotate -d annotate

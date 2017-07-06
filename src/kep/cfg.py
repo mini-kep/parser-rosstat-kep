@@ -108,13 +108,10 @@ class Specification:
                 varnames.add(x)
         return sorted(list(varnames))
 
-    def __get_markers__(self):
-        pass
-
     def validate(self):
         # FIXME: make sure markers are sorted
         pass
-        # TODO 1 validate specification - order of markers 
+        # TODO: validate specification - order of markers 
         # - ends are after starts
         # - sorted starts follow each other 
 
@@ -123,14 +120,23 @@ class Specification:
         for pdef in [self.main] + self.additional:
             for req in pdef.required:
                 yield req
+                
+    def count_vars(self):
+        return len(list(self.required()))
+    
+    def count_defs(self):
+        return len(self.additional + [self.main])                       
         
     def __str__(self): 
-        listing = ", ".join(d.__str__() for d in self.additional)
-        cnt = len(list(self.required()))
-        return ("<Required variables: {}".format(cnt) +
-              "\nParsing definitions: {}".format(listing) +
-              "\nDefault definition: {}>".format(self.main.__str__())
-              )
+        listing = ", ".join(d.__str__() for d in self.additional + [self.main])
+        cnt1 = self.count_vars()
+        cnt2 = self.count_defs()
+        pat = "{} required variables in {} parsing definitions {}"
+        return (pat.format(cnt1, cnt2, listing)) 
+        
+    def __repr__(self):     
+        return "{}({})".format(self.__class__, self.__str__())
+        
 
 d = Definition("MAIN")
 d.add_header("Объем ВВП", "GDP")

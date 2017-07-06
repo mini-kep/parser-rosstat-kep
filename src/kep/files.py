@@ -6,6 +6,11 @@ ENC = 'utf8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
 
+
+def locate_csv(year: int=None, month: int=None):
+    year, month = filter_date(year, month)
+    return get_path_csv(year, month)
+
 #FIXME: hardcoded constant will not update to new months
 DATES =     [                                 (2009, 4), (2009, 5), (2009, 6), 
              (2009, 7), (2009, 8), (2009, 9), (2009, 10), (2009, 11), (2009, 12), 
