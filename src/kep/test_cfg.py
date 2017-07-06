@@ -3,19 +3,7 @@ import pytest
 
 import cfg
 import tables
-import files
-
-# FIXME: method already defined
-# all_heads() emits all Rows names (strings), but we need those for headers only (not datarows)
-# therefore it is not possible to resolve this FIXME properly with all_heads method as is
-def all_heads_first_rows():
-    """Emits all heads first rows for debugging markers starts/ends"""
-
-    csv_path = files.get_path_csv()
-    csv_dicts_gen = (row.name
-                     for row in tables.read_csv(csv_path)
-                     if not(row.is_datarow()))
-    return csv_dicts_gen
+from test_parse_functions import Test_Function_get_year
 
 
 def marker_has_valid_start_and_end(marker):
@@ -33,7 +21,9 @@ def marker_has_valid_start_and_end(marker):
     start_pos = None
     end_pos = None
 
-    for head in all_heads_first_rows():
+    for head in Test_Function_get_year.all_heads():
+        if tables.is_year(head):
+            continue
         if not start_found:
             start_pos = head.find(s)
             start_found = start_pos != -1
