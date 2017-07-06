@@ -39,7 +39,8 @@ def marker_has_valid_start_and_end(marker):
         if start_found and end_found:
             break
 
-    return start_found and end_found and ((start_head != end_head) or (start_pos < end_pos))
+    # start and end fields should come from different lines (heads), otherwise the condition should be changed
+    return start_found and end_found and (start_head != end_head)
 
 
 def test_cfg_main_marker_valid():
