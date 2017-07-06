@@ -1,105 +1,10 @@
 # -*- coding: utf-8 -*-
-"""
-Testing status
-==============
-splitters.py - covered by doctests
-cfg.py - requires some additinal testing/validation, see Tasks
-parse.py: 
-
-   test_parse.py           - testing strategy (this file)
-                           - regression tests / bug fixes   
-
-   test_parse_functions.py - stateless functions
-
-   test_headers.py         - some classes with simple fixtures
-                           - data pipleine, based on mock data  
-
-   test_parse_by_datapoints.py - checks for actual testing results, 
-                                 to be expanded along with cfg.py 
-                                 definitions 
-
-Testing goals
-=============
-Tests should help to: 
-
-    G.1 ensure we read all data we wanted (everything from parsing defnition 
-        was read)
- 
-    G.2 this is actually the data requested (one table was not confused for 
-        another)
- 
-    G.3 parts of algorithm return what is expected (helps to do refactoring, 
-        once we change something in algorithm or data structures or else, 
-        some tests break and we have to put in new ones)
- 
-    G.4 some functions return expected results on actual data (like to_float())
-
-
-Test ideas
-==========
-
-(1) Some part of checks are implemented as validation procedures
-    inside code, eg. check all required variables were read from csv
-
-(2) Non-goals: 
-    - 100% formal coverage by unit tests is not a target. Fixtures 
-    for intermedaite results can grow very big and untransparent. 
-    - Some tests in 'skeleton' (tst_draft.py) may remain empty.
- 
-(3) Must combine eye code review with unit tests and other types of tests. 
-
-(4) Want to avoid too much testing of obvious easy-to test things. This will 
-    not make this program better. 
-    
-(5) Testing provides ideas for refactoring - can leave comments about that. 
-
-(6) Mentioning risk area in comments for the test is encouraged
-
-(7) repr and str methds are used extensively, sometimes they retrun the same 
-    in this program, repr is preferred
-
-Tasks
-======
-    
-general 
--------
-- what is the coverage tool to use? TODO: add from Misha's answer
-
-- some useful tests died at https://github.com/epogrebnyak/data-rosstat-kep,
-  summary of tests - which tests are potentially useful for mini-kep
- 
-test_parse.py 
--------------
- 
-- introduce skeleton from , mark tests to enhance and not-to-do tests
-
-- complete fixtures list, sample csv must include at least two tables
-
-- go to individual todo/fixme in tests 
-
-test_parse_by_datapoints.py
-----------------------------
-
-- change dataframe dumps constants when new parsing definitons are added in 
-  cfg.py    
-    
-test_cfg.py 
------------
-- the algorithm will break if markers (start and end lines) are not in order
-    
-    to check for that:
-      - must read csv file rows, use a reference csv file 
-      - use first pair in start and end markers 
-      - make sure the order of markers in specification is the same order as in 
-        csv file
-      - can be done as a test or as vaidator method
-"""
-
 from pathlib import Path
 import pytest
 from tempfile import NamedTemporaryFile
 
-import parse
+import tables
+import vintage
 import files
 import splitter
 
@@ -200,7 +105,7 @@ def csv_path_header():
 @pytest.fixture
 def rows():
     path = Path(mock_csv.path)
-    return list(parse.read_csv(path))
+    return list(tables.read_csv(path))
 
 def test_read_csv_returns_row_instances(rows):    
     rows_dicts = [
@@ -223,13 +128,13 @@ def test_read_csv_returns_row_instances(rows):
 
 
 @pytest.fixture
-def tables():
-    rows = parse.read_csv(csv_path())
-    return parse.get_tables_from_rows_segment(rows, _pdef(), _units())
+def tables_sample():
+    rows = tables.read_csv(csv_path())
+    return tables.extract_tables(rows, _pdef(), _units())
 
 @pytest.fixture
 def table():
-    return tables()[0]
+    return tables_sample()[0]
 
 
 class Test_Table():    
@@ -259,16 +164,18 @@ class Test_Table():
         assert table.__str__() == """Table GDP_bln_rub
 columns: 5
 varname: GDP, unit: bln_rub
+headers:
 + <Объем ВВП>
 - <(уточненная оценка)>
 + <млрд.рублей>
-Row <1991 1) | 4823 901 1102 1373 1447>"""
+data:
+<1991 1) | 4823 901 1102 1373 1447>"""
     
 
 # Table -> Emitter 
 @pytest.fixture
-def emitter(tables):    
-    return parse.Emitter(table())
+def emitter(tables_sample):    
+    return vintage.Emitter(table())
 
 def test_emitter(emitter):
     a_91 = {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1991}
@@ -281,7 +188,7 @@ def test_emitter(emitter):
 # Tables -> DataPoints 
 @pytest.fixture
 def datapoints():    
-    return parse.Datapoints(tables())
+    return vintage.Datapoints(tables_sample())
 
 def test_datapoints(datapoints):
     z = {}    
@@ -303,19 +210,12 @@ def test_datapoints(datapoints):
 # Tables -> Frames
 @pytest.fixture
 def frames():
-    return parse.Frames(tables())
+    return vintage.Frames(tables_sample())
 
 def test_frames(frames):
     f = frames
     assert f.dfa['GDP_bln_rub'].sum() == f.dfq['GDP_bln_rub'].sum()
     assert frames.dfa.GDP_bln_rub['1991-12-31'] == 4823.0
-
     
-# regression tests - after bug fixes on occasional errors
-def test_csv_has_no_null_byte():
-    csv_path = files.get_path_csv(2015, 2)
-    z = csv_path.read_text(encoding=parse.ENC)
-    assert "\0" not in z
-
 if __name__ == "__main__":
-    pytest.main(["test_parse.py"])
+    pytest.main([__file__])

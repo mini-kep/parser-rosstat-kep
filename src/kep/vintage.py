@@ -276,8 +276,7 @@ class Collection:
             vintage = Vintage(year, month)
             vintage.validate()
 
-# FIXME: review __str__, and __repr__
-
+# FIXME: review __str__, and __repr__()
 
 if __name__ == "__main__":
     Collection.approve_latest()

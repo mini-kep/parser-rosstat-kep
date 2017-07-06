@@ -2,15 +2,15 @@
 import pytest
 
 import cfg
-import parse
+import tables
 import files
 
-
+# FIXME: method already defined
 def all_heads_first_rows():
     """Emits all heads first rows for debugging markers starts/ends"""
 
     csv_path = files.get_path_csv()
-    csv_dicts = parse.read_csv(csv_path)
+    csv_dicts = tables.read_csv(csv_path)
     for row in csv_dicts:
         if not row.is_datarow():
             yield row.name
@@ -101,4 +101,4 @@ def test_cfg_additional_markers_valid():
 
 
 if __name__ == "__main__":
-    pytest.main("test_cfg.py")
+    pytest.main([__file__])
