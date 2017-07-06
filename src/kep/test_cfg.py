@@ -6,18 +6,20 @@ import tables
 import files
 
 # FIXME: method already defined
+# all_heads() emits all Rows names (strings), but we need those for headers only (not datarows)
+# therefore it is not possible to resolve this FIXME properly with all_heads method as is
 def all_heads_first_rows():
     """Emits all heads first rows for debugging markers starts/ends"""
 
     csv_path = files.get_path_csv()
-    csv_dicts = tables.read_csv(csv_path)
-    for row in csv_dicts:
-        if not row.is_datarow():
-            yield row.name
+    csv_dicts_gen = (row.name
+                     for row in tables.read_csv(csv_path)
+                     if not(row.is_datarow()))
+    return csv_dicts_gen
 
 
-def validate_marker(marker):
-    """Helper function for testing marker"""
+def marker_has_valid_start_and_end(marker):
+    """Helper function for marker validation."""
 
     s = marker['start']
     e = marker['end']
@@ -51,12 +53,11 @@ def validate_marker(marker):
 
 
 def test_cfg_main_marker_valid():
-    """Checks that main definition has only one marker specified and that its start and end fields are None"""
+    """Tests that main definition has only one marker specified and that its start and end fields are None."""
 
-    main_definition = cfg.SPEC.main
-    assert len(main_definition.markers) == 1
+    assert len(cfg.SPEC.main.markers) == 1
 
-    marker = main_definition.markers[0]
+    marker = cfg.SPEC.main.markers[0]
     assert marker["start"] is None and marker["end"] is None
 
 
@@ -64,25 +65,23 @@ def test_cfg_additional_markers_valid():
     """Tests that all additional definitions markers are not None.
        Also tests that:
          * markers starts/ends are not None
-         * each marker's `start` and `end` fields are located in a proper order
-           in the latest CSV file, i.e.: start comes first, end comes second
+         * each marker's start and end fields are located in a proper order in the latest CSV file, i.e.:
+           start comes first, end comes second
     """
 
     none_markers_notices = []
     invalid_markers_notices = []
 
-    additional_definitions = cfg.SPEC.additional
-
-    for definition in additional_definitions:
-        for marker in definition.markers:
+    for pdef in cfg.SPEC.additional:
+        for marker in pdef.markers:
             if marker["start"] is None or marker["end"] is None:
-                none_markers_notices.append("definition: '{}'; marker: '{}';".format(definition, marker))
+                none_markers_notices.append("definition: '{}'; marker: '{}';".format(pdef, marker))
 
-    for definition in additional_definitions:
-        # for each definition take first marker only
-        marker = definition.markers[0]
-        if not validate_marker(marker):
-            invalid_markers_notices.append("definition '{}'; marker not found: '{}'".format(definition, marker))
+    for pdef in cfg.SPEC.additional:
+        # for each definition take its first marker only
+        marker = pdef.markers[0]
+        if not marker_has_valid_start_and_end(marker):
+            invalid_markers_notices.append("definition: '{}'; marker not found: '{}'".format(pdef, marker))
 
     if none_markers_notices or invalid_markers_notices:
 
