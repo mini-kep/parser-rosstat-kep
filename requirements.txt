@@ -6,4 +6,5 @@
 pandas
 xlwt
 openpyxl
+codecov
 #matplotlib
