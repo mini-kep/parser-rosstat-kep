@@ -99,11 +99,11 @@ def spark(data):
 def make_png_filename(vn, dirpath):
     if not os.path.exists(dirpath):
         os.makedirs(dirpath)
-    return os.path.join(dirpath, "%s_spark.png" % vn)
+    return os.path.join(dirpath, "{0!s}_spark.png".format(vn))
 
 
 def spark_png_fn(varname):
-    return "%s_spark.png" % varname
+    return "{0!s}_spark.png".format(varname)
 
 
 def write_sparkline_pngs(df, folder = config.PNG_FOLDER):
@@ -140,7 +140,7 @@ def get_last(df, lab):
 def insert_image_to_md(varname):
     folder = "https://github.com/epogrebnyak/data-rosstat-kep/raw/master/output/png/"
     path = folder + spark_png_fn(varname)
-    return '![](%s)' % path
+    return '![]({0!s})'.format(path)
   
 def get_md_code():
     header = ["Код", "Значение", "Дата", ""]
