@@ -9,4 +9,4 @@ script:
   - pytest src/kep --doctest-modules
 #after_success:
 #TODO: add codecov to requirements + add .cov to script + run locally + commit
-#  - codecov
+  - codecov
