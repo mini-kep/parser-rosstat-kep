@@ -6,6 +6,6 @@
 pandas
 xlwt
 openpyxl
-codecov
-pytest-cov
+#codecov
+#pytest-cov
 #matplotlib
