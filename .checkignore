@@ -1,1 +1,7 @@
-test_*.py
+**/test_cfg.py
+**/test_checkpoints.py
+**/test_files.py
+**/test_pipeline.py
+**/test_tables.py
+**/test_vintage.py
+frontpage/old/*
