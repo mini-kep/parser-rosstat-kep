@@ -178,7 +178,7 @@ def dump_doc_files_to_csv(file_list, csv_path):
     to_csv(folder_iter, csv_path)
 
 def make_file_list(folder):
-    files = ["tab.doc"] + ["tab%d.doc" % x for x in range(1, 5)]
+    files = ["tab.doc"] + ["tab{0:d}.doc".format(x) for x in range(1, 5)]
     return [os.path.abspath(os.path.join(folder, fn)) for fn in files]
 
 def folder_to_csv(folder):

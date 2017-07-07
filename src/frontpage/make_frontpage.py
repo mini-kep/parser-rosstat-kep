@@ -94,12 +94,12 @@ def spark(data):
 
 
 def spark_png_fn(varname):
-    return "%s_spark.png" % varname
+    return "{0!s}_spark.png".format(varname)
 
 
 def insert_image_to_md(name, folder=PNG_FOLDER):
     path = folder + "/" + spark_png_fn(name)
-    return '![](%s)' % path
+    return '![]({0!s})'.format(path)
 
 
 def stream_table_rows_images(dfm=dfm):
