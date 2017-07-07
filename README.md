@@ -1,4 +1,6 @@
-[![Build Status](https://travis-ci.org/epogrebnyak/mini-kep.svg?branch=master)](https://travis-ci.org/epogrebnyak/mini-kep) [![Code Issues](https://www.quantifiedcode.com/api/v1/project/c2db5f2af9d54cb1888a21c37bfc24ec/badge.svg)](https://www.quantifiedcode.com/app/project/c2db5f2af9d54cb1888a21c37bfc24ec)
+[![Build Status](https://travis-ci.org/epogrebnyak/mini-kep.svg?branch=master)](https://travis-ci.org/epogrebnyak/mini-kep)
+[![Code Issues](https://www.quantifiedcode.com/api/v1/project/c2db5f2af9d54cb1888a21c37bfc24ec/badge.svg)](https://www.quantifiedcode.com/app/project/c2db5f2af9d54cb1888a21c37bfc24ec)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8a467743314641b4a22b66b327834367)](https://www.codacy.com/app/epogrebnyak/mini-kep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=epogrebnyak/mini-kep&amp;utm_campaign=Badge_Grade)
 
 ### Месячные значения
 
