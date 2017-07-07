@@ -6,6 +6,6 @@ install:
   - pip install -r requirements.txt
 # command to run tests
 script: 
-  - pytest src/kep --cov --doctest-modules
+  - pytest src/kep --doctest-modules
 #after_success:
-  - codecov
+#  - codecov
