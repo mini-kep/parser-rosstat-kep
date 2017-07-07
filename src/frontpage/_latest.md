@@ -13,6 +13,7 @@
 | IND_PROD_rog                           | 97.7     | 04.2017 |
 | IND_PROD_yoy                           | 102.3    | 04.2017 |
 | IND_PROD_ytd                           | 100.7    | 04.2017 |
-| RETAIL_SALES_FOOD_bln_rub              | 1129.7   | 04.2017 |
-| RETAIL_SALES_NONFOODS_bln_rub          | 1199.6   | 04.2017 |
+| RETAIL_SALES_FOOD_yoy                  | 99.0     | 04.2017 |
+| RETAIL_SALES_NONFOODS_yoy              | 100.9    | 04.2017 |
 | RETAIL_SALES_bln_rub                   | 2329.3   | 04.2017 |
+| RETAIL_SALES_yoy                       | 100.0    | 04.2017 |

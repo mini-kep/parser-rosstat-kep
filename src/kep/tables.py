@@ -411,7 +411,7 @@ class Header:
 
 def test_csv_has_no_null_byte():
     csv_path = files.get_path_csv(2015, 2)
-    z = csv_path.read_text(encoding=ENC)
+    z = csv_path.read_text(encoding=tables.ENC)
     assert "\0" not in z
 
 

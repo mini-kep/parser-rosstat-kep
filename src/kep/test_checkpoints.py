@@ -50,13 +50,15 @@ def test_Datapoints_is_included_annual_1999_values_in_2017_4():
         assert dpoints.includes(x)
 
 
-dfa_ref = frame.dfa['1999'].transpose()
+dfa = frame.dfa['1999']
+# FIXME: move to get_dfs()
+dfa.columns.name = None
+dfa = dfa.transpose()
 
 
 def test_dfa_in_2017_4():
-    assert dfa_ref.__str__() == \
+    assert str(dfa) == \
         """time_index                              1999-12-31
-label
 year                                        1999.0
 EXPORT_GOODS_TOTAL_bln_usd                    75.6
 GDP_bln_rub                                 4823.0
@@ -72,17 +74,22 @@ GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub           7.0
 IMPORT_GOODS_TOTAL_bln_usd                    39.5
 IND_PROD_yoy                                   NaN
 RETAIL_SALES_FOOD_bln_rub                    866.1
+RETAIL_SALES_FOOD_yoy                         93.6
 RETAIL_SALES_NONFOODS_bln_rub                931.3
-RETAIL_SALES_bln_rub                        1797.4"""
+RETAIL_SALES_NONFOODS_yoy                     94.7
+RETAIL_SALES_bln_rub                        1797.4
+RETAIL_SALES_yoy                              94.2"""
 
 
-dfq_ref = frame.dfq.loc["2017-03", ].transpose()
+dfq = frame.dfq.loc["2017-03", ]
+# FIXME: move to get_dfs()
+dfq.columns.name = None
+dfq = dfq.transpose()
 
 
 def test_dfq_in_2017_4():
-    assert dfq_ref.__str__() == \
+    assert str(dfq) == \
         """time_index                              2017-03-31
-label
 year                                        2017.0
 qtr                                            1.0
 EXPORT_GOODS_TOTAL_bln_usd                    82.2
@@ -100,17 +107,25 @@ IMPORT_GOODS_TOTAL_bln_usd                    48.0
 IND_PROD_rog                                  83.1
 IND_PROD_yoy                                 100.1
 RETAIL_SALES_FOOD_bln_rub                   3275.3
+RETAIL_SALES_FOOD_rog                         83.4
+RETAIL_SALES_FOOD_yoy                         97.0
 RETAIL_SALES_NONFOODS_bln_rub               3460.1
-RETAIL_SALES_bln_rub                        6735.4"""
+RETAIL_SALES_NONFOODS_rog                     82.2
+RETAIL_SALES_NONFOODS_yoy                     99.3
+RETAIL_SALES_bln_rub                        6735.4
+RETAIL_SALES_rog                              82.8
+RETAIL_SALES_yoy                              98.2"""
 
 
-dfm_ref = frame.dfm.loc["2017-01", ].transpose()
+dfm = frame.dfm.loc["2017-01", ]
+# FIXME: move to get_dfs()
+dfm.columns.name = None
+dfm = dfm.transpose()
 
 
 def test_dfm_in_2017_4():
-    assert dfm_ref.__str__() == \
+    assert str(dfm) == \
         """time_index                              2017-01-31
-label
 year                                        2017.0
 month                                          1.0
 EXPORT_GOODS_TOTAL_bln_usd                    25.1
@@ -127,8 +142,14 @@ IND_PROD_rog                                  76.2
 IND_PROD_yoy                                 102.3
 IND_PROD_ytd                                 102.3
 RETAIL_SALES_FOOD_bln_rub                   1073.8
+RETAIL_SALES_FOOD_rog                         75.2
+RETAIL_SALES_FOOD_yoy                         96.6
 RETAIL_SALES_NONFOODS_bln_rub               1133.7
-RETAIL_SALES_bln_rub                        2207.5"""
+RETAIL_SALES_NONFOODS_rog                     75.0
+RETAIL_SALES_NONFOODS_yoy                     98.7
+RETAIL_SALES_bln_rub                        2207.5
+RETAIL_SALES_rog                              75.1
+RETAIL_SALES_yoy                              97.7"""
 
 
 if __name__ == "__main__":

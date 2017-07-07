@@ -1,17 +1,10 @@
 # -*- coding: utf-8 -*-
-"""Parsing specification is *units* dict and *spec*, Specification() instance.
+"""Parsing specification is *units* dict and *spec* instance.
 
-*UNITS* is to detect units of measurement in table headers (like "мдрд.руб.")
+  *UNITS* is to detect units of measurement in table headers (like "мдрд.руб.")
 
-*spec* is Specification() instance, containing main and additional parsing
-definitions. Yes, it seems to be a singleton.
-
-A parsing definition consists of:
- (a) parsing boundaries - start and end lines CSV file segment
-     where definition applies (self.markers)
- (b) a dictionary linking table headers ("Объем ВВП") and variable names
-     ("GDP")
- (с) reader function name, for some unusual tables.
+  *spec* is Specification() instance, containing main and additional parsing
+         definitions. Yes, it seems to be a singleton.
 
 """
 
@@ -45,9 +38,9 @@ UNIT_NAMES = {'bln_rub': 'млрд.руб.',
               'gdp_percent': '% ВВП',
               'mln_rub': 'млн.руб.',
               'rub': 'руб.',
-              'rog': '% к предыдущему периоду',
-              'yoy': '% к соответствующему месяцу предыдущего года',
-              'ytd': 'период с начала отчетного года'}
+              'rog': '% к пред. периоду',
+              'yoy': '% год к году',
+              'ytd': 'период с начала года'}
 
 # check 1: all units have a common short name
 assert set(UNIT_NAMES.keys()) == set(UNITS.values())
@@ -236,9 +229,19 @@ d.add_header(
     "пищевые продукты, включая напитки, и табачные изделия",
     "RETAIL_SALES_FOOD")
 d.add_header("непродовольственные товары", "RETAIL_SALES_NONFOODS")
+#
 d.require("RETAIL_SALES", "bln_rub")
+d.require("RETAIL_SALES", "yoy")
+d.require("RETAIL_SALES", "rog")
+#
 d.require("RETAIL_SALES_FOOD", "bln_rub")
+d.require("RETAIL_SALES_FOOD", "yoy")
+d.require("RETAIL_SALES_FOOD", "rog")
+#
 d.require("RETAIL_SALES_NONFOODS", "bln_rub")
+d.require("RETAIL_SALES_NONFOODS", "yoy")
+d.require("RETAIL_SALES_NONFOODS", "rog")
+
 SPEC.append(d)
 
 # FIXME: does nothing yet
@@ -251,11 +254,11 @@ print(SPEC)
 DESC = {
     "GDP": "Валовой внутренний продукт",
     "IND_PROD": "Промышленное производство",
-    "EXPORT_GOODS_TOTAL": "Экспорт товаров - всего",
-    "IMPORT_GOODS_TOTAL": "Импорт товаров - всего",
-    "RETAIL_SALES": "Оборот розничной торговли - всего",
-    "RETAIL_SALES_FOOD": "Оборот розничной торговли - продовольственные товары",
-    "RETAIL_SALES_NONFOODS": "Оборот розничной торговли - непродовольственные товары"}
+    "EXPORT_GOODS_TOTAL": "Экспорт товаров",
+    "IMPORT_GOODS_TOTAL": "Импорт товаров",
+    "RETAIL_SALES": "Розничная торговля - всего",
+    "RETAIL_SALES_FOOD": "Розничная торговля - прод.товары",
+    "RETAIL_SALES_NONFOODS": "Розничная торговля - непрод.товары"}
 
 # check 2: check all spec.required are listed in desc_dict and vice versus
 # assert set(desc.keys()) == set(x for x, y in spec.required())
@@ -278,6 +281,16 @@ assert not_in_a == {
 assert not_in_b == set()
 
 # groups of variables for frontend
+M_SECTIONS = odict([
+    ("Производство", ["IND_PROD_rog", "IND_PROD_yoy"]),
+    ("Внешняя торговля", ["EXPORT_GOODS_TOTAL_bln_usd",
+                          "IMPORT_GOODS_TOTAL_bln_usd"]),
+    ("Розничная торговля", ["RETAIL_SALES_yoy",
+                            "RETAIL_SALES_FOOD_yoy",
+                            "RETAIL_SALES_NONFOODS_yoy"])
+])
+
+
 SECTIONS = odict([
     ("ВВП и производство", ["GDP", "IND_PROD"]),
     ("Внешняя торговля", ["EXPORT_GOODS_TOTAL",
@@ -287,24 +300,12 @@ SECTIONS = odict([
                             "RETAIL_SALES_NONFOODS"])
 ])
 
-# TODO:can make it a class
-# class Sections:
-#    """Grouping of variables to report at frontend"""
-
 # check 3: sections includes all items in description
-z = list()
-[z.extend(labels) for labels in SECTIONS.values()]
-assert set(z) == set(DESC.keys())
-
-
-def yield_variable_descriptions_with_subheaders(sections=SECTIONS,
-                                                desc=DESC):
-    def bold(s):
-        return"**{}**".format(s)
-    for section_name, labels in sections.items():
-        yield([bold(section_name), ""])
-        for label in labels:
-            yield([desc[label], label])
+import itertools
+assert set(
+    DESC.keys()) == set(
+        itertools.chain.from_iterable(
+            SECTIONS.values()))
 
 
 if __name__ == "__main__":

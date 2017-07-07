@@ -87,18 +87,12 @@ latest_values_file.write_text(md2)
 # всё ниже относится к TABLE 3 таску
 
 class Sparkline():
-    LOCAL_FOLDER = get_root() / "output" / "png"
-    GITHUB_FOLDER = \
-        "https://github.com/epogrebnyak/mini-kep/raw/master/output/png/{}"
 
     def __init__(self, ts):
         self.ts = ts
-
+        
     def path(self):
-        return str(self.LOCAL_FOLDER / self.filename())
-
-    def filename(self):
-        return "{}_spark.png".format(self.ts.name)
+        return Namer(self.ts.name).path()
 
     def plot(self):
         """Draw sparkline graph. Return Axes()."""
@@ -112,14 +106,30 @@ class Sparkline():
         return ax
 
     def save(self):
-        spark(self.ts)
+        self.plot()
         plt.subplots_adjust(bottom=0.15)
         plt.savefig(self.path())
         plt.close()
 
+
+class Namer():
+
+    LOCAL_FOLDER = get_root() / "output" / "png"
+    GITHUB_FOLDER = \
+        "https://github.com/epogrebnyak/mini-kep/raw/master/output/png/{}"
+    
+    def __init__(self, label):
+        self.label = label
+    
+    def path(self):
+        return str(self.LOCAL_FOLDER / self.filename())
+
+    def filename(self):
+        return "{}_spark.png".format(self.label)
+
     def markdown(self):
         path = self.GITHUB_FOLDER.format(self.filename())
-        return '![]{}'.format(path)
+        return '![]({})'.format(path)
     
 def make_sparks(df, save=False):
     df = df.drop(['year', 'month'], 1)

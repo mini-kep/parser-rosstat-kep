@@ -5,6 +5,7 @@ from tempfile import NamedTemporaryFile
 
 import tables
 import vintage
+import files
 import splitter
 
 # Testing dataflow with CSV-based fixtures and definitions
