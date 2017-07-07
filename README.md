@@ -1,10 +1,12 @@
 [![Build Status](https://travis-ci.org/epogrebnyak/mini-kep.svg?branch=master)](https://travis-ci.org/epogrebnyak/mini-kep) [![Code Issues](https://www.quantifiedcode.com/api/v1/project/c2db5f2af9d54cb1888a21c37bfc24ec/badge.svg)](https://www.quantifiedcode.com/app/project/c2db5f2af9d54cb1888a21c37bfc24ec)
 
+### Месячные значения
+
 | Показатель                        | Ед.изм.           | Дата    | Значение | График                                                                                                  |
 |:----------------------------------|:------------------|:--------|:---------|:--------------------------------------------------------------------------------------------------------|
 | **Производство**                  |                   |         |          |                                                                                                         |
 | Промышленное производство         | % к пред. периоду | 04.2017 | 97.7     | ![](https://github.com/epogrebnyak/mini-kep/raw/master/output/png/IND_PROD_rog_spark.png)               |
-| Промышленное производство         | % г/г             | 04.2017 | 102.3    | ![](https://github.com/epogrebnyak/mini-kep/raw/master/output/png/IND_PROD_yoy_spark.png)               |
+|                                   | % г/г             | 04.2017 | 102.3    | ![](https://github.com/epogrebnyak/mini-kep/raw/master/output/png/IND_PROD_yoy_spark.png)               |
 | **Внешняя торговля**              |                   |         |          |                                                                                                         |
 | Экспорт товаров                   | млрд.долл.        | 03.2017 | 31.3     | ![](https://github.com/epogrebnyak/mini-kep/raw/master/output/png/EXPORT_GOODS_TOTAL_bln_usd_spark.png) |
 | Импорт товаров                    | млрд.долл.        | 03.2017 | 18.7     | ![](https://github.com/epogrebnyak/mini-kep/raw/master/output/png/IMPORT_GOODS_TOTAL_bln_usd_spark.png) |
