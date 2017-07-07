@@ -262,6 +262,11 @@ class Collection:
             Vintage(year, month).save()
 
     @staticmethod
+    def save_latest():
+        vintage = Vintage(year=None, month=None)
+        vintage.save()
+
+    @staticmethod
     def approve_latest():
         """Quick check for algorithm on latest available data."""
         vintage = Vintage(year=None, month=None)
@@ -281,6 +286,7 @@ class Collection:
 
 if __name__ == "__main__":
     Collection.approve_latest()
+    Collection.save_latest()
     # Collection.approve_all()
     # Collection.save_all_dataframes_to_csv()
 

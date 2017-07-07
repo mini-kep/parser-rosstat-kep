@@ -52,10 +52,11 @@ def test_Datapoints_is_included_annual_1999_values_in_2017_4():
 
 dfa_ref = frame.dfa['1999'].transpose()
 
+
 def test_dfa_in_2017_4():
     assert dfa_ref.__str__() == \
-    """time_index                              1999-12-31
-label                                             
+        """time_index                              1999-12-31
+label
 year                                        1999.0
 EXPORT_GOODS_TOTAL_bln_usd                    75.6
 GDP_bln_rub                                 4823.0
@@ -76,10 +77,12 @@ RETAIL_SALES_bln_rub                        1797.4"""
 
 
 dfq_ref = frame.dfq.loc["2017-03", ].transpose()
+
+
 def test_dfq_in_2017_4():
     assert dfq_ref.__str__() == \
-    """time_index                              2017-03-31
-label                                             
+        """time_index                              2017-03-31
+label
 year                                        2017.0
 qtr                                            1.0
 EXPORT_GOODS_TOTAL_bln_usd                    82.2
@@ -100,11 +103,14 @@ RETAIL_SALES_FOOD_bln_rub                   3275.3
 RETAIL_SALES_NONFOODS_bln_rub               3460.1
 RETAIL_SALES_bln_rub                        6735.4"""
 
+
 dfm_ref = frame.dfm.loc["2017-01", ].transpose()
+
+
 def test_dfm_in_2017_4():
     assert dfm_ref.__str__() == \
-    """time_index                              2017-01-31
-label                                             
+        """time_index                              2017-01-31
+label
 year                                        2017.0
 month                                          1.0
 EXPORT_GOODS_TOTAL_bln_usd                    25.1

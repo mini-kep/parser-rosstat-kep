@@ -143,6 +143,7 @@ def copy_latest_csv_to_separate_folder(dst_folder=latest):
     for src in [f for f in src_folder.iterdir() if f.is_file()]:
         dst = dst_folder / src.name
         shutil.copyfile(src, dst)
+    print("Updated folder *latest*")
 
 
 if __name__ == "__main__":

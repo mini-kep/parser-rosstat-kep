@@ -56,11 +56,12 @@ assert set(UNIT_NAMES.keys()) == set(UNITS.values())
 class Definition():
     """Parsing defintion contains:
        - csv line boundaries
-       - text to match with variable name 
+       - text to match with variable name
        - required variable names
        - reader function name for unusual table formats (optional)"""
+
     def __init__(self, name):
-        # Definion name  
+        # Definion name
         self.name = name
         self.headers = odict()
         self.markers = []
@@ -106,6 +107,7 @@ class Specification:
        .main (default definition)
        .additional (other defintitions)
     """
+
     def __init__(self, pdef_main):
         self.main = pdef_main
         self.additional = []

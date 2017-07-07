@@ -8,18 +8,22 @@
 
 NCOL = 2
 
-def add_tail(lst, n = NCOL):
+
+def add_tail(lst, n=NCOL):
     """Add extra elements at end of lst"""
     extra_blanks = (len(lst) // n + 1) * n - len(lst)
     return lst + [' ' for x in range(extra_blanks)]
 
-def chunks(lst, n = NCOL):
+
+def chunks(lst, n=NCOL):
     """Yield successive n-sized chunks from lst."""
     for i in range(0, len(lst), n):
-        yield lst[i:i+n]
+        yield lst[i:i + n]
+
 
 def get_max_width_in_list(textlist):
     return max([len(t) for t in textlist])
+
 
 def cell_format(max_width):
     """
@@ -27,17 +31,21 @@ def cell_format(max_width):
     :rtype: string
     """
     return "{:<" + str(max_width) + "}"
-    
-def printable(textlist, sep = " "):
+
+
+def printable(textlist, sep=" "):
     """Returns a string with elements of *testlist* printied by NCOL columns."""
     max_width = get_max_width_in_list(textlist)
-    cell_pattern = cell_format(max_width)    
-    return '\n'.join([sep.join([cell_pattern.format(x) for x in line]) for line in chunks(add_tail(textlist))])
+    cell_pattern = cell_format(max_width)
+    return '\n'.join([sep.join([cell_pattern.format(x) for x in line])
+                      for line in chunks(add_tail(textlist))])
 
-#----------------------------------------------------------------------------------------------------------------
-        
+#-------------------------------------------------------------------------
+
+
 import itertools
 TABLE_HEADER = ["Код", "Описание", "Ед.изм.", "Частота"]
+
 
 def get_max_widths(table):
     """
@@ -45,13 +53,13 @@ def get_max_widths(table):
     where each element is the maximum width of the corresponding column.
 
     Supports incomplete rows with less than N elements.
-    
+
     *table* is a list of lists.
     """
     max_widths = []
     column_count = 0
     for row in table:
-        #extend incomplete rows
+        # extend incomplete rows
         if len(row) > column_count:
             max_widths.extend([0 for _ in range(len(row) - column_count)])
             column_count = len(max_widths)
@@ -69,6 +77,7 @@ def pad_cells(table):
             row[cell_num] = pad_to(cell, col_sizes[cell_num])
     return table
 
+
 def pad_to(unpadded, target_len):
     """
     Pad a string to the target length in characters, or return the original
@@ -79,20 +88,23 @@ def pad_to(unpadded, target_len):
         return unpadded
     return unpadded + (' ' * under)
 
+
 def add_dividers(row, divider="|", padding=0):
     """Add dividers and padding to a row of cells and return a string."""
     div = ''.join([padding * ' ', divider, padding * ' '])
     return '| {} |'.format(div.join(row))
 
+
 def horiz_div(col_widths):
     row = ['-' * x for x in col_widths]
     return '|:{}-|'.format('-|:'.join(row))
-    
+
+
 def tabulate(table, header=TABLE_HEADER):
     table = pad_cells([header] + table)
     header = table[0]
     body = table[1:]
-    
+
     col_widths = [len(cell) for cell in header]
     horiz = horiz_div(col_widths)
 
@@ -103,22 +115,22 @@ def tabulate(table, header=TABLE_HEADER):
     table.extend(body)
     return '\n'.join(table)
 
+
 def pure_tabulate(table, header=TABLE_HEADER):
     """Returns markdown-formatted table as a string.
-    
+
     TABLE_HEADER = ["Код", "Описание", "Ед.изм.", "Частота"]
     table = [['35462356', 'wrt', 'wergwetrgwegwetg'], ['qrgfwertgwqert', 'abc']]
-    
+
     pure_tabulate(table, TABLE_HEADER) result should be like below
-    
+
     | Код            | Описание | Ед.изм.          | Частота |
     |:---------------|:---------|:-----------------|:--------|
     | 35462356       | wrt      | wergwetrgwegwetg |         |
     | qrgfwertgwqert | abc      |                  |         |
-    
+
     """
 
-    
     col_widths = [len(cell) for cell in header]
     horiz = horiz_div(col_widths, header_div, divider, padding)
 
@@ -129,11 +141,11 @@ def pure_tabulate(table, header=TABLE_HEADER):
     table.extend(body)
     table = [row.rstrip() for row in table]
     return '\n'.join(table)
-    
+
     # Calculate column widths
     widths = get_max_widths(itertools.chain([header], table))
     # | Text      | Another text |
-    template =              '| ' + ' | '.join(cell_format(x) for x in widths) + ' |'
+    template = '| ' + ' | '.join(cell_format(x) for x in widths) + ' |'
     #                        |:------|:------------------------------------|
     header_separator_line = '|:' + '-|:'.join('-' * x for x in widths) + '-|'
 
@@ -150,20 +162,21 @@ def pure_tabulate(table, header=TABLE_HEADER):
         rows.extend([fitted_row])
     return '\n'.join(rows)
 
+
 if __name__ == '__main__':
-    
+
     header = 'abc'
     table = [['hh', 'ggg', 'q'], '456']
-    
+
     assert header[2] == 'c'
     assert table[1][2] == '6'
     #assert (get_max_widths(table)) == [2, 3, 1]
     print(tabulate(table, header))
-    
-    textlist = [['35462356', 'wrt', 'wergwetrgwegwetg'], ['qrgfwertgwqert', 'abc', "zzz"]]
+
+    textlist = [['35462356', 'wrt', 'wergwetrgwegwetg'],
+                ['qrgfwertgwqert', 'abc', "zzz"]]
     print(tabulate(textlist, header))
 
     #textlist = ['35462356', 'wrt', 'wergwetrgwegwetg', 'qrgfwertgwqert', 'abc']
-    #print(printable(textlist))
+    # print(printable(textlist))
     #print(pure_tabulate(chunks(add_tail(textlist, n = 4), n = 4), header=TABLE_HEADER))
-        

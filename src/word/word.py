@@ -1,4 +1,4 @@
-"""make_csv(data_folder) dumps data from tables in Word document to csv file. 
+"""make_csv(data_folder) dumps data from tables in Word document to csv file.
    Windows-only, requires MS Word installed.
 """
 
@@ -23,7 +23,8 @@ ENCODING = 'utf8'
 # -------------------------------------------------------------------------------
 
 def win32_word_dispatch():
-    # Lazy import of win32com - do not load Windows/MS Office libraries when they are not called.
+    # Lazy import of win32com - do not load Windows/MS Office libraries when
+    # they are not called.
     import win32com.client as win32
     word = win32.Dispatch("Word.Application")
     word.Visible = 0
@@ -33,14 +34,16 @@ def win32_word_dispatch():
 def open_ms_word():
     try:
         return win32_word_dispatch()
-    except:
-        raise Exception("Apparently not a Windows machine or no MS Word installed.")
+    except BaseException:
+        raise Exception(
+            "Apparently not a Windows machine or no MS Word installed.")
 
 
 def close_ms_word(app):
     app.Quit()
-    # ISSUE: must also quit somewhere by calling app.Quit() 
-    # like in http://bytes.com/topic/python/answers/23946-closing-excel-application
+    # ISSUE: must also quit somewhere by calling app.Quit()
+    # like in
+    # http://bytes.com/topic/python/answers/23946-closing-excel-application
 
 
 def open_doc(path, word):
@@ -67,13 +70,11 @@ SPACE = " "
 VOID = ""
 APOCHAR = '"'
 REPLACEMENTS = [('\r\x07', VOID)  # delete this symbol
-    , ('\x0c', SPACE)  # sub with space
-    , ('\x0b', SPACE)  # sub with space
-    , ('\r', SPACE)  # sub with space
-    , ("\u201c", APOCHAR)
-    , ("\u201d", APOCHAR)
-    , ('\x00', VOID)
-]
+                , ('\x0c', SPACE)  # sub with space
+                , ('\x0b', SPACE)  # sub with space
+                , ('\r', SPACE)  # sub with space
+                , ("\u201c", APOCHAR), ("\u201d", APOCHAR), ('\x00', VOID)
+                ]
 
 
 def filter_cell_contents(cell_value):
@@ -140,7 +141,7 @@ def yield_continious_rows(p):
 
 # -------------------------------------------------------------------------------
 #
-#    Write CSV 
+#    Write CSV
 #
 # -------------------------------------------------------------------------------
 
@@ -154,9 +155,10 @@ def to_csv(gen, csv_path):
 
 # -------------------------------------------------------------------------------
 #
-#    Folder-level batch job 
+#    Folder-level batch job
 #
 # -------------------------------------------------------------------------------
+
 
 def yield_rows_from_many_files(file_list):
     """Iterate by row over .doc files in *file_list* """
@@ -177,9 +179,11 @@ def dump_doc_files_to_csv(file_list, csv_path):
     folder_iter = yield_rows_from_many_files(file_list)
     to_csv(folder_iter, csv_path)
 
+
 def make_file_list(folder):
     files = ["tab.doc"] + ["tab{0:d}.doc".format(x) for x in range(1, 5)]
     return [os.path.abspath(os.path.join(folder, fn)) for fn in files]
+
 
 def folder_to_csv(folder):
     """Make single csv based on 5 .doc files in *folder*. """
@@ -188,6 +192,7 @@ def folder_to_csv(folder):
     csv_filename = get_csv_filename(folder)
     dump_doc_files_to_csv(file_list, csv_filename)
     print("Finished creating raw CSV file:", csv_filename)
+
 
 if __name__ == "__main__":
     from run_word import get_word_folder
