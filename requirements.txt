@@ -7,4 +7,5 @@ pandas
 xlwt
 openpyxl
 codecov
+pytest-cov
 #matplotlib
