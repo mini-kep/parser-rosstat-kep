@@ -4,4 +4,4 @@
 **/test_pipeline.py
 **/test_tables.py
 **/test_vintage.py
-frontpage/old/*
+src/frontpage/old/*
