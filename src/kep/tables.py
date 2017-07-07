@@ -79,7 +79,7 @@ def read_csv(path):
 
 
 class Tables:
-    """Returns tables from *csv_path* by .get_all() method."""
+    """Returns tables from *csv_path* by .extract_all_tables() method."""
 
     def __init__(self, csv_path, spec=SPEC, units=UNITS):
         rows = read_csv(csv_path)
@@ -411,7 +411,7 @@ class Header:
 
 def test_csv_has_no_null_byte():
     csv_path = files.get_path_csv(2015, 2)
-    z = csv_path.read_text(encoding=tables.ENC)
+    z = csv_path.read_text(encoding=ENC)
     assert "\0" not in z
 
 
