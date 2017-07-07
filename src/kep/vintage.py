@@ -210,7 +210,7 @@ VALID_DATAPOINTS = [
     {'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL_bln_usd', 'value': 75.6, 'year': 1999},
     {'freq': 'q', 'label': 'IMPORT_GOODS_TOTAL_bln_usd',
         'qtr': 1, 'value': 9.1, 'year': 1999},
-    # FIXME: found only in latest, need some monthly value 
+    # FIXME: found only in latest, need some monthly value
     #{'freq': 'm', 'label': 'IND_PROD_yoy', 'month': 4, 'value': 102.3, 'year': 2017}
 ]
 
@@ -277,6 +277,7 @@ class Collection:
             vintage.validate()
 
 # FIXME: review __str__, and __repr__()
+
 
 if __name__ == "__main__":
     Collection.approve_latest()
