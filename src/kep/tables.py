@@ -222,7 +222,7 @@ class RowStack:
             print("   ", self.is_found(e), "<{}>".format(e))
 
     def pop_segment(self, start, end):
-        """Pops elements of self.row between [start, end).
+        """Pops elements of self.rows between [start, end).
            Recognises element occurrences by index *i*.
            Modifies *self.rows*."""
         we_are_in_segment = False
