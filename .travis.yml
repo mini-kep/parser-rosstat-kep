@@ -7,6 +7,6 @@ install:
 # command to run tests
 script: 
   - pytest src/kep --doctest-modules
-#after_success:
+after_success:
   - codecov
   - coveralls
