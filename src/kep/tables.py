@@ -139,17 +139,17 @@ YEAR_CATCHER = re.compile('(\d{4}).*')
 
 def get_year(string: str, rx=YEAR_CATCHER):
     """Extracts year from string *string*.
-       Returns None if year is not valid or not in plausible range."""
+       Returns False if year is not valid or not in plausible range."""
     match = re.match(rx, string)
     if match:
         year = int(match.group(1))
         if year >= 1991:
             return year
-    return None
+    return False
 
 
 def is_year(string: str) -> bool:
-    return get_year(string) is not None
+    return get_year(string) is not False
 
 
 class Row:
