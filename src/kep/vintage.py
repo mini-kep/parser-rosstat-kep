@@ -147,7 +147,8 @@ class Frames:
     def collect(self, freq):
         return [x for x in self.datapoints if x['freq'] == freq]
 
-    def validate(self, df):
+    @staticmethod
+    def validate(df):
         if not df.empty:
             dups = df[df.duplicated(keep=False)]
             if not dups.empty:
