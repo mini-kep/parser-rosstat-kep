@@ -24,12 +24,12 @@ class Test_Function_get_year():
     def test_get_year(self):
         assert tables.get_year("19991)") == 1999
         assert tables.get_year("1999") == 1999
-        assert tables.get_year("1812") is None
+        assert tables.get_year("1812") is False
 
     def test_on_all_heads(self):
         for s in self.all_heads():
             year = tables.get_year(s)
-            assert isinstance(year, int) or year is None
+            assert isinstance(year, int) or year is False
 
     @staticmethod
     def all_heads():

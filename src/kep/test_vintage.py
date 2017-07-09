@@ -68,8 +68,6 @@ class Test_Functions_Dates():
         assert vintage.get_date_year_end(2015) == \
             pd.Timestamp('2015') + pd.offsets.YearEnd()
 
-# FIXME: why to_float defaults to False and get_year to None?
-
 
 if __name__ == "__main__":
     pytest.main([__file__])
