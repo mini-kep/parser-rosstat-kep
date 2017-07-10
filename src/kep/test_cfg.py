@@ -18,9 +18,6 @@ def marker_has_valid_start_and_end(marker):
     start_head = None
     end_head = None
 
-    start_pos = None
-    end_pos = None
-
     for head in Test_Function_get_year.all_heads():
         if tables.is_year(head):
             continue
