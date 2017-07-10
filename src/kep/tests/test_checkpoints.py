@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
-import vintage
+from .. import vintage
 
 # TESTING END TO END
 year, month = 2017, 4

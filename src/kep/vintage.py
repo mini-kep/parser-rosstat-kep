@@ -15,8 +15,8 @@ import calendar
 
 import pandas as pd
 
-import tables
-import files
+from . import tables
+from . import files
 
 
 # use'always' or 'ignore'
@@ -61,8 +61,7 @@ class DictMaker:
         return {**self.basedict, 'freq': 'q', 'value': to_float(val), 'qtr': q}
 
     def m_dict(self, val, m):
-        return {**self.basedict, 'freq': 'm', 'value': to_float(val),
-                'month': m}
+        return {**self.basedict, 'freq': 'm', 'value': to_float(val), 'month': m}
 
     def __str__(self):
         return self.basedict.__str__()
@@ -75,13 +74,13 @@ class Emitter:
        Table must have defined *label* and *splitter_func*."""
 
     def __init__(self, table):
-        if not table.label or not table.splitter_func:
-            table.echo_error_table_not_valid()
+        if not table.is_defined():
+            raise ValueError(table)
         self.a = []
         self.q = []
         self.m = []
         for row in table.datarows:
-            dmaker = DictMaker(tables.get_year(row.name), table.label)
+            dmaker = DictMaker(row.get_year(), table.label)
             a_value, q_values, m_values = table.splitter_func(row.data)
             if a_value:
                 self.a.append(dmaker.a_dict(a_value))

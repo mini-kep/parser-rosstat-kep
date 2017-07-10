@@ -1,43 +1,45 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-import cfg
-import tables
-from test_tables import Test_Function_get_year
+from .. import cfg
+from .. import tables
+
+#FIXME
+# from .test_tables import Test_Function_get_year
 
 
-def marker_has_valid_start_and_end(marker):
-    """Helper function for marker validation."""
+# def marker_has_valid_start_and_end(marker):
+    # """Helper function for marker validation."""
 
-    s = marker['start']
-    e = marker['end']
+    # s = marker['start']
+    # e = marker['end']
 
-    start_found = False
-    end_found = False
+    # start_found = False
+    # end_found = False
 
-    start_head = None
-    end_head = None
+    # start_head = None
+    # end_head = None
 
-    for head in Test_Function_get_year.all_heads():
-        if tables.is_year(head):
-            continue
-        if not start_found:
-            start_pos = head.find(s)
-            start_found = start_pos != -1
-            if start_found:
-                start_head = head
-        if start_found:
-            if not end_found:
-                end_pos = head.find(e)
-                end_found = end_pos != -1
-                if end_found:
-                    end_head = head
+    # for head in Test_Function_get_year.all_heads():
+        # if tables.is_year(head):
+            # continue
+        # if not start_found:
+            # start_pos = head.find(s)
+            # start_found = start_pos != -1
+            # if start_found:
+                # start_head = head
+        # if start_found:
+            # if not end_found:
+                # end_pos = head.find(e)
+                # end_found = end_pos != -1
+                # if end_found:
+                    # end_head = head
 
-        if start_found and end_found:
-            break
+        # if start_found and end_found:
+            # break
 
-    # start and end fields should come from different lines (heads), otherwise the condition should be changed
-    return start_found and end_found and (start_head != end_head)
+    # # start and end fields should come from different lines (heads), otherwise the condition should be changed
+    # return start_found and end_found and (start_head != end_head)
 
 
 def test_cfg_main_marker_valid():

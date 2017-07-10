@@ -3,10 +3,10 @@ from pathlib import Path
 import pytest
 from tempfile import NamedTemporaryFile
 
-import tables
-import vintage
-import files
-import splitter
+from .. import tables
+from .. import vintage
+from .. import files
+from .. import splitter
 
 # Testing dataflow with CSV-based fixtures and definitions
 
