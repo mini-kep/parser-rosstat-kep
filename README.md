@@ -31,9 +31,9 @@
 | Экспорт товаров, млрд.долл.  (апрель 2017)  | ```26.1``` | ![](https://github.com/epogrebnyak/mini-kep/raw/master/output/png/EXPORT_GOODS_TOTAL_bln_usd_spark.png)
 | Импорт товаров, , млрд.долл.  (апрель 2017) | ```18.1```      | ![](https://github.com/epogrebnyak/mini-kep/raw/master/output/png/IMPORT_GOODS_TOTAL_bln_usd_spark.png) 
 | **Розничная торговля** |    |   
-| Розничная торговля - всего, % изм. за 12 месецев (май 2017)  | ```100.7```  | ![](https://github.com/epogrebnyak/mini-kep/raw/master/output/png/RETAIL_SALES_yoy_spark.png)   
-| Розничная торговля - прод.товары, % изм. за 12 месецев (май 2017)    | ```99.6```   | ![](https://github.com/epogrebnyak/mini-kep/raw/master/output/png/RETAIL_SALES_FOOD_yoy_spark.png)      
-| Розничная торговля - непрод.товары, % изм. за 12 месецев (май 2017)  | ```101.8```     | ![](https://github.com/epogrebnyak/mini-kep/raw/master/output/png/RETAIL_SALES_NONFOODS_yoy_spark.png) 
+| Розничная торговля - всего, % изм. за 12 мес. (май 2017)  | ```100.7```  | ![](https://github.com/epogrebnyak/mini-kep/raw/master/output/png/RETAIL_SALES_yoy_spark.png)   
+| Розничная торговля - прод.товары, % изм. за 12 мес. (май 2017)    | ```99.6```   | ![](https://github.com/epogrebnyak/mini-kep/raw/master/output/png/RETAIL_SALES_FOOD_yoy_spark.png)      
+| Розничная торговля - непрод.товары, % изм. за 12 мес. (май 2017)  | ```101.8```     | ![](https://github.com/epogrebnyak/mini-kep/raw/master/output/png/RETAIL_SALES_NONFOODS_yoy_spark.png) 
 
 
 
