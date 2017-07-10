@@ -21,7 +21,6 @@ sys.path.extend([str(src_root / "kep"), str(src_root / "access_data")])
 
 import cfg
 from to_markdown import to_markdown
-from to_markdown import tabulate
 import access_data
 import sparkline
 

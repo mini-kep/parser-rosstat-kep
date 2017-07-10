@@ -255,7 +255,7 @@ class Vintage:
 
 
 class Collection:
-    # Methods to manipulate entire set of data releases
+    """Methods to manipulate entire set of data releases"""
 
     @staticmethod
     def save_all_dataframes_to_csv():
@@ -286,11 +286,11 @@ class Collection:
 
 
 if __name__ == "__main__":
-    Collection.approve_latest()
-    Collection.save_latest()
-    # Collection.approve_all()
-    # Collection.save_all_dataframes_to_csv()
+    #Collection.approve_latest()
+    #Collection.save_latest()
+    #Collection.approve_all()
+    Collection.save_all_dataframes_to_csv()
 
-    year, month = 2017, 4
+    year, month = 2017, 5
     vintage = Vintage(year, month)
-    dfa, _, dfm = vintage.dfs()
+    dfa, dfq, dfm = vintage.dfs()

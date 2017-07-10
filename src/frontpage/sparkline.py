@@ -2,7 +2,6 @@
 from pathlib import Path
 import sys
 import matplotlib.pyplot as plt
-import os
 
 
 # see 'Notebooks are for exploration and communication' in
