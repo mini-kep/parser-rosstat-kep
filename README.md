@@ -1,8 +1,49 @@
 [![Build Status](https://travis-ci.org/epogrebnyak/mini-kep.svg?branch=master)](https://travis-ci.org/epogrebnyak/mini-kep)
-[![Code Issues](https://www.quantifiedcode.com/api/v1/project/c2db5f2af9d54cb1888a21c37bfc24ec/badge.svg)](https://www.quantifiedcode.com/app/project/c2db5f2af9d54cb1888a21c37bfc24ec)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8a467743314641b4a22b66b327834367)](https://www.codacy.com/app/epogrebnyak/mini-kep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=epogrebnyak/mini-kep&amp;utm_campaign=Badge_Grade)
 
-Всего переменных: 24  
+--------------
+
+Всего переменных: 35
+
+**ВВП и производство**:
+- GDP(bln_rub, yoy)
+- IND_PROD(yoy, rog)
+
+**Инвестиции**:
+- INVESTMENT(bln_rub, yoy, rog)
+
+**Внешняя торговля**:
+- EXPORT_GOODS_TOTAL(bln_usd)
+- IMPORT_GOODS_TOTAL(bln_usd)
+
+**Розничная торговля**:
+- RETAIL_SALES(bln_rub, yoy, rog)
+- RETAIL_SALES_FOOD(bln_rub, yoy, rog)
+- RETAIL_SALES_NONFOODS(bln_rub, yoy, rog)
+
+**Цены**:
+- CPI(rog)
+- CPI_FOOD(rog)
+- CPI_NONFOOD(rog)
+- CPI_ALCOHOL(rog)
+- CPI_SERVICES(rog)
+
+**Население**:
+- UNEMPL(pct)
+- WAGE_REAL(rog, yoy)
+- WAGE_NOMINAL(rub)
+
+**Бюджет**:
+- GOV_EXPENSE_ACCUM_CONSOLIDATED(bln_rub)
+- GOV_EXPENSE_ACCUM_FEDERAL(bln_rub)
+- GOV_EXPENSE_ACCUM_SUBFEDERAL(bln_rub)
+- GOV_REVENUE_ACCUM_CONSOLIDATED(bln_rub)
+- GOV_REVENUE_ACCUM_FEDERAL(bln_rub)
+- GOV_REVENUE_ACCUM_SUBFEDERAL(bln_rub)
+- GOV_SURPLUS_ACCUM_FEDERAL(bln_rub)
+- GOV_SURPLUS_ACCUM_SUBFEDERAL(bln_rub)
+
+---------------
 
 ### Месячные значения
 ### Квартальные значения
