@@ -2,7 +2,7 @@
                                                           
 import csv
 import re
-from . import cfg
+import kep.cfg as cfg
 
 ENC = 'utf-8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
@@ -31,8 +31,6 @@ def read_csv(path):
     filled = filter(lambda row: row and row[0], raw_csv_rows)
     no_comments = filter(lambda row: not row[0].startswith("___"), filled)
     return map(Row, no_comments)
-
-
 
 
 class Row:
@@ -80,7 +78,7 @@ class Row:
     
     def __single_value__(self, values):
         """Return first element in *values* or raise ValueError.
-           Returns False if *values* is empty.
+           Returns False if *values* is empty. Uses *self.name*.           
         """
         if len(values)>1:
             msg = "Multiple entries found in <{}>: {}".format(self.name, values)
@@ -101,7 +99,7 @@ class Row:
             return "<{}>".format(self.name)
 
     def __repr__(self):
-        return "Row {}".format([self.name] + self.data)
+        return "Row({})".format([self.name] + self.data)
 
 YEAR_CATCHER = re.compile('(\d{4}).*')
 
