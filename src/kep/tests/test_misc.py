@@ -1,5 +1,5 @@
 import pytest
-import files
+from .. import files
 
 # regression tests - after bug fixes on occasional errors
 def test_csv_has_no_null_byte():
