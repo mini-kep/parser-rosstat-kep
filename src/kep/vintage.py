@@ -18,7 +18,7 @@ import pandas as pd
 import kep.rows as rows
 import kep.tables as tables
 import kep.files as files
-
+import kep.cfg as cfg
 
 
 # use'always' or 'ignore'
@@ -176,6 +176,7 @@ class Frames:
         dfa = dfa.pivot(columns='label', values='value', index='time_index')
         dfa.insert(0, "year", dfa.index.year)
         dfa.columns.name = None
+        dfa.index.name = None
         return dfa
 
     @staticmethod
@@ -188,6 +189,7 @@ class Frames:
         dfq.insert(0, "year", dfq.index.year)
         dfq.insert(1, "qtr", dfq.index.quarter)
         dfq.columns.name = None
+        dfq.index.name = None
         return dfq
 
     @staticmethod
@@ -200,6 +202,7 @@ class Frames:
         dfm.insert(0, "year", dfm.index.year)
         dfm.insert(1, "month", dfm.index.month)
         dfm.columns.name = None
+        dfm.index.name = None
         return dfm
 
     def save(self, folder_path):
@@ -215,6 +218,8 @@ VALID_DATAPOINTS = [
     {'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL_bln_usd', 'value': 75.6, 'year': 1999},
     {'freq': 'q', 'label': 'IMPORT_GOODS_TOTAL_bln_usd',
         'qtr': 1, 'value': 9.1, 'year': 1999},
+    {'freq': 'a', 'label': 'CPI_rog', 'value': 136.5, 'year': 1999},
+    {'freq': 'm', 'label': 'CPI_rog', 'value': 108.4, 'year': 1999, 'month': 1}    
     # FIXME: found only in latest, need some monthly value
     #{'freq': 'm', 'label': 'IND_PROD_yoy', 'month': 4, 'value': 102.3, 'year': 2017}
 ]
@@ -293,10 +298,37 @@ class Collection:
 
 if __name__ == "__main__":
     Collection.approve_latest()
+    #Collection.approve_all()    
     #Collection.save_latest()
-    #Collection.approve_all()
     #Collection.save_all_dataframes_to_csv()
 
     year, month = 2017, 5
     vintage = Vintage(year, month)
     dfa, dfq, dfm = vintage.dfs()
+    
+    # some notebook work
+    iq = ["GDP_yoy", "IND_PROD_yoy", "INVESTMENT_yoy", "RETAIL_SALES_yoy", "WAGE_REAL_yoy"]
+    last_q = dfq[iq]['2017-03'].transpose()
+    im = [           "IND_PROD",                       "RETAIL_SALES",     "WAGE_REAL"]
+    im1 = ["{}_yoy".format(x) for x in im]
+    last_m1 = dfm[im1]['2017-05'].transpose()
+    im2 = ["{}_rog".format(x) for x in im]
+    last_m2 = dfm[im2]['2017-05'].transpose()
+    #print(last_m1)
+    #print(last_m2)
+    
+    # TODO:
+    # all_names = set(dfa.columns + dfq.columns + dfm.columns)
+    
+    #from kep.tables import extract_varname
+    print("Всего переменных: {}".format(len(list(cfg.SPEC.required()))))
+    for k, v in cfg.SECTIONS.items():        
+        print("\n**{}**:".format(k))
+        for vn in v:          
+            z = []
+            for x in cfg.SPEC.required():
+                if x[0] == vn:                    
+                    z.append(x[1])
+            print("- {}({})".format(vn, ", ".join(z)))
+            
+            
