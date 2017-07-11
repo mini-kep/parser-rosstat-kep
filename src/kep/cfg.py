@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
-"""Parsing specification is *units* dict and *spec* instance.
+"""Parsing specification:
 
-  *UNITS* is to detect units of measurement in table headers (like "мдрд.руб.")
+  *UNITS* maps parts of headers like "мдрд.руб." to "bln_rub"
 
-  *spec* is Specification() instance, containing main and additional parsing
-         definitions. Yes, it seems to be a singleton.
-
+  *spec* - Specification() instance, containing main and additional parsing
+           definitions. Yes, it seems to be a singleton.
 """
 
 from collections import OrderedDict as odict
+import itertools
+
 
 # units of measurement
 UNITS = odict([('млрд.долларов', 'bln_usd'),
@@ -47,23 +48,27 @@ assert set(UNIT_NAMES.keys()) == set(UNITS.values())
 
 
 # start and end lines
-def is_found(start, rows):
+def is_found(line, rows):
+    """Return True, is *line* found at start of any entry in *rows*""" 
     for r in rows:
-        if r.startswith(start):
+        if r.startswith(line):
             return True
     return False 
 
 class Scope():
     """Start and end lines CSV file segment. 
     
-       May hold and manupulate several versions of start and end line
+       May hold and manupulate several versions of start and end line,
        applicable to different csv file versions.
-       Solves problem of different headers for same table at various dates.
        
-        d.add_marker("1.9. Внешнеторговый оборот – всего",
-                     "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
-        d.add_marker("1.10. Внешнеторговый оборот – всего",
-                     "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")
+       Solves problem of different headers for same table at various 
+       data releases.
+       
+       Will use methods like:
+       .add_marker("1.9. Внешнеторговый оборот – всего",
+                "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
+       .add_marker("1.10. Внешнеторговый оборот – всего",
+                "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")
     """
     
     def __init__(self):        
@@ -73,54 +78,62 @@ class Scope():
         if start and end:
             self.markers.append(dict(start=start, end=end))
         else:
-            raise ValueError("Cannot accept empty line for boundary in Scope().")        
-        
-    def __get_marker_index__(self, rows):
-        """Identify which pair of markers applies to *rows*."""
-        rows = [r for r in rows] # consume iterator
-        ix = None                   
-        for i, marker in enumerate(self.markers):
-            s = marker['start']
-            e = marker['end']            
-            if is_found(s, rows) and is_found(e, rows):
-               ix = i
-               break
-        return ix       
-
+            raise ValueError("Cannot accept empty line for Scope() boundary")
+            
     def get_boundaries(self, rows):
         ix = self.__get_marker_index__(rows)
         if ix is not None:
             marker = self.markers[ix]
             return marker['start'], marker['end']
         else:
-            self.__notify_lines_not_found__(rows)
+            msg = self.__error_message__(rows)  
+            raise ValueError(msg)
+   
+    def __get_marker_index__(self, rows):
+        """Identify which pair of markers applies to *rows*."""
+        rows = [r for r in rows] # consume iterator
+        for i, marker in enumerate(self.markers):
+            s = marker['start']
+            e = marker['end']            
+            if is_found(s, rows) and is_found(e, rows):
+               return i
+        return None        
 
-    def __notify_lines_not_found__(self, rows):
-        print("ERROR: start or end line not found in *rows*")
+    def __error_message__(self, rows):
+        msg = []
+        msg.append("start or end line not found in *rows*")
         for marker in self.markers:
             s = marker['start']
             e = marker['end']
-            print("   ", is_found(s, rows), "<{}>".format(s))
-            print("   ", is_found(e, rows), "<{}>".format(e))
+            msg.append("   {} <{}>".format(is_found(s, rows), s))
+            msg.append("   {} <{}>".format(is_found(e, rows), e))
+        return "\n".join(msg)
             
 class Definition():
     """Parsing defintion contains:
-       - csv line boundaries
        - text to match with variable name
        - required variable names
+       - csv line boundaries (optional)
        - reader function name for unusual table formats (optional)"""
 
     def __init__(self, name):
-        # Definion name
         self.name = name
+        # mandatory
         self.headers = odict()
+        self.required = []
+        # optional
         self.scope = Scope()
         self.reader = None
-        self.required = []
 
     def add_header(self, text, varname):
         # linking table header line ("Объем ВВП") to variable name ("GDP")
         self.headers.update(odict({text: varname}))
+
+    def require(self, varname, unit):
+        # require occurrence of varibale lable defined by varibale name and 
+        # unit of measurement eg 'GDP', 'rog'
+        # only required variables will be imported to final dataset
+        self.required.append((varname, unit))
 
     def add_marker(self, start, end):
         # start and end lines CSV file segment  where defintion applies
@@ -131,51 +144,49 @@ class Definition():
         self.reader = funcname
 
     def __str__(self):
-        return self.name + "({})".format(len(self.required))
+        return  "{}({})".format(self.name, len(self.required))
 
     def __repr__(self):
         return self.__str__()
 
     def varnames(self):
-        gen = self.headers.values()
-        return list(set(v for v in gen))
-
-    def require(self, varname, unit):
-        # require occurrence of varibale lable defined by varibale name and unit of measurement
-        # eg 'GDP', 'rog'
-        # only required variables will be imported to final dataset
-        self.required.append((varname, unit))
-
+        gen = list(self.headers.values())
+        return list(set(gen))
+    
 
 class Specification:
     """Specification holds a list of defintions in two variables:
+        
        .main (default definition)
-       .additional (other defintitions)
+       .additional (segment defintitions)
+       
     """
 
     def __init__(self, pdef_main):
         self.main = pdef_main
-        self.additional = []
+        self.segments = []
+        
+    def all_definitions(self):
+        return [self.main] + self.segments
 
     def append(self, pdef):
-        self.additional.append(pdef)
+        self.segments.append(pdef)
 
     def varnames(self):
         varnames = set()
-        for pdef in [self.main] + self.additional:
+        for pdef in self.all_definitions():
             for x in pdef.varnames():
                 varnames.add(x)
         return sorted(list(varnames))
 
-    def validate(self):
-        # FIXME: make sure markers are sorted
-        pass
+    def validate(self, rows):
         # TODO: validate specification - order of markers
         # - ends are after starts
-        # - sorted starts follow each other
+        # - sorted end-starts follow each other
+        pass
 
     def required(self):
-        for pdef in [self.main] + self.additional:
+        for pdef in self.all_definitions():
             for req in pdef.required:
                 yield req
 
@@ -183,14 +194,16 @@ class Specification:
         return len(list(self.required()))
 
     def count_defs(self):
-        return len(self.additional + [self.main])
+        return len(self.all_definitions())
 
     def __str__(self):
-        listing = ", ".join(d.__str__() for d in self.additional + [self.main])
         cnt1 = self.count_vars()
         cnt2 = self.count_defs()
-        pat = "{} required variables in {} parsing definitions {}"
-        return (pat.format(cnt1, cnt2, listing))
+        pat = "{} required variables in {} parsing definitions".format(cnt1, cnt2)
+        listing1 = ", ".join([str(d) for d in self.segments])
+        segs = "segments: {}".format(listing1)
+        main = "main: {}".format(self.main)
+        return "{} ({}, {})".format(pat, segs, main)
 
     def __repr__(self):
         return "{}({})".format(self.__class__, self.__str__())
@@ -295,13 +308,13 @@ d.require("RETAIL_SALES_NONFOODS", "rog")
 
 SPEC.append(d)
 
-# FIXME: does nothing yet
-SPEC.validate()
+# TODO: must check order of markers in additional definitions
+SPEC.validate(None)
+
 # units and spec are ready to use are parsing inputs
 print(SPEC)
 
-
-# variable descriptions for frontend
+# variable descriptions
 DESC = {
     "GDP": "Валовой внутренний продукт",
     "IND_PROD": "Промышленное производство",
@@ -331,7 +344,9 @@ assert not_in_a == {
     'GOV_SURPLUS_ACCUM_SUBFEDERAL'}
 assert not_in_b == set()
 
-# groups of variables for frontend
+# frontend variable grouping
+
+# FIXME: groups of variables for frontend
 M_SECTIONS = odict([
     ("Производство", ["IND_PROD_rog", "IND_PROD_yoy"]),
     ("Внешняя торговля", ["EXPORT_GOODS_TOTAL_bln_usd",
@@ -352,11 +367,9 @@ SECTIONS = odict([
 ])
 
 # check 3: sections includes all items in description
-import itertools
-assert set(
-    DESC.keys()) == set(
-        itertools.chain.from_iterable(
-            SECTIONS.values()))
+set1 = set(DESC.keys())
+set2 = set(itertools.chain.from_iterable(SECTIONS.values()))
+assert set1 == set2
 
 
 if __name__ == "__main__":

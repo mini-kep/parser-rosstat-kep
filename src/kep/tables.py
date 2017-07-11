@@ -19,7 +19,7 @@ import warnings
 
 from kep import files
 from kep import splitter
-from kep.rows import Rows
+from kep.rows import CSV
 from kep.cfg import SPEC
 from kep.cfg import UNITS
 
@@ -62,21 +62,21 @@ def check_required_labels(tables, pdef):
     if labels_missed:
         raise ValueError("Missed labels: {}".format(labels_missed))
 
+from itertools import chain 
+
 class Tables:
     """Extract tables from *csv_path* using *Rows(csv_path)*."""
 
-    def __init__(self, csv_path, spec=SPEC, units=UNITS, constructor=Rows):
+    def __init__(self, rows, spec=SPEC, units=UNITS):
         self.spec = spec 
         self.units = units
-        self.rows = constructor(csv_path)
-        gen1 = self.yield_tables_from_segments()             
-        gen2 = self.yield_tables_from_main()
-        self.tables = list(gen1)
-        self.tables.extend(list(gen2)) 
-        
+        self.rows = rows
+        gen = chain(self.yield_tables_from_segments(),             
+                    self.yield_tables_from_main())
+        self.tables = list(gen)
     def yield_tables_from_segments(self):
         # use parsing definitions for segments first
-        for pdef in self.spec.additional:
+        for pdef in self.spec.segments:
             csv_segment = self.rows.pop(pdef)
             for t in self.extract_tables(csv_segment, pdef, self.units):
                 yield t
@@ -219,9 +219,10 @@ class Table:
                                                       repr(self.datarows))
 
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     csv_path = files.locate_csv()
-    tables = Tables(csv_path).get_required()
+    rowstack = CSV(csv_path).rowstack 
+    tables = Tables(rowstack).get_required()
     for t in tables:
         print()
         print(t)

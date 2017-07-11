@@ -15,8 +15,10 @@ import calendar
 
 import pandas as pd
 
+import kep.rows as rows
 import kep.tables as tables
 import kep.files as files
+
 
 
 # use'always' or 'ignore'
@@ -222,14 +224,17 @@ class Vintage:
     """Represents dataset release for a given year and month."""
 
     def __init__(self, year, month):
+        # save for reference and navigation
+        self.year, self.month = files.filter_date(year, month)        
         # find csv
         self.csv_path = files.locate_csv(year, month)
+        # rowstack 
+        self.rowstack = rows.CSV(self.csv_path).rowstack
         # break csv to tables with variable names
-        self.tables = tables.Tables(self.csv_path).get_required()
+        self.tables = tables.Tables(self.rowstack).get_required()
         # convert stream values to pandas dataframes
-        self.frames = Frames(tables=self.tables)
-        # save for reference and navigation
-        self.year, self.month = files.filter_date(year, month)
+        self.frames = Frames(tables=self.tables)     
+
 
     def save(self):
         """Save dataframes to CSVs."""

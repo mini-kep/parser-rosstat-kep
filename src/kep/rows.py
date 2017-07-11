@@ -33,6 +33,12 @@ def read_csv(path):
     return map(Row, no_comments)
 
 
+class CSV:
+    def __init__(self, path):
+        self.rows = read_csv(path)
+        self.rowstack = RowStack(self.rows)     
+
+
 class Row:
     """CSV row representation."""
 
@@ -119,13 +125,15 @@ def is_year(string: str) -> bool:
     return get_year(string) is not False
 
 
-class Rows:
+class RowStack:
     """Holder for CSV rows. Allows extracting segments of CSV file and 
-       remaining part of CSV file, after all segments are extracted."""
+       remaining part of CSV file, after all segments are extracted.
+       
+       Operates on list of Row() instances."""
 
-    def __init__(self, csv_path, reader_func=read_csv):
+    def __init__(self, rows):
         # consume *rows*, likely it is a generator
-        self.rows = [r for r in reader_func(csv_path)]
+        self.rows = [r for r in rows]     
 
     def remaining_rows(self):
         return self.rows
@@ -166,7 +174,7 @@ if __name__ == "__main__":
     assert Row(["1. abcd, %"]).get_unit({'%':"pct"}) == 'pct'     
 
      
-    def mock_read_csv(_):
+    def mock_read_csv():
         yield Row(["apt", "1", "2"])
         yield Row(["bat aa...ah", "1", "2"])
         yield Row(["can", "1", "2"])
@@ -174,7 +182,7 @@ if __name__ == "__main__":
         yield Row(["wed", "1", "2"])
         yield Row(["zed"])
     
-    rows = Rows(None, mock_read_csv)
+    rows = RowStack(mock_read_csv())
     a = rows.__pop_segment__("bat", "dot")
     assert len(a) == 2      
     b = rows.__pop_segment__("apt", "wed")  

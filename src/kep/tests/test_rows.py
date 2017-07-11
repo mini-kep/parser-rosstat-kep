@@ -4,7 +4,7 @@ from collections import OrderedDict as odict
 
 
 # testing:
-from kep.rows import get_year, is_year, Row, Rows
+from kep.rows import get_year, is_year, Row, RowStack
 
 #TODO: test csv readers here
 
@@ -104,7 +104,7 @@ class Test_Row:
         assert str(self.row1) == "<Объем ВВП>"
         assert str(self.row2) == "<1991 1) | 4823 901 1102 1373 1447>"
     
-def mock_read_csv(_):
+def mock_read_csv():
     yield Row(["apt", "1", "2"])
     yield Row(["bat aa...ah", "1", "2"])
     yield Row(["can", "1", "2"])
@@ -113,11 +113,8 @@ def mock_read_csv(_):
     yield Row(["zed"])
 
 @pytest.fixture
-def rows():
-    # 'dependency injection' by *reader_func* allows bypass
-    # construction of mock csv file and use stream of Rows() directly,
-    # this makes testing more modular and transparent
-    return Rows(csv_path=None, reader_func=mock_read_csv)
+def rowstack():
+    return RowStack(mock_read_csv())
 
 class Test_Rows:
     
@@ -125,12 +122,12 @@ class Test_Rows:
         # NOT TEST: fixture too complex, testing __pop_segment__() instead
         pass    
 
-    def test_pop_segment_and_remaining_rows_behaviour(self, rows):    
-        a = rows.__pop_segment__("bat", "dot")
+    def test_pop_segment_and_remaining_rows_behaviour(self, rowstack):    
+        a = rowstack.__pop_segment__("bat", "dot")
         assert len(a) == 2      
-        b = rows.__pop_segment__("apt", "wed")  
+        b = rowstack.__pop_segment__("apt", "wed")  
         assert len(b) == 2    
-        c = rows.remaining_rows()
+        c = rowstack.remaining_rows()
         assert c[0] == Row(['wed', '1', '2'])
         assert c[1] == Row(['zed'])
         

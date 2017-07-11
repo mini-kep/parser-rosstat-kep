@@ -1,6 +1,6 @@
 import pytest
 from kep.tables import Table, Tables, split_to_tables
-from kep.rows import Row, Rows
+from kep.rows import Row, RowStack
 
 from kep.cfg import Definition, Specification
 
@@ -30,7 +30,7 @@ def units():
     return {'млрд.рублей': 'bln_rub', 
             'в % к соответствующему периоду предыдущего года': 'yoy'}
 
-def mock_row_stream(_):
+def mock_row_stream():
     yield Row(['Объем ВВП', '', '',  '', ''])
     yield Row(['(уточненная оценка)'])
     yield Row(['млрд.рублей', '', '',  '', ''])
@@ -55,7 +55,7 @@ t1 = Table(headers=[Row(['Индекс промышленного произво
 class Test_split_to_tables():
     
     def setup_method(self):
-        self.rows = list(mock_row_stream(None))
+        self.rows = list(mock_row_stream())
         
     def test_split_to_tables(self):
         tables = list(split_to_tables(self.rows))        
@@ -63,12 +63,12 @@ class Test_split_to_tables():
         assert tables[0] == t0 
         assert tables[1] == t1
     
-def mock_Rows(_):
-    return Rows(None, mock_row_stream)
+def mock_RowStack():
+    return RowStack(mock_row_stream())
 
 @pytest.fixture
 def mock_Tables():
-   return Tables(csv_path=None, constructor=mock_Rows, spec=spec(), units=units())
+   return Tables(mock_RowStack(), spec=spec(), units=units())
 
 class Test_Tables:    
     
