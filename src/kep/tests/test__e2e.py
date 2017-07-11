@@ -3,22 +3,22 @@ from pathlib import Path
 import pytest
 from tempfile import NamedTemporaryFile
 
-import tables
-import vintage
-import files
-import splitter
+import kep.cfg as cfg
+import kep.rows as rows
+import kep.tables as tables
+import kep.vintage as vintage
+import kep.splitter as splitter
 
 # Testing dataflow with CSV-based fixtures and definitions
 
 
 @pytest.fixture
 def _pdef():
-    from cfg import Definition
     # WONTFIX: name MAIN is rather useless for Definition instance
-    pdef = Definition("MAIN")
+    pdef = cfg.Definition("MAIN")
     pdef.add_header("Объем ВВП", "GDP")
     # WONTFIX: not testing boundaries here
-    pdef.add_marker(None, None)
+    #pdef.add_marker(None, None)
     pdef.require("GDP", "bln_rub")
     pdef.add_header("Индекс промышленного производства", "IND_PROD")
     pdef.require("IND_PROD", "yoy")
@@ -28,8 +28,7 @@ def _pdef():
 @pytest.fixture
 def _units():
     # IDEA: may use explicit hardcoded constant with less units
-    from cfg import UNITS
-    return UNITS
+    return cfg.UNITS
 
 
 def tab(values):
@@ -139,12 +138,12 @@ def csv_path_header():
 
 
 @pytest.fixture
-def rows():
+def rows_fix():
     path = Path(mock_csv.path)
-    return list(tables.read_csv(path))
+    return list(rows.read_csv(path))
 
 
-def test_read_csv_returns_row_instances(rows):
+def test_read_csv_returns_row_instances(rows_fix):
     rows_dicts = [{'name': 'Объем ВВП',
                    'data': ['',
                             '',
@@ -185,9 +184,10 @@ def test_read_csv_returns_row_instances(rows):
                             '98,4',
                             '101,0',
                             '98,1']}]
-    assert len(rows) == len(rows_dicts)
-    for r, d in zip(rows, rows_dicts):
-        assert r.equals_dict(d) is True
+    assert len(rows_fix) == len(rows_dicts)
+    for r, d in zip(rows_fix, rows_dicts):
+        assert r.name == d['name']
+        assert r.data == d['data']
 
 # Row() list -> RowStack()
 # WONTFIX: not tested separately
@@ -199,8 +199,8 @@ def test_read_csv_returns_row_instances(rows):
 
 @pytest.fixture
 def tables_sample():
-    rows = tables.read_csv(csv_path())
-    return tables.extract_tables(rows, _pdef(), _units())
+    rows_sam = rows.read_csv(csv_path())
+    return tables.Tables.extract_tables(rows_sam, _pdef(), _units())
 
 
 @pytest.fixture
@@ -229,18 +229,14 @@ class Test_Table():
         assert table.label == 'GDP_bln_rub'
 
     def test_Table_repr(self, table):
-        assert table.__repr__() == 'Table GDP_bln_rub (headers: 3, datarows: 1)'
+        assert table.__repr__() == "Table(headers=[Row(['Объем ВВП', '', '', '', '']), Row(['(уточненная оценка)']), Row(['млрд.рублей', '', '', '', ''])], datarows=[Row(['1991 1)', '4823', '901', '1102', '1373', '1447'])])"
 
     def test_Table_str(self, table):
         print(table)
-        assert table.__str__() == """Table GDP_bln_rub
-columns: 5
-varname: GDP, unit: bln_rub
-headers:
+        assert table.__str__() == """Table GDP_bln_rub (5 columns)
 + <Объем ВВП>
 - <(уточненная оценка)>
 + <млрд.рублей>
-data:
 <1991 1) | 4823 901 1102 1373 1447>"""
 
 

@@ -46,6 +46,63 @@ UNIT_NAMES = {'bln_rub': 'млрд.руб.',
 assert set(UNIT_NAMES.keys()) == set(UNITS.values())
 
 
+# start and end lines
+def is_found(start, rows):
+    for r in rows:
+        if r.startswith(start):
+            return True
+    return False 
+
+class Scope():
+    """Start and end lines CSV file segment. 
+    
+       May hold and manupulate several versions of start and end line
+       applicable to different csv file versions.
+       Solves problem of different headers for same table at various dates.
+       
+        d.add_marker("1.9. Внешнеторговый оборот – всего",
+                     "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
+        d.add_marker("1.10. Внешнеторговый оборот – всего",
+                     "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")
+    """
+    
+    def __init__(self):        
+        self.markers = []
+   
+    def add_marker(self, start, end):        
+        if start and end:
+            self.markers.append(dict(start=start, end=end))
+        else:
+            raise ValueError("Cannot accept empty line for boundary in Scope().")        
+        
+    def __get_marker_index__(self, rows):
+        """Identify which pair of markers applies to *rows*."""
+        rows = [r for r in rows] # consume iterator
+        ix = None                   
+        for i, marker in enumerate(self.markers):
+            s = marker['start']
+            e = marker['end']            
+            if is_found(s, rows) and is_found(e, rows):
+               ix = i
+               break
+        return ix       
+
+    def get_boundaries(self, rows):
+        ix = self.__get_marker_index__(rows)
+        if ix is not None:
+            marker = self.markers[ix]
+            return marker['start'], marker['end']
+        else:
+            self.__notify_lines_not_found__(rows)
+
+    def __notify_lines_not_found__(self, rows):
+        print("ERROR: start or end line not found in *rows*")
+        for marker in self.markers:
+            s = marker['start']
+            e = marker['end']
+            print("   ", is_found(s, rows), "<{}>".format(s))
+            print("   ", is_found(e, rows), "<{}>".format(e))
+            
 class Definition():
     """Parsing defintion contains:
        - csv line boundaries
@@ -57,7 +114,7 @@ class Definition():
         # Definion name
         self.name = name
         self.headers = odict()
-        self.markers = []
+        self.scope = Scope()
         self.reader = None
         self.required = []
 
@@ -65,14 +122,9 @@ class Definition():
         # linking table header line ("Объем ВВП") to variable name ("GDP")
         self.headers.update(odict({text: varname}))
 
-    def add_marker(self, _start, _end, must_check=True):
+    def add_marker(self, start, end):
         # start and end lines CSV file segment  where defintion applies
-        if must_check:
-            if _start is None and _end is not None:
-                raise ValueError("Markers not supported")
-            if _start is not None and _end is None:
-                raise ValueError("Markers not supported")
-        self.markers.append(odict(start=_start, end=_end))
+        self.scope.add_marker(start, end)
 
     def add_reader(self, funcname):
         # reader function name, for some unusual tables
@@ -149,12 +201,11 @@ d.add_header("Объем ВВП", "GDP")
 d.add_header("Валовой внутренний продукт", "GDP")
 d.add_header("Индекс физического объема произведенного ВВП, в %", "GDP")
 d.add_header("Индекс промышленного производства", "IND_PROD")
-d.add_marker(None, None)
+#d.add_marker(None, None)
 d.require("GDP", "bln_rub")
 d.require("GDP", "yoy")
 d.require("IND_PROD", "yoy")
 d.require("IND_PROD", "rog")
-d.require("IND_PROD", "ytd")
 SPEC = Specification(d)
 
 
@@ -309,4 +360,10 @@ assert set(
 
 
 if __name__ == "__main__":
-    pass
+    sc = Scope()
+    sc.add_marker("1.9. Внешнеторговый оборот – всего",
+               "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
+    sc.add_marker("1.10. Внешнеторговый оборот – всего",
+                  "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")
+    sc.add_marker("1.10. Внешнеторговый оборот – всего",
+                  "1.10.1.Внешнеторговый оборот со странами дальнего зарубежья") 

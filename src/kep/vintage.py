@@ -15,8 +15,8 @@ import calendar
 
 import pandas as pd
 
-import tables
-import files
+import kep.tables as tables
+import kep.files as files
 
 
 # use'always' or 'ignore'
@@ -61,8 +61,7 @@ class DictMaker:
         return {**self.basedict, 'freq': 'q', 'value': to_float(val), 'qtr': q}
 
     def m_dict(self, val, m):
-        return {**self.basedict, 'freq': 'm', 'value': to_float(val),
-                'month': m}
+        return {**self.basedict, 'freq': 'm', 'value': to_float(val), 'month': m}
 
     def __str__(self):
         return self.basedict.__str__()
@@ -75,13 +74,13 @@ class Emitter:
        Table must have defined *label* and *splitter_func*."""
 
     def __init__(self, table):
-        if not table.label or not table.splitter_func:
-            table.echo_error_table_not_valid()
+        if not table.is_defined():
+            raise ValueError(table)
         self.a = []
         self.q = []
         self.m = []
         for row in table.datarows:
-            dmaker = DictMaker(tables.get_year(row.name), table.label)
+            dmaker = DictMaker(row.get_year(), table.label)
             a_value, q_values, m_values = table.splitter_func(row.data)
             if a_value:
                 self.a.append(dmaker.a_dict(a_value))
@@ -174,6 +173,7 @@ class Frames:
                 x['year']), axis=1)
         dfa = dfa.pivot(columns='label', values='value', index='time_index')
         dfa.insert(0, "year", dfa.index.year)
+        dfa.columns.name = None
         return dfa
 
     @staticmethod
@@ -185,6 +185,7 @@ class Frames:
         dfq = dfq.pivot(columns='label', values='value', index='time_index')
         dfq.insert(0, "year", dfq.index.year)
         dfq.insert(1, "qtr", dfq.index.quarter)
+        dfq.columns.name = None
         return dfq
 
     @staticmethod
@@ -196,6 +197,7 @@ class Frames:
         dfm = dfm.pivot(columns='label', values='value', index='time_index')
         dfm.insert(0, "year", dfm.index.year)
         dfm.insert(1, "month", dfm.index.month)
+        dfm.columns.name = None
         return dfm
 
     def save(self, folder_path):
@@ -243,6 +245,7 @@ class Vintage:
 
     def __repr__(self):
         # FIXME: use self.__class__ in other __repr__()'s
+        # FIXME: review __str__, and __repr__()
         return "{0!s}({1!r}, {2!r})".format(
             self.__class__, self.year, self.month)
 
@@ -255,7 +258,7 @@ class Vintage:
 
 
 class Collection:
-    """Methods to manipulate entire set of data releases"""
+    """Methods to manipulate entire set of data releases."""
 
     @staticmethod
     def save_all_dataframes_to_csv():
@@ -282,14 +285,12 @@ class Collection:
             vintage = Vintage(year, month)
             vintage.validate()
 
-# FIXME: review __str__, and __repr__()
-
 
 if __name__ == "__main__":
-    #Collection.approve_latest()
+    Collection.approve_latest()
     #Collection.save_latest()
     #Collection.approve_all()
-    Collection.save_all_dataframes_to_csv()
+    #Collection.save_all_dataframes_to_csv()
 
     year, month = 2017, 5
     vintage = Vintage(year, month)

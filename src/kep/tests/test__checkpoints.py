@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
-import vintage
+import kep.vintage as vintage
 
 # TESTING END TO END
 year, month = 2017, 4
@@ -50,10 +50,7 @@ def test_Datapoints_is_included_annual_1999_values_in_2017_4():
         assert dpoints.includes(x)
 
 
-dfa = frame.dfa['1999']
-# FIXME: move to get_dfs()
-dfa.columns.name = None
-dfa = dfa.transpose()
+dfa = frame.dfa['1999'].transpose()
 
 
 def test_dfa_in_2017_4():
@@ -81,10 +78,7 @@ RETAIL_SALES_bln_rub                        1797.4
 RETAIL_SALES_yoy                              94.2"""
 
 
-dfq = frame.dfq.loc["2017-03", ]
-# FIXME: move to get_dfs()
-dfq.columns.name = None
-dfq = dfq.transpose()
+dfq = frame.dfq.loc["2017-03", ].transpose()
 
 
 def test_dfq_in_2017_4():
@@ -117,10 +111,7 @@ RETAIL_SALES_rog                              82.8
 RETAIL_SALES_yoy                              98.2"""
 
 
-dfm = frame.dfm.loc["2017-01", ]
-# FIXME: move to get_dfs()
-dfm.columns.name = None
-dfm = dfm.transpose()
+dfm = frame.dfm.loc["2017-01", ].transpose()
 
 
 def test_dfm_in_2017_4():
@@ -140,7 +131,6 @@ GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub          41.5
 IMPORT_GOODS_TOTAL_bln_usd                    13.7
 IND_PROD_rog                                  76.2
 IND_PROD_yoy                                 102.3
-IND_PROD_ytd                                 102.3
 RETAIL_SALES_FOOD_bln_rub                   1073.8
 RETAIL_SALES_FOOD_rog                         75.2
 RETAIL_SALES_FOOD_yoy                         96.6

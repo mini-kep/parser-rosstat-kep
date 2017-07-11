@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
-import files
+from .. import files
 
 
 def test_InterimDataFolder():
