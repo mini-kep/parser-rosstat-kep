@@ -2,9 +2,8 @@
 
 #IDEA: make a check where monthly data is used to generate qtr and annual values
 
-import pandas as pd
-
-FREQUENCIES = "aqm" # or "aqmwd" for other datasets
+#FIXME: "aqmwd" for other datasets
+FREQUENCIES = "aqm" 
 
 def read_csv(source):
     """Canonical wrapper for pd.read_csv.
@@ -51,16 +50,14 @@ def update():
         df.to_csv(get_path(freq))
         
 def load():    
-    """Load CSv from local files.
-    """    
+    """Load CSv from local files."""    
     dfs = {}
     for freq in "aqm":
         dfs[freq] = read_csv(get_path(freq))
     return dfs    
     
 def get_dataframes():
-    """Get three dataframes from local csv files.
-    """
+    """Get three dataframes from local csv files"""
     try:
         dfs = load()
     except FileNotFoundError:
