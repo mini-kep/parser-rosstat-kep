@@ -18,7 +18,6 @@ import pandas as pd
 import kep.rows as rows
 import kep.tables as tables
 import kep.files as files
-import kep.cfg as cfg
 
 
 # use'always' or 'ignore'
@@ -215,8 +214,8 @@ class Frames:
 VALID_DATAPOINTS = [
     {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
     {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999},
-    {'freq': 'a', 'label': 'EXPORT_GOODS_TOTAL_bln_usd', 'value': 75.6, 'year': 1999},
-    {'freq': 'q', 'label': 'IMPORT_GOODS_TOTAL_bln_usd',
+    {'freq': 'a', 'label': 'EXPORT_GOODS_bln_usd', 'value': 75.6, 'year': 1999},
+    {'freq': 'q', 'label': 'IMPORT_GOODS_bln_usd',
         'qtr': 1, 'value': 9.1, 'year': 1999},
     {'freq': 'a', 'label': 'CPI_rog', 'value': 136.5, 'year': 1999},
     {'freq': 'm', 'label': 'CPI_rog', 'value': 108.4, 'year': 1999, 'month': 1}    
@@ -303,17 +302,17 @@ if __name__ == "__main__":
     #Collection.save_all_dataframes_to_csv()
 
     year, month = 2017, 5
-    vintage = Vintage(year, month)
-    dfa, dfq, dfm = vintage.dfs()
+    vint = Vintage(year, month)
+    dfa, dfq, dfm = vint.dfs()
     
     # some notebook work
-    iq = ["GDP_yoy", "IND_PROD_yoy", "INVESTMENT_yoy", "RETAIL_SALES_yoy", "WAGE_REAL_yoy"]
-    last_q = dfq[iq]['2017-03'].transpose()
-    im = [           "IND_PROD",                       "RETAIL_SALES",     "WAGE_REAL"]
-    im1 = ["{}_yoy".format(x) for x in im]
-    last_m1 = dfm[im1]['2017-05'].transpose()
-    im2 = ["{}_rog".format(x) for x in im]
-    last_m2 = dfm[im2]['2017-05'].transpose()
+#    iq = ["GDP_yoy", "IND_PROD_yoy", "INVESTMENT_yoy", "RETAIL_SALES_yoy", "WAGE_REAL_yoy"]
+#    last_q = dfq[iq]['2017-03'].transpose()
+#    im = [           "IND_PROD",                       "RETAIL_SALES",     "WAGE_REAL"]
+#    im1 = ["{}_yoy".format(x) for x in im]
+#    last_m1 = dfm[im1]['2017-05'].transpose()
+#    im2 = ["{}_rog".format(x) for x in im]
+#    last_m2 = dfm[im2]['2017-05'].transpose()
     #print(last_m1)
     #print(last_m2)
     
@@ -321,14 +320,14 @@ if __name__ == "__main__":
     # all_names = set(dfa.columns + dfq.columns + dfm.columns)
     
     #from kep.tables import extract_varname
-    print("Всего переменных: {}".format(len(list(cfg.SPEC.required()))))
-    for k, v in cfg.SECTIONS.items():        
-        print("\n**{}**:".format(k))
-        for vn in v:          
-            z = []
-            for x in cfg.SPEC.required():
-                if x[0] == vn:                    
-                    z.append(x[1])
-            print("- {}({})".format(vn, ", ".join(z)))
+#    print("Всего переменных: {}".format(len(list(cfg.SPEC.required()))))
+#    for k, v in cfg.SECTIONS.items():        
+#        print("\n**{}**:".format(k))
+#        for vn in v:          
+#            z = []
+#            for x in cfg.SPEC.required():
+#                if x[0] == vn:                    
+#                    z.append(x[1])
+#            print("- {}({})".format(vn, ", ".join(z)))
             
             

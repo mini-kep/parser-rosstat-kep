@@ -20,8 +20,8 @@ import warnings
 from kep import files
 from kep import splitter
 from kep.rows import CSV
-from kep.cfg import SPEC
-from kep.cfg import UNITS
+from kep.spec import SPEC
+from kep.spec import UNITS
 
 # use'always' or 'ignore'
 warnings.simplefilter('ignore', UserWarning)
@@ -67,26 +67,31 @@ from itertools import chain
 class Tables:
     """Extract tables from *csv_path* using *Rows(csv_path)*."""
 
-    def __init__(self, rows, spec=SPEC, units=UNITS):
+    def __init__(self, rowstack, spec=SPEC, units=UNITS):
+        self.rowstack = rowstack
         self.spec = spec 
         self.units = units
-        self.rows = rows
-        gen = chain(self.yield_tables_from_segments(),             
-                    self.yield_tables_from_main())
-        self.tables = list(gen)
+        self.required = [make_label(varname, unit) for varname, unit in spec.required()]
+       
     def yield_tables_from_segments(self):
         # use parsing definitions for segments first
-        for pdef in self.spec.segments:
-            csv_segment = self.rows.pop(pdef)
-            for t in self.extract_tables(csv_segment, pdef, self.units):
+        for scope in self.spec.scopes:
+            start, end = scope.get_bounds(self.rowstack.rows)
+            csv_segment = self.rowstack.pop(start, end)            
+            pdef = scope.definition
+            for t in self.extract_tables(csv_segment, pdef, units=self.units):
                 yield t
                 
     def yield_tables_from_main(self):
         # use default parsing definition on remaining rows
+        csv_segment = self.rowstack.remaining_rows()
         pdef = self.spec.main
-        csv_segment = self.rows.remaining_rows()
-        for t in self.extract_tables(csv_segment, pdef, self.units):
+        for t in self.extract_tables(csv_segment, pdef, units=self.units):
             yield t
+            
+    def yield_tables(self):        
+        return chain(self.yield_tables_from_segments(),             
+                     self.yield_tables_from_main())   
 
     @staticmethod 
     def extract_tables(csv_segment, pdef, units):
@@ -100,10 +105,12 @@ class Tables:
         check_required_labels(tables, pdef)
         return tables
 
+    def get(self):
+        gen = self.yield_tables()
+        return list(gen)
+    
     def get_required(self):
-        required_labels = [make_label(*req) for req in self.spec.required()]
-        return [t for t in self.tables 
-                if t.is_defined() and t.label in required_labels]
+        return [t for t in self.get() if t.label in self.required]
     
 
 # classes for split_to_tables()
@@ -161,8 +168,11 @@ class Table:
         self.splitter_func = None
 
     def parse(self, pdef, units):
-        self.set_label(varnames_dict=pdef.headers, units_dict=units)        
-        self.set_splitter(funcname=pdef.reader)
+        varnames_dict = pdef.headers
+        units_dict = units
+        funcname = pdef.reader
+        self.set_label(varnames_dict, units_dict)        
+        self.set_splitter(funcname)
         return self
     
     def set_label(self, varnames_dict, units_dict):

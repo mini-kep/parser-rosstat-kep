@@ -6,10 +6,9 @@
        - reader function name for unusual table formats (optional)"""
 
 from collections import OrderedDict as odict
+from collections import namedtuple
 
-class Units:
-    
-    glob = odict([# 1. MONEY
+UNITS = odict([# 1. MONEY
                ('млрд.долларов', 'bln_usd'),
                ('млрд. долларов', 'bln_usd'),
                ('млрд, долларов', 'bln_usd'),
@@ -17,10 +16,7 @@ class Units:
                ('млрд. рублей', 'bln_rub'),
                ('рублей / rubles', 'rub'),
                ('млн.рублей', 'mln_rub'),
-               # 2. OTHER UNITS
-               ('%', 'pct'),               
-               ('в % к ВВП', 'gdp_percent'),
-               # 3. RATES OF CHANGE
+               # 2. RATES OF CHANGE
                ("Индекс физического объема произведенного ВВП, в %", 'yoy'),
                ('в % к декабрю предыдущего года', 'ytd'),
                ('в % к предыдущему месяцу', 'rog'),
@@ -36,6 +32,9 @@ class Units:
                ('отчетный месяц в % к предыдущему месяцу', 'rog'),
                ('отчетный месяц в % к соответствующему месяцу предыдущего года', 'yoy'),
                ('период с начала отчетного года', 'ytd'),                              
+               # 3. OTHER UNITS (keep below RATES OF CHANGE)
+               ('%', 'pct'),               
+               ('в % к ВВП', 'gdp_percent'),               
                # 4. stub for CPI section
                ("продукты питания", 'rog'),
                ("алкогольные напитки", 'rog'),
@@ -44,7 +43,7 @@ class Units:
                ("услуги", 'rog')               
                ])
     
-    names = {'bln_rub': 'млрд.руб.',
+UNIT_NAMES = {'bln_rub': 'млрд.руб.',
               'bln_usd': 'млрд.долл.',
               'gdp_percent': '% ВВП',
               'mln_rub': 'млн.руб.',
@@ -54,58 +53,78 @@ class Units:
               'ytd': 'период с начала года',
               'pct': '%'}
     
-    # check: all units have a common short name
-    assert set(names.keys()) == set(glob.values())    
+# check: all units have a common short name
+assert set(UNIT_NAMES.keys()) == set(UNITS.values())    
 
-    @staticmethod 
-    def get_mapper_dict(required_units):
-        return odict([(k,v) for k,v in Units.glob.items() 
-                      if v in required_units])
+
+class Definition:
     
-    
-class Definition():
-    def __init__(self, text, varname, required_units, desc):
-        # declarations
-        self.headers = odict()
-        # initialisation
-        self.varname = varname        
-        self.add_header(text)
-        if isinstance(required_units, str):
-            required_units = [required_units]
-        self.units = Units.get_mapper_dict(required_units)           
-        self.desc = desc
+    def __init__(self, reader = None):
+        self.definitions = []
+        self.reader = reader
         
-    def add_header(self, text):
-        # linking parts of table header text ("Объем ВВП") to variable name ("GDP")
-        self.headers.update(odict({text: self.varname}))
-        return self
+    def append(self, text, varname, required_units, desc):
+        pdef = Indicator(text, varname, required_units, desc)
+        self.definitions.append(pdef)
     
-    def __required_units(self):
-       return list(set(self.units.values()))
-                   
-    @property 
+    @property    
+    def headers(self):
+        def _yield():
+            for pdef in self.definitions:
+                for k,v in pdef.headers.items():
+                    yield k, v                    
+        return odict(list( _yield()))
+    
+    @property  
     def required(self):
-        return [(self.varname, unit) for unit in self.__required_units()]
-            
-    def __repr__(self):
-        text = [x for x in d.headers.keys()][0]
-        ru = self.__required_units()
-        #FIXME: no additional defintions
-        return "Definition ('{}', '{}', {})".format(text, self.varname, ru)
-
-class Scope():
-    """Start and end lines for CSV file segment. 
+        def _yield():
+            for pdef in self.definitions:
+                for req in pdef.required:
+                    yield req
+        return list(_yield())    
     
-       Hold several versions of start and end line, return applicable line 
-       for a particular CSV file versions.
-       
-       Solves problem of different headers for same table at various releases.       
+    def varnames(self):
+        return [pdef.varname for pdef in self.definitions]         
+    
+    def __repr__(self):
+        vns = ", ".join(self.varnames())
+        return "<Definition for {}>".format(vns)    
+    
+class Indicator:
+    
+    def __init__(self, text, varname, required_units, desc):
+        self.varname = varname        
+        text = self.as_list(text)
+        self.headers = odict([(t, self.varname) for t in text])      
+        ru = self.as_list(required_units)
+        self.required = [(self.varname, unit) for unit in ru]
+        self.desc = desc                   
+           
+    def __repr__(self):
+        text = [x for x in d.headers.keys()]
+        ru = [x[1] for x in self.required]
+        return "Definition ('{}', {}, {}, '{}')".format(self.varname, text, 
+                                                        ru, self.desc)
+    @staticmethod
+    def as_list(x):
+       if isinstance(x, str):
+           return [x]
+       else:
+           return x    
+        
+class Scope():
+    """Start and end lines for CSV file segment and associated variables 
+       defintion.
+    
+       Holds several versions of start and end line, return applicable line 
+       for a particular CSV file versions. This solves problem of different 
+       headers for same table at various releases.       
     """
     
-    def __init__(self, start, end):        
+    def __init__(self, start, end, reader=None):        
         self.__markers = []
         self.add_bounds(start, end)
-        self.definitions = []        
+        self.definition = Definition(reader)
    
     def add_bounds(self, start, end):        
         if start and end:
@@ -113,13 +132,11 @@ class Scope():
         else:
             raise ValueError("Cannot accept empty line as Scope() boundary")
    
-    def append(self, text, varname, required_units, desc=""):
-        pdef = Definition(text, varname, required_units, desc)
-        self.definitions.append(pdef)
+    def append(self, text, varname, required_units, desc):
+        self.definition.append(text, varname, required_units, desc)
 
-    def __repr__(self):
-        vns = ", ".join([pdef.varname for pdef in self.definitions])
-        msg1 = "Scope for varibales <{}>".format(vns)
+    def __repr__(self):        
+        msg1 = repr(self.definition)
         s = self.__markers[0]['start'][:8]
         e = self.__markers[0]['end'][:8]
         msg2 = "bound by start <{}...>, end <{}...>".format(s, e)
@@ -156,52 +173,103 @@ class Scope():
             msg.append("is_found: {} <{}>".format(self.__is_found(s, rows), s))
             msg.append("is_found: {} <{}>".format(self.__is_found(e, rows), e))
         return "\n".join(msg)
-      
+
+
+class Specification:
+    """Specification holds a list of defintions in two variables:
+        
+       .main (default definition)
+       .additional (segment defintitions)
+    """
+
+    def __init__(self, pdef):
+        self.main = pdef
+        self.scopes = []
+        
+    def all_definitions(self):
+        return [self.main] + [sc.definition for sc in self.scopes]
+
+    def append(self, scope):
+        self.scopes.append(scope)
+
+    def varnames(self):
+        varnames = set()
+        for pdef in self.all_definitions():
+            for x in pdef.varnames():
+                varnames.add(x)
+        return sorted(list(varnames))
+
+    def validate(self, rows):
+        # TODO: validate specification - order of markers
+        # - ends are after starts
+        # - sorted end-starts follow each other
+        pass
+
+    def required(self):
+        for pdef in self.all_definitions():
+            for req in pdef.required:
+                yield req
+
+main = Definition()
+main.append(varname="GDP",
+            text=["Oбъем ВВП",
+                  "Индекс физического объема произведенного ВВП, в %",   
+                  "Валовой внутренний продукт"],
+            required_units=["bln_rub", "yoy"],                
+            desc="Валовый внутренний продукт")    
+main.append(varname="INDPRO",
+            text="Индекс промышленного производства",
+            required_units=["yoy", "rog"],
+            desc="Индекс промышленного производства") 
+    
+SPEC = Specification(main)
+
+seg = Scope("1.9. Внешнеторговый оборот – всего",
+           "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
+seg.add_bounds("1.10. Внешнеторговый оборот – всего",
+              "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")    
+seg.append(text="экспорт товаров – всего", 
+          varname="EXPORT_GOODS", 
+          required_units="bln_usd",                
+          desc="Экспорт товаров")
+seg.append(text="импорт товаров – всего", 
+          varname="IMPORT_GOODS", 
+          required_units="bln_usd",                
+          desc="Импорт товаров")   
+SPEC.append(seg)    
+
         
 if __name__ == "__main__": 
-    
-    main=[]
-    d = Definition(text="Oбъем ВВП", 
-                   varname="GDP", 
-                   required_units=["bln_rub", "yoy"],                
-                   desc="Валовый внутренний продукт")    
-    d.add_header("Индекс физического объема произведенного ВВП, в %")
-    # test code     
-    assert d.required == [('GDP', 'bln_rub'), ('GDP', 'yoy')]
+    # test code  
+    d = Indicator(varname="GDP", 
+                  text=["Oбъем ВВП", 
+                        "Индекс физического объема произведенного ВВП, в %"],
+                  required_units=["bln_rub", "yoy"],                
+                  desc="Валовый внутренний продукт")   
+    assert repr(d)
+    assert d.varname =="GDP"
     assert d.headers == odict([('Oбъем ВВП', 'GDP'),                                            
              ('Индекс физического объема произведенного ВВП, в %', 'GDP')])
-    assert 'bln_rub' in d.units.values()
-    assert 'yoy' in d.units.values()
-    # end-test-code 
-    main.append(d)
+    assert d.required == [('GDP', 'bln_rub'), ('GDP', 'yoy')]
+    # end
     
-    segments = []
-    sc = Scope("1.9. Внешнеторговый оборот – всего",
-               "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
-    sc.add_bounds("1.10. Внешнеторговый оборот – всего",
-                  "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")    
-    sc.append(text="экспорт товаров – всего", 
-              varname="EXPORT_GOODS", 
-              required_units="bln_usd",                
-              desc="Экспорт товаров")
-    sc.append(text="импорт товаров – всего", 
-              varname="IMPORT_GOODS", 
-              required_units="bln_usd",                
-              desc="Импорт товаров")   
-    segments.append(sc)    
+
+    # test code
+    assert repr(main)
+    assert isinstance(main.headers, odict)
+    # end
+    
 
     # test code 
     sc = Scope("Header 1", "Header 2")    
     ah = "A bit rotten Header #1", "Curved Header 2."
     sc.add_bounds(*ah)
-    d1 = dict(text="экспорт товаров – всего", 
-              varname="EXPORT_GOODS", 
-              required_units="bln_usd",                
+    sc.append(text="экспорт товаров", 
+              varname="EX", 
+              required_units="bln_usd",              
               desc="Экспорт товаров")
-    sc.append(**d1)    
     assert repr(sc)
-    assert isinstance(sc.definitions, list)
-    assert isinstance(sc.definitions[0], Definition)
+    assert isinstance(sc.definition, Definition)
     
     row_mock1 = ["A bit rotten Header #1",
      "more lines here", 
@@ -210,13 +278,19 @@ if __name__ == "__main__":
      "Curved Header 2."]
     s, e = sc.get_bounds(row_mock1)
     assert s, e == ah     
-    # end-test-code    
+    # end
      
 
-    SPEC = dict(main=main, segments=segments)
     
     # test_code
-    assert isinstance(SPEC, dict)    
+    assert isinstance(SPEC, Specification) 
+    assert isinstance(SPEC.main, Definition)
+    assert SPEC.main.headers
+    assert SPEC.main.required
+    assert SPEC.main.reader is None
+    for scope in SPEC.scopes:
+        assert isinstance(scope.definition, Definition)
+    # end
     
     
     # TODO:
