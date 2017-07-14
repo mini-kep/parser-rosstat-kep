@@ -2,11 +2,11 @@ TODOs
 =====
 ### Make new branch/PRs: 
 - [ ] Go over **test_rows.py** and make any suggestions about its enhancement (via comments like ```#FIXME EP: must also test .len() method```).
-- [ ] Fix <src/kep/tests/test\_\_checkpoints.py ...FFF> by supplying new hardcoded constants
 
 ###  Todos in spec.py
 
 ###  More planning:
+- [ ] Fix <src/kep/tests/test\_\_checkpoints.py ...FFF> by supplying new hardcoded constants
 - [ ] split vintage.py into emitter and wrapper
 - [ ] pick from [issues related to testing](https://github.com/epogrebnyak/mini-kep/issues?q=is%3Aissue+is%3Aopen+label%3Atesting), approve a plan to fix them +  see below in testing status
 
