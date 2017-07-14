@@ -4,25 +4,9 @@ TODOs
 - [ ] Go over **test_rows.py** and make any suggestions about its enhancement (via comments like ```#FIXME EP: must also test .len() method```).
 - [ ] Fix <src/kep/tests/test\_\_checkpoints.py ...FFF> by supplying new hardcoded constants
 
+###  Todos in spec.py
+
 ###  More planning:
-- [ ] change cfg.py to avoid singletons
-```python 
-d = Definition(text="Oбъем ВВП", 
-               varname="GDP", 
-               require="bln_rub", 
-               units={"млрд.руб.":"bln_rub"}, 
-               desc="Валовый внутренний продукт")
-#d.add_header()
-scope0 = CSV_Full()
-scope0.append(d)
-
-d = Definition("экспорт товаров", "EX")
-scope1 = CSV_Segment("EXIM", "Start of segment", "End of segment")
-scope1.append(d)
-
-SPEC = dictmainscope0, scope1 
-```
-
 - [ ] split vintage.py into emitter and wrapper
 - [ ] pick from [issues related to testing](https://github.com/epogrebnyak/mini-kep/issues?q=is%3Aissue+is%3Aopen+label%3Atesting), approve a plan to fix them +  see below in testing status
 
