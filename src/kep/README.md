@@ -1,10 +1,10 @@
 TODOs
 =====
-Make new branch/PRs: 
+### Make new branch/PRs: 
 - [ ] Go over **test_rows.py** and make any suggestions about its enhancement (via comments like ```#FIXME EP: must also test .len() method```).
 - [ ] Fix <src/kep/tests/test\_\_checkpoints.py ...FFF> by supplying new hardcoded constants
 
-More planning:
+###  More planning:
 - [ ] change cfg.py to avoid singletons
 ```python 
 d = Definition(text="Oбъем ВВП", 
