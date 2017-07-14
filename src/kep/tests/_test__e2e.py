@@ -3,7 +3,7 @@ from pathlib import Path
 import pytest
 from tempfile import NamedTemporaryFile
 
-import kep.cfg as cfg
+import kep.spec as spec
 import kep.rows as rows
 import kep.tables as tables
 import kep.vintage as vintage

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-import kep.cfg as cfg
+import kep.spec as spec
 import kep.tables as tables
 
 #FIXME

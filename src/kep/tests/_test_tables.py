@@ -2,7 +2,7 @@ import pytest
 from kep.tables import Table, Tables, split_to_tables
 from kep.rows import Row, RowStack
 
-from kep.cfg import Definition, Specification
+from kep.spec import Definition, Specification
 
 
 rows = [Row(['Индекс промышленного производства']),
