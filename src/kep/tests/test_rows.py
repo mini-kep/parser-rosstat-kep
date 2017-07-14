@@ -123,9 +123,9 @@ class Test_Rows:
         pass    
 
     def test_pop_segment_and_remaining_rows_behaviour(self, rowstack):    
-        a = rowstack.__pop_segment__("bat", "dot")
+        a = rowstack.pop("bat", "dot")
         assert len(a) == 2      
-        b = rowstack.__pop_segment__("apt", "wed")  
+        b = rowstack.pop("apt", "wed")  
         assert len(b) == 2    
         c = rowstack.remaining_rows()
         assert c[0] == Row(['wed', '1', '2'])
