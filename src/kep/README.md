@@ -1,3 +1,32 @@
+TODOs
+=====
+Make new branch/PRs: 
+- [ ] Go over **test_rows.py** and make any suggestions about its enhancement (via comments like ```#FIXME EP: must also test .len() method```).
+- [ ] Fix <src/kep/tests/test\_\_checkpoints.py ...FFF> by supplying new hardcoded constants
+
+More planning:
+- [ ] change cfg.py to avoid singletons
+```python 
+d = Definition(text="Oбъем ВВП", 
+               varname="GDP", 
+               require="bln_rub", 
+               units={"млрд.руб.":"bln_rub"}, 
+               desc="Валовый внутренний продукт")
+#d.add_header()
+scope0 = CSV_Full()
+scope0.append(d)
+
+d = Definition("экспорт товаров", "EX")
+scope1 = CSV_Segment("EXIM", "Start of segment", "End of segment")
+scope1.append(d)
+
+SPEC = dictmainscope0, scope1 
+```
+
+- [ ] split vintage.py into emitter and wrapper
+- [ ] pick from [issues related to testing](https://github.com/epogrebnyak/mini-kep/issues?q=is%3Aissue+is%3Aopen+label%3Atesting), approve a plan to fix them +  see below in testing status
+
+
 File roles
 ==========
 
@@ -23,7 +52,7 @@ Run \_\_main\_\_ part in following scripts and look at some output:
 Testing status
 ==============
 1. Well tested file is *rows.py* - small clear fixtures, quick tests, can add a bit more coverage
-2. Large end-to-end test is *test__checkpoints.py* - makes sure some control values were read
+2. Large end-to-end test is *test__checkpoints.py** - makes sure some control values were read
 3. Most tests in between not so good:
  - fixtures grow big, "chained" and less understandable
  - things not tested in isolation 
@@ -31,13 +60,6 @@ Testing status
  - test naming
  - not testing bad egde cases, etc.
  
-TODOs
-=====
-Make new branch/PR for following:
-1. Go over **test_rows.py** and make any suggestions about its enhancement (via comments like ```#FIXME EP: must also test .len() method```).
-2. Fix <src/kep/tests/test__checkpoints.py ...FFF> by supplying new hardcoded constants
-3. Pick some things to fix from  [issues related to testing](https://github.com/epogrebnyak/mini-kep/issues?q=is%3Aissue+is%3Aopen+label%3Atesting),
-   approve a plan to fix them, make a fix, refer issue in commits/PR. 
- 
+
  
  
