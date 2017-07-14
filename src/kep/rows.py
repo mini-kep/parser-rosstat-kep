@@ -2,7 +2,7 @@
                                                           
 import csv
 import re
-import kep.cfg as cfg
+import kep.spec as spec
 
 ENC = 'utf-8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
@@ -33,10 +33,9 @@ def read_csv(path):
     return map(Row, no_comments)
 
 
-class CSV:
-    def __init__(self, path):
-        self.rows = read_csv(path)
-        self.rowstack = RowStack(self.rows)     
+def get_rowstack(path):
+    rows = read_csv(path)
+    return RowStack(rows)
 
 
 class Row:
@@ -76,7 +75,7 @@ class Row:
                 varnames.append(varnames_mapper_dict[k])
         return self.__single_value__(varnames)
     
-    def get_unit(self, units_mapper_dict = cfg.UNITS):
+    def get_unit(self, units_mapper_dict = spec.UNITS):
         for k in units_mapper_dict.keys():
             if k in self.name:
                 return units_mapper_dict[k]
@@ -106,6 +105,7 @@ class Row:
 
     def __repr__(self):
         return "Row({})".format([self.name] + self.data)
+
 
 YEAR_CATCHER = re.compile('(\d{4}).*')
 
@@ -138,12 +138,7 @@ class RowStack:
     def remaining_rows(self):
         return self.rows
 
-    def pop(self, pdef):
-        # walks by different versions of start/end lines 
-        start, end = pdef.scope.get_boundaries(self.rows)
-        return self.__pop_segment__(start, end)
-
-    def __pop_segment__(self, start, end):
+    def pop(self, start, end):
         """Pops elements of self.rows between [start, end).
            Recognises element occurrences by index *i*.
            Modifies *self.rows*.
@@ -165,6 +160,7 @@ class RowStack:
                 i += 1
         return segment    
     
+    
 if __name__ == "__main__":
     assert Row(["1. abcd"]).get_varname({'1. ab':"ZZZ"}) == 'ZZZ'
     assert Row(["1. abcd"]).get_varname({'bc':"ZZZ"}) is False
@@ -183,9 +179,9 @@ if __name__ == "__main__":
         yield Row(["zed"])
     
     rows = RowStack(mock_read_csv())
-    a = rows.__pop_segment__("bat", "dot")
+    a = rows.pop("bat", "dot")
     assert len(a) == 2      
-    b = rows.__pop_segment__("apt", "wed")  
+    b = rows.pop("apt", "wed")  
     assert len(b) == 2    
     c = rows.remaining_rows()
     assert c[0] == Row(['wed', '1', '2'])

@@ -233,7 +233,7 @@ class Vintage:
         # find csv
         self.csv_path = files.locate_csv(year, month)
         # rowstack 
-        self.rowstack = rows.CSV(self.csv_path).rowstack
+        self.rowstack = rows.get_rowstack(self.csv_path)
         # break csv to tables with variable names
         self.tables = tables.Tables(self.rowstack).get_required()
         # convert stream values to pandas dataframes
@@ -261,8 +261,8 @@ class Vintage:
     def validate(self, valid_datapoints=VALID_DATAPOINTS):
         for x in valid_datapoints:
             if x not in self.frames.datapoints:
-                raise ValueError("Not found in dataset: {}".format(x) +
-                                 "File: {}".format(self.csv_path))
+                msg = "Not found in dataset: {}\nFile: {}".format(x, self.csv_path)
+                raise ValueError(msg)
         print("Test values parsed OK for", self)
 
 

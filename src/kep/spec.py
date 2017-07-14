@@ -6,7 +6,7 @@
        - reader function name for unusual table formats (optional)"""
 
 from collections import OrderedDict as odict
-from collections import namedtuple
+
 
 UNITS = odict([# 1. MONEY
                ('млрд.долларов', 'bln_usd'),
@@ -237,6 +237,32 @@ seg.append(text="импорт товаров – всего",
           required_units="bln_usd",                
           desc="Импорт товаров")   
 SPEC.append(seg)    
+
+
+seg = Scope(start="3.5. Индекс потребительских цен",
+              end="4. Социальная сфера")
+seg.append(text="Индекс потребительских цен", 
+           varname="CPI", 
+           required_units="rog",                
+           desc="Индекс потребительских цен (ИПЦ)")
+seg.append(text=["непродовольственные товары", 
+                 "непродовольст- венные товары"],
+           varname="CPI_NONFOOD", 
+           required_units="rog",                
+           desc="ИПЦ (непродтовары)")
+seg.append(text="продукты питания", 
+           varname="CPI_FOOD", 
+           required_units="rog",                
+           desc="ИПЦ (продтовары)")
+seg.append(text="алкогольные напитки", 
+           varname="CPI_ALC", 
+           required_units="rog",                
+           desc="ИПЦ (алкоголь)")
+seg.append(text="услуги", 
+           varname="CPI_SERVICES", 
+           required_units="rog",                
+           desc="ИПЦ (услуги)")
+SPEC.append(seg)
 
         
 if __name__ == "__main__": 

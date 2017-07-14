@@ -19,7 +19,7 @@ import warnings
 
 from kep import files
 from kep import splitter
-from kep.rows import CSV
+from kep.rows import get_rowstack
 from kep.spec import SPEC
 from kep.spec import UNITS
 
@@ -231,7 +231,7 @@ class Table:
 
 if __name__ == "__main__":    
     csv_path = files.locate_csv()
-    rowstack = CSV(csv_path).rowstack 
+    rowstack = get_rowstack(csv_path) 
     tables = Tables(rowstack).get_required()
     for t in tables:
         print()
