@@ -1,5 +1,5 @@
 """Read CSV file and represent it as a stream/list of Rows() instances."""
-                                                          
+
 import csv
 import re
 import kep.spec as spec
@@ -8,6 +8,8 @@ ENC = 'utf-8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
 # csv file access
+
+
 def to_csv(rows, path):
     """Accept iterable of rows *rows* and write in to *csv_path*"""
     with path.open('w', encoding=ENC) as csvfile:
@@ -56,46 +58,46 @@ class Row:
         r = self.name.replace('"', '')
         text = text.replace('"', '')
         return r.startswith(text)
-    
+
     # FIXME: identical to startswith?
     def matches(self, pat):
         rx = r"\b{}".format(pat)
         if re.search(rx, self.name):
             return True
         else:
-            return False   
+            return False
 
     def get_year(self):
-        return get_year(self.name)      
-        
+        return get_year(self.name)
+
     def get_varname(self, varnames_mapper_dict):
         varnames = []
         for k in varnames_mapper_dict.keys():
             if self.matches(k):
                 varnames.append(varnames_mapper_dict[k])
         return self.__single_value__(varnames)
-    
-    def get_unit(self, units_mapper_dict = spec.UNITS):
+
+    def get_unit(self, units_mapper_dict=spec.UNITS):
         for k in units_mapper_dict.keys():
             if k in self.name:
                 return units_mapper_dict[k]
-        return False    
-    
+        return False
+
     def __single_value__(self, values):
         """Return first element in *values* or raise ValueError.
-           Returns False if *values* is empty. Uses *self.name*.           
+           Returns False if *values* is empty. Uses *self.name*.
         """
-        if len(values)>1:
-            msg = "Multiple entries found in <{}>: {}".format(self.name, values)
+        if len(values) > 1:
+            msg = "Multiple entries found in <{}>: {}".format(
+                self.name, values)
             raise ValueError(msg)
-        elif len(values)==1:
+        elif len(values) == 1:
             return values[0]
         else:
             return False
 
     def __eq__(self, x):
-       return bool(self.name == x.name and self.data == x.data)           
-              
+        return bool(self.name == x.name and self.data == x.data)
 
     def __str__(self):
         if "".join(self.data):
@@ -126,14 +128,14 @@ def is_year(string: str) -> bool:
 
 
 class RowStack:
-    """Holder for CSV rows. Allows extracting segments of CSV file and 
+    """Holder for CSV rows. Allows extracting segments of CSV file and
        remaining part of CSV file, after all segments are extracted.
-       
+
        Operates on list of Row() instances."""
 
     def __init__(self, rows):
         # consume *rows*, likely it is a generator
-        self.rows = [r for r in rows]     
+        self.rows = [r for r in rows]
 
     def remaining_rows(self):
         return self.rows
@@ -158,18 +160,17 @@ class RowStack:
             else:
                 # else is very important, wrong indexing without it
                 i += 1
-        return segment    
-    
-    
-if __name__ == "__main__":
-    assert Row(["1. abcd"]).get_varname({'1. ab':"ZZZ"}) == 'ZZZ'
-    assert Row(["1. abcd"]).get_varname({'bc':"ZZZ"}) is False
-    import pytest       
-    with pytest.raises(ValueError):
-         assert Row(["1. abcd"]).get_varname({'1. ab':"ZZZ", '1. abcd':"YYY"}) 
-    assert Row(["1. abcd, %"]).get_unit({'%':"pct"}) == 'pct'     
+        return segment
 
-     
+
+if __name__ == "__main__":
+    assert Row(["1. abcd"]).get_varname({'1. ab': "ZZZ"}) == 'ZZZ'
+    assert Row(["1. abcd"]).get_varname({'bc': "ZZZ"}) is False
+    import pytest
+    with pytest.raises(ValueError):
+        assert Row(["1. abcd"]).get_varname({'1. ab': "ZZZ", '1. abcd': "YYY"})
+    assert Row(["1. abcd, %"]).get_unit({'%': "pct"}) == 'pct'
+
     def mock_read_csv():
         yield Row(["apt", "1", "2"])
         yield Row(["bat aa...ah", "1", "2"])
@@ -177,13 +178,12 @@ if __name__ == "__main__":
         yield Row(["dot oo...eh", "1", "2"])
         yield Row(["wed", "1", "2"])
         yield Row(["zed"])
-    
+
     rows = RowStack(mock_read_csv())
     a = rows.pop("bat", "dot")
-    assert len(a) == 2      
-    b = rows.pop("apt", "wed")  
-    assert len(b) == 2    
+    assert len(a) == 2
+    b = rows.pop("apt", "wed")
+    assert len(b) == 2
     c = rows.remaining_rows()
     assert c[0] == Row(['wed', '1', '2'])
     assert c[1] == Row(['zed'])
-         

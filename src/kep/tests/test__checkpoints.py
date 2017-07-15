@@ -31,8 +31,10 @@ def test_end_to_end_latest_month():
 
 def test_Datapoints_is_included_annual_1999_values_in_2017_4():
     test_datapoints = [{'freq': 'm', 'label': 'EXPORT_GOODS_bln_usd', 'month': 1, 'value': 4.5, 'year': 1999},
-                       {'freq': 'a', 'label': 'EXPORT_GOODS_bln_usd', 'value': 75.6, 'year': 1999},
-                       {'freq': 'a', 'label': 'IMPORT_GOODS_bln_usd', 'value': 39.5, 'year': 1999},
+                       {'freq': 'a', 'label': 'EXPORT_GOODS_bln_usd',
+                           'value': 75.6, 'year': 1999},
+                       {'freq': 'a', 'label': 'IMPORT_GOODS_bln_usd',
+                           'value': 39.5, 'year': 1999},
                        #{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub', 'value': 1213.6, 'year': 1999},
                        #{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_FEDERAL_bln_rub', 'value': 615.5, 'year': 1999},
                        #{'freq': 'a', 'label': 'GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub', 'value': 660.8, 'year': 1999},
@@ -44,7 +46,8 @@ def test_Datapoints_is_included_annual_1999_values_in_2017_4():
                        #{'freq': 'a', 'label': 'RETAIL_SALES_bln_rub', 'value': 1797.4, 'year': 1999},
                        #{'freq': 'a', 'label': 'RETAIL_SALES_FOOD_bln_rub', 'value': 866.1, 'year': 1999},
                        #{'freq': 'a', 'label': 'RETAIL_SALES_NONFOOD_bln_rub', 'value': 931.3, 'year': 1999},
-                       {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
+                       {'freq': 'a', 'label': 'GDP_bln_rub',
+                           'value': 4823.0, 'year': 1999},
                        {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999}]
     for x in test_datapoints:
         assert dpoints.includes(x)

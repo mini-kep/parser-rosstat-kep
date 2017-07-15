@@ -10,7 +10,7 @@
 from collections import OrderedDict as odict
 import itertools
 
-# TODO: maybe units should not be a global, but rather a part of pdef 
+# TODO: maybe units should not be a global, but rather a part of pdef
 # units of measurement
 UNITS = odict([('млрд.долларов', 'bln_usd'),
                ('млрд. долларов', 'bln_usd'),
@@ -18,7 +18,7 @@ UNITS = odict([('млрд.долларов', 'bln_usd'),
                ('млрд.рублей', 'bln_rub'),
                ('млрд. рублей', 'bln_rub'),
                ('рублей / rubles', 'rub'),
-               
+
                ("Индекс физического объема произведенного ВВП, в %", 'yoy'),
                ('в % к ВВП', 'gdp_percent'),
                ('в % к декабрю предыдущего года', 'ytd'),
@@ -36,14 +36,14 @@ UNITS = odict([('млрд.долларов', 'bln_usd'),
                ('отчетный месяц в % к предыдущему месяцу', 'rog'),
                ('отчетный месяц в % к соответствующему месяцу предыдущего года', 'yoy'),
                ('период с начала отчетного года', 'ytd'),
-               ('%', 'pct'),               
-               
+               ('%', 'pct'),
+
                # -- stub for CPI section---
                ("продукты питания", 'rog'),
                ("алкогольные напитки", 'rog'),
                ("непродовольственные товары", 'rog'),
                ("непродовольст- венные товары", 'rog'),
-               ("услуги", 'rog')               
+               ("услуги", 'rog')
                ])
 
 UNIT_NAMES = {'bln_rub': 'млрд.руб.',
@@ -62,55 +62,56 @@ assert set(UNIT_NAMES.keys()) == set(UNITS.values())
 
 # start and end lines
 def is_found(line, rows):
-    """Return True, is *line* found at start of any entry in *rows*""" 
+    """Return True, is *line* found at start of any entry in *rows*"""
     for r in rows:
         if r.startswith(line):
             return True
-    return False 
+    return False
+
 
 class Scope():
-    """Start and end lines CSV file segment. 
-    
+    """Start and end lines CSV file segment.
+
        May hold and manupulate several versions of start and end line,
        applicable to different csv file versions.
-       
-       Solves problem of different headers for same table at various 
+
+       Solves problem of different headers for same table at various
        data releases.
-       
+
        Will use methods like:
        .add_marker("1.9. Внешнеторговый оборот – всего",
                 "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
        .add_marker("1.10. Внешнеторговый оборот – всего",
                 "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")
     """
-    
-    def __init__(self):        
+
+    def __init__(self):
         self.markers = []
-   
-    def add_marker(self, start, end):        
+
+    def add_marker(self, start, end):
         if start and end:
             self.markers.append(dict(start=start, end=end))
         else:
             raise ValueError("Cannot accept empty line for Scope() boundary")
-            
+
     def get_boundaries(self, rows):
         ix = self.__get_marker_index__(rows)
         if ix is not None:
             marker = self.markers[ix]
             return marker['start'], marker['end']
         else:
-            msg = self.__error_message__(rows)  
+            msg = self.__error_message__(rows)
             raise ValueError(msg)
-   
+
     def __get_marker_index__(self, rows):
         """Identify which pair of markers applies to *rows*."""
-        rows = [r for r in rows] # consume iterator
+        rows = [r for r in rows]  # consume iterator
         for i, marker in enumerate(self.markers):
             s = marker['start']
-            e = marker['end']            
+            e = marker['end']
             if is_found(s, rows) and is_found(e, rows):
-               return i
-        return None        
+                return i
+        return None
 
     def __error_message__(self, rows):
         msg = []
@@ -121,7 +122,8 @@ class Scope():
             msg.append("   {} <{}>".format(is_found(s, rows), s))
             msg.append("   {} <{}>".format(is_found(e, rows), e))
         return "\n".join(msg)
-            
+
+
 class Definition():
     """Parsing defintion contains:
        - text to match with variable name
@@ -143,13 +145,13 @@ class Definition():
         # linking table header line ("Объем ВВП") to variable name ("GDP")
         self.headers.update(odict({text: varname}))
         if ref:
-            self.add_desc(text, varname)   
-            
-    def add_desc(self, text, varname): 
-        self.reference_names.update({varname:text})          
+            self.add_desc(text, varname)
+
+    def add_desc(self, text, varname):
+        self.reference_names.update({varname: text})
 
     def require(self, varname, unit):
-        # require occurrence of varibale lable defined by varibale name and 
+        # require occurrence of varibale lable defined by varibale name and
         # unit of measurement eg 'GDP', 'rog'
         # only required variables will be imported to final dataset
         self.required.append((varname, unit))
@@ -163,7 +165,7 @@ class Definition():
         self.reader = funcname
 
     def __str__(self):
-        return  "{}({})".format(self.name, len(self.required))
+        return "{}({})".format(self.name, len(self.required))
 
     def __repr__(self):
         return self.__str__()
@@ -171,20 +173,20 @@ class Definition():
     def varnames(self):
         gen = list(self.headers.values())
         return list(set(gen))
-    
+
 
 class Specification:
     """Specification holds a list of defintions in two variables:
-        
+
        .main (default definition)
        .additional (segment defintitions)
-       
+
     """
 
     def __init__(self, pdef_main):
         self.main = pdef_main
         self.segments = []
-        
+
     def all_definitions(self):
         return [self.main] + self.segments
 
@@ -218,7 +220,8 @@ class Specification:
     def __str__(self):
         cnt1 = self.count_vars()
         cnt2 = self.count_defs()
-        pat = "{} required variables in {} parsing definitions".format(cnt1, cnt2)
+        pat = "{} required variables in {} parsing definitions".format(
+            cnt1, cnt2)
         listing1 = ", ".join([str(d) for d in self.segments])
         segs = "Segment definitions: {}".format(listing1)
         main = "Main definition: {}".format(self.main)
@@ -226,12 +229,13 @@ class Specification:
 
     def __repr__(self):
         return "{}({})".format(self.__class__, self.__str__())
-    
+
     def reference_names(self):
         d = {}
         for pdef in self.all_definitions():
             d = {**d, **pdef.reference_names}
-        return d 
+        return d
+
 
 d = Definition("MAIN")
 d.add_header("Валовой внутренний продукт", "GDP", True)
@@ -246,8 +250,9 @@ d.require("IND_PROD", "rog")
 #d.add_header("Уровень безработицы в возрасте 15-72 лет", "UNEMPL")
 d.add_header("Уровень безработицы", "UNEMPL", True)
 d.require("UNEMPL", "pct")
-d.add_header("Среднемесячная номинальная начисленная заработная плата работников организаций", 
-             "WAGE_NOMINAL")
+d.add_header(
+    "Среднемесячная номинальная начисленная заработная плата работников организаций",
+    "WAGE_NOMINAL")
 d.add_desc("Среднемесячная заработная плата", "WAGE_NOMINAL")
 d.require("WAGE_NOMINAL", "rub")
 d.add_header("Реальная начисленная заработная плата работников организаций",
@@ -262,10 +267,11 @@ d.require("WAGE_REAL", "yoy")
 SPEC = Specification(d)
 
 
-# Коммерческий грузооборот транспорта, млрд. тонно-км / Commercial freight turnover, bln ton-km	
+# Коммерческий грузооборот транспорта, млрд. тонно-км / Commercial freight
+# turnover, bln ton-km
 d = Definition("INVEST")
 d.add_marker("1.6. Инвестиции в основной капитал",
-             "1.6.1. Инвестиции в основной капитал организаций")             
+             "1.6.1. Инвестиции в основной капитал организаций")
 d.add_marker("1.7. Инвестиции в основной капитал",
              "1.7.1. Инвестиции в основной капитал организаций")
 d.add_header("Инвестиции в основной капитал", "INVESTMENT", True)
@@ -417,28 +423,28 @@ assert not_in_b == set()
 
 # frontend variable grouping
 M_SECTIONS = odict([
-    ("Производство",       ["IND_PROD_rog", "IND_PROD_yoy"]),
-    ("Внешняя торговля",   ["EXPORT_GOODS_TOTAL_bln_usd", "IMPORT_GOODS_TOTAL_bln_usd"]),
+    ("Производство", ["IND_PROD_rog", "IND_PROD_yoy"]),
+    ("Внешняя торговля", ["EXPORT_GOODS_TOTAL_bln_usd", "IMPORT_GOODS_TOTAL_bln_usd"]),
     ("Розничная торговля", ["RETAIL_SALES_yoy", "RETAIL_SALES_FOOD_yoy", "RETAIL_SALES_NONFOODS_yoy"]),
-    ("Социальная сфера",   ["UNEMPL"])
+    ("Социальная сфера", ["UNEMPL"])
 ])
 
 
 SECTIONS = odict([
     ("ВВП и производство", ["GDP", "IND_PROD"]),
-    ("Инвестиции",         ["INVESTMENT"]),
-    ("Внешняя торговля",   ["EXPORT_GOODS_TOTAL", "IMPORT_GOODS_TOTAL"]),
+    ("Инвестиции", ["INVESTMENT"]),
+    ("Внешняя торговля", ["EXPORT_GOODS_TOTAL", "IMPORT_GOODS_TOTAL"]),
     ("Розничная торговля", ["RETAIL_SALES", "RETAIL_SALES_FOOD", "RETAIL_SALES_NONFOODS"]),
-    ("Цены",               ["CPI", "CPI_FOOD", "CPI_NONFOOD", "CPI_ALCOHOL", "CPI_SERVICES"]),
-    ("Население",          ["UNEMPL", 'WAGE_REAL', 'WAGE_NOMINAL']),
-    ("Бюджет",             ['GOV_EXPENSE_ACCUM_CONSOLIDATED',
-                            'GOV_EXPENSE_ACCUM_FEDERAL',
-                            'GOV_EXPENSE_ACCUM_SUBFEDERAL',
-                            'GOV_REVENUE_ACCUM_CONSOLIDATED',
-                            'GOV_REVENUE_ACCUM_FEDERAL',
-                            'GOV_REVENUE_ACCUM_SUBFEDERAL',
-                            'GOV_SURPLUS_ACCUM_FEDERAL',
-                            'GOV_SURPLUS_ACCUM_SUBFEDERAL'])
+    ("Цены", ["CPI", "CPI_FOOD", "CPI_NONFOOD", "CPI_ALCOHOL", "CPI_SERVICES"]),
+    ("Население", ["UNEMPL", 'WAGE_REAL', 'WAGE_NOMINAL']),
+    ("Бюджет", ['GOV_EXPENSE_ACCUM_CONSOLIDATED',
+                'GOV_EXPENSE_ACCUM_FEDERAL',
+                'GOV_EXPENSE_ACCUM_SUBFEDERAL',
+                'GOV_REVENUE_ACCUM_CONSOLIDATED',
+                'GOV_REVENUE_ACCUM_FEDERAL',
+                'GOV_REVENUE_ACCUM_SUBFEDERAL',
+                'GOV_SURPLUS_ACCUM_FEDERAL',
+                'GOV_SURPLUS_ACCUM_SUBFEDERAL'])
 ])
 
 # check 3: sections includes all items in description
@@ -451,8 +457,8 @@ if set1 != set2:
 if __name__ == "__main__":
     sc = Scope()
     sc.add_marker("1.9. Внешнеторговый оборот – всего",
-               "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
+                  "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
     sc.add_marker("1.10. Внешнеторговый оборот – всего",
                   "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")
     sc.add_marker("1.10. Внешнеторговый оборот – всего",
-                  "1.10.1.Внешнеторговый оборот со странами дальнего зарубежья") 
+                  "1.10.1.Внешнеторговый оборот со странами дальнего зарубежья")

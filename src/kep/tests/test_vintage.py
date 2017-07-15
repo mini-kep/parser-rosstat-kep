@@ -32,7 +32,7 @@ class Test_Function_to_float:
             vintage.to_float("1.2,,,,,")
 
     # FIXME:
-    #def test_on_all_values(self):
+    # def test_on_all_values(self):
     #    for s in self.all_values():
     #        f = vintage.to_float(s)
     #        assert isinstance(f, float) or f is False

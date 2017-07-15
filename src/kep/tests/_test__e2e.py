@@ -229,7 +229,8 @@ class Test_Table():
         assert table.label == 'GDP_bln_rub'
 
     def test_Table_repr(self, table):
-        assert table.__repr__() == "Table(headers=[Row(['Объем ВВП', '', '', '', '']), Row(['(уточненная оценка)']), Row(['млрд.рублей', '', '', '', ''])], datarows=[Row(['1991 1)', '4823', '901', '1102', '1373', '1447'])])"
+        assert table.__repr__(
+        ) == "Table(headers=[Row(['Объем ВВП', '', '', '', '']), Row(['(уточненная оценка)']), Row(['млрд.рублей', '', '', '', ''])], datarows=[Row(['1991 1)', '4823', '901', '1102', '1373', '1447'])])"
 
     def test_Table_str(self, table):
         print(table)

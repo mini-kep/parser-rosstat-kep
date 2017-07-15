@@ -27,6 +27,8 @@ from kep.spec import UNITS
 warnings.simplefilter('ignore', UserWarning)
 
 # label handling
+
+
 def make_label(vn, unit, sep="_"):
     return vn + sep + unit
 
@@ -45,8 +47,10 @@ def extract_unit(label):
     return '_'.join(itertools.dropwhile(lambda word: word.isupper(), words))
 
 # handling tables
+
+
 def fix_multitable_units(tables):
-    """For tables without *varname* copy *varname* from previous table. 
+    """For tables without *varname* copy *varname* from previous table.
         Applies to tables without unknown rows.
     """
     for prev_table, table in zip(tables, tables[1:]):
@@ -56,48 +60,52 @@ def fix_multitable_units(tables):
 
 def check_required_labels(tables, pdef):
     """Raise exception if *tables* do not contain any of labels from *pdef.required*."""
-    labels_required = [make_label(varname, unit) for varname, unit in pdef.required]
+    labels_required = [make_label(varname, unit)
+                       for varname, unit in pdef.required]
     labels_in_tables = [t.label for t in tables]
     labels_missed = [x for x in labels_required if x not in labels_in_tables]
     if labels_missed:
         raise ValueError("Missed labels: {}".format(labels_missed))
 
-from itertools import chain 
+
+from itertools import chain
+
 
 class Tables:
     """Extract tables from *csv_path* using *Rows(csv_path)*."""
 
     def __init__(self, rowstack, spec=SPEC, units=UNITS):
         self.rowstack = rowstack
-        self.spec = spec 
+        self.spec = spec
         self.units = units
-        self.required = [make_label(varname, unit) for varname, unit in spec.required()]
-       
+        self.required = [make_label(varname, unit)
+                         for varname, unit in spec.required()]
+
     def yield_tables_from_segments(self):
         # use parsing definitions for segments first
         for scope in self.spec.scopes:
             start, end = scope.get_bounds(self.rowstack.rows)
-            csv_segment = self.rowstack.pop(start, end)            
+            csv_segment = self.rowstack.pop(start, end)
             pdef = scope.definition
             for t in self.extract_tables(csv_segment, pdef, units=self.units):
                 yield t
-                
+
     def yield_tables_from_main(self):
         # use default parsing definition on remaining rows
         csv_segment = self.rowstack.remaining_rows()
         pdef = self.spec.main
         for t in self.extract_tables(csv_segment, pdef, units=self.units):
             yield t
-            
-    def yield_tables(self):        
-        return chain(self.yield_tables_from_segments(),             
-                     self.yield_tables_from_main())   
 
-    @staticmethod 
+    def yield_tables(self):
+        return chain(self.yield_tables_from_segments(),
+                     self.yield_tables_from_main())
+
+    @staticmethod
     def extract_tables(csv_segment, pdef, units):
         # yield tables from csv_segment
         tables = split_to_tables(csv_segment)
-        # parse tables to obtain labels 
+        # parse tables to obtain labels
         tables = [t.parse(pdef, units) for t in tables]
         # another run to assign trailing units to some tables
         fix_multitable_units(tables)
@@ -108,10 +116,10 @@ class Tables:
     def get(self):
         gen = self.yield_tables()
         return list(gen)
-    
+
     def get_required(self):
         return [t for t in self.get() if t.label in self.required]
-    
+
 
 # classes for split_to_tables()
 @unique
@@ -157,12 +165,12 @@ class Table:
     VALID_ROW_LENGTHS = list(splitter.ROW_LENGTH_TO_FUNC_MAPPER.keys())
     KNOWN = "+"
     UNKNOWN = "-"
-   
+
     def __init__(self, headers, datarows):
         self.varname = None
         self.unit = None
         self.headers = headers
-        self.lines = odict((row.name, self.UNKNOWN) for row in headers)  
+        self.lines = odict((row.name, self.UNKNOWN) for row in headers)
         self.datarows = datarows
         self.coln = max(row.len() for row in self.datarows)
         self.splitter_func = None
@@ -171,15 +179,15 @@ class Table:
         varnames_dict = pdef.headers
         units_dict = units
         funcname = pdef.reader
-        self.set_label(varnames_dict, units_dict)        
+        self.set_label(varnames_dict, units_dict)
         self.set_splitter(funcname)
         return self
-    
+
     def set_label(self, varnames_dict, units_dict):
         for row in self.headers:
             varname = row.get_varname(varnames_dict)
-            if varname:            
-                self.varname = varname          
+            if varname:
+                self.varname = varname
                 self.lines[row.name] = self.KNOWN
             unit = row.get_unit(units_dict)
             if unit:
@@ -221,17 +229,17 @@ class Table:
         show = ["Table {} ({} columns)".format(self.label, self.coln),
                 '\n'.join(["{} <{}>".format(v, k) for k, v in self.lines.items()]),
                 '\n'.join([str(row) for row in self.datarows])
-                 ]
+                ]
         return "\n".join(show)
 
     def __repr__(self):
         return "Table(headers={}, datarows={})".format(repr(self.headers),
-                                                      repr(self.datarows))
+                                                       repr(self.datarows))
 
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     csv_path = files.locate_csv()
-    rowstack = get_rowstack(csv_path) 
+    rowstack = get_rowstack(csv_path)
     tables = Tables(rowstack).get_required()
     for t in tables:
         print()

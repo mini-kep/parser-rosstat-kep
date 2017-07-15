@@ -62,7 +62,11 @@ class DictMaker:
         return {**self.basedict, 'freq': 'q', 'value': to_float(val), 'qtr': q}
 
     def m_dict(self, val, m):
-        return {**self.basedict, 'freq': 'm', 'value': to_float(val), 'month': m}
+        return {
+            **self.basedict,
+            'freq': 'm',
+            'value': to_float(val),
+            'month': m}
 
     def __str__(self):
         return self.basedict.__str__()
@@ -218,7 +222,7 @@ VALID_DATAPOINTS = [
     {'freq': 'q', 'label': 'IMPORT_GOODS_bln_usd',
         'qtr': 1, 'value': 9.1, 'year': 1999},
     {'freq': 'a', 'label': 'CPI_rog', 'value': 136.5, 'year': 1999},
-    {'freq': 'm', 'label': 'CPI_rog', 'value': 108.4, 'year': 1999, 'month': 1}    
+    {'freq': 'm', 'label': 'CPI_rog', 'value': 108.4, 'year': 1999, 'month': 1}
     # FIXME: found only in latest, need some monthly value
     #{'freq': 'm', 'label': 'IND_PROD_yoy', 'month': 4, 'value': 102.3, 'year': 2017}
 ]
@@ -229,16 +233,15 @@ class Vintage:
 
     def __init__(self, year, month):
         # save for reference and navigation
-        self.year, self.month = files.filter_date(year, month)        
+        self.year, self.month = files.filter_date(year, month)
         # find csv
         self.csv_path = files.locate_csv(year, month)
-        # rowstack 
+        # rowstack
         self.rowstack = rows.get_rowstack(self.csv_path)
         # break csv to tables with variable names
         self.tables = tables.Tables(self.rowstack).get_required()
         # convert stream values to pandas dataframes
-        self.frames = Frames(tables=self.tables)     
-
+        self.frames = Frames(tables=self.tables)
 
     def save(self):
         """Save dataframes to CSVs."""
@@ -261,7 +264,8 @@ class Vintage:
     def validate(self, valid_datapoints=VALID_DATAPOINTS):
         for x in valid_datapoints:
             if x not in self.frames.datapoints:
-                msg = "Not found in dataset: {}\nFile: {}".format(x, self.csv_path)
+                msg = "Not found in dataset: {}\nFile: {}".format(
+                    x, self.csv_path)
                 raise ValueError(msg)
         print("Test values parsed OK for", self)
 
@@ -297,14 +301,14 @@ class Collection:
 
 if __name__ == "__main__":
     Collection.approve_latest()
-    #Collection.approve_all()    
-    #Collection.save_latest()
-    #Collection.save_all_dataframes_to_csv()
+    # Collection.approve_all()
+    # Collection.save_latest()
+    # Collection.save_all_dataframes_to_csv()
 
     year, month = 2017, 5
     vint = Vintage(year, month)
     dfa, dfq, dfm = vint.dfs()
-    
+
     # some notebook work
 #    iq = ["GDP_yoy", "IND_PROD_yoy", "INVESTMENT_yoy", "RETAIL_SALES_yoy", "WAGE_REAL_yoy"]
 #    last_q = dfq[iq]['2017-03'].transpose()
@@ -313,21 +317,19 @@ if __name__ == "__main__":
 #    last_m1 = dfm[im1]['2017-05'].transpose()
 #    im2 = ["{}_rog".format(x) for x in im]
 #    last_m2 = dfm[im2]['2017-05'].transpose()
-    #print(last_m1)
-    #print(last_m2)
-    
+    # print(last_m1)
+    # print(last_m2)
+
     # TODO:
     # all_names = set(dfa.columns + dfq.columns + dfm.columns)
-    
+
     #from kep.tables import extract_varname
 #    print("Всего переменных: {}".format(len(list(cfg.SPEC.required()))))
-#    for k, v in cfg.SECTIONS.items():        
+#    for k, v in cfg.SECTIONS.items():
 #        print("\n**{}**:".format(k))
-#        for vn in v:          
+#        for vn in v:
 #            z = []
 #            for x in cfg.SPEC.required():
-#                if x[0] == vn:                    
+#                if x[0] == vn:
 #                    z.append(x[1])
 #            print("- {}({})".format(vn, ", ".join(z)))
-            
-            

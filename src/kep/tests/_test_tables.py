@@ -10,92 +10,97 @@ rows = [Row(['Индекс промышленного производства']
         Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])]
 
 
-
 @pytest.fixture
 def spec():
     d = Definition("MAIN")
     d.add_header("Объем ВВП", "GDP")
     d.require("GDP", "bln_rub")
     _spec = Specification(d)
-    
+
     d = Definition("IND_PROM")
     d.add_marker("Индекс промышленного производства", "End")
     d.add_header("Индекс промышленного производства", "IND_PROD")
     d.require("IND_PROD", "yoy")
     _spec.append(d)
-    return _spec 
+    return _spec
+
 
 @pytest.fixture
 def units():
-    return {'млрд.рублей': 'bln_rub', 
+    return {'млрд.рублей': 'bln_rub',
             'в % к соответствующему периоду предыдущего года': 'yoy'}
 
+
 def mock_row_stream():
-    yield Row(['Объем ВВП', '', '',  '', ''])
+    yield Row(['Объем ВВП', '', '', '', ''])
     yield Row(['(уточненная оценка)'])
-    yield Row(['млрд.рублей', '', '',  '', ''])
+    yield Row(['млрд.рублей', '', '', '', ''])
     yield Row(["1991", "4823", "901", "1102", "1373", "1447"])
     yield Row(['Индекс промышленного производства'])
     yield Row(['в % к соответствующему периоду предыдущего года'])
     yield Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])
-    yield Row(['End', '', '',  '', ''])    
+    yield Row(['End', '', '', '', ''])
 
 
-t0 = Table(headers=[Row(['Объем ВВП', '', '', '', '']), 
-                    Row(['(уточненная оценка)']), 
-                    Row(['млрд.рублей', '', '', '', ''])], 
-          datarows=[Row(['1991', '4823', '901', '1102', '1373', '1447'])]
-)
+t0 = Table(headers=[Row(['Объем ВВП', '', '', '', '']),
+                    Row(['(уточненная оценка)']),
+                    Row(['млрд.рублей', '', '', '', ''])],
+           datarows=[Row(['1991', '4823', '901', '1102', '1373', '1447'])]
+           )
 
-t1 = Table(headers=[Row(['Индекс промышленного производства']), 
-                    Row(['в % к соответствующему периоду предыдущего года'])], 
-          datarows=[Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])]
-)
+t1 = Table(headers=[Row(['Индекс промышленного производства']),
+                    Row(['в % к соответствующему периоду предыдущего года'])],
+           datarows=[Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])]
+           )
+
 
 class Test_split_to_tables():
-    
+
     def setup_method(self):
         self.rows = list(mock_row_stream())
-        
+
     def test_split_to_tables(self):
-        tables = list(split_to_tables(self.rows))        
+        tables = list(split_to_tables(self.rows))
         assert len(tables) == 2
-        assert tables[0] == t0 
+        assert tables[0] == t0
         assert tables[1] == t1
-    
+
+
 def mock_RowStack():
     return RowStack(mock_row_stream())
 
+
 @pytest.fixture
 def mock_Tables():
-   return Tables(mock_RowStack(), spec=spec(), units=units())
+    return Tables(mock_RowStack(), spec=spec(), units=units())
 
-class Test_Tables:    
-    
+
+class Test_Tables:
+
     def test_tables_property(self, mock_Tables):
         # tables appear in order of defintions parsing
         mock_Tables.tables[0] = t1
-        mock_Tables.tables[1] = t0      
-    
+        mock_Tables.tables[1] = t0
+
     def test_get_required(self, mock_Tables):
         tables = mock_Tables.get_required()
         # tables appear in order of defintions parsing
         tables[0] = t1
-        tables[1] = t0      
+        tables[1] = t0
 
 
-#def to_row(d):
+# def to_row(d):
 #    elements = [d['name']] + d['data']
 #    return tables.Row(elements)
 #
 #
 #@pytest.fixture
-#def row_stack():
+# def row_stack():
 #    rows = [to_row(d) for d in ROWS]
 #    return tables.RowStack(rows)
 #
 #
-#class Test_RowStack():
+# class Test_RowStack():
 #    def test_row_stack_fixture_self_test(self, row_stack):
 #        for s, r in zip(row_stack.rows, ROWS):
 #            assert s.name == r['name']
@@ -105,7 +110,7 @@ class Test_Tables:
 #from cfg import Definition
 #
 #
-#class Test_RowStack_stable_on_definition_with_None_markers:
+# class Test_RowStack_stable_on_definition_with_None_markers:
 #
 #    def setup_method(self):
 #        # pdef_with_two_None_markers
@@ -131,12 +136,12 @@ class Test_Tables:
 #
 #
 #@pytest.fixture
-#def header():
+# def header():
 #    return tables.Header(rows_for_header())
 #
 #
 #@pytest.fixture
-#def parsed_header():
+# def parsed_header():
 #    pheader = header()
 #    pheader.set_unit(units=_units())
 #    pheader.set_varname(pdef=_pdef(), units=_units())
@@ -144,7 +149,7 @@ class Test_Tables:
 #
 #
 #@pytest.fixture
-#def _pdef():
+# def _pdef():
 #    from cfg import Definition
 #    # WONTFIX: name MAIN is rather useless for Definition instance
 #    pdef = Definition("MAIN")
@@ -158,14 +163,14 @@ class Test_Tables:
 #
 #
 #@pytest.fixture
-#def _units():
+# def _units():
 #    # IDEA: may use explicit hardcoded constant with less units
 #    from cfg import UNITS
 #    return UNITS
 #
 #
 # TODO: restore Test_Header
-#class Test_Header:
+# class Test_Header:
 #
 #    def test_KNOWN_UNKNOWN_sanity(self):
 #        # actual error before class constants were introduced
