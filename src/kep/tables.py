@@ -28,8 +28,8 @@ warnings.simplefilter('ignore', UserWarning)
 
 # label handling
 
-
 def make_label(vn, unit, sep="_"):
+    print(vn, unit)
     return vn + sep + unit
 
 

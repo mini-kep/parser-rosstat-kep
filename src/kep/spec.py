@@ -7,7 +7,7 @@
 
 from collections import OrderedDict as odict
 
-
+# mapper dictionary to convert text in table headers to unit of measurement
 UNITS = odict([  # 1. MONEY
     ('млрд.долларов', 'bln_usd'),
     ('млрд. долларов', 'bln_usd'),
@@ -43,6 +43,7 @@ UNITS = odict([  # 1. MONEY
     ("услуги", 'rog')
 ])
 
+# 'official' names of units used in project front 
 UNIT_NAMES = {'bln_rub': 'млрд.руб.',
               'bln_usd': 'млрд.долл.',
               'gdp_percent': '% ВВП',
@@ -53,59 +54,33 @@ UNIT_NAMES = {'bln_rub': 'млрд.руб.',
               'ytd': 'период с начала года',
               'pct': '%'}
 
-# check: all units have a common short name
+# check: all units in mapper dict have an 'offical' name
 assert set(UNIT_NAMES.keys()) == set(UNITS.values())
 
 
-class Definition:
-
-    def __init__(self, reader=None):
-        self.definitions = []
-        self.reader = reader
-
-    def append(self, text, varname, required_units, desc):
-        pdef = Indicator(text, varname, required_units, desc)
-        self.definitions.append(pdef)
-
-    @property
-    def headers(self):
-        def _yield():
-            for pdef in self.definitions:
-                for k, v in pdef.headers.items():
-                    yield k, v
-        return odict(list(_yield()))
-
-    @property
-    def required(self):
-        def _yield():
-            for pdef in self.definitions:
-                for req in pdef.required:
-                    yield req
-        return list(_yield())
-
-    def varnames(self):
-        return [pdef.varname for pdef in self.definitions]
-
-    def __repr__(self):
-        vns = ", ".join(self.varnames())
-        return "<Definition for {}>".format(vns)
-
-
 class Indicator:
+    """An economic indicator with a *varname* like GDP and its parsing instructions:
+           text           - table header string(s) used to identify table in CSV file 
+           required_units - units of measurement required this indicator           
+           desc           - indicator desciption string for frontpage
+           value          - control value (experimantal)
+    """
 
-    def __init__(self, text, varname, required_units, desc):
+    def __init__(self, varname, text, required_units, desc, value=None):
         self.varname = varname
         text = self.as_list(text)
+        # construct mapper dictionary
         self.headers = odict([(t, self.varname) for t in text])
         ru = self.as_list(required_units)
+        # construct labels        
         self.required = [(self.varname, unit) for unit in ru]
         self.desc = desc
 
     def __repr__(self):
         text = [x for x in d.headers.keys()]
         ru = [x[1] for x in self.required]
-        return "Definition ('{}', {}, {}, '{}')".format(self.varname, text,
-                                                        ru, self.desc)
+        args = "'{}', {}, {}, '{}'".format(self.varname, text, ru, self.desc)
+        return "Indicator ({})".format(args)                                                       
 
     @staticmethod
     def as_list(x):
@@ -113,6 +88,39 @@ class Indicator:
             return [x]
         else:
             return x
+
+class Definition:
+
+    def __init__(self, reader=None):
+        self.indicators = []
+        self.reader = reader
+
+    def append(self, *args, **kwargs):
+        pdef = Indicator(*args, **kwargs)
+        self.indicators.append(pdef)
+
+    @property
+    def headers(self):
+        def _yield():
+            for ind in self.indicators:
+                for k, v in ind.headers.items():
+                    yield k, v
+        return odict(list(_yield()))
+
+    @property
+    def required(self):
+        def _yield():
+            for ind in self.indicators:
+                for req in ind.required:
+                    yield req
+        return list(_yield())
+
+    def varnames(self):
+        return [ind.varname for ind in self.indicators]
+
+    def __repr__(self):
+        vns = ", ".join(self.varnames())
+        return "<Definition for {}>".format(vns)
 
 
 class Scope():
@@ -135,8 +143,8 @@ class Scope():
         else:
             raise ValueError("Cannot accept empty line as Scope() boundary")
 
-    def append(self, text, varname, required_units, desc):
-        self.definition.append(text, varname, required_units, desc)
+    def append(self, *args, **kwargs):
+        self.definition.append(*args, **kwargs)
 
     def __repr__(self):
         msg1 = repr(self.definition)
@@ -186,13 +194,15 @@ class Specification:
     """
 
     def __init__(self, pdef):
+        # main parsing definition
         self.main = pdef
+        # local parsing definitions for segments
         self.scopes = []
 
     def all_definitions(self):
         return [self.main] + [sc.definition for sc in self.scopes]
 
-    def append(self, scope):
+    def add_scope(self, scope):
         self.scopes.append(scope)
 
     def varnames(self):
@@ -220,54 +230,53 @@ main.append(varname="GDP",
                   "Индекс физического объема произведенного ВВП, в %",
                   "Валовой внутренний продукт"],
             required_units=["bln_rub", "yoy"],
-            desc="Валовый внутренний продукт")
+            desc="Валовый внутренний продукт",
+            value=dict(dt="1999-12-31", a=0, q=0, m=0))
 main.append(varname="INDPRO",
             text="Индекс промышленного производства",
             required_units=["yoy", "rog"],
             desc="Индекс промышленного производства")
-
 SPEC = Specification(main)
 
-seg = Scope("1.9. Внешнеторговый оборот – всего",
+sc = Scope("1.9. Внешнеторговый оборот – всего",
             "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
-seg.add_bounds("1.10. Внешнеторговый оборот – всего",
+sc.add_bounds("1.10. Внешнеторговый оборот – всего",
                "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")
-seg.append(text="экспорт товаров – всего",
+sc.append(text="экспорт товаров – всего",
            varname="EXPORT_GOODS",
            required_units="bln_usd",
            desc="Экспорт товаров")
-seg.append(text="импорт товаров – всего",
+sc.append(text="импорт товаров – всего",
            varname="IMPORT_GOODS",
            required_units="bln_usd",
            desc="Импорт товаров")
-SPEC.append(seg)
+SPEC.add_scope(sc)
 
 
-seg = Scope(start="3.5. Индекс потребительских цен",
+sc = Scope(start="3.5. Индекс потребительских цен",
             end="4. Социальная сфера")
-seg.append(text="Индекс потребительских цен",
-           varname="CPI",
-           required_units="rog",
-           desc="Индекс потребительских цен (ИПЦ)")
-seg.append(text=["непродовольственные товары",
-                 "непродовольст- венные товары"],
-           varname="CPI_NONFOOD",
-           required_units="rog",
-           desc="ИПЦ (непродтовары)")
-seg.append(text="продукты питания",
-           varname="CPI_FOOD",
-           required_units="rog",
-           desc="ИПЦ (продтовары)")
-seg.append(text="алкогольные напитки",
-           varname="CPI_ALC",
-           required_units="rog",
-           desc="ИПЦ (алкоголь)")
-seg.append(text="услуги",
-           varname="CPI_SERVICES",
-           required_units="rog",
-           desc="ИПЦ (услуги)")
-SPEC.append(seg)
-
+sc.append("CPI",
+          text="Индекс потребительских цен",
+          required_units="rog",
+          desc="Индекс потребительских цен (ИПЦ)")
+sc.append("CPI_NONFOOD",
+          text=["непродовольственные товары",
+                "непродовольст- венные товары"],
+          required_units="rog",
+          desc="ИПЦ (непродтовары)")
+sc.append("CPI_FOOD",
+          text="продукты питания",
+          required_units="rog",
+          desc="ИПЦ (продтовары)")
+sc.append("CPI_ALC",
+          text="алкогольные напитки",
+          required_units="rog",
+          desc="ИПЦ (алкоголь)")
+sc.append("CPI_SERVICES", 
+          text="услуги",
+          required_units="rog",
+          desc="ИПЦ (услуги)")
+SPEC.add_scope(sc)
 
 if __name__ == "__main__":
     # test code
@@ -289,23 +298,23 @@ if __name__ == "__main__":
     # end
 
     # test code
-    sc = Scope("Header 1", "Header 2")
-    ah = "A bit rotten Header #1", "Curved Header 2."
-    sc.add_bounds(*ah)
-    sc.append(text="экспорт товаров",
-              varname="EX",
-              required_units="bln_usd",
-              desc="Экспорт товаров")
-    assert repr(sc)
-    assert isinstance(sc.definition, Definition)
+    #sc = Scope("Header 1", "Header 2")
+    #ah = "A bit rotten Header #1", "Curved Header 2."
+    #sc.add_bounds(*ah)
+    #sc.append(text="экспорт товаров",
+    #          varname="EX",
+    #          required_units="bln_usd",
+    #          desc="Экспорт товаров")
+    #assert repr(sc)
+    #assert isinstance(sc.definition, Definition)
 
     row_mock1 = ["A bit rotten Header #1",
                  "more lines here",
                  "more lines here",
                  "more lines here",
                  "Curved Header 2."]
-    s, e = sc.get_bounds(row_mock1)
-    assert s, e == ah
+    #s, e = sc.get_bounds(row_mock1)
+    #assert s, e == ah
     # end
 
     # test_code
