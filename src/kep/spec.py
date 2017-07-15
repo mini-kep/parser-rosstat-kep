@@ -59,14 +59,17 @@ assert set(UNIT_NAMES.keys()) == set(UNITS.values())
 
 
 class Indicator:
-    """An economic indicator with a *varname* like GDP and its parsing instructions:
-           text           - table header string(s) used to identify table in CSV file
-           required_units - units of measurement required this indicator
-           desc           - indicator desciption string for frontpage
-           value          - control value (experimantal)
-    """
+    """An economic indicator parsing instructions"""
 
-    def __init__(self, varname, text, required_units, desc, value=None):
+    def __init__(self, varname, text, required_units, desc=None, sample=None):
+        """Parameters:
+        varname        - variable name string like 'GDP', 'CPI', etc
+        text           - string(s) found in table header in CSV files 
+                         examples: 'Объем ВВП', 'Gross domestic product'  
+        required_units - unit(s) of measurement required for this indicator
+                         examples: 'rog', ['rog'],  ['bln_rub', 'yoy']
+        desc           - indicator desciption string for frontpage
+        sample         - control string - one of raw CSV file rows (not implemented)"""
         self.varname = varname
         text = self.as_list(text)
         # construct mapper dictionary
@@ -74,7 +77,13 @@ class Indicator:
         ru = self.as_list(required_units)
         # construct labels
         self.required = [(self.varname, unit) for unit in ru]
-        self.desc = desc
+        # optional description
+        if desc:
+            self.desc = desc
+        else:
+            self.desc = text[0]
+        # TODO: make use of sample string in parsing    
+        self.sample = sample    
 
     def __repr__(self):
         text = [x for x in d.headers.keys()]
@@ -229,22 +238,33 @@ class Specification:
             for req in pdef.required:
                 yield req
 
-
+# global parsing defintion
 main = Definition()
 main.append(varname="GDP",
             text=["Oбъем ВВП",
                   "Индекс физического объема произведенного ВВП, в %",
                   "Валовой внутренний продукт"],
             required_units=["bln_rub", "yoy"],
-            desc="Валовый внутренний продукт",
-            value=dict(dt="1999-12-31", a=0, q=0, m=0))
+            desc="Валовый внутренний продукт (ВВП)",
+            sample="1999	4823	901	1102	1373	1447")
 main.append(varname="INDPRO",
             text="Индекс промышленного производства",
             required_units=["yoy", "rog"],
             desc="Индекс промышленного производства")
 SPEC = Specification(main)
 
+# CSV segment definitions
+# investment
+sc = Scope("1.6. Инвестиции в основной капитал",
+           "1.6.1. Инвестиции в основной капитал организаций")
+sc.add_bounds("1.7. Инвестиции в основной капитал",
+              "1.7.1. Инвестиции в основной капитал организаций")
+sc.append("INVESTMENT",
+          "Инвестиции в основной капитал", 
+          ["bln_rub", "yoy", "rog"])
+SPEC.add_scope(sc)
 
+# export/import
 sc = Scope("1.9. Внешнеторговый оборот – всего",
            "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
 sc.add_bounds("1.10. Внешнеторговый оборот – всего",
@@ -259,17 +279,7 @@ sc.append(text="импорт товаров – всего",
           desc="Импорт товаров")
 SPEC.add_scope(sc)
 
-
-sc = Scope("1.6. Инвестиции в основной капитал",
-           "1.6.1. Инвестиции в основной капитал организаций")
-sc.add_bounds("1.7. Инвестиции в основной капитал",
-              "1.7.1. Инвестиции в основной капитал организаций")
-sc.append("INVESTMENT",
-          "Инвестиции в основной капитал", 
-          ["bln_rub", "yoy", "rog"],
-          "Инвестиции в основной капитал")
-SPEC.add_scope(sc)
-
+# inflation
 sc = Scope(start="3.5. Индекс потребительских цен",
            end="4. Социальная сфера")
 sc.append("CPI",
@@ -295,7 +305,19 @@ sc.append("CPI_SERVICES",
           desc="ИПЦ (услуги)")
 SPEC.add_scope(sc)
 
+    # TODO:
+    # - [ ] add more test asserts to Definition, Scope and SPEC
+    # - [ ] move assetrts to test_cfg.py
+    # - [ ] move assetrts to test_cfg.py
+    # - [ ] migrate existing definitions to this file    
+    # NOT TODO:
+    # - [ ] spec validation procedure
+    # - [ ] use of row sample
+    # - [ ] think of a better pattern to create SPEC
+
+
 if __name__ == "__main__":
+    # TODO: move test code to test_spec.py 
     # test code
     d = Indicator(varname="GDP",
                   text=["Oбъем ВВП",
@@ -344,11 +366,3 @@ if __name__ == "__main__":
         assert isinstance(scope.definition, Definition)
     # end
 
-    # TODO:
-    # - [ ] add more test asserts to Definition, Scope and SPEC
-    # - [ ] move assetrts to to test_cfg.py
-    # - [ ] use new definitions in tables.py
-    # - [ ] migrate existing definitions to this file
-    # NOT TODO:
-    # - [ ] think of a better pattern to create SPEC
-    # - [ ] separate may cfg.py into definition.py (code, testable) and spec.py (values)

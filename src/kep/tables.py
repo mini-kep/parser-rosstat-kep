@@ -1,24 +1,15 @@
-"""Parse raw CSV file into Tables() instances using parsing specification from cfg.py
+"""Parse raw CSV file into Tables() instances using parsing specification from spec.py
 
 Main call:
-   csv_path = locate_csv(year, month)
-   tables = Tables(csv_path).get_required():
-
-Parsing procedure:
-   - cut out a segment of csv file as delimited by start and end line makers
-   - hold remaining parts of csv file for further parsing
-   - break csv segment into tables, each table containing headers and data rows
-   - parse table headers to obtain variable name ("GDP") and unit ("bln_rub")
+   tables = Tables(rowstack).get_required():
 
 """
 
 from enum import Enum, unique
 from collections import OrderedDict as odict
 import itertools
-from itertools import chain
 import warnings
 
-from kep import files
 from kep import splitter
 from kep.rows import get_rowstack
 from kep.spec import SPEC
@@ -111,6 +102,11 @@ class Tables:
         return tables
 
     def get(self):
+        """Parsing procedure:
+           - cut out a segment of csv file as delimited by start and end line makers
+           - hold remaining parts of csv file for further parsing
+           - break csv segment into tables, each table containing headers and data rows
+           - parse table headers to obtain variable name ("GDP") and unit ("bln_rub")"""
         return list(self.yield_tables())
 
     def get_required(self):
@@ -234,6 +230,7 @@ class Table:
 
 
 if __name__ == "__main__":
+    from kep import files
     csv_path = files.locate_csv()
     rowstack = get_rowstack(csv_path)
     tables = Tables(rowstack).get_required()
