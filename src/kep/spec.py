@@ -70,12 +70,13 @@ class Indicator:
                          examples: 'rog', ['rog'],  ['bln_rub', 'yoy']
         desc           - indicator desciption string for frontpage
         sample         - control string - one of raw CSV file rows (not implemented)"""
+        
         self.varname = varname
         text = self.as_list(text)
         # construct mapper dictionary
         self.headers = odict([(t, self.varname) for t in text])
-        ru = self.as_list(required_units)
         # construct labels
+        ru = self.as_list(required_units)
         self.required = [(self.varname, unit) for unit in ru]
         # optional description
         if desc:
@@ -87,8 +88,8 @@ class Indicator:
 
     def __repr__(self):
         text = [x for x in d.headers.keys()]
-        ru = [x[1] for x in self.required]
-        args = "'{}', {}, {}, '{}'".format(self.varname, text, ru, self.desc)
+        req = [x[1] for x in self.required]
+        args = "'{}', {}, {}, '{}'".format(self.varname, text, req, self.desc)
         return "Indicator ({})".format(args)
 
     @staticmethod
@@ -130,7 +131,7 @@ class Definition:
 
     def __repr__(self):
         vns = ", ".join(self.varnames())
-        return "<Definition for {}>".format(vns)
+        return "Definition for {}".format(vns)
 
 
 class Scope():
@@ -161,24 +162,21 @@ class Scope():
 
     def __repr__(self):
         msg1 = repr(self.definition)
-        s = self.__markers[0]['start'][:8]
-        e = self.__markers[0]['end'][:8]
+        s = self.__markers[0]['start'][:10]
+        e = self.__markers[0]['end'][:10]
         msg2 = "bound by start <{}...>, end <{}...>".format(s, e)
         return " ".join([msg1, msg2])
 
     def get_bounds(self, rows):
-        """Get start and end line markers, which aplly to *rows*"""
+        """Get start and end line markers, which can be found in *rows*"""
         rows = [r for r in rows]  # consume iterator
-        ix = False
-        for i, marker in enumerate(self.__markers):
+        for marker in self.__markers:
             s = marker['start']
             e = marker['end']
             if self.__is_found(s, rows) and self.__is_found(e, rows):
-                m = self.__markers[ix]
-                return m['start'], m['end']
-        if not ix:
-            msg = self.__error_message(rows)
-            raise ValueError(msg)
+                return s, e
+        msg = self.__error_message(rows)
+        raise ValueError(msg)
 
     @staticmethod
     def __is_found(line, rows):
@@ -191,7 +189,7 @@ class Scope():
     def __error_message(self, rows):
         msg = []
         msg.append("start or end line not found in *rows*")
-        for marker in self.markers:
+        for marker in self.__markers:
             s = marker['start']
             e = marker['end']
             msg.append("is_found: {} <{}>".format(self.__is_found(s, rows), s))
@@ -253,7 +251,8 @@ main.append(varname="INDPRO",
             desc="Индекс промышленного производства")
 SPEC = Specification(main)
 
-# CSV segment definitions
+# segment definitions
+
 # investment
 sc = Scope("1.6. Инвестиции в основной капитал",
            "1.6.1. Инвестиции в основной капитал организаций")
@@ -337,25 +336,24 @@ if __name__ == "__main__":
     # end
 
     # test code
-    #sc = Scope("Header 1", "Header 2")
-    # ah = "A bit rotten Header #1", "Curved Header 2."
-    # sc.add_bounds(*ah)
-    # sc.append(text="экспорт товаров",
-    #          varname="EX",
-    #          required_units="bln_usd",
-    #          desc="Экспорт товаров")
-    #assert repr(sc)
-    #assert isinstance(sc.definition, Definition)
+    sc = Scope("Header 1", "Header 2")
+    ah = "A bit rotten Header #1", "Curved Header 2."
+    sc.add_bounds(*ah)
+    sc.append(text="экспорт товаров",
+              varname="EX",
+              required_units="bln_usd",
+              desc="Экспорт товаров")
+    assert repr(sc)
+    assert isinstance(sc.definition, Definition)
 
     row_mock1 = ["A bit rotten Header #1",
                  "more lines here",
                  "more lines here",
                  "more lines here",
                  "Curved Header 2."]
-    #s, e = sc.get_bounds(row_mock1)
-    #assert s, e == ah
-    # end
-
+    s, e = sc.get_bounds(row_mock1)
+    assert s, e == ah
+    
     # test_code
     assert isinstance(SPEC, Specification)
     assert isinstance(SPEC.main, Definition)
@@ -365,4 +363,3 @@ if __name__ == "__main__":
     for scope in SPEC.scopes:
         assert isinstance(scope.definition, Definition)
     # end
-
