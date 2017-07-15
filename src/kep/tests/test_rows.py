@@ -1,9 +1,6 @@
 import pytest
-
 from collections import OrderedDict as odict
 
-
-# testing:
 from kep.rows import get_year, is_year, Row, RowStack
 
 # TODO: test csv readers here
@@ -23,22 +20,6 @@ class Test_is_year():
         assert is_year("1999") is True
         assert is_year("Объем ВВП") is False
 
-# FIXME:
-#    def test_on_all_heads(self):
-#        for s in self.all_heads():
-#            year = get_year(s)
-#            assert isinstance(year, int) or year is False
-#
-#    @staticmethod
-#    def all_heads():
-#        """Emit all heads for debugging get_year()"""
-#        import files
-#        import rows
-#        csv_path = files.get_path_csv()
-#        csv_dicts = rows.read_csv(csv_path)
-#        for d in csv_dicts:
-#            yield d.name
-
 
 class Test_Row:
 
@@ -50,6 +31,7 @@ class Test_Row:
     def test_name_property(self):
         assert self.row1.name == 'Объем ВВП'
         assert self.row2.name == "1991 1)"
+        assert self.row3.name == 'abcd'
 
     def test_data_property(self):
         assert self.row1.data == ['', '', '', '']
@@ -66,25 +48,21 @@ class Test_Row:
     def test_startswith_returns_bool(self):
         assert self.row1.startswith("Объем \"ВВП\"") is True
         assert self.row2.startswith("Объем ВВП") is False
-        # numbering is considered in Rows
         assert Row(["1.1 Объем ВВП"]).startswith("Объем ВВП") is False
 
     def test_matches_returns_bool(self):
         assert self.row1.matches("Объем ВВП") is True
         assert self.row2.matches("Объем ВВП") is False
 
-    def test_single_value(self):
-        assert Row(['abcd', '1', '2']).__single_value__(['a']) == 'a'
-        assert Row(['abcd', '1', '2']).__single_value__([]) is False
-        with pytest.raises(ValueError):
-            assert Row(['abcd', '1', '2']).__single_value__(['a', 'a'])
-
     def test_get_year(self):
         assert Row(["1999", "1", "2"]).get_year() == 1999
 
     def test_get_varname(self):
+        # finds one
         assert Row(["1. abcd"]).get_varname({'1. ab': "ZZZ"}) == 'ZZZ'
+        # will not find anything
         assert Row(["1. abcd"]).get_varname({'bc': "ZZZ"}) is False
+        # finds too many
         with pytest.raises(ValueError):
             assert Row(["1. abcd"]).get_varname(
                 {'1. ab': "ZZZ", '1. abcd': "YYY"})
@@ -110,7 +88,7 @@ class Test_Row:
         assert str(self.row2) == "<1991 1) | 4823 901 1102 1373 1447>"
 
 
-def mock_read_csv():
+def mock_rows():
     yield Row(["apt", "1", "2"])
     yield Row(["bat aa...ah", "1", "2"])
     yield Row(["can", "1", "2"])
@@ -121,14 +99,14 @@ def mock_read_csv():
 
 @pytest.fixture
 def rowstack():
-    return RowStack(mock_read_csv())
+    return RowStack(mock_rows())
 
 
 class Test_Rows:
 
-    def test_pop(self):
-        # NOT TEST: fixture too complex, testing __pop_segment__() instead
-        pass
+    def test_pop(self, rowstack):
+        assert rowstack.pop("bat", "dot") == [Row(['bat aa...ah', '1', '2']),
+                                              Row(['can', '1', '2'])]
 
     def test_pop_segment_and_remaining_rows_behaviour(self, rowstack):
         a = rowstack.pop("bat", "dot")

@@ -2,13 +2,13 @@
 
 import csv
 import re
+
 import kep.spec as spec
 
 ENC = 'utf-8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
 # csv file access
-
 
 def to_csv(rows, path):
     """Accept iterable of rows *rows* and write in to *csv_path*"""
@@ -75,27 +75,20 @@ class Row:
         for k in varnames_mapper_dict.keys():
             if self.matches(k):
                 varnames.append(varnames_mapper_dict[k])
-        return self.__single_value__(varnames)
+        if len(varnames) > 1:
+            msg = "Many entries found in <{}>: {}".format(self.name, varnames)
+            raise ValueError(msg)
+        elif len(varnames) == 1:
+            return varnames[0]
+        else:
+            return False
 
     def get_unit(self, units_mapper_dict=spec.UNITS):
         for k in units_mapper_dict.keys():
             if k in self.name:
                 return units_mapper_dict[k]
         return False
-
-    def __single_value__(self, values):
-        """Return first element in *values* or raise ValueError.
-           Returns False if *values* is empty. Uses *self.name*.
-        """
-        if len(values) > 1:
-            msg = "Multiple entries found in <{}>: {}".format(
-                self.name, values)
-            raise ValueError(msg)
-        elif len(values) == 1:
-            return values[0]
-        else:
-            return False
-
+    
     def __eq__(self, x):
         return bool(self.name == x.name and self.data == x.data)
 
