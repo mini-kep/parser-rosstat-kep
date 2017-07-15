@@ -43,7 +43,7 @@ UNITS = odict([  # 1. MONEY
     ("услуги", 'rog')
 ])
 
-# 'official' names of units used in project front 
+# 'official' names of units used in project front
 UNIT_NAMES = {'bln_rub': 'млрд.руб.',
               'bln_usd': 'млрд.долл.',
               'gdp_percent': '% ВВП',
@@ -60,8 +60,8 @@ assert set(UNIT_NAMES.keys()) == set(UNITS.values())
 
 class Indicator:
     """An economic indicator with a *varname* like GDP and its parsing instructions:
-           text           - table header string(s) used to identify table in CSV file 
-           required_units - units of measurement required this indicator           
+           text           - table header string(s) used to identify table in CSV file
+           required_units - units of measurement required this indicator
            desc           - indicator desciption string for frontpage
            value          - control value (experimantal)
     """
@@ -72,7 +72,7 @@ class Indicator:
         # construct mapper dictionary
         self.headers = odict([(t, self.varname) for t in text])
         ru = self.as_list(required_units)
-        # construct labels        
+        # construct labels
         self.required = [(self.varname, unit) for unit in ru]
         self.desc = desc
 
@@ -80,7 +80,7 @@ class Indicator:
         text = [x for x in d.headers.keys()]
         ru = [x[1] for x in self.required]
         args = "'{}', {}, {}, '{}'".format(self.varname, text, ru, self.desc)
-        return "Indicator ({})".format(args)                                                       
+        return "Indicator ({})".format(args)
 
     @staticmethod
     def as_list(x):
@@ -88,6 +88,7 @@ class Indicator:
             return [x]
         else:
             return x
+
 
 class Definition:
 
@@ -146,6 +147,9 @@ class Scope():
     def append(self, *args, **kwargs):
         self.definition.append(*args, **kwargs)
 
+    def get_parsing_definition(self):
+        return self.definition
+
     def __repr__(self):
         msg1 = repr(self.definition)
         s = self.__markers[0]['start'][:8]
@@ -189,37 +193,39 @@ class Scope():
 class Specification:
     """Specification holds a list of defintions in two variables:
 
-       .main (default definition)
-       .additional (segment defintitions)
+       .main ()
+       .scope (segment defintitions)
     """
 
     def __init__(self, pdef):
-        # main parsing definition
+        # main parsing definition, Definition
         self.main = pdef
         # local parsing definitions for segments
         self.scopes = []
 
-    def all_definitions(self):
-        return [self.main] + [sc.definition for sc in self.scopes]
-
     def add_scope(self, scope):
         self.scopes.append(scope)
+        self.validate()
+
+    def get_main_parsing_definition(self):
+        return self.main
+
+    def __all_definitions(self):
+        return [self.main] + [sc.definition for sc in self.scopes]
 
     def varnames(self):
         varnames = set()
-        for pdef in self.all_definitions():
+        for pdef in self.__all_definitions():
             for x in pdef.varnames():
                 varnames.add(x)
         return sorted(list(varnames))
 
-    def validate(self, rows):
-        # TODO: validate specification - order of markers
-        # - ends are after starts
-        # - sorted end-starts follow each other
+    def validate(self):
+        # FIXME: order of markers - ends are not starts
         pass
 
     def required(self):
-        for pdef in self.all_definitions():
+        for pdef in self.__all_definitions():
             for req in pdef.required:
                 yield req
 
@@ -238,23 +244,34 @@ main.append(varname="INDPRO",
             desc="Индекс промышленного производства")
 SPEC = Specification(main)
 
+
 sc = Scope("1.9. Внешнеторговый оборот – всего",
-            "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
+           "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
 sc.add_bounds("1.10. Внешнеторговый оборот – всего",
-               "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")
+              "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")
 sc.append(text="экспорт товаров – всего",
-           varname="EXPORT_GOODS",
-           required_units="bln_usd",
-           desc="Экспорт товаров")
+          varname="EXPORT_GOODS",
+          required_units="bln_usd",
+          desc="Экспорт товаров")
 sc.append(text="импорт товаров – всего",
-           varname="IMPORT_GOODS",
-           required_units="bln_usd",
-           desc="Импорт товаров")
+          varname="IMPORT_GOODS",
+          required_units="bln_usd",
+          desc="Импорт товаров")
 SPEC.add_scope(sc)
 
 
+sc = Scope("1.6. Инвестиции в основной капитал",
+           "1.6.1. Инвестиции в основной капитал организаций")
+sc.add_bounds("1.7. Инвестиции в основной капитал",
+              "1.7.1. Инвестиции в основной капитал организаций")
+sc.append("INVESTMENT",
+          "Инвестиции в основной капитал", 
+          ["bln_rub", "yoy", "rog"],
+          "Инвестиции в основной капитал")
+SPEC.add_scope(sc)
+
 sc = Scope(start="3.5. Индекс потребительских цен",
-            end="4. Социальная сфера")
+           end="4. Социальная сфера")
 sc.append("CPI",
           text="Индекс потребительских цен",
           required_units="rog",
@@ -272,7 +289,7 @@ sc.append("CPI_ALC",
           text="алкогольные напитки",
           required_units="rog",
           desc="ИПЦ (алкоголь)")
-sc.append("CPI_SERVICES", 
+sc.append("CPI_SERVICES",
           text="услуги",
           required_units="rog",
           desc="ИПЦ (услуги)")
@@ -299,9 +316,9 @@ if __name__ == "__main__":
 
     # test code
     #sc = Scope("Header 1", "Header 2")
-    #ah = "A bit rotten Header #1", "Curved Header 2."
-    #sc.add_bounds(*ah)
-    #sc.append(text="экспорт товаров",
+    # ah = "A bit rotten Header #1", "Curved Header 2."
+    # sc.add_bounds(*ah)
+    # sc.append(text="экспорт товаров",
     #          varname="EX",
     #          required_units="bln_usd",
     #          desc="Экспорт товаров")
@@ -328,8 +345,8 @@ if __name__ == "__main__":
     # end
 
     # TODO:
-    # - [ ] add some more test asserts to Definition, Scope and SPEC
-    # - [ ] more assetrts to to test_cfg.py
+    # - [ ] add more test asserts to Definition, Scope and SPEC
+    # - [ ] move assetrts to to test_cfg.py
     # - [ ] use new definitions in tables.py
     # - [ ] migrate existing definitions to this file
     # NOT TODO:

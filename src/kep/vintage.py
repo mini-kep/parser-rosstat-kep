@@ -309,6 +309,8 @@ if __name__ == "__main__":
     vint = Vintage(year, month)
     dfa, dfq, dfm = vint.dfs()
 
+    # TODO: need parsing result
+
     # some notebook work
 #    iq = ["GDP_yoy", "IND_PROD_yoy", "INVESTMENT_yoy", "RETAIL_SALES_yoy", "WAGE_REAL_yoy"]
 #    last_q = dfq[iq]['2017-03'].transpose()

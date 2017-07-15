@@ -15,6 +15,7 @@ Parsing procedure:
 from enum import Enum, unique
 from collections import OrderedDict as odict
 import itertools
+from itertools import chain
 import warnings
 
 from kep import files
@@ -28,8 +29,8 @@ warnings.simplefilter('ignore', UserWarning)
 
 # label handling
 
+
 def make_label(vn, unit, sep="_"):
-    print(vn, unit)
     return vn + sep + unit
 
 
@@ -58,17 +59,11 @@ def fix_multitable_units(tables):
             table.varname = prev_table.varname
 
 
-def check_required_labels(tables, pdef):
-    """Raise exception if *tables* do not contain any of labels from *pdef.required*."""
+def missed_labels(tables, pdef):
     labels_required = [make_label(varname, unit)
                        for varname, unit in pdef.required]
     labels_in_tables = [t.label for t in tables]
-    labels_missed = [x for x in labels_required if x not in labels_in_tables]
-    if labels_missed:
-        raise ValueError("Missed labels: {}".format(labels_missed))
-
-
-from itertools import chain
+    return [x for x in labels_required if x not in labels_in_tables]
 
 
 class Tables:
@@ -82,24 +77,24 @@ class Tables:
                          for varname, unit in spec.required()]
 
     def yield_tables_from_segments(self):
-        # use parsing definitions for segments first
+        # use parsing definitions for segments
         for scope in self.spec.scopes:
             start, end = scope.get_bounds(self.rowstack.rows)
             csv_segment = self.rowstack.pop(start, end)
-            pdef = scope.definition
+            pdef = scope.get_parsing_definition()
             for t in self.extract_tables(csv_segment, pdef, units=self.units):
                 yield t
 
     def yield_tables_from_main(self):
         # use default parsing definition on remaining rows
         csv_segment = self.rowstack.remaining_rows()
-        pdef = self.spec.main
+        pdef = self.spec.get_main_parsing_definition()
         for t in self.extract_tables(csv_segment, pdef, units=self.units):
             yield t
 
     def yield_tables(self):
-        return chain(self.yield_tables_from_segments(),
-                     self.yield_tables_from_main())
+        return itertools.chain(self.yield_tables_from_segments(),
+                               self.yield_tables_from_main())
 
     @staticmethod
     def extract_tables(csv_segment, pdef, units):
@@ -110,12 +105,13 @@ class Tables:
         # another run to assign trailing units to some tables
         fix_multitable_units(tables)
         # were all required tables read?
-        check_required_labels(tables, pdef)
+        labels_missed = missed_labels(tables, pdef)
+        if labels_missed:
+            raise ValueError("Missed labels: {}".format(labels_missed))
         return tables
 
     def get(self):
-        gen = self.yield_tables()
-        return list(gen)
+        return list(self.yield_tables())
 
     def get_required(self):
         return [t for t in self.get() if t.label in self.required]
@@ -177,8 +173,8 @@ class Table:
 
     def parse(self, pdef, units):
         varnames_dict = pdef.headers
-        units_dict = units
         funcname = pdef.reader
+        units_dict = units
         self.set_label(varnames_dict, units_dict)
         self.set_splitter(funcname)
         return self
@@ -203,7 +199,7 @@ class Table:
             self.splitter_func = splitter.get_splitter(self.coln)
         else:
             # Trying to parse a table without <year> <values> structure.
-            # Such tables are currently out of scope of parsing.
+            # Such tables are currently out of scope of parsing, issue warning.
             msg = "unexpected row length {}\n{}".format(self.coln, self)
             warnings.warn(msg)
 
