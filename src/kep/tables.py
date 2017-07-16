@@ -73,14 +73,14 @@ class Tables:
             start, end = scope.get_bounds(self.rowstack.rows)
             csv_segment = self.rowstack.pop(start, end)
             pdef = scope.get_parsing_definition()
-            for t in self.extract_tables(csv_segment, pdef, units=self.units):
+            for t in self.extract_tables(csv_segment, pdef, self.units):
                 yield t
 
     def yield_tables_from_main(self):
         # use default parsing definition on remaining rows
         csv_segment = self.rowstack.remaining_rows()
         pdef = self.spec.get_main_parsing_definition()
-        for t in self.extract_tables(csv_segment, pdef, units=self.units):
+        for t in self.extract_tables(csv_segment, pdef, self.units):
             yield t
 
     def yield_tables(self):
@@ -88,11 +88,11 @@ class Tables:
                                self.yield_tables_from_main())
 
     @staticmethod
-    def extract_tables(csv_segment, pdef, units):
+    def extract_tables(csv_segment, pdef, units_dict):
         # yield tables from csv_segment
         tables = split_to_tables(csv_segment)
         # parse tables to obtain labels
-        tables = [t.parse(pdef, units) for t in tables]
+        tables = [t.parse(pdef.headers, units_dict, pdef.reader) for t in tables]
         # another run to assign trailing units to some tables
         fix_multitable_units(tables)
         # were all required tables read?
@@ -167,10 +167,7 @@ class Table:
         self.coln = max(row.len() for row in self.datarows)
         self.splitter_func = None
 
-    def parse(self, pdef, units):
-        varnames_dict = pdef.headers
-        funcname = pdef.reader
-        units_dict = units
+    def parse(self, varnames_dict, units_dict, funcname):
         self.set_label(varnames_dict, units_dict)
         self.set_splitter(funcname)
         return self
