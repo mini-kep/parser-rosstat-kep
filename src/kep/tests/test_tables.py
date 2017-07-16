@@ -1,4 +1,6 @@
+import itertools
 import pytest
+
 from kep.tables import Table, Tables, split_to_tables
 from kep.rows import Row
 
@@ -20,37 +22,53 @@ from kep.rows import Row
 #    words = label.split('_')
 #    return '_'.join(itertools.dropwhile(lambda word: word.isupper(), words))
 
+# FIXME: csv to rows testing
 
-def mock_row_stream0():
-    yield Row(['Объем ВВП', '', '', '', ''])
-    yield Row(['(уточненная оценка)'])
-    yield Row(['млрд.рублей', '', '', '', ''])
-    yield Row(["1991", "4823", "901", "1102", "1373", "1447"])
+header0 = [Row(['Объем ВВП', '', '', '', '']),
+           Row(['млрд.рублей', '', '', '', ''])]
+data0 = [Row(["1991", "4823", "901", "1102", "1373", "1447"])]
 
 
+def yield_rows(headers, data):
+    for h in headers:
+        yield h
+    for d in data:
+        yield d
+        
 @pytest.fixture
-def mock_row_stream():
-    yield Row(['Объем ВВП', '', '', '', ''])
-    yield Row(['(уточненная оценка)'])
-    yield Row(['млрд.рублей', '', '', '', ''])
-    yield Row(["1991", "4823", "901", "1102", "1373", "1447"])
-    yield Row(['Индекс промышленного производства'])
-    yield Row(['в % к соответствующему периоду предыдущего года'])
-    yield Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])
-    yield Row(['--End--', '', '', '', ''])
-
+def rows0():
+    return yield_rows(header0, data0)    
 
 @pytest.fixture
 def table0():
-    return Table(headers=[Row(['Объем ВВП', '', '', '', '']),
-                          Row(['(уточненная оценка)']),
-                          Row(['млрд.рублей', '', '', '', ''])],
-                 datarows=[Row(['1991', '4823', '901', '1102', '1373', '1447'])]
-                 )
+    return Table(header0, data0)    
 
+def rows1():
+    yield Row(['Индекс ВВП, в % / GDP index, percent'])
+    yield Row(['1999', '106,4', '98,1', '103,1', '111,4',  '112,0'])
+   
+def rows2():
+    yield Row(['Индекс промышленного производства'])
+    yield Row(['в % к соответствующему периоду предыдущего года'])
+    yield Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])
 
 @pytest.fixture
-def table1():
+def mock_rows():
+    return itertools.chain(rows0(), rows1(), rows2())
+
+assert list(mock_rows()) == [Row(['Объем ВВП', '', '', '', '']),
+ Row(['млрд.рублей', '', '', '', '']),
+ Row(['1991', '4823', '901', '1102', '1373', '1447']),
+ Row(['Индекс ВВП, в % / GDP index, percent']),
+ Row(['1999', '106,4', '98,1', '103,1', '111,4', '112,0']),
+ Row(['Индекс промышленного производства']),
+ Row(['в % к соответствующему периоду предыдущего года']),
+ Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])]
+
+#FIXME: table1
+
+@pytest.fixture
+def table2():
     return Table(headers=[Row(['Индекс промышленного производства']),
                           Row(['в % к соответствующему периоду предыдущего года'])],
                  datarows=[Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])]
@@ -59,11 +77,11 @@ def table1():
 
 class Test_split_to_tables():
 
-    def test_split_to_tables(self):
-        tables = list(split_to_tables(mock_row_stream()))
-        assert len(tables) == 2
+    def test_split_to_tables(self, mock_rows):
+        tables = list(split_to_tables(mock_rows))
+        assert len(tables) == 3
         assert tables[0] == table0()
-        assert tables[1] == table1()
+        assert tables[2] == table2()
 
 
 class Test_Table_on_creation:
@@ -84,10 +102,8 @@ class Test_Table_on_creation:
         assert self.table.coln == 5
 
     def test_on_creation_header_and_datarows(self):
-        #self.headers = headers
-        #self.datarows = datarows
-        # WONTFIX: not meaningful
-        pass
+        self.table.headers = header0
+        self.table.datarows = data0
 
     def test_on_creation_lines_is_unknown(self):
         assert self.table.lines['Объем ВВП'] == self.table.UNKNOWN
@@ -116,7 +132,6 @@ class Test_Table_after_parsing:
         assert table.lines['Объем ВВП'] == table.KNOWN
         assert table.unit == 'bln_rub'
         assert table.lines['млрд.рублей'] == table.KNOWN
-        assert table.lines['(уточненная оценка)'] == table.UNKNOWN
 
     def test_set_splitter(self):
         table = table0()
@@ -125,7 +140,7 @@ class Test_Table_after_parsing:
         assert table.splitter_func == split_row_by_year_and_qtr
 
     def test_has_unknown_lines(self):
-        assert self.table_after_parsing.has_unknown_lines() is True
+        assert self.table_after_parsing.has_unknown_lines() is False
 
     def test_str_and_repr(self):
         assert str(self.table_after_parsing)
@@ -155,7 +170,7 @@ def pdef_sample():
 
 
 # test pdef fixture
-assert [k for k in pdef_sample().headers][0] == next(mock_row_stream()).name
+assert [k for k in pdef_sample().headers][0] == next(mock_rows()).name
 
 
 def spec_sample():
@@ -169,12 +184,12 @@ def spec_sample():
 
 @pytest.fixture
 def mock_Tables():
-    return Tables(mock_row_stream(), spec=spec_sample(), units=units_sample())
+    return Tables(mock_rows(), spec=spec_sample(), units=units_sample())
 
 
 def extract_sample():
     extract = mock_Tables().extract_tables
-    return extract(csv_segment=list(mock_row_stream0()),
+    return extract(csv_segment=list(rows0()),
                    pdef=pdef_sample(),
                    units_dict=units_sample())
 
