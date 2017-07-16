@@ -1,6 +1,6 @@
 import pytest
 from kep.tables import Table, Tables, split_to_tables
-from kep.rows import Row, RowStack
+from kep.rows import Row
 
 # FIXME: test for label handling
 #    def make_label(vn, unit, sep="_"):
