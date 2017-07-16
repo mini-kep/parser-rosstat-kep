@@ -35,11 +35,6 @@ def read_csv(path):
     return map(Row, no_comments)
 
 
-def get_rowstack(path):
-    rows = read_csv(path)
-    return RowStack(rows)
-
-
 class Row:
     """CSV row representation."""
 

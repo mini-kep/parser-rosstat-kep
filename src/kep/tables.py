@@ -11,7 +11,7 @@ import itertools
 import warnings
 
 from kep import splitter
-from kep.rows import get_rowstack
+from kep.rows import RowStack
 from kep.spec import SPEC
 from kep.spec import UNITS
 
@@ -50,9 +50,9 @@ def fix_multitable_units(tables):
             table.varname = prev_table.varname
 
 
-def missed_labels(tables, pdef):
+def missed_labels(tables, required):
     labels_required = [make_label(varname, unit)
-                       for varname, unit in pdef.required]
+                       for varname, unit in required]
     labels_in_tables = [t.label for t in tables]
     return [x for x in labels_required if x not in labels_in_tables]
 
@@ -60,43 +60,42 @@ def missed_labels(tables, pdef):
 class Tables:
     """Extract tables from *csv_path* using *Rows(csv_path)*."""
 
-    def __init__(self, rowstack, spec=SPEC, units=UNITS):
-        self.rowstack = rowstack
+    def __init__(self, _rows, spec=SPEC, units=UNITS):
+        self.rowstack = RowStack(_rows)
         self.spec = spec
         self.units = units
         self.required = [make_label(varname, unit)
                          for varname, unit in spec.required()]
-
-    def yield_tables_from_segments(self):
-        # use parsing definitions for segments
+        self.make_queue()
+    
+    def make_queue(self):
+        self.to_parse = []
         for scope in self.spec.scopes:
             start, end = scope.get_bounds(self.rowstack.rows)
             csv_segment = self.rowstack.pop(start, end)
             pdef = scope.get_parsing_definition()
-            for t in self.extract_tables(csv_segment, pdef, self.units):
-                yield t
-
-    def yield_tables_from_main(self):
-        # use default parsing definition on remaining rows
+            self.to_parse.append([csv_segment, pdef]) 
         csv_segment = self.rowstack.remaining_rows()
-        pdef = self.spec.get_main_parsing_definition()
-        for t in self.extract_tables(csv_segment, pdef, self.units):
-            yield t
-
+        pdef = self.spec.get_main_parsing_definition()   
+        self.to_parse.append([csv_segment, pdef]) 
+        
     def yield_tables(self):
-        return itertools.chain(self.yield_tables_from_segments(),
-                               self.yield_tables_from_main())
+        for csv_segment, pdef in self.to_parse:
+            for t in self.extract_tables(csv_segment, pdef, self.units):
+                    yield t
 
     @staticmethod
     def extract_tables(csv_segment, pdef, units_dict):
         # yield tables from csv_segment
         tables = split_to_tables(csv_segment)
         # parse tables to obtain labels
-        tables = [t.parse(pdef.headers, units_dict, pdef.reader) for t in tables]
+        varnames_dict = pdef.headers
+        tables = [t.set_label(varnames_dict, units_dict) for t in tables]
+        tables = [t.set_splitter(pdef.reader) for t in tables]
         # another run to assign trailing units to some tables
         fix_multitable_units(tables)
         # were all required tables read?
-        labels_missed = missed_labels(tables, pdef)
+        labels_missed = missed_labels(tables, pdef.required)
         if labels_missed:
             raise ValueError("Missed labels: {}".format(labels_missed))
         return tables
@@ -182,6 +181,7 @@ class Table:
             if unit:
                 self.unit = unit
                 self.lines[row.name] = self.KNOWN
+        return self                  
 
     def set_splitter(self, funcname):
         if funcname:
@@ -195,6 +195,7 @@ class Table:
             # Such tables are currently out of scope of parsing, issue warning.
             msg = "unexpected row length {}\n{}".format(self.coln, self)
             warnings.warn(msg)
+        return self
 
     @property
     def label(self):
@@ -228,9 +229,10 @@ class Table:
 
 if __name__ == "__main__":
     from kep import files
+    from kep import rows
     csv_path = files.locate_csv()
-    rowstack = get_rowstack(csv_path)
-    tables = Tables(rowstack).get_required()
-    for t in tables:
-        print()
-        print(t)
+    _rows = rows.read_csv(csv_path)
+    tables = Tables(_rows).get_required()
+    #for t in tables:
+    #    print()
+    #    print(t)

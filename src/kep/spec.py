@@ -85,9 +85,12 @@ class Indicator:
             self.desc = text[0]
         # TODO: make use of sample string in parsing    
         self.sample = sample    
+        
+    def __eq__(self, x):
+        return bool(self.required == x.required and self.headers == x.headers)
 
     def __repr__(self):
-        text = [x for x in d.headers.keys()]
+        text = [x for x in self.headers.keys()]
         req = [x[1] for x in self.required]
         args = "'{}', {}, {}, '{}'".format(self.varname, text, req, self.desc)
         return "Indicator ({})".format(args)
@@ -128,6 +131,9 @@ class Definition:
 
     def varnames(self):
         return [ind.varname for ind in self.indicators]
+
+    def __eq__(self, x):
+        return bool(self.indicators == x.indicators and self.reader == x.reader)
 
     def __repr__(self):
         vns = ", ".join(self.varnames())

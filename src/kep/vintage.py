@@ -237,9 +237,9 @@ class Vintage:
         # find csv
         self.csv_path = files.locate_csv(year, month)
         # rowstack
-        self.rowstack = rows.get_rowstack(self.csv_path)
+        self.rows = rows.read_csv(self.csv_path)
         # break csv to tables with variable names
-        self.tables = tables.Tables(self.rowstack).get_required()
+        self.tables = tables.Tables(self.rows).get_required()
         # convert stream values to pandas dataframes
         self.frames = Frames(tables=self.tables)
 
