@@ -74,6 +74,62 @@ def table2():
                  datarows=[Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])]
                  )
 
+#TODO: rename moule rows
+csvtext=dict()
+headers={0:header0}
+data={0:data0}
+#def rowstream
+table=dict()
+
+
+class Sample:
+    from kep.spec import Indicator
+    Indicator = dict(GDP=Indicator(varname="GDP",
+                     text='Объем ВВП',
+                     required_units="bln_rub"))    
+
+
+def units_sample():
+    return {'млрд.рублей': 'bln_rub'} # add 2 units
+
+
+def i_gdp():    
+    return Sample.Indicator["GDP"]
+
+# TODO: more to pdef spec
+
+
+def pdef_sample():
+    from kep.spec import Definition
+    pdef = Definition()
+    pdef.append(varname="GDP",
+                text='Объем ВВП',
+                required_units="bln_rub")
+    return pdef
+
+
+# test pdef fixture
+assert [k for k in pdef_sample().headers][0] == next(mock_rows()).name
+
+
+def spec_sample():
+    from kep.spec import Definition, Specification
+    main = Definition()
+    main.append(varname="GDP",
+                text='Объем ВВП',
+                required_units="bln_rub")
+    return Specification(main)
+
+
+@pytest.fixture
+def mock_Tables():
+    return Tables(mock_rows(), spec=spec_sample(), units=units_sample())
+
+
+
+
+
+
 
 class Test_split_to_tables():
 
@@ -81,6 +137,7 @@ class Test_split_to_tables():
         tables = list(split_to_tables(mock_rows))
         assert len(tables) == 3
         assert tables[0] == table0()
+        # table 1
         assert tables[2] == table2()
 
 
@@ -146,45 +203,6 @@ class Test_Table_after_parsing:
         assert str(self.table_after_parsing)
         assert repr(self.table_after_parsing)
 
-
-def units_sample():
-    return {'млрд.рублей': 'bln_rub'}
-
-
-def i_gdp():
-    from kep.spec import Indicator
-    return Indicator(varname="GDP",
-                     text='Объем ВВП',
-                     required_units="bln_rub")
-
-# TODO: more to pdef spec
-
-
-def pdef_sample():
-    from kep.spec import Definition
-    pdef = Definition()
-    pdef.append(varname="GDP",
-                text='Объем ВВП',
-                required_units="bln_rub")
-    return pdef
-
-
-# test pdef fixture
-assert [k for k in pdef_sample().headers][0] == next(mock_rows()).name
-
-
-def spec_sample():
-    from kep.spec import Definition, Specification
-    main = Definition()
-    main.append(varname="GDP",
-                text='Объем ВВП',
-                required_units="bln_rub")
-    return Specification(main)
-
-
-@pytest.fixture
-def mock_Tables():
-    return Tables(mock_rows(), spec=spec_sample(), units=units_sample())
 
 
 def extract_sample():
