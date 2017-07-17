@@ -30,7 +30,7 @@ class Test_Row:
 
 
 class Test_Row_Properies_and_Some_Methods(Test_Row):
- 
+
     def test_name_property(self):
         assert self.row1.name == 'Объем ВВП'
         assert self.row2.name == "1991 1)"
@@ -60,13 +60,15 @@ class Test_Row_Properies_and_Some_Methods(Test_Row):
 
     def test_repr_method(self):
         assert repr(self.row1) == "Row(['Объем ВВП', '', '', '', ''])"
-        assert repr(self.row2) == "Row(['1991 1)', '4823', '901', '1102', '1373', '1447'])"
-        assert repr(self.row3) 
-    
+        assert repr(
+            self.row2) == "Row(['1991 1)', '4823', '901', '1102', '1373', '1447'])"
+        assert repr(self.row3)
+
     def test_str_method(self):
         assert str(self.row1) == "<Объем ВВП>"
         assert str(self.row2) == "<1991 1) | 4823 901 1102 1373 1447>"
-        assert str(self.row3)        
+        assert str(self.row3)
+
 
 class Test_Row_Match_Methods(Test_Row):
 
@@ -76,7 +78,7 @@ class Test_Row_Match_Methods(Test_Row):
         assert Row(["1.1 Объем ВВП"]).startswith("Объем ВВП") is False
 
     def test_startswith_ignores_apostrophe(self):
-        assert self.row1.startswith("Объем \"ВВП\"") is True
+        assert self.row1.startswith('Объем \"ВВП\"') is True
 
     def test_matches_returns_bool(self):
         assert self.row1.matches("Объем ВВП") is True
@@ -95,7 +97,7 @@ class Test_Row_Match_Methods(Test_Row):
     def test_get_unit(self):
         unit_mapper = {'%': 'pct'}
         assert Row(["Rate, %"]).get_unit(unit_mapper) == 'pct'
-        
+
     def test_get_unit_uses_first_entry_in_unit_mapper_dict(self):
         unit_mapper = odict([('%', "pct"), ('% change', "pct_chg")])
         assert Row(["1. abcd, % change"]).get_unit(unit_mapper) == 'pct'
@@ -119,7 +121,7 @@ def rowstack():
 class Test_Rowstack:
 
     def test_pop(self, rowstack):
-        a = rowstack.pop("bat", "dot") 
+        a = rowstack.pop("bat", "dot")
         assert a == [Row(['bat aa...ah', '1', '2']),
                      Row(["can extra text", "1", "2"])]
 
@@ -129,6 +131,7 @@ class Test_Rowstack:
         c = rowstack.remaining_rows()
         assert c[0] == Row(["wed more text", "1", "2"])
         assert c[1] == Row(["zed some text"])
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

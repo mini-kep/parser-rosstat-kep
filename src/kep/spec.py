@@ -254,7 +254,7 @@ main.append(varname="GDP",
 main.append(varname="INDPRO",
             text="Индекс промышленного производства",
             required_units=["yoy", "rog"],
-            desc="Индекс промышленного производства")
+            desc="Промышленное производство")
 SPEC = Specification(main)
 
 # segment definitions
@@ -311,61 +311,12 @@ sc.append("CPI_SERVICES",
 SPEC.add_scope(sc)
 
     # TODO:
-    # - [ ] add more test asserts to Definition, Scope and SPEC
-    # - [ ] move assetrts to test_cfg.py
-    # - [ ] move assetrts to test_cfg.py
     # - [ ] migrate existing definitions to this file    
     # NOT TODO:
     # - [ ] spec validation procedure
-    # - [ ] use of row sample
+    # - [ ] use of sample row
     # - [ ] think of a better pattern to create SPEC
 
 
 if __name__ == "__main__":
-    # TODO: move test code to test_spec.py 
-    # test code
-    d = Indicator(varname="GDP",
-                  text=["Oбъем ВВП",
-                        "Индекс физического объема произведенного ВВП, в %"],
-                  required_units=["bln_rub", "yoy"],
-                  desc="Валовый внутренний продукт")
-    assert repr(d)
-    assert d.varname == "GDP"
-    assert d.headers == odict(
-        [('Oбъем ВВП', 'GDP'), ('Индекс физического объема произведенного ВВП, в %', 'GDP')])
-    assert d.required == [('GDP', 'bln_rub'), ('GDP', 'yoy')]
-    # end
-
-    # test code
-    assert repr(main)
-    assert isinstance(main.headers, odict)
-    # end
-
-    # test code
-    sc = Scope("Header 1", "Header 2")
-    ah = "A bit rotten Header #1", "Curved Header 2."
-    sc.add_bounds(*ah)
-    sc.append(text="экспорт товаров",
-              varname="EX",
-              required_units="bln_usd",
-              desc="Экспорт товаров")
-    assert repr(sc)
-    assert isinstance(sc.definition, Definition)
-
-    row_mock1 = ["A bit rotten Header #1",
-                 "more lines here",
-                 "more lines here",
-                 "more lines here",
-                 "Curved Header 2."]
-    s, e = sc.get_bounds(row_mock1)
-    assert s, e == ah
-    
-    # test_code
-    assert isinstance(SPEC, Specification)
-    assert isinstance(SPEC.main, Definition)
-    assert SPEC.main.headers
-    assert SPEC.main.required
-    assert SPEC.main.reader is None
-    for scope in SPEC.scopes:
-        assert isinstance(scope.definition, Definition)
-    # end
+    pass

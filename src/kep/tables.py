@@ -58,7 +58,13 @@ def missed_labels(tables, required):
 
 
 class Tables:
-    """Extract tables from *csv_path* using *Rows(csv_path)*."""
+    """Extract tables from *csv_path* using *Rows(csv_path)*.
+    
+       Parsing procedure:
+       - cut out a segment of csv file as delimited by start and end line makers
+       - hold remaining parts of csv file for further parsing
+       - break csv segment into tables, each table containing headers and data rows
+       - parse table headers to obtain variable name ("GDP") and unit ("bln_rub")"""
 
     def __init__(self, _rows, spec=SPEC, units=UNITS):
         self.rowstack = RowStack(_rows)
@@ -69,10 +75,14 @@ class Tables:
         self.make_queue()
     
     def make_queue(self):
+        """Init list of csv segments and parsing definitons"""
         self.to_parse = []
         for scope in self.spec.scopes:
+            # find segemnt limits
             start, end = scope.get_bounds(self.rowstack.rows)
+            # pop csv segment 
             csv_segment = self.rowstack.pop(start, end)
+            # get current parsing definition
             pdef = scope.get_parsing_definition()
             self.to_parse.append([csv_segment, pdef]) 
         csv_segment = self.rowstack.remaining_rows()
@@ -101,11 +111,6 @@ class Tables:
         return tables
 
     def get(self):
-        """Parsing procedure:
-           - cut out a segment of csv file as delimited by start and end line makers
-           - hold remaining parts of csv file for further parsing
-           - break csv segment into tables, each table containing headers and data rows
-           - parse table headers to obtain variable name ("GDP") and unit ("bln_rub")"""
         return list(self.yield_tables())
 
     def get_required(self):
@@ -233,6 +238,6 @@ if __name__ == "__main__":
     csv_path = files.locate_csv()
     _rows = rows.read_csv(csv_path)
     tables = Tables(_rows).get_required()
-    #for t in tables:
-    #    print()
-    #    print(t)
+    for t in tables:
+        print()
+        print(t)
