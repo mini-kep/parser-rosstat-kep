@@ -5,65 +5,73 @@ from invoke import Collection, task
 from pathlib import Path
 
 
-PROJECT_DIR = Path(__file__).parent 
+PROJECT_DIR = Path(__file__).parent
+
 
 def walk_files(directory: Path):
     for _insider in directory.iterdir():
         if _insider.is_dir():
-            for _sub in walk_files(_insider.resolve()):  # When is folder we recall this function to iterate insider elements
+            for _sub in walk_files(_insider.resolve(
+            )):  # When is folder we recall this function to iterate insider elements
                 yield _sub.resolve()
         else:
             yield _insider.resolve()
 
+
 def find_all(glob):
     for f in walk_files(PROJECT_DIR):
         if glob in f.name:
-            yield f        
-        
+            yield f
+
+
 @task
 def pep8(ctx, folder="kep"):
     path = PROJECT_DIR / "src" / folder
-    files =  filter(lambda x: x.suffix == ".py", walk_files(path))
+    files = filter(lambda x: x.suffix == ".py", walk_files(path))
     for f in files:
         print("Formatting", f)
-        # FIXME: may 
+        # FIXME: may
         ctx.run("autopep8 --aggressive --aggressive --in-place {}".format(f))
+
 
 @task
 def clean(ctx):
-    """Delete all compiled Python files"""    
-    for f in find_all(".pyc"):        
+    """Delete all compiled Python files"""
+    for f in find_all(".pyc"):
         print("Removing", f)
         f.unlink()
 
 # WONTFIX: add flake8
-## Lint using flake8
-#lint:
+# Lint using flake8
+# lint:
 #	flake8 --exclude=lib/,bin/,docs/conf.py .
 
 #@task
-#def lint():
+# def lint():
 #    """lint - check style with flake8."""
 #    run('flake8 {{ cookiecutter.repo_name|replace('-', '_') }} tests')
 
 # https://habrahabr.ru/company/dataart/blog/318776/
 
+
 @task
 def test(ctx):
-     ctx.run("py.test --cov=kep")
+    ctx.run("py.test --cov=kep")
+
 
 @task
 def cov(ctx):
-     ctx.run("coverage report --omit=*tests*")
+    ctx.run("coverage report --omit=*tests*")
+
 
 @task
 def ls(ctx):
     """List directory"""
     cmd = "dir /b"
     result = ctx.run(cmd, hide=False, warn=True)
-    #print(result.ok)
-    #print(result.stdout.splitlines())
-    
+    # print(result.ok)
+    # print(result.stdout.splitlines())
+
 
 ns = Collection()
 ns.add_task(clean)
@@ -76,7 +84,6 @@ ns.add_task(test)
 if platform == 'win32':
     # This is path to cmd.exe
     ns.configure({'run': {'shell': environ['COMSPEC']}})
-
 
 
 """
