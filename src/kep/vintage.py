@@ -1,12 +1,19 @@
-"""Emit dataframes from raw CSV file represented as Tables() instances.
+"""Create pandas dataframes based on data in Table() instances.
+
+
+*Emitter* class extracts data at different frequences from Table.datarows
+          from a list of Table() instances.
+*Frames* uses Emitter.collect_data() method to get data, creates pandas dataframes
+*Vintage* is a wrapper class to create and save dataframes based on year and month.
+
 
 Main call:
 
    Vintage(year, month).save()
 
+
 """
 
-import itertools
 import re
 import warnings
 
@@ -73,54 +80,49 @@ class DictMaker:
 
 
 class Emitter:
-    """Emitter extracts and holds annual, quarterly and monthly values
-       for a given Table.
+    """Emitter extracts, holds and emits annual, quarterly and monthly values
+       from list of defined Table() instances.
+    """
 
-       Table must have defined *label* and *splitter_func*."""
-
-    def __init__(self, table):
-        if not table.is_defined():
-            raise ValueError(table)
+    def __init__(self, tables):
         self.a = []
         self.q = []
         self.m = []
+        for t in tables:
+            self.add_table(t)        
+        
+    def add_table(self, table):    
+        # defined Table() must have *label* and *splitter_func*
+        if not table.is_defined():
+            raise ValueError(table)
         for row in table.datarows:
             dmaker = DictMaker(row.get_year(), table.label)
             a_value, q_values, m_values = table.splitter_func(row.data)
             if a_value:
                 self.a.append(dmaker.a_dict(a_value))
             if q_values:
-                self.q.extend([dmaker.q_dict(val, t + 1)
-                               for t, val in enumerate(q_values) if val])
+                qs = [dmaker.q_dict(val, t + 1) for t, val in enumerate(q_values) if val]
+                self.q.extend(qs)
             if m_values:
-                self.m.extend([dmaker.m_dict(val, t + 1)
-                               for t, val in enumerate(m_values) if val])
+                ms = [dmaker.m_dict(val, t + 1)  for t, val in enumerate(m_values) if val]
+                self.m.extend(ms)
+    
+    def collect_data(self, freq):
+        if freq in "aqm":
+            return getattr(self, freq)        
+        else:
+            raise ValueError(freq)
 
+## FIXME: may create Validator class
+#    
+#   def get(self, freq, label=None, year=None):
+#        gen = self.emit_by_freq(freq)
+#        if label:
+#            gen = filter(lambda x: x['label'].startswith(label), gen)
+#        if year:
+#            gen = filter(lambda x: x['year'] == year, gen)
+#        return list(gen)
 
-class Datapoints:
-    """Inspection into datapoints using emitters"""
-
-    def __init__(self, tables):
-        self.emitters = [Emitter(t) for t in tables if t.is_defined()]
-        self.datapoints = (self.emit_by_freq("a") +
-                           self.emit_by_freq("q") +
-                           self.emit_by_freq("m"))
-
-    def emit_by_freq(self, freq: str):
-        assert freq in "aqm"
-        gen = [getattr(e, freq) for e in self.emitters]
-        return list(itertools.chain.from_iterable(gen))
-
-    def get(self, freq, label=None, year=None):
-        gen = self.emit_by_freq(freq)
-        if label:
-            gen = filter(lambda x: x['label'].startswith(label), gen)
-        if year:
-            gen = filter(lambda x: x['year'] == year, gen)
-        return list(gen)
-
-    def includes(self, x):
-        return x in self.datapoints
 
 # dataframe dates handling
 
@@ -148,8 +150,22 @@ def get_date_year_end(year):
 class Frames:
     """Create pandas DataFrames."""
 
-    def collect(self, freq):
-        return [x for x in self.datapoints if x['freq'] == freq]
+    def __init__(self, tables):
+        self.emitter = Emitter(t for t in tables if t.is_defined())
+        self.datapoints = [x for freq in "aqm" 
+                             for x in self.emitter.collect_data(freq)]           
+        
+        dfa = pd.DataFrame(self.emitter.collect_data("a"))
+        dfq = pd.DataFrame(self.emitter.collect_data("q"))
+        dfm = pd.DataFrame(self.emitter.collect_data("m"))
+        for df in dfa, dfq, dfm:
+            self.validate(df)
+        self.dfa = self.reshape_a(dfa)
+        self.dfq = self.reshape_q(dfq)
+        self.dfm = self.reshape_m(dfm)
+    
+    def includes(self, x):
+        return x in self.datapoints
 
     @staticmethod
     def validate(df):
@@ -158,17 +174,6 @@ class Frames:
             if not dups.empty:
                 # df must have no duplicate rows
                 raise ValueError(dups)
-
-    def __init__(self, tables):
-        self.datapoints = Datapoints(tables).datapoints
-        dfa = pd.DataFrame(self.collect("a"))
-        dfq = pd.DataFrame(self.collect("q"))
-        dfm = pd.DataFrame(self.collect("m"))
-        for df in dfa, dfq, dfm:
-            self.validate(df)
-        self.dfa = self.reshape_a(dfa)
-        self.dfq = self.reshape_q(dfq)
-        self.dfm = self.reshape_m(dfm)
 
     @staticmethod
     def reshape_a(dfa):
@@ -253,17 +258,14 @@ class Vintage:
         return self.frames.dfa, self.frames.dfq, self.frames.dfm
 
     def __str__(self):
-        return "{} {}".format(self.year, self.month)
+        return repr(self)
 
     def __repr__(self):
-        # FIXME: use self.__class__ in other __repr__()'s
-        # FIXME: review __str__, and __repr__()
-        return "{0!s}({1!r}, {2!r})".format(
-            self.__class__, self.year, self.month)
+        return "Vintage ({}, {})".format(self.year, self.month)
 
     def validate(self, valid_datapoints=VALID_DATAPOINTS):
         for x in valid_datapoints:
-            if x not in self.frames.datapoints:
+            if not self.frames.includes(x):
                 msg = "Not found in dataset: {}\nFile: {}".format(
                     x, self.csv_path)
                 raise ValueError(msg)
