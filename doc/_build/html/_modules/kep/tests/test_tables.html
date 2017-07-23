@@ -1,0 +1,335 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>kep.tests.test_tables &#8212; kep  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for kep.tests.test_tables</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+
+<span class="c1"># fixtures</span>
+<span class="kn">from</span> <span class="nn">kep.rows</span> <span class="k">import</span> <span class="n">Row</span>
+<span class="c1"># testing</span>
+<span class="kn">from</span> <span class="nn">kep.tables</span> <span class="k">import</span> <span class="n">Table</span><span class="p">,</span> <span class="n">Tables</span><span class="p">,</span> <span class="n">split_to_tables</span>
+<span class="kn">from</span> <span class="nn">kep.spec</span> <span class="k">import</span> <span class="n">Indicator</span><span class="p">,</span> <span class="n">Definition</span><span class="p">,</span> <span class="n">Specification</span>
+
+<span class="c1"># TODO: rename module &#39;rows&#39;</span>
+
+<span class="c1"># FIXME: test for label handling</span>
+<span class="c1">#    def make_label(vn, unit, sep=&quot;_&quot;):</span>
+<span class="c1">#    return vn + sep + unit</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># def split_label(label):</span>
+<span class="c1">#    return extract_varname(label), extract_unit(label)</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># def extract_varname(label):</span>
+<span class="c1">#    words = label.split(&#39;_&#39;)</span>
+<span class="c1">#    return &#39;_&#39;.join(itertools.takewhile(lambda word: word.isupper(), words))</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># def extract_unit(label):</span>
+<span class="c1">#    words = label.split(&#39;_&#39;)</span>
+<span class="c1">#    return &#39;_&#39;.join(itertools.dropwhile(lambda word: word.isupper(), words))</span>
+
+<span class="c1"># FIXME: csv to rows testing</span>
+
+<span class="c1"># FIXME: Scope not tested</span>
+
+
+<span class="n">gdp_def</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">varname</span><span class="o">=</span><span class="s2">&quot;GDP&quot;</span><span class="p">,</span>
+               <span class="n">text</span><span class="o">=</span><span class="s1">&#39;Объем ВВП&#39;</span><span class="p">,</span>
+               <span class="n">required_units</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;bln_rub&#39;</span><span class="p">,</span> <span class="s1">&#39;rog&#39;</span><span class="p">])</span>
+
+<span class="n">indpro_def</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">varname</span><span class="o">=</span><span class="s2">&quot;INDPRO&quot;</span><span class="p">,</span>
+                  <span class="n">text</span><span class="o">=</span><span class="s1">&#39;Индекс промышленного производства&#39;</span><span class="p">,</span>
+                  <span class="n">required_units</span><span class="o">=</span><span class="s1">&#39;yoy&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Spec_Sample"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Spec_Sample">[docs]</a><span class="k">class</span> <span class="nc">Spec_Sample</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Spec_Sample.units"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Spec_Sample.units">[docs]</a>    <span class="k">def</span> <span class="nf">units</span><span class="p">():</span>
+        <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;млрд.рублей&#39;</span><span class="p">:</span> <span class="s1">&#39;bln_rub&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;в % к прошлому периоду&#39;</span><span class="p">:</span> <span class="s1">&#39;rog&#39;</span><span class="p">,</span>
+                <span class="s1">&#39;в % к соответствующему периоду предыдущего года&#39;</span><span class="p">:</span> <span class="s1">&#39;yoy&#39;</span><span class="p">}</span></div>
+
+<div class="viewcode-block" id="Spec_Sample.indicator"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Spec_Sample.indicator">[docs]</a>    <span class="k">def</span> <span class="nf">indicator</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+        <span class="n">inds</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">GDP</span><span class="o">=</span><span class="n">Indicator</span><span class="p">(</span><span class="o">**</span><span class="n">gdp_def</span><span class="p">),</span>
+                    <span class="n">INDPRO</span><span class="o">=</span><span class="n">Indicator</span><span class="p">(</span><span class="o">**</span><span class="n">indpro_def</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">inds</span><span class="p">[</span><span class="n">name</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Spec_Sample.pdef"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Spec_Sample.pdef">[docs]</a>    <span class="k">def</span> <span class="nf">pdef</span><span class="p">():</span>
+        <span class="n">pdef</span> <span class="o">=</span> <span class="n">Definition</span><span class="p">(</span><span class="n">reader</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">pdef</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">**</span><span class="n">gdp_def</span><span class="p">)</span>
+        <span class="n">pdef</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">**</span><span class="n">indpro_def</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">pdef</span></div>
+
+<div class="viewcode-block" id="Spec_Sample.spec"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Spec_Sample.spec">[docs]</a>    <span class="k">def</span> <span class="nf">spec</span><span class="p">():</span>
+        <span class="n">main</span> <span class="o">=</span> <span class="n">Definition</span><span class="p">()</span>
+        <span class="n">main</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">**</span><span class="n">gdp_def</span><span class="p">)</span>
+        <span class="n">main</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">**</span><span class="n">indpro_def</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Specification</span><span class="p">(</span><span class="n">main</span><span class="p">)</span></div></div>
+
+
+<span class="n">headers</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">[</span><span class="n">Row</span><span class="p">([</span><span class="s1">&#39;Объем ВВП&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]),</span>
+               <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;млрд.рублей&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">])],</span>
+           <span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="n">Row</span><span class="p">([</span><span class="s1">&#39;Индекс ВВП, в % к прошлому периоду/ GDP index, percent&#39;</span><span class="p">])],</span>
+           <span class="mi">2</span><span class="p">:</span> <span class="p">[</span><span class="n">Row</span><span class="p">([</span><span class="s1">&#39;Индекс промышленного производства&#39;</span><span class="p">]),</span>
+               <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;в % к соответствующему периоду предыдущего года&#39;</span><span class="p">])]</span>
+           <span class="p">}</span>
+
+<span class="n">data_items</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="p">[</span><span class="n">Row</span><span class="p">([</span><span class="s2">&quot;1991&quot;</span><span class="p">,</span> <span class="s2">&quot;4823&quot;</span><span class="p">,</span> <span class="s2">&quot;901&quot;</span><span class="p">,</span> <span class="s2">&quot;1102&quot;</span><span class="p">,</span> <span class="s2">&quot;1373&quot;</span><span class="p">,</span> <span class="s2">&quot;1447&quot;</span><span class="p">])],</span>
+              <span class="mi">1</span><span class="p">:</span> <span class="p">[</span><span class="n">Row</span><span class="p">([</span><span class="s1">&#39;1999&#39;</span><span class="p">,</span> <span class="s1">&#39;106,4&#39;</span><span class="p">,</span> <span class="s1">&#39;98,1&#39;</span><span class="p">,</span> <span class="s1">&#39;103,1&#39;</span><span class="p">,</span> <span class="s1">&#39;111,4&#39;</span><span class="p">,</span> <span class="s1">&#39;112,0&#39;</span><span class="p">])],</span>
+              <span class="mi">2</span><span class="p">:</span> <span class="p">[</span><span class="n">Row</span><span class="p">([</span><span class="s1">&#39;1991&#39;</span><span class="p">,</span> <span class="s1">&#39;102,7&#39;</span><span class="p">,</span> <span class="s1">&#39;101,1&#39;</span><span class="p">,</span> <span class="s1">&#39;102,2&#39;</span><span class="p">,</span> <span class="s1">&#39;103,3&#39;</span><span class="p">,</span> <span class="s1">&#39;104,4&#39;</span><span class="p">])]</span>
+              <span class="p">}</span>
+
+
+<div class="viewcode-block" id="Sample"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Sample">[docs]</a><span class="k">class</span> <span class="nc">Sample</span><span class="p">(</span><span class="n">Spec_Sample</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Fixtures for testing&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Sample.rows"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Sample.rows">[docs]</a>    <span class="k">def</span> <span class="nf">rows</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">headers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">data_items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Sample.headers"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Sample.headers">[docs]</a>    <span class="k">def</span> <span class="nf">headers</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">headers</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Sample.data_items"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Sample.data_items">[docs]</a>    <span class="k">def</span> <span class="nf">data_items</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">data_items</span><span class="p">[</span><span class="n">i</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Sample.table"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Sample.table">[docs]</a>    <span class="k">def</span> <span class="nf">table</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Table</span><span class="p">(</span><span class="n">headers</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">data_items</span><span class="p">[</span><span class="n">i</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Sample.label"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Sample.label">[docs]</a>    <span class="k">def</span> <span class="nf">label</span><span class="p">(</span><span class="n">i</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;GDP_bln_rub&#39;</span><span class="p">,</span> <span class="s1">&#39;GDP_rog&#39;</span><span class="p">,</span> <span class="s1">&#39;INDPRO_yoy&#39;</span><span class="p">][</span><span class="n">i</span><span class="p">]</span></div>
+
+    <span class="c1"># TODO: not tested - Scope</span>
+
+<div class="viewcode-block" id="Sample.tables"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Sample.tables">[docs]</a>    <span class="k">def</span> <span class="nf">tables</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">Tables</span><span class="p">(</span><span class="n">mock_rows</span><span class="p">(),</span> <span class="n">spec</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">spec</span><span class="p">(),</span> <span class="n">units</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">units</span><span class="p">())</span></div></div>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<div class="viewcode-block" id="mock_rows"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.mock_rows">[docs]</a><span class="k">def</span> <span class="nf">mock_rows</span><span class="p">():</span>
+    <span class="n">gen</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">Sample</span><span class="o">.</span><span class="n">rows</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">gen</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Test_fixtures"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_fixtures">[docs]</a><span class="k">class</span> <span class="nc">Test_fixtures</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Test_fixtures.test_mock_rows"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_fixtures.test_mock_rows">[docs]</a>    <span class="k">def</span> <span class="nf">test_mock_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">list</span><span class="p">(</span><span class="n">mock_rows</span><span class="p">())</span> <span class="o">==</span> <span class="p">[</span><span class="n">Row</span><span class="p">([</span><span class="s1">&#39;Объем ВВП&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]),</span>
+                                     <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;млрд.рублей&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]),</span>
+                                     <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;1991&#39;</span><span class="p">,</span> <span class="s1">&#39;4823&#39;</span><span class="p">,</span> <span class="s1">&#39;901&#39;</span><span class="p">,</span> <span class="s1">&#39;1102&#39;</span><span class="p">,</span> <span class="s1">&#39;1373&#39;</span><span class="p">,</span> <span class="s1">&#39;1447&#39;</span><span class="p">]),</span>
+                                     <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;Индекс ВВП, в % к прошлому периоду/ GDP index, percent&#39;</span><span class="p">]),</span>
+                                     <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;1999&#39;</span><span class="p">,</span> <span class="s1">&#39;106,4&#39;</span><span class="p">,</span> <span class="s1">&#39;98,1&#39;</span><span class="p">,</span> <span class="s1">&#39;103,1&#39;</span><span class="p">,</span> <span class="s1">&#39;111,4&#39;</span><span class="p">,</span> <span class="s1">&#39;112,0&#39;</span><span class="p">]),</span>
+                                     <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;Индекс промышленного производства&#39;</span><span class="p">]),</span>
+                                     <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;в % к соответствующему периоду предыдущего года&#39;</span><span class="p">]),</span>
+                                     <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;1991&#39;</span><span class="p">,</span> <span class="s1">&#39;102,7&#39;</span><span class="p">,</span> <span class="s1">&#39;101,1&#39;</span><span class="p">,</span> <span class="s1">&#39;102,2&#39;</span><span class="p">,</span> <span class="s1">&#39;103,3&#39;</span><span class="p">,</span> <span class="s1">&#39;104,4&#39;</span><span class="p">])]</span></div>
+
+<div class="viewcode-block" id="Test_fixtures.test_regression_same_string_used_in_first_row_and_pdef"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_fixtures.test_regression_same_string_used_in_first_row_and_pdef">[docs]</a>    <span class="k">def</span> <span class="nf">test_regression_same_string_used_in_first_row_and_pdef</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">Sample</span><span class="o">.</span><span class="n">pdef</span><span class="p">()</span><span class="o">.</span><span class="n">headers</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> \
+            <span class="nb">next</span><span class="p">(</span><span class="n">mock_rows</span><span class="p">())</span><span class="o">.</span><span class="n">name</span></div></div>
+
+
+<div class="viewcode-block" id="Test_split_to_tables"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_split_to_tables">[docs]</a><span class="k">class</span> <span class="nc">Test_split_to_tables</span><span class="p">():</span>
+
+<div class="viewcode-block" id="Test_split_to_tables.test_split_to_tables"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_split_to_tables.test_split_to_tables">[docs]</a>    <span class="k">def</span> <span class="nf">test_split_to_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">mock_rows</span><span class="p">):</span>
+        <span class="n">tables</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">split_to_tables</span><span class="p">(</span><span class="n">mock_rows</span><span class="p">))</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">tables</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span>
+        <span class="k">assert</span> <span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">Sample</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">tables</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">Sample</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">tables</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="n">Sample</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Test_Table_on_creation"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_on_creation">[docs]</a><span class="k">class</span> <span class="nc">Test_Table_on_creation</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Test_Table_on_creation.setup_method"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_on_creation.setup_method">[docs]</a>    <span class="k">def</span> <span class="nf">setup_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span> <span class="o">=</span> <span class="n">Sample</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Test_Table_on_creation.test_KNOWN_UNKNOWN_sanity"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_on_creation.test_KNOWN_UNKNOWN_sanity">[docs]</a>    <span class="k">def</span> <span class="nf">test_KNOWN_UNKNOWN_sanity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># actual error before class constants were introduced</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">KNOWN</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">UNKNOWN</span></div>
+
+<div class="viewcode-block" id="Test_Table_on_creation.test_on_creation_varname_and_unit_and_splitter_are_none"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_on_creation.test_on_creation_varname_and_unit_and_splitter_are_none">[docs]</a>    <span class="k">def</span> <span class="nf">test_on_creation_varname_and_unit_and_splitter_are_none</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">varname</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">unit</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">splitter_func</span> <span class="ow">is</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="Test_Table_on_creation.test_on_creation_coln"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_on_creation.test_on_creation_coln">[docs]</a>    <span class="k">def</span> <span class="nf">test_on_creation_coln</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">coln</span> <span class="o">==</span> <span class="mi">5</span></div>
+
+<div class="viewcode-block" id="Test_Table_on_creation.test_on_creation_header_and_datarows"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_on_creation.test_on_creation_header_and_datarows">[docs]</a>    <span class="k">def</span> <span class="nf">test_on_creation_header_and_datarows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">headers</span> <span class="o">=</span> <span class="n">Sample</span><span class="o">.</span><span class="n">headers</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">datarows</span> <span class="o">=</span> <span class="n">Sample</span><span class="o">.</span><span class="n">data_items</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Test_Table_on_creation.test_on_creation_lines_is_unknown"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_on_creation.test_on_creation_lines_is_unknown">[docs]</a>    <span class="k">def</span> <span class="nf">test_on_creation_lines_is_unknown</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="s1">&#39;Объем ВВП&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">UNKNOWN</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="s1">&#39;млрд.рублей&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">UNKNOWN</span></div>
+
+<div class="viewcode-block" id="Test_Table_on_creation.test_on_creation_has_unknown_lines"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_on_creation.test_on_creation_has_unknown_lines">[docs]</a>    <span class="k">def</span> <span class="nf">test_on_creation_has_unknown_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="o">.</span><span class="n">has_unknown_lines</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Test_Table_on_creation.test_str_repr"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_on_creation.test_str_repr">[docs]</a>    <span class="k">def</span> <span class="nf">test_str_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Test_Table_after_parsing"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_after_parsing">[docs]</a><span class="k">class</span> <span class="nc">Test_Table_after_parsing</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Test_Table_after_parsing.setup_method"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_after_parsing.setup_method">[docs]</a>    <span class="k">def</span> <span class="nf">setup_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">table_after_parsing</span> <span class="o">=</span> <span class="n">Sample</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span>
+            <span class="n">varnames_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Объем ВВП&#39;</span><span class="p">:</span> <span class="s1">&#39;GDP&#39;</span><span class="p">},</span>
+            <span class="n">units_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;млрд.рублей&#39;</span><span class="p">:</span> <span class="s1">&#39;bln_rub&#39;</span><span class="p">},</span>
+            <span class="n">funcname</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Test_Table_after_parsing.test_set_label"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_after_parsing.test_set_label">[docs]</a>    <span class="k">def</span> <span class="nf">test_set_label</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">Sample</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">set_label</span><span class="p">({</span><span class="s1">&#39;Объем ВВП&#39;</span><span class="p">:</span> <span class="s1">&#39;GDP&#39;</span><span class="p">},</span> <span class="p">{</span><span class="s1">&#39;млрд.рублей&#39;</span><span class="p">:</span> <span class="s1">&#39;bln_rub&#39;</span><span class="p">})</span>
+        <span class="k">assert</span> <span class="n">table</span><span class="o">.</span><span class="n">varname</span> <span class="o">==</span> <span class="s1">&#39;GDP&#39;</span>
+        <span class="k">assert</span> <span class="n">table</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="s1">&#39;Объем ВВП&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">table</span><span class="o">.</span><span class="n">KNOWN</span>
+        <span class="k">assert</span> <span class="n">table</span><span class="o">.</span><span class="n">unit</span> <span class="o">==</span> <span class="s1">&#39;bln_rub&#39;</span>
+        <span class="k">assert</span> <span class="n">table</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="s1">&#39;млрд.рублей&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">table</span><span class="o">.</span><span class="n">KNOWN</span></div>
+
+<div class="viewcode-block" id="Test_Table_after_parsing.test_set_splitter"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_after_parsing.test_set_splitter">[docs]</a>    <span class="k">def</span> <span class="nf">test_set_splitter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">table</span> <span class="o">=</span> <span class="n">Sample</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">table</span><span class="o">.</span><span class="n">set_splitter</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+        <span class="kn">from</span> <span class="nn">kep.splitter</span> <span class="k">import</span> <span class="n">split_row_by_year_and_qtr</span>
+        <span class="k">assert</span> <span class="n">table</span><span class="o">.</span><span class="n">splitter_func</span> <span class="o">==</span> <span class="n">split_row_by_year_and_qtr</span></div>
+
+<div class="viewcode-block" id="Test_Table_after_parsing.test_has_unknown_lines"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_after_parsing.test_has_unknown_lines">[docs]</a>    <span class="k">def</span> <span class="nf">test_has_unknown_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">table_after_parsing</span><span class="o">.</span><span class="n">has_unknown_lines</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Test_Table_after_parsing.test_str_and_repr"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Table_after_parsing.test_str_and_repr">[docs]</a>    <span class="k">def</span> <span class="nf">test_str_and_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_after_parsing</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">table_after_parsing</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Test_extract_tables_function"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_extract_tables_function">[docs]</a><span class="k">class</span> <span class="nc">Test_extract_tables_function</span><span class="p">:</span>
+    <span class="n">extract_tables</span> <span class="o">=</span> <span class="n">Tables</span><span class="o">.</span><span class="n">extract_tables</span>
+    <span class="n">tables</span> <span class="o">=</span> <span class="n">extract_tables</span><span class="p">(</span><span class="n">csv_segment</span><span class="o">=</span><span class="n">mock_rows</span><span class="p">(),</span>
+                            <span class="n">pdef</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">pdef</span><span class="p">(),</span>
+                            <span class="n">units_dict</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">units</span><span class="p">())</span>
+
+    <span class="c1"># FIXME:  more functions in extract_tables other than split tables</span>
+
+<div class="viewcode-block" id="Test_extract_tables_function.test_returns_list"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_extract_tables_function.test_returns_list">[docs]</a>    <span class="k">def</span> <span class="nf">test_returns_list</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Test_extract_tables_function.test_table0_is_table_instance"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_extract_tables_function.test_table0_is_table_instance">[docs]</a>    <span class="k">def</span> <span class="nf">test_table0_is_table_instance</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">t0</span><span class="p">,</span> <span class="n">Table</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">t0</span> <span class="o">==</span> <span class="n">Sample</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Test_extract_tables_function.test_table0_is_parsed_with_label_GDP_bln_rub"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_extract_tables_function.test_table0_is_parsed_with_label_GDP_bln_rub">[docs]</a>    <span class="k">def</span> <span class="nf">test_table0_is_parsed_with_label_GDP_bln_rub</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tables</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">t0</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">varnames_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;Объем ВВП&#39;</span><span class="p">:</span> <span class="s1">&#39;GDP&#39;</span><span class="p">},</span>
+                 <span class="n">units_dict</span><span class="o">=</span><span class="p">{</span><span class="s1">&#39;млрд.рублей&#39;</span><span class="p">:</span> <span class="s1">&#39;bln_rub&#39;</span><span class="p">},</span>
+                 <span class="n">funcname</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">t0</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="s1">&#39;GDP_bln_rub&#39;</span></div></div>
+
+
+<div class="viewcode-block" id="Test_Tables_class_init"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Tables_class_init">[docs]</a><span class="k">class</span> <span class="nc">Test_Tables_class_init</span><span class="p">:</span>
+
+    <span class="c1"># WONTFIX: test attibutes on creation</span>
+
+    <span class="c1"># TODO: test ts.to_parse  /  make_queue()</span>
+
+<div class="viewcode-block" id="Test_Tables_class_init.test_spec_get_main_parsing_definition_returns_pdef"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Tables_class_init.test_spec_get_main_parsing_definition_returns_pdef">[docs]</a>    <span class="k">def</span> <span class="nf">test_spec_get_main_parsing_definition_returns_pdef</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                                           <span class="n">ts</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">tables</span><span class="p">()):</span>
+        <span class="k">assert</span> <span class="n">ts</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">get_main_parsing_definition</span><span class="p">()</span> <span class="o">==</span> <span class="n">Sample</span><span class="o">.</span><span class="n">pdef</span><span class="p">()</span></div></div>
+
+
+<div class="viewcode-block" id="Test_Tables_class_parsing_behaviour"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Tables_class_parsing_behaviour">[docs]</a><span class="k">class</span> <span class="nc">Test_Tables_class_parsing_behaviour</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Test_Tables_class_parsing_behaviour.test_yield_tables"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_tables.Test_Tables_class_parsing_behaviour.test_yield_tables">[docs]</a>    <span class="k">def</span> <span class="nf">test_yield_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ts</span><span class="o">=</span><span class="n">Sample</span><span class="o">.</span><span class="n">tables</span><span class="p">()):</span>
+        <span class="n">gen</span> <span class="o">=</span> <span class="n">ts</span><span class="o">.</span><span class="n">yield_tables</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">gen</span><span class="p">):</span>
+            <span class="k">assert</span> <span class="n">t</span> <span class="o">==</span> <span class="n">Sample</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="n">t</span><span class="o">.</span><span class="n">label</span> <span class="o">==</span> <span class="n">Sample</span><span class="o">.</span><span class="n">label</span><span class="p">(</span><span class="n">i</span><span class="p">)</span></div></div>
+
+    <span class="c1"># if Scope is used</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">pytest</span><span class="o">.</span><span class="n">main</span><span class="p">([</span><span class="n">__file__</span><span class="p">])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

@@ -1,0 +1,211 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>kep.splitter &#8212; kep  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for kep.splitter</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Splitter functions extract annual, quarterly and monthly values from data row.&quot;&quot;&quot;</span>
+
+
+<div class="viewcode-block" id="split_row_by_periods"><a class="viewcode-back" href="../../kep.html#kep.splitter.split_row_by_periods">[docs]</a><span class="k">def</span> <span class="nf">split_row_by_periods</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Values format:</span>
+<span class="sd">       A Q Q Q Q M*12</span>
+
+<span class="sd">    &gt;&gt;&gt; split_row_by_periods([&#39;2015&#39;,&#39;a&#39;,&#39;b&#39;,&#39;c&#39;,&#39;d&#39;,1,2,3,4,5,6,7,8,9,10,11,12])</span>
+<span class="sd">    (&#39;2015&#39;, [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])&quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span><span class="p">:</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">12</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="split_row_by_year_and_qtr"><a class="viewcode-back" href="../../kep.html#kep.splitter.split_row_by_year_and_qtr">[docs]</a><span class="k">def</span> <span class="nf">split_row_by_year_and_qtr</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Values format:</span>
+<span class="sd">       A Q Q Q Q</span>
+
+<span class="sd">    &gt;&gt;&gt; split_row_by_year_and_qtr([&#39;85881&#39;, &#39;18561&#39;, &#39;19979&#39;, &#39;22190&#39;, &#39;&#39;])</span>
+<span class="sd">    (&#39;85881&#39;, [&#39;18561&#39;, &#39;19979&#39;, &#39;22190&#39;, &#39;&#39;], None)&quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span><span class="p">],</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="split_row_by_months"><a class="viewcode-back" href="../../kep.html#kep.splitter.split_row_by_months">[docs]</a><span class="k">def</span> <span class="nf">split_row_by_months</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Values format:</span>
+<span class="sd">       M*12</span>
+
+<span class="sd">    &gt;&gt;&gt; split_row_by_months([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])</span>
+<span class="sd">    (None, None, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])</span>
+
+<span class="sd">    &gt;&gt;&gt; split_row_by_months([&#39;1697&#39;, &#39;1832&#39;, &#39;2317&#39;, &#39;3066&#39;, &#39;3607&#39;, &#39;4111&#39;, &#39;3856&#39;, &#39;3530&#39;, &#39;2961&#39;, &#39;2149&#39;, &#39;1565&#39;, &#39;1583&#39;])</span>
+<span class="sd">    (None, None, [&#39;1697&#39;, &#39;1832&#39;, &#39;2317&#39;, &#39;3066&#39;, &#39;3607&#39;, &#39;4111&#39;, &#39;3856&#39;, &#39;3530&#39;, &#39;2961&#39;, &#39;2149&#39;, &#39;1565&#39;, &#39;1583&#39;])&quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">12</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="split_row_by_months_and_annual"><a class="viewcode-back" href="../../kep.html#kep.splitter.split_row_by_months_and_annual">[docs]</a><span class="k">def</span> <span class="nf">split_row_by_months_and_annual</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Values format:</span>
+<span class="sd">       A M*12</span>
+
+<span class="sd">    &gt;&gt;&gt; split_row_by_months_and_annual([78] + [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])</span>
+<span class="sd">    (78, None, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])</span>
+<span class="sd">    &gt;&gt;&gt; 78 == sum([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])</span>
+<span class="sd">    True</span>
+
+
+<span class="sd">    &gt;&gt;&gt; split_row_by_months_and_annual([&#39;32259&#39;, &#39;1703&#39;, &#39;1853&#39;, &#39;2305&#39;, &#39;3049&#39;, &#39;3590&#39;, &#39;4007&#39;, &#39;3891&#39;, &#39;3515&#39;, &#39;2917&#39;, &#39;2160&#39;, &#39;1613&#39;, &#39;1656&#39;])</span>
+<span class="sd">    (&#39;32259&#39;, None, [&#39;1703&#39;, &#39;1853&#39;, &#39;2305&#39;, &#39;3049&#39;, &#39;3590&#39;, &#39;4007&#39;, &#39;3891&#39;, &#39;3515&#39;, &#39;2917&#39;, &#39;2160&#39;, &#39;1613&#39;, &#39;1656&#39;])</span>
+<span class="sd">    &gt;&gt;&gt; 32259 == sum(int(x) for x in            [&#39;1703&#39;, &#39;1853&#39;, &#39;2305&#39;, &#39;3049&#39;, &#39;3590&#39;, &#39;4007&#39;, &#39;3891&#39;, &#39;3515&#39;, &#39;2917&#39;, &#39;2160&#39;, &#39;1613&#39;, &#39;1656&#39;])</span>
+<span class="sd">    True</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="kc">None</span><span class="p">,</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">12</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="split_row_by_accum_qtrs"><a class="viewcode-back" href="../../kep.html#kep.splitter.split_row_by_accum_qtrs">[docs]</a><span class="k">def</span> <span class="nf">split_row_by_accum_qtrs</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Values format:</span>
+<span class="sd">       Annual AccumQ1 AccumH1 Accum9mo</span>
+<span class="sd">       &lt;I квартал Q 1&gt;	&lt;I полугодие 1st half-year&gt;	&lt;Январь-сентябрь January-September&gt;</span>
+
+<span class="sd">    &gt;&gt;&gt; split_row_by_accum_qtrs ([&#39;35217&#39;,&#39;6372&#39;,&#39;7236&#39;,&#39;33523&#39;])</span>
+<span class="sd">    (&#39;35217&#39;, [&#39;6372&#39;, &#39;7236&#39;, &#39;33523&#39;, &#39;35217&#39;], None)&quot;&quot;&quot;</span>
+
+    <span class="k">return</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">3</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]],</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="emit_nones"><a class="viewcode-back" href="../../kep.html#kep.splitter.emit_nones">[docs]</a><span class="k">def</span> <span class="nf">emit_nones</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;WARNING: unexpected number of columns </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span></div>
+
+
+<span class="n">ROW_LENGTH_TO_FUNC_MAPPER</span> <span class="o">=</span> <span class="p">{</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">+</span> <span class="mi">12</span><span class="p">:</span> <span class="n">split_row_by_periods</span><span class="p">,</span>
+                             <span class="mi">1</span> <span class="o">+</span> <span class="mi">4</span><span class="p">:</span> <span class="n">split_row_by_year_and_qtr</span><span class="p">,</span>
+                             <span class="mi">1</span> <span class="o">+</span> <span class="mi">12</span><span class="p">:</span> <span class="n">split_row_by_months_and_annual</span><span class="p">,</span>
+                             <span class="mi">12</span><span class="p">:</span> <span class="n">split_row_by_months</span><span class="p">,</span>
+                             <span class="mi">4</span><span class="p">:</span> <span class="n">split_row_by_accum_qtrs</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="get_splitter"><a class="viewcode-back" href="../../kep.html#kep.splitter.get_splitter">[docs]</a><span class="k">def</span> <span class="nf">get_splitter</span><span class="p">(</span><span class="n">coln</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">ROW_LENGTH_TO_FUNC_MAPPER</span><span class="p">[</span><span class="n">coln</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">emit_nones</span></div>
+<span class="c1"># FIXME: source of warnings?</span>
+<span class="c1"># WARNING: unexpected row with length 3</span>
+<span class="c1"># WARNING: unexpected row with length 14</span>
+<span class="c1"># WARNING: unexpected row with length 14</span>
+
+<span class="c1"># Custom splitter functions</span>
+
+
+<span class="sd">&#39;&#39;&#39;</span>
+<span class="sd">#	Год Year	Янв. Jan.	Янв-фев. Jan-Feb	I квартал Q1	Янв-апр. Jan-Apr	Янв-май Jan-May	I полугод. 1st half year	Янв-июль Jan-Jul	Янв-авг. Jan-Aug	Янв-cент. Jan-Sent	Янв-окт. Jan-Oct	Янв-нояб. Jan-Nov</span>
+<span class="sd"># Консолидированные бюджеты субъектов Российской Федерации, млрд.рублей / Consolidated budgets of constituent entities of the Russian Federation, bln rubles</span>
+<span class="sd"># 1999	653,8	22,7	49,2	91,5	138,7	185,0	240,0	288,5	345,5	400,6	454,0	528,0</span>
+<span class="sd">#   0	    1	   2      3 	   4	    5	    6	    7	    8	    9	   10	   11	   12</span>
+<span class="sd">#          0     1      2     3       4      5      6      7     8      9     10     11</span>
+<span class="sd">&#39;&#39;&#39;</span>
+
+
+<div class="viewcode-block" id="split_row_fiscal"><a class="viewcode-back" href="../../kep.html#kep.splitter.split_row_fiscal">[docs]</a><span class="k">def</span> <span class="nf">split_row_fiscal</span><span class="p">(</span><span class="n">row</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &gt;&gt;&gt; split_row_fiscal([&#39;653,8&#39;, &#39;22,7&#39;, &#39;49,2&#39;, &#39;91,5&#39;, &#39;138,7&#39;, &#39;185,0&#39;, &#39;240,0&#39;, &#39;288,5&#39;, &#39;345,5&#39;, &#39;400,6&#39;, &#39;454,0&#39;, &#39;528,0&#39;])</span>
+<span class="sd">    (&#39;653,8&#39;, [&#39;91,5&#39;, &#39;240,0&#39;, &#39;400,6&#39;, &#39;653,8&#39;], [&#39;22,7&#39;, &#39;49,2&#39;, &#39;91,5&#39;, &#39;138,7&#39;, &#39;185,0&#39;, &#39;240,0&#39;, &#39;288,5&#39;, &#39;345,5&#39;, &#39;400,6&#39;, &#39;454,0&#39;, &#39;528,0&#39;, &#39;653,8&#39;])</span>
+
+<span class="sd">    TODO: summ up differences by months, must be equal to 653,8</span>
+<span class="sd">    accum_by_month_str = [&#39;22,7&#39;, &#39;49,2&#39;, &#39;91,5&#39;, &#39;138,7&#39;, &#39;185,0&#39;, &#39;240,0&#39;, &#39;288,5&#39;, &#39;345,5&#39;, &#39;400,6&#39;, &#39;454,0&#39;, &#39;528,0&#39;, &#39;653,8&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="n">x</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">0</span><span class="p">]],</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">1</span> <span class="o">+</span> <span class="mi">12</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span></div>
+
+
+<span class="n">SPECIAL_FUNC_NAMES_TO_FUNC_MAPPER</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;fiscal&#39;</span><span class="p">:</span> <span class="n">split_row_fiscal</span><span class="p">}</span>
+
+
+<div class="viewcode-block" id="get_custom_splitter"><a class="viewcode-back" href="../../kep.html#kep.splitter.get_custom_splitter">[docs]</a><span class="k">def</span> <span class="nf">get_custom_splitter</span><span class="p">(</span><span class="n">func_name</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">SPECIAL_FUNC_NAMES_TO_FUNC_MAPPER</span><span class="p">[</span><span class="n">func_name</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;ERROR: custom function name not found:&quot;</span><span class="p">,</span> <span class="n">func_name</span><span class="p">)</span></div>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">pass</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

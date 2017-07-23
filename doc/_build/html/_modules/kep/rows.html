@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>kep.rows &#8212; kep  documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+   
+  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for kep.rows</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;Read CSV file and represent it as a stream/list of Rows() instances.&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">csv</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">import</span> <span class="nn">kep.spec</span> <span class="k">as</span> <span class="nn">spec</span>
+
+<span class="n">ENC</span> <span class="o">=</span> <span class="s1">&#39;utf-8&#39;</span>
+<span class="n">CSV_FORMAT</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">lineterminator</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+
+<span class="c1"># csv file access</span>
+
+<div class="viewcode-block" id="to_csv"><a class="viewcode-back" href="../../kep.html#kep.rows.to_csv">[docs]</a><span class="k">def</span> <span class="nf">to_csv</span><span class="p">(</span><span class="n">rows</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Accept iterable of rows *rows* and write in to *csv_path*&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s1">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">ENC</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
+        <span class="n">filewriter</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="o">**</span><span class="n">CSV_FORMAT</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">:</span>
+            <span class="n">filewriter</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">path</span></div>
+
+
+<div class="viewcode-block" id="from_csv"><a class="viewcode-back" href="../../kep.html#kep.rows.from_csv">[docs]</a><span class="k">def</span> <span class="nf">from_csv</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get iterable of rows from *csv_path*&quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="n">path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="n">ENC</span><span class="p">)</span> <span class="k">as</span> <span class="n">csvfile</span><span class="p">:</span>
+        <span class="n">csvreader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">csvfile</span><span class="p">,</span> <span class="o">**</span><span class="n">CSV_FORMAT</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">csvreader</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">row</span></div>
+
+
+<div class="viewcode-block" id="read_csv"><a class="viewcode-back" href="../../kep.html#kep.rows.read_csv">[docs]</a><span class="k">def</span> <span class="nf">read_csv</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Yield non-empty dictionaries with &#39;head&#39; and &#39;data&#39; keys from *path*&quot;&quot;&quot;</span>
+    <span class="n">raw_csv_rows</span> <span class="o">=</span> <span class="n">from_csv</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+    <span class="n">filled</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">row</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">raw_csv_rows</span><span class="p">)</span>
+    <span class="n">no_comments</span> <span class="o">=</span> <span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="ow">not</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;___&quot;</span><span class="p">),</span> <span class="n">filled</span><span class="p">)</span>
+    <span class="k">return</span> <span class="nb">map</span><span class="p">(</span><span class="n">Row</span><span class="p">,</span> <span class="n">no_comments</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Row"><a class="viewcode-back" href="../../kep.html#kep.rows.Row">[docs]</a><span class="k">class</span> <span class="nc">Row</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;CSV row representation.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+<div class="viewcode-block" id="Row.len"><a class="viewcode-back" href="../../kep.html#kep.rows.Row.len">[docs]</a>    <span class="k">def</span> <span class="nf">len</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Row.is_datarow"><a class="viewcode-back" href="../../kep.html#kep.rows.Row.is_datarow">[docs]</a>    <span class="k">def</span> <span class="nf">is_datarow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">is_year</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Row.startswith"><a class="viewcode-back" href="../../kep.html#kep.rows.Row.startswith">[docs]</a>    <span class="k">def</span> <span class="nf">startswith</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+        <span class="c1"># clean out apostrophe (&quot;)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">r</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">text</span><span class="p">)</span></div>
+
+    <span class="c1"># FIXME: identical to startswith?</span>
+<div class="viewcode-block" id="Row.matches"><a class="viewcode-back" href="../../kep.html#kep.rows.Row.matches">[docs]</a>    <span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pat</span><span class="p">):</span>
+        <span class="n">rx</span> <span class="o">=</span> <span class="s2">r&quot;\b</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">pat</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">rx</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Row.get_year"><a class="viewcode-back" href="../../kep.html#kep.rows.Row.get_year">[docs]</a>    <span class="k">def</span> <span class="nf">get_year</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">get_year</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Row.get_varname"><a class="viewcode-back" href="../../kep.html#kep.rows.Row.get_varname">[docs]</a>    <span class="k">def</span> <span class="nf">get_varname</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">varnames_mapper_dict</span><span class="p">):</span>
+        <span class="n">varnames</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">varnames_mapper_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="n">k</span><span class="p">):</span>
+                <span class="n">varnames</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">varnames_mapper_dict</span><span class="p">[</span><span class="n">k</span><span class="p">])</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">varnames</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Many entries found in &lt;</span><span class="si">{}</span><span class="s2">&gt;: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">varnames</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">varnames</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">varnames</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Row.get_unit"><a class="viewcode-back" href="../../kep.html#kep.rows.Row.get_unit">[docs]</a>    <span class="k">def</span> <span class="nf">get_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">units_mapper_dict</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">UNITS</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">units_mapper_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">units_mapper_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">return</span> <span class="kc">False</span></div>
+    
+    <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">x</span><span class="o">.</span><span class="n">name</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="n">x</span><span class="o">.</span><span class="n">data</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2"> | </span><span class="si">{}</span><span class="s2">&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&lt;</span><span class="si">{}</span><span class="s2">&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Row(</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="p">)</span></div>
+
+
+<span class="n">YEAR_CATCHER</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s1">&#39;(\d</span><span class="si">{4}</span><span class="s1">).*&#39;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_year"><a class="viewcode-back" href="../../kep.html#kep.rows.get_year">[docs]</a><span class="k">def</span> <span class="nf">get_year</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rx</span><span class="o">=</span><span class="n">YEAR_CATCHER</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extracts year from string *string*.</span>
+<span class="sd">       Returns False if year is not valid or not in plausible range.&quot;&quot;&quot;</span>
+    <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">rx</span><span class="p">,</span> <span class="n">string</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+        <span class="n">year</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">year</span> <span class="o">&gt;=</span> <span class="mi">1991</span> <span class="ow">and</span> <span class="n">year</span> <span class="o">&lt;=</span> <span class="mi">2050</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">year</span>
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="is_year"><a class="viewcode-back" href="../../kep.html#kep.rows.is_year">[docs]</a><span class="k">def</span> <span class="nf">is_year</span><span class="p">(</span><span class="n">string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">get_year</span><span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">False</span></div>
+
+
+<div class="viewcode-block" id="RowStack"><a class="viewcode-back" href="../../kep.html#kep.rows.RowStack">[docs]</a><span class="k">class</span> <span class="nc">RowStack</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Holder for CSV rows. Allows extracting segments of CSV file and</span>
+<span class="sd">       remaining part of CSV file, after all segments are extracted.</span>
+
+<span class="sd">       Operates on list of Row() instances.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
+        <span class="c1"># consume *rows*, likely it is a generator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>
+
+<div class="viewcode-block" id="RowStack.remaining_rows"><a class="viewcode-back" href="../../kep.html#kep.rows.RowStack.remaining_rows">[docs]</a>    <span class="k">def</span> <span class="nf">remaining_rows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows</span></div>
+
+<div class="viewcode-block" id="RowStack.pop"><a class="viewcode-back" href="../../kep.html#kep.rows.RowStack.pop">[docs]</a>    <span class="k">def</span> <span class="nf">pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Pops elements of self.rows between [start, end).</span>
+<span class="sd">           Recognises element occurrences by index *i*.</span>
+<span class="sd">           Modifies *self.rows*.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">we_are_in_segment</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">segment</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">):</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">start</span><span class="p">):</span>
+                <span class="n">we_are_in_segment</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="n">row</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">end</span><span class="p">):</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="n">we_are_in_segment</span><span class="p">:</span>
+                <span class="n">segment</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">row</span><span class="p">)</span>
+                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">rows</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># else is very important, wrong indexing without it</span>
+                <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">segment</span></div></div>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="k">assert</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;1. abcd&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get_varname</span><span class="p">({</span><span class="s1">&#39;1. ab&#39;</span><span class="p">:</span> <span class="s2">&quot;ZZZ&quot;</span><span class="p">})</span> <span class="o">==</span> <span class="s1">&#39;ZZZ&#39;</span>
+    <span class="k">assert</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;1. abcd&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get_varname</span><span class="p">({</span><span class="s1">&#39;bc&#39;</span><span class="p">:</span> <span class="s2">&quot;ZZZ&quot;</span><span class="p">})</span> <span class="ow">is</span> <span class="kc">False</span>
+    <span class="kn">import</span> <span class="nn">pytest</span>
+    <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;1. abcd&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get_varname</span><span class="p">({</span><span class="s1">&#39;1. ab&#39;</span><span class="p">:</span> <span class="s2">&quot;ZZZ&quot;</span><span class="p">,</span> <span class="s1">&#39;1. abcd&#39;</span><span class="p">:</span> <span class="s2">&quot;YYY&quot;</span><span class="p">})</span>
+    <span class="k">assert</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;1. abcd, %&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get_unit</span><span class="p">({</span><span class="s1">&#39;%&#39;</span><span class="p">:</span> <span class="s2">&quot;pct&quot;</span><span class="p">})</span> <span class="o">==</span> <span class="s1">&#39;pct&#39;</span>
+
+    <span class="k">def</span> <span class="nf">mock_read_csv</span><span class="p">():</span>
+        <span class="k">yield</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;apt&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])</span>
+        <span class="k">yield</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;bat aa...ah&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])</span>
+        <span class="k">yield</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;can&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])</span>
+        <span class="k">yield</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;dot oo...eh&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])</span>
+        <span class="k">yield</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;wed&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])</span>
+        <span class="k">yield</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;zed&quot;</span><span class="p">])</span>
+
+    <span class="n">rows</span> <span class="o">=</span> <span class="n">RowStack</span><span class="p">(</span><span class="n">mock_read_csv</span><span class="p">())</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">rows</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;bat&quot;</span><span class="p">,</span> <span class="s2">&quot;dot&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">rows</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;apt&quot;</span><span class="p">,</span> <span class="s2">&quot;wed&quot;</span><span class="p">)</span>
+    <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">rows</span><span class="o">.</span><span class="n">remaining_rows</span><span class="p">()</span>
+    <span class="k">assert</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;wed&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">])</span>
+    <span class="k">assert</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;zed&#39;</span><span class="p">])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../index.html">Documentation overview</a><ul>
+  <li><a href="../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

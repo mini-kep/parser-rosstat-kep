@@ -1,0 +1,175 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>kep.tests.test_spec &#8212; kep  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for kep.tests.test_spec</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span> <span class="k">as</span> <span class="n">odict</span>
+
+<span class="c1"># testing</span>
+<span class="kn">from</span> <span class="nn">kep.spec</span> <span class="k">import</span> <span class="n">Indicator</span><span class="p">,</span> <span class="n">Definition</span><span class="p">,</span> <span class="n">Scope</span><span class="p">,</span> <span class="n">Specification</span>
+
+
+<div class="viewcode-block" id="Test_Indicator"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_spec.Test_Indicator">[docs]</a><span class="k">class</span> <span class="nc">Test_Indicator</span><span class="p">:</span>
+
+    <span class="n">i</span> <span class="o">=</span> <span class="n">Indicator</span><span class="p">(</span><span class="n">varname</span><span class="o">=</span><span class="s2">&quot;GDP&quot;</span><span class="p">,</span>
+                  <span class="n">text</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Oбъем ВВП&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;Индекс физического объема произведенного ВВП, в %&quot;</span><span class="p">],</span>
+                  <span class="n">required_units</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;bln_rub&quot;</span><span class="p">,</span> <span class="s2">&quot;yoy&quot;</span><span class="p">],</span>
+                  <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Валовый внутренний продукт&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Test_Indicator.test_repr"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_spec.Test_Indicator.test_repr">[docs]</a>    <span class="k">def</span> <span class="nf">test_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Test_Indicator.test_attributes"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_spec.Test_Indicator.test_attributes">[docs]</a>    <span class="k">def</span> <span class="nf">test_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">varname</span> <span class="o">==</span> <span class="s2">&quot;GDP&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">headers</span> <span class="o">==</span> <span class="n">odict</span><span class="p">(</span>
+            <span class="p">[(</span><span class="s1">&#39;Oбъем ВВП&#39;</span><span class="p">,</span> <span class="s1">&#39;GDP&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;Индекс физического объема произведенного ВВП, в %&#39;</span><span class="p">,</span> <span class="s1">&#39;GDP&#39;</span><span class="p">)])</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">i</span><span class="o">.</span><span class="n">required</span> <span class="o">==</span> <span class="p">[(</span><span class="s1">&#39;GDP&#39;</span><span class="p">,</span> <span class="s1">&#39;bln_rub&#39;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;GDP&#39;</span><span class="p">,</span> <span class="s1">&#39;yoy&#39;</span><span class="p">)]</span></div></div>
+        <span class="c1"># end</span>
+
+
+<div class="viewcode-block" id="Test_Definition"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_spec.Test_Definition">[docs]</a><span class="k">class</span> <span class="nc">Test_Definition</span><span class="p">:</span>
+
+    <span class="n">main</span> <span class="o">=</span> <span class="n">Definition</span><span class="p">()</span>
+    <span class="n">main</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">varname</span><span class="o">=</span><span class="s2">&quot;GDP&quot;</span><span class="p">,</span>
+                <span class="n">text</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;Oбъем ВВП&quot;</span><span class="p">,</span>
+                      <span class="s2">&quot;Индекс физического объема произведенного ВВП, в %&quot;</span><span class="p">],</span>
+                <span class="n">required_units</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;bln_rub&quot;</span><span class="p">,</span> <span class="s2">&quot;yoy&quot;</span><span class="p">],</span>
+                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Валовый внутренний продукт (ВВП)&quot;</span><span class="p">,</span>
+                <span class="n">sample</span><span class="o">=</span><span class="s2">&quot;1999	4823	901	1102	1373	1447&quot;</span><span class="p">)</span>
+    <span class="n">main</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">varname</span><span class="o">=</span><span class="s2">&quot;INDPRO&quot;</span><span class="p">,</span>
+                <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Индекс промышленного производства&quot;</span><span class="p">,</span>
+                <span class="n">required_units</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;yoy&quot;</span><span class="p">,</span> <span class="s2">&quot;rog&quot;</span><span class="p">],</span>
+                <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Промышленное производство&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Test_Definition.test_repr"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_spec.Test_Definition.test_repr">[docs]</a>    <span class="k">def</span> <span class="nf">test_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Test_Definition.test_headers"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_spec.Test_Definition.test_headers">[docs]</a>    <span class="k">def</span> <span class="nf">test_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="n">odict</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Test_Scope"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_spec.Test_Scope">[docs]</a><span class="k">class</span> <span class="nc">Test_Scope</span><span class="p">:</span>
+    <span class="n">sc</span> <span class="o">=</span> <span class="n">Scope</span><span class="p">(</span><span class="s2">&quot;Header 1&quot;</span><span class="p">,</span> <span class="s2">&quot;Header 2&quot;</span><span class="p">)</span>
+    <span class="n">ah</span> <span class="o">=</span> <span class="s2">&quot;A bit rotten Header #1&quot;</span><span class="p">,</span> <span class="s2">&quot;Curved Header 2.&quot;</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">add_bounds</span><span class="p">(</span><span class="o">*</span><span class="n">ah</span><span class="p">)</span>
+    <span class="n">sc</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">text</span><span class="o">=</span><span class="s2">&quot;экспорт товаров&quot;</span><span class="p">,</span>
+              <span class="n">varname</span><span class="o">=</span><span class="s2">&quot;EX&quot;</span><span class="p">,</span>
+              <span class="n">required_units</span><span class="o">=</span><span class="s2">&quot;bln_usd&quot;</span><span class="p">,</span>
+              <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Экспорт товаров&quot;</span><span class="p">)</span>
+    <span class="n">row_mock</span> <span class="o">=</span> <span class="p">[</span><span class="n">ah</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="s2">&quot;more lines here&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;more lines here&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;more lines here&quot;</span><span class="p">,</span>
+                <span class="n">ah</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span>
+
+<div class="viewcode-block" id="Test_Scope.test_repr"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_spec.Test_Scope.test_repr">[docs]</a>    <span class="k">def</span> <span class="nf">test_repr</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sc</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Test_Scope.test_def"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_spec.Test_Scope.test_def">[docs]</a>    <span class="k">def</span> <span class="nf">test_def</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sc</span><span class="o">.</span><span class="n">definition</span><span class="p">,</span> <span class="n">Definition</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Test_Scope.test_able_to_find_bounds"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_spec.Test_Scope.test_able_to_find_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">test_able_to_find_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sc</span><span class="o">.</span><span class="n">get_bounds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row_mock</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">ah</span></div></div>
+
+
+<div class="viewcode-block" id="Test_Specification"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_spec.Test_Specification">[docs]</a><span class="k">class</span> <span class="nc">Test_Specification</span><span class="p">:</span>
+    <span class="c1"># TODO:</span>
+    <span class="c1"># test_code</span>
+    <span class="c1">#assert isinstance(SPEC, Specification)</span>
+    <span class="c1">#assert isinstance(SPEC.main, Definition)</span>
+    <span class="c1">#assert SPEC.main.headers</span>
+    <span class="c1">#assert SPEC.main.required</span>
+    <span class="c1">#assert SPEC.main.reader is None</span>
+    <span class="c1"># for scope in SPEC.scopes:</span>
+    <span class="c1">#    assert isinstance(scope.definition, Definition)</span>
+    <span class="k">pass</span></div>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">pytest</span><span class="o">.</span><span class="n">main</span><span class="p">([</span><span class="n">__file__</span><span class="p">])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

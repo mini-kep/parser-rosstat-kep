@@ -1,0 +1,224 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>kep.tests.test_rows &#8212; kep  documentation</title>
+    
+    <link rel="stylesheet" href="../../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../../',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="../../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../../_static/doctools.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+   
+  <link rel="stylesheet" href="../../../_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <h1>Source code for kep.tests.test_rows</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">pytest</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">OrderedDict</span> <span class="k">as</span> <span class="n">odict</span>
+
+<span class="kn">from</span> <span class="nn">kep.rows</span> <span class="k">import</span> <span class="n">get_year</span><span class="p">,</span> <span class="n">is_year</span><span class="p">,</span> <span class="n">Row</span><span class="p">,</span> <span class="n">RowStack</span>
+
+<span class="c1"># TODO: test csv readers</span>
+
+
+<div class="viewcode-block" id="Test_get_year"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_get_year">[docs]</a><span class="k">class</span> <span class="nc">Test_get_year</span><span class="p">():</span>
+<div class="viewcode-block" id="Test_get_year.test_get_year"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_get_year.test_get_year">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_year</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">get_year</span><span class="p">(</span><span class="s2">&quot;19991)&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1999</span>
+        <span class="k">assert</span> <span class="n">get_year</span><span class="p">(</span><span class="s2">&quot;1999&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1999</span>
+        <span class="k">assert</span> <span class="n">get_year</span><span class="p">(</span><span class="s2">&quot;1812&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="k">assert</span> <span class="n">get_year</span><span class="p">(</span><span class="s2">&quot;2051&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span></div></div>
+
+
+<div class="viewcode-block" id="Test_is_year"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_is_year">[docs]</a><span class="k">class</span> <span class="nc">Test_is_year</span><span class="p">():</span>
+<div class="viewcode-block" id="Test_is_year.test_is_year"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_is_year.test_is_year">[docs]</a>    <span class="k">def</span> <span class="nf">test_is_year</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="n">is_year</span><span class="p">(</span><span class="s2">&quot;19991)&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="n">is_year</span><span class="p">(</span><span class="s2">&quot;1999&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="n">is_year</span><span class="p">(</span><span class="s2">&quot;Объем ВВП&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span></div></div>
+
+
+<div class="viewcode-block" id="Test_Row"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row">[docs]</a><span class="k">class</span> <span class="nc">Test_Row</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Test_Row.setup_method"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row.setup_method">[docs]</a>    <span class="k">def</span> <span class="nf">setup_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">row1</span> <span class="o">=</span> <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;Объем ВВП&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">row2</span> <span class="o">=</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;1991 1)&quot;</span><span class="p">,</span> <span class="s2">&quot;4823&quot;</span><span class="p">,</span> <span class="s2">&quot;901&quot;</span><span class="p">,</span> <span class="s2">&quot;1102&quot;</span><span class="p">,</span> <span class="s2">&quot;1373&quot;</span><span class="p">,</span> <span class="s2">&quot;1447&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">row3</span> <span class="o">=</span> <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;abcd&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">])</span></div></div>
+
+
+<div class="viewcode-block" id="Test_Row_Properies_and_Some_Methods"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Properies_and_Some_Methods">[docs]</a><span class="k">class</span> <span class="nc">Test_Row_Properies_and_Some_Methods</span><span class="p">(</span><span class="n">Test_Row</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Test_Row_Properies_and_Some_Methods.test_name_property"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Properies_and_Some_Methods.test_name_property">[docs]</a>    <span class="k">def</span> <span class="nf">test_name_property</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row1</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;Объем ВВП&#39;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row2</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;1991 1)&quot;</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row3</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s1">&#39;abcd&#39;</span></div>
+
+<div class="viewcode-block" id="Test_Row_Properies_and_Some_Methods.test_data_property"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Properies_and_Some_Methods.test_data_property">[docs]</a>    <span class="k">def</span> <span class="nf">test_data_property</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row1</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row2</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="p">[</span><span class="s2">&quot;4823&quot;</span><span class="p">,</span> <span class="s2">&quot;901&quot;</span><span class="p">,</span> <span class="s2">&quot;1102&quot;</span><span class="p">,</span> <span class="s2">&quot;1373&quot;</span><span class="p">,</span> <span class="s2">&quot;1447&quot;</span><span class="p">]</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row3</span><span class="o">.</span><span class="n">data</span> <span class="o">==</span> <span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Test_Row_Properies_and_Some_Methods.test_len_method"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Properies_and_Some_Methods.test_len_method">[docs]</a>    <span class="k">def</span> <span class="nf">test_len_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row1</span><span class="o">.</span><span class="n">len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">4</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row2</span><span class="o">.</span><span class="n">len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">5</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row3</span><span class="o">.</span><span class="n">len</span><span class="p">()</span> <span class="o">==</span> <span class="mi">2</span></div>
+
+<div class="viewcode-block" id="Test_Row_Properies_and_Some_Methods.test_is_datarow"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Properies_and_Some_Methods.test_is_datarow">[docs]</a>    <span class="k">def</span> <span class="nf">test_is_datarow</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row1</span><span class="o">.</span><span class="n">is_datarow</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row2</span><span class="o">.</span><span class="n">is_datarow</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row3</span><span class="o">.</span><span class="n">is_datarow</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Test_Row_Properies_and_Some_Methods.test_eq"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Properies_and_Some_Methods.test_eq">[docs]</a>    <span class="k">def</span> <span class="nf">test_eq</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">class</span> <span class="nc">MockRow</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;abcd&quot;</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">]</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">MockRow</span>
+        <span class="k">assert</span> <span class="n">Row</span><span class="p">([</span><span class="s1">&#39;abcd&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">__eq__</span><span class="p">(</span><span class="n">r</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Test_Row_Properies_and_Some_Methods.test_repr_method"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Properies_and_Some_Methods.test_repr_method">[docs]</a>    <span class="k">def</span> <span class="nf">test_repr_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row1</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Row([&#39;Объем ВВП&#39;, &#39;&#39;, &#39;&#39;, &#39;&#39;, &#39;&#39;])&quot;</span>
+        <span class="k">assert</span> <span class="nb">repr</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">row2</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Row([&#39;1991 1)&#39;, &#39;4823&#39;, &#39;901&#39;, &#39;1102&#39;, &#39;1373&#39;, &#39;1447&#39;])&quot;</span>
+        <span class="k">assert</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row3</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Test_Row_Properies_and_Some_Methods.test_str_method"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Properies_and_Some_Methods.test_str_method">[docs]</a>    <span class="k">def</span> <span class="nf">test_str_method</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row1</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&lt;Объем ВВП&gt;&quot;</span>
+        <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row2</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;&lt;1991 1) | 4823 901 1102 1373 1447&gt;&quot;</span>
+        <span class="k">assert</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">row3</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Test_Row_Match_Methods"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Match_Methods">[docs]</a><span class="k">class</span> <span class="nc">Test_Row_Match_Methods</span><span class="p">(</span><span class="n">Test_Row</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Test_Row_Match_Methods.test_startswith_returns_bool"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Match_Methods.test_startswith_returns_bool">[docs]</a>    <span class="k">def</span> <span class="nf">test_startswith_returns_bool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row1</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Объем ВВП&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row2</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Объем ВВП&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="k">assert</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;1.1 Объем ВВП&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;Объем ВВП&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Test_Row_Match_Methods.test_startswith_ignores_apostrophe"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Match_Methods.test_startswith_ignores_apostrophe">[docs]</a>    <span class="k">def</span> <span class="nf">test_startswith_ignores_apostrophe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row1</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;Объем </span><span class="se">\&quot;</span><span class="s1">ВВП</span><span class="se">\&quot;</span><span class="s1">&#39;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span></div>
+
+<div class="viewcode-block" id="Test_Row_Match_Methods.test_matches_returns_bool"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Match_Methods.test_matches_returns_bool">[docs]</a>    <span class="k">def</span> <span class="nf">test_matches_returns_bool</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row1</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="s2">&quot;Объем ВВП&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">True</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">row2</span><span class="o">.</span><span class="n">matches</span><span class="p">(</span><span class="s2">&quot;Объем ВВП&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">False</span></div>
+
+<div class="viewcode-block" id="Test_Row_Match_Methods.test_get_varname"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Match_Methods.test_get_varname">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_varname</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># finds one entry</span>
+        <span class="k">assert</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;1. abcd&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get_varname</span><span class="p">({</span><span class="s1">&#39;1. ab&#39;</span><span class="p">:</span> <span class="s2">&quot;ZZZ&quot;</span><span class="p">})</span> <span class="o">==</span> <span class="s1">&#39;ZZZ&#39;</span>
+        <span class="c1"># will not find anything, becase &#39;bc&#39; is in the middle of string</span>
+        <span class="k">assert</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;1. abcd&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get_varname</span><span class="p">({</span><span class="s1">&#39;bc&#39;</span><span class="p">:</span> <span class="s2">&quot;ZZZ&quot;</span><span class="p">})</span> <span class="ow">is</span> <span class="kc">False</span>
+        <span class="c1"># finds too many entries, raises error - must be strictly defined</span>
+        <span class="k">with</span> <span class="n">pytest</span><span class="o">.</span><span class="n">raises</span><span class="p">(</span><span class="ne">ValueError</span><span class="p">):</span>
+            <span class="n">varname_mapper_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;1. a&#39;</span><span class="p">:</span> <span class="s2">&quot;ZZZ&quot;</span><span class="p">,</span> <span class="s1">&#39;1. ab&#39;</span><span class="p">:</span> <span class="s2">&quot;YYY&quot;</span><span class="p">}</span>
+            <span class="k">assert</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;1. abcd&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get_varname</span><span class="p">(</span><span class="n">varname_mapper_dict</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Test_Row_Match_Methods.test_get_unit"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Match_Methods.test_get_unit">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_unit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">unit_mapper</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;%&#39;</span><span class="p">:</span> <span class="s1">&#39;pct&#39;</span><span class="p">}</span>
+        <span class="k">assert</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;Rate, %&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get_unit</span><span class="p">(</span><span class="n">unit_mapper</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;pct&#39;</span></div>
+
+<div class="viewcode-block" id="Test_Row_Match_Methods.test_get_unit_uses_first_entry_in_unit_mapper_dict"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Row_Match_Methods.test_get_unit_uses_first_entry_in_unit_mapper_dict">[docs]</a>    <span class="k">def</span> <span class="nf">test_get_unit_uses_first_entry_in_unit_mapper_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">unit_mapper</span> <span class="o">=</span> <span class="n">odict</span><span class="p">([(</span><span class="s1">&#39;%&#39;</span><span class="p">,</span> <span class="s2">&quot;pct&quot;</span><span class="p">),</span> <span class="p">(</span><span class="s1">&#39;</span><span class="si">% c</span><span class="s1">hange&#39;</span><span class="p">,</span> <span class="s2">&quot;pct_chg&quot;</span><span class="p">)])</span>
+        <span class="k">assert</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;1. abcd, </span><span class="si">% c</span><span class="s2">hange&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get_unit</span><span class="p">(</span><span class="n">unit_mapper</span><span class="p">)</span> <span class="o">==</span> <span class="s1">&#39;pct&#39;</span>
+        <span class="k">assert</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;1. abcd, </span><span class="si">% c</span><span class="s2">hange&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">get_unit</span><span class="p">(</span><span class="n">unit_mapper</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;pct_chg&#39;</span></div></div>
+
+
+<div class="viewcode-block" id="mock_rows"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.mock_rows">[docs]</a><span class="k">def</span> <span class="nf">mock_rows</span><span class="p">():</span>
+    <span class="k">yield</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;apt extra text&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])</span>
+    <span class="k">yield</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;bat aa...ah&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])</span>
+    <span class="k">yield</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;can extra text&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])</span>
+    <span class="k">yield</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;dot oo...eh&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])</span>
+    <span class="k">yield</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;wed more text&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])</span>
+    <span class="k">yield</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;zed some text&quot;</span><span class="p">])</span></div>
+
+
+<span class="nd">@pytest</span><span class="o">.</span><span class="n">fixture</span>
+<div class="viewcode-block" id="rowstack"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.rowstack">[docs]</a><span class="k">def</span> <span class="nf">rowstack</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">RowStack</span><span class="p">(</span><span class="n">mock_rows</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="Test_Rowstack"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Rowstack">[docs]</a><span class="k">class</span> <span class="nc">Test_Rowstack</span><span class="p">:</span>
+
+<div class="viewcode-block" id="Test_Rowstack.test_pop"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Rowstack.test_pop">[docs]</a>    <span class="k">def</span> <span class="nf">test_pop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rowstack</span><span class="p">):</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">rowstack</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;bat&quot;</span><span class="p">,</span> <span class="s2">&quot;dot&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">a</span> <span class="o">==</span> <span class="p">[</span><span class="n">Row</span><span class="p">([</span><span class="s1">&#39;bat aa...ah&#39;</span><span class="p">,</span> <span class="s1">&#39;1&#39;</span><span class="p">,</span> <span class="s1">&#39;2&#39;</span><span class="p">]),</span>
+                     <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;can extra text&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])]</span></div>
+
+<div class="viewcode-block" id="Test_Rowstack.test_pop_segment_and_remaining_rows_behaviour"><a class="viewcode-back" href="../../../kep.tests.html#kep.tests.test_rows.Test_Rowstack.test_pop_segment_and_remaining_rows_behaviour">[docs]</a>    <span class="k">def</span> <span class="nf">test_pop_segment_and_remaining_rows_behaviour</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rowstack</span><span class="p">):</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">rowstack</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;apt&quot;</span><span class="p">,</span> <span class="s2">&quot;wed&quot;</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">==</span> <span class="mi">4</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">rowstack</span><span class="o">.</span><span class="n">remaining_rows</span><span class="p">()</span>
+        <span class="k">assert</span> <span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;wed more text&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">])</span>
+        <span class="k">assert</span> <span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="n">Row</span><span class="p">([</span><span class="s2">&quot;zed some text&quot;</span><span class="p">])</span></div></div>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">pytest</span><span class="o">.</span><span class="n">main</span><span class="p">([</span><span class="n">__file__</span><span class="p">])</span>
+</pre></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper"><div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="../../../index.html">Documentation overview</a><ul>
+  <li><a href="../../index.html">Module code</a><ul>
+  </ul></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../../search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+    </div>
+
+    
+
+    
+  </body>
+</html>

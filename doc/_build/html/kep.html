@@ -1,0 +1,858 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>kep package &#8212; kep  documentation</title>
+    
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to kep’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body role="document">
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="kep-package">
+<h1>kep package<a class="headerlink" href="#kep-package" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-kep.files">
+<span id="kep-files-module"></span><h2>kep.files module<a class="headerlink" href="#module-kep.files" title="Permalink to this headline">¶</a></h2>
+<dl class="class">
+<dt id="kep.files.InterimDataFolder">
+<em class="property">class </em><code class="descclassname">kep.files.</code><code class="descname">InterimDataFolder</code><span class="sig-paren">(</span><em>folder=WindowsPath('C:/Users/Евгений/Documents/GitHub/mini-kep/data/interim')</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/files.html#InterimDataFolder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.files.InterimDataFolder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Find latest month available in interim data folder</p>
+<dl class="method">
+<dt id="kep.files.InterimDataFolder.get_latest_date">
+<code class="descname">get_latest_date</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/files.html#InterimDataFolder.get_latest_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.files.InterimDataFolder.get_latest_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.files.InterimDataFolder.get_latest_folder">
+<code class="descname">get_latest_folder</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/files.html#InterimDataFolder.get_latest_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.files.InterimDataFolder.get_latest_folder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.files.InterimDataFolder.list_subfolders">
+<em class="property">static </em><code class="descname">list_subfolders</code><span class="sig-paren">(</span><em>folder</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/files.html#InterimDataFolder.list_subfolders"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.files.InterimDataFolder.list_subfolders" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.files.InterimDataFolder.max_month">
+<code class="descname">max_month</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/files.html#InterimDataFolder.max_month"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.files.InterimDataFolder.max_month" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.files.InterimDataFolder.max_year">
+<code class="descname">max_year</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/files.html#InterimDataFolder.max_year"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.files.InterimDataFolder.max_year" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.files.copy_latest_csv_to_separate_folder">
+<code class="descclassname">kep.files.</code><code class="descname">copy_latest_csv_to_separate_folder</code><span class="sig-paren">(</span><em>dst_folder=WindowsPath('C:/Users/Евгений/Documents/GitHub/mini-kep/data/processed/latest')</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/files.html#copy_latest_csv_to_separate_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.files.copy_latest_csv_to_separate_folder" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.files.filled_dates">
+<code class="descclassname">kep.files.</code><code class="descname">filled_dates</code><span class="sig-paren">(</span><em>available_dates=[(2009, 4), (2009, 5), (2009, 6), (2009, 7), (2009, 8), (2009, 9), (2009, 10), (2009, 11), (2009, 12), (2010, 1), (2010, 2), (2010, 3), (2010, 4), (2010, 5), (2010, 6), (2010, 7), (2010, 8), (2010, 9), (2010, 10), (2010, 11), (2010, 12), (2011, 1), (2011, 2), (2011, 3), (2011, 4), (2011, 5), (2011, 6), (2011, 7), (2011, 8), (2011, 9), (2011, 10), (2011, 11), (2011, 12), (2012, 1), (2012, 2), (2012, 3), (2012, 4), (2012, 5), (2012, 6), (2012, 7), (2012, 8), (2012, 9), (2012, 10), (2012, 11), (2012, 12), (2013, 1), (2013, 2), (2013, 3), (2013, 4), (2013, 5), (2013, 6), (2013, 7), (2013, 8), (2013, 9), (2013, 10), (2013, 12), (2014, 1), (2014, 2), (2014, 3), (2014, 4), (2014, 5), (2014, 6), (2014, 7), (2014, 8), (2014, 9), (2014, 10), (2014, 11), (2014, 12), (2015, 1), (2015, 2), (2015, 3), (2015, 4), (2015, 5), (2015, 6), (2015, 7), (2015, 8), (2015, 9), (2015, 10), (2015, 11), (2015, 12), (2016, 1), (2016, 2), (2016, 3), (2016, 4), (2016, 5), (2016, 6), (2016, 7), (2016, 8), (2016, 9), (2016, 10), (2016, 11), (2016, 12), (2017, 1), (2017, 2), (2017, 3), (2017, 4), (2017, 5)]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/files.html#filled_dates"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.files.filled_dates" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.files.filter_date">
+<code class="descclassname">kep.files.</code><code class="descname">filter_date</code><span class="sig-paren">(</span><em>year</em>, <em>month</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/files.html#filter_date"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.files.filter_date" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.files.get_path_csv">
+<code class="descclassname">kep.files.</code><code class="descname">get_path_csv</code><span class="sig-paren">(</span><em>year=None</em>, <em>month=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/files.html#get_path_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.files.get_path_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return interim CSV file path based on year and month</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.files.get_processed_folder">
+<code class="descclassname">kep.files.</code><code class="descname">get_processed_folder</code><span class="sig-paren">(</span><em>year=None</em>, <em>month=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/files.html#get_processed_folder"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.files.get_processed_folder" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return processed CSV file path based on year and month</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.files.init_dirs">
+<code class="descclassname">kep.files.</code><code class="descname">init_dirs</code><span class="sig-paren">(</span><em>root, available_dates=[(2009, 4), (2009, 5), (2009, 6), (2009, 7), (2009, 8), (2009, 9), (2009, 10), (2009, 11), (2009, 12), (2010, 1), (2010, 2), (2010, 3), (2010, 4), (2010, 5), (2010, 6), (2010, 7), (2010, 8), (2010, 9), (2010, 10), (2010, 11), (2010, 12), (2011, 1), (2011, 2), (2011, 3), (2011, 4), (2011, 5), (2011, 6), (2011, 7), (2011, 8), (2011, 9), (2011, 10), (2011, 11), (2011, 12), (2012, 1), (2012, 2), (2012, 3), (2012, 4), (2012, 5), (2012, 6), (2012, 7), (2012, 8), (2012, 9), (2012, 10), (2012, 11), (2012, 12), (2013, 1), (2013, 2), (2013, 3), (2013, 4), (2013, 5), (2013, 6), (2013, 7), (2013, 8), (2013, 9), (2013, 10), (2013, 12), (2014, 1), (2014, 2), (2014, 3), (2014, 4), (2014, 5), (2014, 6), (2014, 7), (2014, 8), (2014, 9), (2014, 10), (2014, 11), (2014, 12), (2015, 1), (2015, 2), (2015, 3), (2015, 4), (2015, 5), (2015, 6), (2015, 7), (2015, 8), (2015, 9), (2015, 10), (2015, 11), (2015, 12), (2016, 1), (2016, 2), (2016, 3), (2016, 4), (2016, 5), (2016, 6), (2016, 7), (2016, 8), (2016, 9), (2016, 10), (2016, 11), (2016, 12), (2017, 1), (2017, 2), (2017, 3), (2017, 4), (2017, 5)]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/files.html#init_dirs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.files.init_dirs" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.files.locate_csv">
+<code class="descclassname">kep.files.</code><code class="descname">locate_csv</code><span class="sig-paren">(</span><em>year: int = None</em>, <em>month: int = None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/files.html#locate_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.files.locate_csv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-kep.rows">
+<span id="kep-rows-module"></span><h2>kep.rows module<a class="headerlink" href="#module-kep.rows" title="Permalink to this headline">¶</a></h2>
+<p>Read CSV file and represent it as a stream/list of Rows() instances.</p>
+<dl class="class">
+<dt id="kep.rows.Row">
+<em class="property">class </em><code class="descclassname">kep.rows.</code><code class="descname">Row</code><span class="sig-paren">(</span><em>row</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>CSV row representation.</p>
+<dl class="method">
+<dt id="kep.rows.Row.get_unit">
+<code class="descname">get_unit</code><span class="sig-paren">(</span><em>units_mapper_dict=OrderedDict([('млрд.долларов'</em>, <em>'bln_usd')</em>, <em>('млрд. долларов'</em>, <em>'bln_usd')</em>, <em>('млрд</em>, <em>долларов'</em>, <em>'bln_usd')</em>, <em>('млрд.рублей'</em>, <em>'bln_rub')</em>, <em>('млрд. рублей'</em>, <em>'bln_rub')</em>, <em>('рублей / rubles'</em>, <em>'rub')</em>, <em>('млн.рублей'</em>, <em>'mln_rub')</em>, <em>('Индекс физического объема произведенного ВВП</em>, <em>в %'</em>, <em>'yoy')</em>, <em>('в % к декабрю предыдущего года'</em>, <em>'ytd')</em>, <em>('в % к предыдущему месяцу'</em>, <em>'rog')</em>, <em>('в % к предыдущему периоду'</em>, <em>'rog')</em>, <em>('% к концу предыдущего периода'</em>, <em>'rog')</em>, <em>('период с начала отчетного года в % к соответствующему периоду предыдущего года'</em>, <em>'ytd')</em>, <em>('в % к соответствующему периоду предыдущего года'</em>, <em>'yoy')</em>, <em>('в % к соответствующему месяцу предыдущего года'</em>, <em>'yoy')</em>, <em>('отчетный месяц в % к предыдущему месяцу'</em>, <em>'rog')</em>, <em>('отчетный месяц в % к соответствующему месяцу предыдущего года'</em>, <em>'yoy')</em>, <em>('период с начала отчетного года'</em>, <em>'ytd')</em>, <em>('%'</em>, <em>'pct')</em>, <em>('в % к ВВП'</em>, <em>'gdp_percent')</em>, <em>('продукты питания'</em>, <em>'rog')</em>, <em>('алкогольные напитки'</em>, <em>'rog')</em>, <em>('непродовольственные товары'</em>, <em>'rog')</em>, <em>('непродовольст- венные товары'</em>, <em>'rog')</em>, <em>('услуги'</em>, <em>'rog')])</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.get_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.get_unit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.Row.get_varname">
+<code class="descname">get_varname</code><span class="sig-paren">(</span><em>varnames_mapper_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.get_varname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.get_varname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.Row.get_year">
+<code class="descname">get_year</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.get_year"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.get_year" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.Row.is_datarow">
+<code class="descname">is_datarow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.is_datarow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.is_datarow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.Row.len">
+<code class="descname">len</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.len"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.len" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.Row.matches">
+<code class="descname">matches</code><span class="sig-paren">(</span><em>pat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.matches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.matches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.Row.startswith">
+<code class="descname">startswith</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.startswith"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.startswith" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.rows.RowStack">
+<em class="property">class </em><code class="descclassname">kep.rows.</code><code class="descname">RowStack</code><span class="sig-paren">(</span><em>rows</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#RowStack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.RowStack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Holder for CSV rows. Allows extracting segments of CSV file and
+remaining part of CSV file, after all segments are extracted.</p>
+<p>Operates on list of Row() instances.</p>
+<dl class="method">
+<dt id="kep.rows.RowStack.pop">
+<code class="descname">pop</code><span class="sig-paren">(</span><em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#RowStack.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.RowStack.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pops elements of self.rows between [start, end).
+Recognises element occurrences by index <em>i</em>.
+Modifies <em>self.rows</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.RowStack.remaining_rows">
+<code class="descname">remaining_rows</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#RowStack.remaining_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.RowStack.remaining_rows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.rows.from_csv">
+<code class="descclassname">kep.rows.</code><code class="descname">from_csv</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#from_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.from_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get iterable of rows from <em>csv_path</em></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.rows.get_year">
+<code class="descclassname">kep.rows.</code><code class="descname">get_year</code><span class="sig-paren">(</span><em>string: str</em>, <em>rx=re.compile('(\\d{4}).*')</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#get_year"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.get_year" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts year from string <em>string</em>.
+Returns False if year is not valid or not in plausible range.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.rows.is_year">
+<code class="descclassname">kep.rows.</code><code class="descname">is_year</code><span class="sig-paren">(</span><em>string: str</em><span class="sig-paren">)</span> &rarr; bool<a class="reference internal" href="_modules/kep/rows.html#is_year"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.is_year" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.rows.read_csv">
+<code class="descclassname">kep.rows.</code><code class="descname">read_csv</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#read_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.read_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield non-empty dictionaries with &#8216;head&#8217; and &#8216;data&#8217; keys from <em>path</em></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.rows.to_csv">
+<code class="descclassname">kep.rows.</code><code class="descname">to_csv</code><span class="sig-paren">(</span><em>rows</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#to_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.to_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accept iterable of rows <em>rows</em> and write in to <em>csv_path</em></p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-kep.spec">
+<span id="kep-spec-module"></span><h2>kep.spec module<a class="headerlink" href="#module-kep.spec" title="Permalink to this headline">¶</a></h2>
+<p>Parsing instruction contains:
+- text to match with variable name
+- required variable names
+- csv line boundaries (optional)
+- reader function name for unusual table formats (optional)</p>
+<dl class="class">
+<dt id="kep.spec.Definition">
+<em class="property">class </em><code class="descclassname">kep.spec.</code><code class="descname">Definition</code><span class="sig-paren">(</span><em>reader=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Definition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Definition" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="kep.spec.Definition.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Definition.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Definition.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kep.spec.Definition.headers">
+<code class="descname">headers</code><a class="headerlink" href="#kep.spec.Definition.headers" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kep.spec.Definition.required">
+<code class="descname">required</code><a class="headerlink" href="#kep.spec.Definition.required" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.spec.Definition.varnames">
+<code class="descname">varnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Definition.varnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Definition.varnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.spec.Indicator">
+<em class="property">class </em><code class="descclassname">kep.spec.</code><code class="descname">Indicator</code><span class="sig-paren">(</span><em>varname</em>, <em>text</em>, <em>required_units</em>, <em>desc=None</em>, <em>sample=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Indicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Indicator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>An economic indicator parsing instructions</p>
+<dl class="staticmethod">
+<dt id="kep.spec.Indicator.as_list">
+<em class="property">static </em><code class="descname">as_list</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Indicator.as_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Indicator.as_list" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.spec.Scope">
+<em class="property">class </em><code class="descclassname">kep.spec.</code><code class="descname">Scope</code><span class="sig-paren">(</span><em>start</em>, <em>end</em>, <em>reader=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Scope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Scope" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Start and end lines for CSV file segment and associated variables
+defintion.</p>
+<p>Holds several versions of start and end line, return applicable line
+for a particular CSV file versions. This solves problem of different
+headers for same table at various releases.</p>
+<dl class="method">
+<dt id="kep.spec.Scope.add_bounds">
+<code class="descname">add_bounds</code><span class="sig-paren">(</span><em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Scope.add_bounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Scope.add_bounds" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.spec.Scope.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Scope.append"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Scope.append" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.spec.Scope.get_bounds">
+<code class="descname">get_bounds</code><span class="sig-paren">(</span><em>rows</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Scope.get_bounds"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Scope.get_bounds" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get start and end line markers, which can be found in <em>rows</em></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.spec.Scope.get_parsing_definition">
+<code class="descname">get_parsing_definition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Scope.get_parsing_definition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Scope.get_parsing_definition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.spec.Specification">
+<em class="property">class </em><code class="descclassname">kep.spec.</code><code class="descname">Specification</code><span class="sig-paren">(</span><em>pdef</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Specification"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Specification" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Specification holds a list of defintions in two variables:</p>
+<p>.main ()
+.scope (segment defintitions)</p>
+<dl class="method">
+<dt id="kep.spec.Specification.add_scope">
+<code class="descname">add_scope</code><span class="sig-paren">(</span><em>scope</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Specification.add_scope"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Specification.add_scope" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.spec.Specification.get_main_parsing_definition">
+<code class="descname">get_main_parsing_definition</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Specification.get_main_parsing_definition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Specification.get_main_parsing_definition" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.spec.Specification.required">
+<code class="descname">required</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Specification.required"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Specification.required" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.spec.Specification.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Specification.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Specification.validate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.spec.Specification.varnames">
+<code class="descname">varnames</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Specification.varnames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Specification.varnames" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-kep.splitter">
+<span id="kep-splitter-module"></span><h2>kep.splitter module<a class="headerlink" href="#module-kep.splitter" title="Permalink to this headline">¶</a></h2>
+<p>Splitter functions extract annual, quarterly and monthly values from data row.</p>
+<dl class="function">
+<dt id="kep.splitter.emit_nones">
+<code class="descclassname">kep.splitter.</code><code class="descname">emit_nones</code><span class="sig-paren">(</span><em>row</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/splitter.html#emit_nones"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.splitter.emit_nones" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.splitter.get_custom_splitter">
+<code class="descclassname">kep.splitter.</code><code class="descname">get_custom_splitter</code><span class="sig-paren">(</span><em>func_name</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/splitter.html#get_custom_splitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.splitter.get_custom_splitter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.splitter.get_splitter">
+<code class="descclassname">kep.splitter.</code><code class="descname">get_splitter</code><span class="sig-paren">(</span><em>coln</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/splitter.html#get_splitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.splitter.get_splitter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.splitter.split_row_by_accum_qtrs">
+<code class="descclassname">kep.splitter.</code><code class="descname">split_row_by_accum_qtrs</code><span class="sig-paren">(</span><em>row</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/splitter.html#split_row_by_accum_qtrs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.splitter.split_row_by_accum_qtrs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Values format:</dt>
+<dd>Annual AccumQ1 AccumH1 Accum9mo
+&lt;I квартал Q 1&gt;  &lt;I полугодие 1st half-year&gt;     &lt;Январь-сентябрь January-September&gt;</dd>
+</dl>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_row_by_accum_qtrs</span> <span class="p">([</span><span class="s1">&#39;35217&#39;</span><span class="p">,</span><span class="s1">&#39;6372&#39;</span><span class="p">,</span><span class="s1">&#39;7236&#39;</span><span class="p">,</span><span class="s1">&#39;33523&#39;</span><span class="p">])</span>
+<span class="go">(&#39;35217&#39;, [&#39;6372&#39;, &#39;7236&#39;, &#39;33523&#39;, &#39;35217&#39;], None)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.splitter.split_row_by_months">
+<code class="descclassname">kep.splitter.</code><code class="descname">split_row_by_months</code><span class="sig-paren">(</span><em>row</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/splitter.html#split_row_by_months"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.splitter.split_row_by_months" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Values format:</dt>
+<dd>M*12</dd>
+</dl>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_row_by_months</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">])</span>
+<span class="go">(None, None, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_row_by_months</span><span class="p">([</span><span class="s1">&#39;1697&#39;</span><span class="p">,</span> <span class="s1">&#39;1832&#39;</span><span class="p">,</span> <span class="s1">&#39;2317&#39;</span><span class="p">,</span> <span class="s1">&#39;3066&#39;</span><span class="p">,</span> <span class="s1">&#39;3607&#39;</span><span class="p">,</span> <span class="s1">&#39;4111&#39;</span><span class="p">,</span> <span class="s1">&#39;3856&#39;</span><span class="p">,</span> <span class="s1">&#39;3530&#39;</span><span class="p">,</span> <span class="s1">&#39;2961&#39;</span><span class="p">,</span> <span class="s1">&#39;2149&#39;</span><span class="p">,</span> <span class="s1">&#39;1565&#39;</span><span class="p">,</span> <span class="s1">&#39;1583&#39;</span><span class="p">])</span>
+<span class="go">(None, None, [&#39;1697&#39;, &#39;1832&#39;, &#39;2317&#39;, &#39;3066&#39;, &#39;3607&#39;, &#39;4111&#39;, &#39;3856&#39;, &#39;3530&#39;, &#39;2961&#39;, &#39;2149&#39;, &#39;1565&#39;, &#39;1583&#39;])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.splitter.split_row_by_months_and_annual">
+<code class="descclassname">kep.splitter.</code><code class="descname">split_row_by_months_and_annual</code><span class="sig-paren">(</span><em>row</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/splitter.html#split_row_by_months_and_annual"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.splitter.split_row_by_months_and_annual" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Values format:</dt>
+<dd>A M*12</dd>
+</dl>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_row_by_months_and_annual</span><span class="p">([</span><span class="mi">78</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">])</span>
+<span class="go">(78, None, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">78</span> <span class="o">==</span> <span class="nb">sum</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">])</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_row_by_months_and_annual</span><span class="p">([</span><span class="s1">&#39;32259&#39;</span><span class="p">,</span> <span class="s1">&#39;1703&#39;</span><span class="p">,</span> <span class="s1">&#39;1853&#39;</span><span class="p">,</span> <span class="s1">&#39;2305&#39;</span><span class="p">,</span> <span class="s1">&#39;3049&#39;</span><span class="p">,</span> <span class="s1">&#39;3590&#39;</span><span class="p">,</span> <span class="s1">&#39;4007&#39;</span><span class="p">,</span> <span class="s1">&#39;3891&#39;</span><span class="p">,</span> <span class="s1">&#39;3515&#39;</span><span class="p">,</span> <span class="s1">&#39;2917&#39;</span><span class="p">,</span> <span class="s1">&#39;2160&#39;</span><span class="p">,</span> <span class="s1">&#39;1613&#39;</span><span class="p">,</span> <span class="s1">&#39;1656&#39;</span><span class="p">])</span>
+<span class="go">(&#39;32259&#39;, None, [&#39;1703&#39;, &#39;1853&#39;, &#39;2305&#39;, &#39;3049&#39;, &#39;3590&#39;, &#39;4007&#39;, &#39;3891&#39;, &#39;3515&#39;, &#39;2917&#39;, &#39;2160&#39;, &#39;1613&#39;, &#39;1656&#39;])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="mi">32259</span> <span class="o">==</span> <span class="nb">sum</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>            <span class="p">[</span><span class="s1">&#39;1703&#39;</span><span class="p">,</span> <span class="s1">&#39;1853&#39;</span><span class="p">,</span> <span class="s1">&#39;2305&#39;</span><span class="p">,</span> <span class="s1">&#39;3049&#39;</span><span class="p">,</span> <span class="s1">&#39;3590&#39;</span><span class="p">,</span> <span class="s1">&#39;4007&#39;</span><span class="p">,</span> <span class="s1">&#39;3891&#39;</span><span class="p">,</span> <span class="s1">&#39;3515&#39;</span><span class="p">,</span> <span class="s1">&#39;2917&#39;</span><span class="p">,</span> <span class="s1">&#39;2160&#39;</span><span class="p">,</span> <span class="s1">&#39;1613&#39;</span><span class="p">,</span> <span class="s1">&#39;1656&#39;</span><span class="p">])</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.splitter.split_row_by_periods">
+<code class="descclassname">kep.splitter.</code><code class="descname">split_row_by_periods</code><span class="sig-paren">(</span><em>row</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/splitter.html#split_row_by_periods"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.splitter.split_row_by_periods" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Values format:</dt>
+<dd>A Q Q Q Q M*12</dd>
+</dl>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_row_by_periods</span><span class="p">([</span><span class="s1">&#39;2015&#39;</span><span class="p">,</span><span class="s1">&#39;a&#39;</span><span class="p">,</span><span class="s1">&#39;b&#39;</span><span class="p">,</span><span class="s1">&#39;c&#39;</span><span class="p">,</span><span class="s1">&#39;d&#39;</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">11</span><span class="p">,</span><span class="mi">12</span><span class="p">])</span>
+<span class="go">(&#39;2015&#39;, [&#39;a&#39;, &#39;b&#39;, &#39;c&#39;, &#39;d&#39;], [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.splitter.split_row_by_year_and_qtr">
+<code class="descclassname">kep.splitter.</code><code class="descname">split_row_by_year_and_qtr</code><span class="sig-paren">(</span><em>row</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/splitter.html#split_row_by_year_and_qtr"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.splitter.split_row_by_year_and_qtr" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Values format:</dt>
+<dd>A Q Q Q Q</dd>
+</dl>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_row_by_year_and_qtr</span><span class="p">([</span><span class="s1">&#39;85881&#39;</span><span class="p">,</span> <span class="s1">&#39;18561&#39;</span><span class="p">,</span> <span class="s1">&#39;19979&#39;</span><span class="p">,</span> <span class="s1">&#39;22190&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">])</span>
+<span class="go">(&#39;85881&#39;, [&#39;18561&#39;, &#39;19979&#39;, &#39;22190&#39;, &#39;&#39;], None)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.splitter.split_row_fiscal">
+<code class="descclassname">kep.splitter.</code><code class="descname">split_row_fiscal</code><span class="sig-paren">(</span><em>row</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/splitter.html#split_row_fiscal"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.splitter.split_row_fiscal" title="Permalink to this definition">¶</a></dt>
+<dd><div class="highlight-default"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">split_row_fiscal</span><span class="p">([</span><span class="s1">&#39;653,8&#39;</span><span class="p">,</span> <span class="s1">&#39;22,7&#39;</span><span class="p">,</span> <span class="s1">&#39;49,2&#39;</span><span class="p">,</span> <span class="s1">&#39;91,5&#39;</span><span class="p">,</span> <span class="s1">&#39;138,7&#39;</span><span class="p">,</span> <span class="s1">&#39;185,0&#39;</span><span class="p">,</span> <span class="s1">&#39;240,0&#39;</span><span class="p">,</span> <span class="s1">&#39;288,5&#39;</span><span class="p">,</span> <span class="s1">&#39;345,5&#39;</span><span class="p">,</span> <span class="s1">&#39;400,6&#39;</span><span class="p">,</span> <span class="s1">&#39;454,0&#39;</span><span class="p">,</span> <span class="s1">&#39;528,0&#39;</span><span class="p">])</span>
+<span class="go">(&#39;653,8&#39;, [&#39;91,5&#39;, &#39;240,0&#39;, &#39;400,6&#39;, &#39;653,8&#39;], [&#39;22,7&#39;, &#39;49,2&#39;, &#39;91,5&#39;, &#39;138,7&#39;, &#39;185,0&#39;, &#39;240,0&#39;, &#39;288,5&#39;, &#39;345,5&#39;, &#39;400,6&#39;, &#39;454,0&#39;, &#39;528,0&#39;, &#39;653,8&#39;])</span>
+</pre></div>
+</div>
+<p>TODO: summ up differences by months, must be equal to 653,8
+accum_by_month_str = [&#8216;22,7&#8217;, &#8216;49,2&#8217;, &#8216;91,5&#8217;, &#8216;138,7&#8217;, &#8216;185,0&#8217;, &#8216;240,0&#8217;, &#8216;288,5&#8217;, &#8216;345,5&#8217;, &#8216;400,6&#8217;, &#8216;454,0&#8217;, &#8216;528,0&#8217;, &#8216;653,8&#8217;]</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-kep.tables">
+<span id="kep-tables-module"></span><h2>kep.tables module<a class="headerlink" href="#module-kep.tables" title="Permalink to this headline">¶</a></h2>
+<p>Parse raw CSV file into Tables() instances using parsing specification from spec.py</p>
+<dl class="docutils">
+<dt>Main call:</dt>
+<dd>tables = Tables(rowstack).get_required():</dd>
+</dl>
+<dl class="class">
+<dt id="kep.tables.RowType">
+<em class="property">class </em><code class="descclassname">kep.tables.</code><code class="descname">RowType</code><a class="reference internal" href="_modules/kep/tables.html#RowType"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.RowType" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="kep.tables.RowType.DATA">
+<code class="descname">DATA</code><em class="property"> = 1</em><a class="headerlink" href="#kep.tables.RowType.DATA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kep.tables.RowType.HEADER">
+<code class="descname">HEADER</code><em class="property"> = 3</em><a class="headerlink" href="#kep.tables.RowType.HEADER" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kep.tables.RowType.SECTION">
+<code class="descname">SECTION</code><em class="property"> = 2</em><a class="headerlink" href="#kep.tables.RowType.SECTION" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kep.tables.RowType.UNKNOWN">
+<code class="descname">UNKNOWN</code><em class="property"> = 0</em><a class="headerlink" href="#kep.tables.RowType.UNKNOWN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.tables.State">
+<em class="property">class </em><code class="descclassname">kep.tables.</code><code class="descname">State</code><a class="reference internal" href="_modules/kep/tables.html#State"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.State" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">enum.Enum</span></code></p>
+<p>An enumeration.</p>
+<dl class="attribute">
+<dt id="kep.tables.State.DATA">
+<code class="descname">DATA</code><em class="property"> = 2</em><a class="headerlink" href="#kep.tables.State.DATA" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kep.tables.State.INIT">
+<code class="descname">INIT</code><em class="property"> = 1</em><a class="headerlink" href="#kep.tables.State.INIT" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kep.tables.State.UNKNOWN">
+<code class="descname">UNKNOWN</code><em class="property"> = 3</em><a class="headerlink" href="#kep.tables.State.UNKNOWN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.tables.Table">
+<em class="property">class </em><code class="descclassname">kep.tables.</code><code class="descname">Table</code><span class="sig-paren">(</span><em>headers</em>, <em>datarows</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Table" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Representation of CSV table, has headers and datarows.</p>
+<dl class="attribute">
+<dt id="kep.tables.Table.KNOWN">
+<code class="descname">KNOWN</code><em class="property"> = '+'</em><a class="headerlink" href="#kep.tables.Table.KNOWN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kep.tables.Table.UNKNOWN">
+<code class="descname">UNKNOWN</code><em class="property"> = '-'</em><a class="headerlink" href="#kep.tables.Table.UNKNOWN" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kep.tables.Table.VALID_ROW_LENGTHS">
+<code class="descname">VALID_ROW_LENGTHS</code><em class="property"> = [17, 5, 13, 12, 4]</em><a class="headerlink" href="#kep.tables.Table.VALID_ROW_LENGTHS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.tables.Table.has_unknown_lines">
+<code class="descname">has_unknown_lines</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Table.has_unknown_lines"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Table.has_unknown_lines" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.tables.Table.is_defined">
+<code class="descname">is_defined</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Table.is_defined"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Table.is_defined" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kep.tables.Table.label">
+<code class="descname">label</code><a class="headerlink" href="#kep.tables.Table.label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.tables.Table.parse">
+<code class="descname">parse</code><span class="sig-paren">(</span><em>varnames_dict</em>, <em>units_dict</em>, <em>funcname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Table.parse"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Table.parse" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.tables.Table.set_label">
+<code class="descname">set_label</code><span class="sig-paren">(</span><em>varnames_dict</em>, <em>units_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Table.set_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Table.set_label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.tables.Table.set_splitter">
+<code class="descname">set_splitter</code><span class="sig-paren">(</span><em>funcname</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Table.set_splitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Table.set_splitter" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.tables.Tables">
+<em class="property">class </em><code class="descclassname">kep.tables.</code><code class="descname">Tables</code><span class="sig-paren">(</span><em>_rows</em>, <em>spec=&lt;kep.spec.Specification object at 0x00000195A86AFC18&gt;</em>, <em>units=OrderedDict([('млрд.долларов'</em>, <em>'bln_usd')</em>, <em>('млрд. долларов'</em>, <em>'bln_usd')</em>, <em>('млрд</em>, <em>долларов'</em>, <em>'bln_usd')</em>, <em>('млрд.рублей'</em>, <em>'bln_rub')</em>, <em>('млрд. рублей'</em>, <em>'bln_rub')</em>, <em>('рублей / rubles'</em>, <em>'rub')</em>, <em>('млн.рублей'</em>, <em>'mln_rub')</em>, <em>('Индекс физического объема произведенного ВВП</em>, <em>в %'</em>, <em>'yoy')</em>, <em>('в % к декабрю предыдущего года'</em>, <em>'ytd')</em>, <em>('в % к предыдущему месяцу'</em>, <em>'rog')</em>, <em>('в % к предыдущему периоду'</em>, <em>'rog')</em>, <em>('% к концу предыдущего периода'</em>, <em>'rog')</em>, <em>('период с начала отчетного года в % к соответствующему периоду предыдущего года'</em>, <em>'ytd')</em>, <em>('в % к соответствующему периоду предыдущего года'</em>, <em>'yoy')</em>, <em>('в % к соответствующему месяцу предыдущего года'</em>, <em>'yoy')</em>, <em>('отчетный месяц в % к предыдущему месяцу'</em>, <em>'rog')</em>, <em>('отчетный месяц в % к соответствующему месяцу предыдущего года'</em>, <em>'yoy')</em>, <em>('период с начала отчетного года'</em>, <em>'ytd')</em>, <em>('%'</em>, <em>'pct')</em>, <em>('в % к ВВП'</em>, <em>'gdp_percent')</em>, <em>('продукты питания'</em>, <em>'rog')</em>, <em>('алкогольные напитки'</em>, <em>'rog')</em>, <em>('непродовольственные товары'</em>, <em>'rog')</em>, <em>('непродовольст- венные товары'</em>, <em>'rog')</em>, <em>('услуги'</em>, <em>'rog')])</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Extract tables from <em>csv_path</em> using <em>Rows(csv_path)</em>.</p>
+<p>Parsing procedure:
+- cut out a segment of csv file as delimited by start and end line makers
+- hold remaining parts of csv file for further parsing
+- break csv segment into tables, each table containing headers and data rows
+- parse table headers to obtain variable name (&#8220;GDP&#8221;) and unit (&#8220;bln_rub&#8221;)</p>
+<dl class="staticmethod">
+<dt id="kep.tables.Tables.extract_tables">
+<em class="property">static </em><code class="descname">extract_tables</code><span class="sig-paren">(</span><em>csv_segment</em>, <em>pdef</em>, <em>units_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Tables.extract_tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Tables.extract_tables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.tables.Tables.get">
+<code class="descname">get</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Tables.get"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Tables.get" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.tables.Tables.get_required">
+<code class="descname">get_required</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Tables.get_required"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Tables.get_required" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.tables.Tables.make_queue">
+<code class="descname">make_queue</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Tables.make_queue"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Tables.make_queue" title="Permalink to this definition">¶</a></dt>
+<dd><p>Init list of csv segments and parsing definitons</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.tables.Tables.yield_tables">
+<code class="descname">yield_tables</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Tables.yield_tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Tables.yield_tables" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.tables.extract_unit">
+<code class="descclassname">kep.tables.</code><code class="descname">extract_unit</code><span class="sig-paren">(</span><em>label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#extract_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.extract_unit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.tables.extract_varname">
+<code class="descclassname">kep.tables.</code><code class="descname">extract_varname</code><span class="sig-paren">(</span><em>label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#extract_varname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.extract_varname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.tables.fix_multitable_units">
+<code class="descclassname">kep.tables.</code><code class="descname">fix_multitable_units</code><span class="sig-paren">(</span><em>tables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#fix_multitable_units"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.fix_multitable_units" title="Permalink to this definition">¶</a></dt>
+<dd><p>For tables without <em>varname</em> copy <em>varname</em> from previous table.
+Applies to tables without unknown rows.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.tables.make_label">
+<code class="descclassname">kep.tables.</code><code class="descname">make_label</code><span class="sig-paren">(</span><em>vn</em>, <em>unit</em>, <em>sep='_'</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#make_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.make_label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.tables.missed_labels">
+<code class="descclassname">kep.tables.</code><code class="descname">missed_labels</code><span class="sig-paren">(</span><em>tables</em>, <em>required</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#missed_labels"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.missed_labels" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.tables.split_label">
+<code class="descclassname">kep.tables.</code><code class="descname">split_label</code><span class="sig-paren">(</span><em>label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#split_label"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.split_label" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.tables.split_to_tables">
+<code class="descclassname">kep.tables.</code><code class="descname">split_to_tables</code><span class="sig-paren">(</span><em>rows</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#split_to_tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.split_to_tables" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yields Table() instances from <em>rows</em>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-kep.vintage">
+<span id="kep-vintage-module"></span><h2>kep.vintage module<a class="headerlink" href="#module-kep.vintage" title="Permalink to this headline">¶</a></h2>
+<p>Create pandas dataframes based on data in Table() instances.</p>
+<dl class="docutils">
+<dt><em>Emitter</em> class extracts data at different frequences from Table.datarows</dt>
+<dd>from a list of Table() instances.</dd>
+</dl>
+<p><em>Frames</em> uses Emitter.collect_data() method to get data, creates pandas dataframes
+<em>Vintage</em> is a wrapper class to create and save dataframes based on year and month.</p>
+<p>Main call:</p>
+<blockquote>
+<div>Vintage(year, month).save()</div></blockquote>
+<dl class="class">
+<dt id="kep.vintage.Collection">
+<em class="property">class </em><code class="descclassname">kep.vintage.</code><code class="descname">Collection</code><a class="reference internal" href="_modules/kep/vintage.html#Collection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Methods to manipulate entire set of data releases.</p>
+<dl class="staticmethod">
+<dt id="kep.vintage.Collection.approve_all">
+<em class="property">static </em><code class="descname">approve_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Collection.approve_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Collection.approve_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks all dates, runs slow (about 20 sec.)
+May fail if dataset not complete.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Collection.approve_latest">
+<em class="property">static </em><code class="descname">approve_latest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Collection.approve_latest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Collection.approve_latest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quick check for algorithm on latest available data.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Collection.save_all_dataframes_to_csv">
+<em class="property">static </em><code class="descname">save_all_dataframes_to_csv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Collection.save_all_dataframes_to_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Collection.save_all_dataframes_to_csv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Collection.save_latest">
+<em class="property">static </em><code class="descname">save_latest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Collection.save_latest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Collection.save_latest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.vintage.DictMaker">
+<em class="property">class </em><code class="descclassname">kep.vintage.</code><code class="descname">DictMaker</code><span class="sig-paren">(</span><em>year</em>, <em>label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#DictMaker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.DictMaker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="kep.vintage.DictMaker.a_dict">
+<code class="descname">a_dict</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#DictMaker.a_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.DictMaker.a_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.vintage.DictMaker.m_dict">
+<code class="descname">m_dict</code><span class="sig-paren">(</span><em>val</em>, <em>m</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#DictMaker.m_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.DictMaker.m_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.vintage.DictMaker.q_dict">
+<code class="descname">q_dict</code><span class="sig-paren">(</span><em>val</em>, <em>q</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#DictMaker.q_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.DictMaker.q_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.vintage.Emitter">
+<em class="property">class </em><code class="descclassname">kep.vintage.</code><code class="descname">Emitter</code><span class="sig-paren">(</span><em>tables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Emitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Emitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Emitter extracts, holds and emits annual, quarterly and monthly values
+from list of defined Table() instances.</p>
+<dl class="method">
+<dt id="kep.vintage.Emitter.add_table">
+<code class="descname">add_table</code><span class="sig-paren">(</span><em>table</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Emitter.add_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Emitter.add_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.vintage.Emitter.collect_data">
+<code class="descname">collect_data</code><span class="sig-paren">(</span><em>freq</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Emitter.collect_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Emitter.collect_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.vintage.Frames">
+<em class="property">class </em><code class="descclassname">kep.vintage.</code><code class="descname">Frames</code><span class="sig-paren">(</span><em>tables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Create pandas DataFrames.</p>
+<dl class="method">
+<dt id="kep.vintage.Frames.includes">
+<code class="descname">includes</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames.includes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames.includes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Frames.reshape_a">
+<em class="property">static </em><code class="descname">reshape_a</code><span class="sig-paren">(</span><em>dfa</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames.reshape_a"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames.reshape_a" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns pandas dataframe with ANNUAL data.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Frames.reshape_m">
+<em class="property">static </em><code class="descname">reshape_m</code><span class="sig-paren">(</span><em>dfm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames.reshape_m"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames.reshape_m" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns pandas dataframe with MONTHLY data.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Frames.reshape_q">
+<em class="property">static </em><code class="descname">reshape_q</code><span class="sig-paren">(</span><em>dfq</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames.reshape_q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames.reshape_q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns pandas dataframe with QUARTERLY data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.vintage.Frames.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>folder_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames.save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Frames.validate">
+<em class="property">static </em><code class="descname">validate</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames.validate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.vintage.Vintage">
+<em class="property">class </em><code class="descclassname">kep.vintage.</code><code class="descname">Vintage</code><span class="sig-paren">(</span><em>year</em>, <em>month</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Vintage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Vintage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Represents dataset release for a given year and month.</p>
+<dl class="method">
+<dt id="kep.vintage.Vintage.dfs">
+<code class="descname">dfs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Vintage.dfs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Vintage.dfs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shorthand for obtaining dataframes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.vintage.Vintage.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Vintage.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Vintage.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save dataframes to CSVs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.vintage.Vintage.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><em>valid_datapoints=[{'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999}, {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999}, {'freq': 'a', 'label': 'EXPORT_GOODS_bln_usd', 'value': 75.6, 'year': 1999}, {'freq': 'q', 'label': 'IMPORT_GOODS_bln_usd', 'qtr': 1, 'value': 9.1, 'year': 1999}, {'freq': 'a', 'label': 'CPI_rog', 'value': 136.5, 'year': 1999}, {'freq': 'm', 'label': 'CPI_rog', 'value': 108.4, 'year': 1999, 'month': 1}]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Vintage.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Vintage.validate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.vintage.get_date_month_end">
+<code class="descclassname">kep.vintage.</code><code class="descname">get_date_month_end</code><span class="sig-paren">(</span><em>year</em>, <em>month</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#get_date_month_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.get_date_month_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.vintage.get_date_quarter_end">
+<code class="descclassname">kep.vintage.</code><code class="descname">get_date_quarter_end</code><span class="sig-paren">(</span><em>year</em>, <em>qtr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#get_date_quarter_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.get_date_quarter_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.vintage.get_date_year_end">
+<code class="descclassname">kep.vintage.</code><code class="descname">get_date_year_end</code><span class="sig-paren">(</span><em>year</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#get_date_year_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.get_date_year_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.vintage.month_end_day">
+<code class="descclassname">kep.vintage.</code><code class="descname">month_end_day</code><span class="sig-paren">(</span><em>year</em>, <em>month</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#month_end_day"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.month_end_day" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.vintage.to_float">
+<code class="descclassname">kep.vintage.</code><code class="descname">to_float</code><span class="sig-paren">(</span><em>text</em>, <em>i=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#to_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.to_float" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">kep package</a><ul>
+<li><a class="reference internal" href="#module-kep.files">kep.files module</a></li>
+<li><a class="reference internal" href="#module-kep.rows">kep.rows module</a></li>
+<li><a class="reference internal" href="#module-kep.spec">kep.spec module</a></li>
+<li><a class="reference internal" href="#module-kep.splitter">kep.splitter module</a></li>
+<li><a class="reference internal" href="#module-kep.tables">kep.tables module</a></li>
+<li><a class="reference internal" href="#module-kep.vintage">kep.vintage module</a></li>
+</ul>
+</li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to kep&#8217;s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/kep.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Go" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2017, Author.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
+      
+      |
+      <a href="_sources/kep.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
