@@ -19,10 +19,9 @@ Steps involved in the parsing pipeline are the following:
   - unpack this zip/rar file to a local folder
 
 - **word2csv**: convert several MS Word files to single interim CSV file
-- **csv2df**: parse interim CSV file to obtain processed CSV files. There are three processed CSV files 
-  at annual, quarterly and monthly frequencies.  
 
-Most of work documented here relates to **csv2df**.  
+- **csv2df**: parse interim CSV file to obtain processed CSV files (annual, quarterly and monthly). 
+Most of work documented here relates to *csv2df*.  
 
 Also in this module:
 
