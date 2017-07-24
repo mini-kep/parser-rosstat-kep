@@ -26,7 +26,7 @@ Steps involved in the parsing pipeline are the following:
 
 - **csv2df**: parse interim CSV file to obtain `processed CSV files <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>`_ with annual, quarterly and monthly data.
 
-Also in this module:
+Also in `/src <https://github.com/epogrebnyak/mini-kep/tree/master/src>`_ folder:
 
 - **access_data**: sample code to download data from stable URL and save its local copy   
 - **frontpage**: try making README.md_ a nice page with graphs
