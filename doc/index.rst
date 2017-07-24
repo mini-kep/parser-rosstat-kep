@@ -20,8 +20,7 @@ Steps involved in the parsing pipeline are the following:
 
 - **word2csv**: convert several MS Word files to single interim CSV file
 
-- **csv2df**: parse interim CSV file to obtain processed CSV files (annual, quarterly and monthly). 
-Most of work documented here relates to *csv2df*.  
+- **csv2df**: parse interim CSV file to obtain processed CSV files with annual, quarterly and monthly data. (most of work documented here relates to **csv2df**).  
 
 Also in this module:
 
