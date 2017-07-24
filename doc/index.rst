@@ -13,8 +13,9 @@ to obtain clean pandas dataframes with macroeconomic time series and save them a
 
 Steps involved in the parsing pipeline are the following:
 
-- download zip/rar file for a specified month (*manually*)
-- unpack archive to local folder (*manually*)
+- **manually** (*FIXME*):
+  - download zip/rar file for a specified month
+  - unpack archive to local folder
 - **word2csv**: convert several MS Word files to single interim CSV file
 - **csv2df**: parse interim CSV file to obtain processed CSV files. There are three processed CSV files 
   at annual, quarterly and monthly frequencies.  
