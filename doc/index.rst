@@ -10,7 +10,8 @@ Welcome to mini-kep documentation
 with macroeconomic time series.
 
 Data source can be found at `Rosstat website`_
-.. Rosstat website: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
+
+.. _Rosstat website: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
 
 Steps involved in the parsing pipeline are the following:
 
@@ -26,7 +27,7 @@ Also in this module:
 - **access_data**: sample code to download data from stable URL and save its local copy   
 - **frontpage**: try making README.md_ a nice page with graphs
 
-.. README.md: https://github.com/epogrebnyak/mini-kep/blob/master/README.md
+.. _README.md: https://github.com/epogrebnyak/mini-kep/blob/master/README.md
 
 
 TODO
