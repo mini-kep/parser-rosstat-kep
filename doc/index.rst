@@ -6,19 +6,18 @@
 Welcome to mini-kep documentation
 ==================================
 
-``mini-kep`` aims to parse archived MS Word files from Rosstat to obtain clean pandas dataframes and CSV files 
-with macroeconomic time series.
+`mini-kep <https://github.com/epogrebnyak/mini-kep>` aims to parse `archived MS Word files from Rosstat`_ 
+to obtain clean pandas dataframes and CSV files with macroeconomic time series.
 
-Data source can be found at `Rosstat website`_
-
-.. _Rosstat website: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
+.. _archived MS Word files from Rosstat: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
 
 Steps involved in the parsing pipeline are the following:
 
-- download zip/rar file with monthly publication (*manually*)
+- download zip/rar file for a specified month (*manually*)
 - unpack archive to local folder (*manually*)
 - **word2csv**: convert several MS Word files to single interim CSV file
-- **csv2df**: parse interim CSV file to obtain processed CSV files holding data at annual, quarterly and monthly frequencies.  
+- **csv2df**: parse interim CSV file to obtain processed CSV files holding data 
+  at annual, quarterly and monthly frequencies.  
 
 Most of work documented here relates to **csv2df**.  
 
