@@ -7,11 +7,16 @@ Welcome to kep's documentation!
 ===============================
 
 .. toctree::
-   :maxdepth: 4
+   :maxdepth: 2
    :caption: Contents:
 
    kep
-
+   kep.files
+   kep.rows
+   kep.spec
+   kep.splitter
+   kep.tables
+   kep.vintage
 
 Indices and tables
 ==================

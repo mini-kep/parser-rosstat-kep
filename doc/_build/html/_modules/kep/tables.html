@@ -6,9 +6,9 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>kep.tables &#8212; kep  documentation</title>
+    <title>kep.tables &#8212; Rosstat fuzzy MS Word/csv parser  documentation</title>
     
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -25,22 +25,23 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head>
   <body role="document">
-  
+      <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
+          <span>Rosstat fuzzy MS Word/csv parser  documentation</span></a></h1>
+        <h2 class="heading"><span>kep.tables</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        <a class="uplink" href="../../index.html">Contents</a>
+        </p>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+      </div>
+      <div class="content">
+        
+        
   <h1>Source code for kep.tables</h1><div class="highlight"><pre>
 <span></span><span class="sd">&quot;&quot;&quot;Parse raw CSV file into Tables() instances using parsing specification from spec.py</span>
 
@@ -65,27 +66,27 @@
 <span class="c1"># label handling</span>
 
 
-<div class="viewcode-block" id="make_label"><a class="viewcode-back" href="../../kep.html#kep.tables.make_label">[docs]</a><span class="k">def</span> <span class="nf">make_label</span><span class="p">(</span><span class="n">vn</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>
+<div class="viewcode-block" id="make_label"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.make_label">[docs]</a><span class="k">def</span> <span class="nf">make_label</span><span class="p">(</span><span class="n">vn</span><span class="p">,</span> <span class="n">unit</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s2">&quot;_&quot;</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">vn</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="n">unit</span></div>
 
 
-<div class="viewcode-block" id="split_label"><a class="viewcode-back" href="../../kep.html#kep.tables.split_label">[docs]</a><span class="k">def</span> <span class="nf">split_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+<div class="viewcode-block" id="split_label"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.split_label">[docs]</a><span class="k">def</span> <span class="nf">split_label</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">extract_varname</span><span class="p">(</span><span class="n">label</span><span class="p">),</span> <span class="n">extract_unit</span><span class="p">(</span><span class="n">label</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="extract_varname"><a class="viewcode-back" href="../../kep.html#kep.tables.extract_varname">[docs]</a><span class="k">def</span> <span class="nf">extract_varname</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+<div class="viewcode-block" id="extract_varname"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.extract_varname">[docs]</a><span class="k">def</span> <span class="nf">extract_varname</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
     <span class="n">words</span> <span class="o">=</span> <span class="n">label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">takewhile</span><span class="p">(</span><span class="k">lambda</span> <span class="n">word</span><span class="p">:</span> <span class="n">word</span><span class="o">.</span><span class="n">isupper</span><span class="p">(),</span> <span class="n">words</span><span class="p">))</span></div>
 
 
-<div class="viewcode-block" id="extract_unit"><a class="viewcode-back" href="../../kep.html#kep.tables.extract_unit">[docs]</a><span class="k">def</span> <span class="nf">extract_unit</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
+<div class="viewcode-block" id="extract_unit"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.extract_unit">[docs]</a><span class="k">def</span> <span class="nf">extract_unit</span><span class="p">(</span><span class="n">label</span><span class="p">):</span>
     <span class="n">words</span> <span class="o">=</span> <span class="n">label</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)</span>
     <span class="k">return</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">dropwhile</span><span class="p">(</span><span class="k">lambda</span> <span class="n">word</span><span class="p">:</span> <span class="n">word</span><span class="o">.</span><span class="n">isupper</span><span class="p">(),</span> <span class="n">words</span><span class="p">))</span></div>
 
 <span class="c1"># handling tables</span>
 
 
-<div class="viewcode-block" id="fix_multitable_units"><a class="viewcode-back" href="../../kep.html#kep.tables.fix_multitable_units">[docs]</a><span class="k">def</span> <span class="nf">fix_multitable_units</span><span class="p">(</span><span class="n">tables</span><span class="p">):</span>
+<div class="viewcode-block" id="fix_multitable_units"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.fix_multitable_units">[docs]</a><span class="k">def</span> <span class="nf">fix_multitable_units</span><span class="p">(</span><span class="n">tables</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;For tables without *varname* copy *varname* from previous table.</span>
 <span class="sd">        Applies to tables without unknown rows.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -94,14 +95,14 @@
             <span class="n">table</span><span class="o">.</span><span class="n">varname</span> <span class="o">=</span> <span class="n">prev_table</span><span class="o">.</span><span class="n">varname</span></div>
 
 
-<div class="viewcode-block" id="missed_labels"><a class="viewcode-back" href="../../kep.html#kep.tables.missed_labels">[docs]</a><span class="k">def</span> <span class="nf">missed_labels</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
+<div class="viewcode-block" id="missed_labels"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.missed_labels">[docs]</a><span class="k">def</span> <span class="nf">missed_labels</span><span class="p">(</span><span class="n">tables</span><span class="p">,</span> <span class="n">required</span><span class="p">):</span>
     <span class="n">labels_required</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_label</span><span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
                        <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">unit</span> <span class="ow">in</span> <span class="n">required</span><span class="p">]</span>
     <span class="n">labels_in_tables</span> <span class="o">=</span> <span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">label</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tables</span><span class="p">]</span>
     <span class="k">return</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">labels_required</span> <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">labels_in_tables</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="Tables"><a class="viewcode-back" href="../../kep.html#kep.tables.Tables">[docs]</a><span class="k">class</span> <span class="nc">Tables</span><span class="p">:</span>
+<div class="viewcode-block" id="Tables"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Tables">[docs]</a><span class="k">class</span> <span class="nc">Tables</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Extract tables from *csv_path* using *Rows(csv_path)*.</span>
 <span class="sd">    </span>
 <span class="sd">       Parsing procedure:</span>
@@ -118,7 +119,7 @@
                          <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">unit</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">required</span><span class="p">()]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">make_queue</span><span class="p">()</span>
     
-<div class="viewcode-block" id="Tables.make_queue"><a class="viewcode-back" href="../../kep.html#kep.tables.Tables.make_queue">[docs]</a>    <span class="k">def</span> <span class="nf">make_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Tables.make_queue"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Tables.make_queue">[docs]</a>    <span class="k">def</span> <span class="nf">make_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init list of csv segments and parsing definitons&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">to_parse</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">scope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">scopes</span><span class="p">:</span>
@@ -133,13 +134,13 @@
         <span class="n">pdef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">get_main_parsing_definition</span><span class="p">()</span>   
         <span class="bp">self</span><span class="o">.</span><span class="n">to_parse</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">csv_segment</span><span class="p">,</span> <span class="n">pdef</span><span class="p">])</span> </div>
         
-<div class="viewcode-block" id="Tables.yield_tables"><a class="viewcode-back" href="../../kep.html#kep.tables.Tables.yield_tables">[docs]</a>    <span class="k">def</span> <span class="nf">yield_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Tables.yield_tables"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Tables.yield_tables">[docs]</a>    <span class="k">def</span> <span class="nf">yield_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">csv_segment</span><span class="p">,</span> <span class="n">pdef</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_parse</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_tables</span><span class="p">(</span><span class="n">csv_segment</span><span class="p">,</span> <span class="n">pdef</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">):</span>
                     <span class="k">yield</span> <span class="n">t</span></div>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Tables.extract_tables"><a class="viewcode-back" href="../../kep.html#kep.tables.Tables.extract_tables">[docs]</a>    <span class="k">def</span> <span class="nf">extract_tables</span><span class="p">(</span><span class="n">csv_segment</span><span class="p">,</span> <span class="n">pdef</span><span class="p">,</span> <span class="n">units_dict</span><span class="p">):</span>
+<div class="viewcode-block" id="Tables.extract_tables"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Tables.extract_tables">[docs]</a>    <span class="k">def</span> <span class="nf">extract_tables</span><span class="p">(</span><span class="n">csv_segment</span><span class="p">,</span> <span class="n">pdef</span><span class="p">,</span> <span class="n">units_dict</span><span class="p">):</span>
         <span class="c1"># yield tables from csv_segment</span>
         <span class="n">tables</span> <span class="o">=</span> <span class="n">split_to_tables</span><span class="p">(</span><span class="n">csv_segment</span><span class="p">)</span>
         <span class="c1"># parse tables to obtain labels</span>
@@ -154,16 +155,16 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Missed labels: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">labels_missed</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">tables</span></div>
 
-<div class="viewcode-block" id="Tables.get"><a class="viewcode-back" href="../../kep.html#kep.tables.Tables.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Tables.get"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Tables.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">yield_tables</span><span class="p">())</span></div>
 
-<div class="viewcode-block" id="Tables.get_required"><a class="viewcode-back" href="../../kep.html#kep.tables.Tables.get_required">[docs]</a>    <span class="k">def</span> <span class="nf">get_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Tables.get_required"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Tables.get_required">[docs]</a>    <span class="k">def</span> <span class="nf">get_required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">t</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get</span><span class="p">()</span> <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">required</span><span class="p">]</span></div></div>
 
 
 <span class="c1"># classes for split_to_tables()</span>
 <span class="nd">@unique</span>
-<div class="viewcode-block" id="RowType"><a class="viewcode-back" href="../../kep.html#kep.tables.RowType">[docs]</a><span class="k">class</span> <span class="nc">RowType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<div class="viewcode-block" id="RowType"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.RowType">[docs]</a><span class="k">class</span> <span class="nc">RowType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">DATA</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">SECTION</span> <span class="o">=</span> <span class="mi">2</span>
@@ -171,13 +172,13 @@
 
 
 <span class="nd">@unique</span>
-<div class="viewcode-block" id="State"><a class="viewcode-back" href="../../kep.html#kep.tables.State">[docs]</a><span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<div class="viewcode-block" id="State"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.State">[docs]</a><span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">INIT</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">DATA</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="mi">3</span></div>
 
 
-<div class="viewcode-block" id="split_to_tables"><a class="viewcode-back" href="../../kep.html#kep.tables.split_to_tables">[docs]</a><span class="k">def</span> <span class="nf">split_to_tables</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
+<div class="viewcode-block" id="split_to_tables"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.split_to_tables">[docs]</a><span class="k">def</span> <span class="nf">split_to_tables</span><span class="p">(</span><span class="n">rows</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Yields Table() instances from *rows*.&quot;&quot;&quot;</span>
     <span class="n">datarows</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">headers</span> <span class="o">=</span> <span class="p">[]</span>
@@ -198,7 +199,7 @@
         <span class="k">yield</span> <span class="n">Table</span><span class="p">(</span><span class="n">headers</span><span class="p">,</span> <span class="n">datarows</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Table"><a class="viewcode-back" href="../../kep.html#kep.tables.Table">[docs]</a><span class="k">class</span> <span class="nc">Table</span><span class="p">:</span>
+<div class="viewcode-block" id="Table"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Table">[docs]</a><span class="k">class</span> <span class="nc">Table</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Representation of CSV table, has headers and datarows.&quot;&quot;&quot;</span>
 
     <span class="c1"># [4, 5, 12, 13, 17]</span>
@@ -215,12 +216,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">coln</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">row</span><span class="o">.</span><span class="n">len</span><span class="p">()</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datarows</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">splitter_func</span> <span class="o">=</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="Table.parse"><a class="viewcode-back" href="../../kep.html#kep.tables.Table.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">varnames_dict</span><span class="p">,</span> <span class="n">units_dict</span><span class="p">,</span> <span class="n">funcname</span><span class="p">):</span>
+<div class="viewcode-block" id="Table.parse"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Table.parse">[docs]</a>    <span class="k">def</span> <span class="nf">parse</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">varnames_dict</span><span class="p">,</span> <span class="n">units_dict</span><span class="p">,</span> <span class="n">funcname</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="n">varnames_dict</span><span class="p">,</span> <span class="n">units_dict</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">set_splitter</span><span class="p">(</span><span class="n">funcname</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span></div>
 
-<div class="viewcode-block" id="Table.set_label"><a class="viewcode-back" href="../../kep.html#kep.tables.Table.set_label">[docs]</a>    <span class="k">def</span> <span class="nf">set_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">varnames_dict</span><span class="p">,</span> <span class="n">units_dict</span><span class="p">):</span>
+<div class="viewcode-block" id="Table.set_label"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Table.set_label">[docs]</a>    <span class="k">def</span> <span class="nf">set_label</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">varnames_dict</span><span class="p">,</span> <span class="n">units_dict</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">headers</span><span class="p">:</span>
             <span class="n">varname</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">get_varname</span><span class="p">(</span><span class="n">varnames_dict</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">varname</span><span class="p">:</span>
@@ -232,7 +233,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">KNOWN</span>
         <span class="k">return</span> <span class="bp">self</span>                  </div>
 
-<div class="viewcode-block" id="Table.set_splitter"><a class="viewcode-back" href="../../kep.html#kep.tables.Table.set_splitter">[docs]</a>    <span class="k">def</span> <span class="nf">set_splitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funcname</span><span class="p">):</span>
+<div class="viewcode-block" id="Table.set_splitter"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Table.set_splitter">[docs]</a>    <span class="k">def</span> <span class="nf">set_splitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funcname</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">funcname</span><span class="p">:</span>
             <span class="c1"># custom reader from pdef has highest priority</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">splitter_func</span> <span class="o">=</span> <span class="n">splitter</span><span class="o">.</span><span class="n">get_custom_splitter</span><span class="p">(</span><span class="n">funcname</span><span class="p">)</span>
@@ -255,10 +256,10 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-<div class="viewcode-block" id="Table.is_defined"><a class="viewcode-back" href="../../kep.html#kep.tables.Table.is_defined">[docs]</a>    <span class="k">def</span> <span class="nf">is_defined</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Table.is_defined"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Table.is_defined">[docs]</a>    <span class="k">def</span> <span class="nf">is_defined</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">splitter_func</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Table.has_unknown_lines"><a class="viewcode-back" href="../../kep.html#kep.tables.Table.has_unknown_lines">[docs]</a>    <span class="k">def</span> <span class="nf">has_unknown_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Table.has_unknown_lines"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Table.has_unknown_lines">[docs]</a>    <span class="k">def</span> <span class="nf">has_unknown_lines</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">UNKNOWN</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="o">.</span><span class="n">values</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
@@ -287,44 +288,18 @@
         <span class="nb">print</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 </pre></div>
 
-          </div>
-        </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        <a class="uplink" href="../../index.html">Contents</a>
+        </p>
+
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2017, Author.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
-      
-    </div>
 
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Evgeniy Pogrebnyak.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
   </body>
 </html>

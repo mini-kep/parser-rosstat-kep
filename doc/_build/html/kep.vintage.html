@@ -1,0 +1,237 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>kep.vintage module &#8212; Rosstat fuzzy MS Word/csv parser  documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="kep.tables module" href="kep.tables.html" /> 
+  </head>
+  <body role="document">
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>Rosstat fuzzy MS Word/csv parser  documentation</span></a></h1>
+        <h2 class="heading"><span>kep.vintage module</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="kep.tables.html">kep.tables module</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="module-kep.vintage">
+<span id="kep-vintage-module"></span><h1>kep.vintage module<a class="headerlink" href="#module-kep.vintage" title="Permalink to this headline">¶</a></h1>
+<p>Create pandas dataframes based on data in Table() instances.</p>
+<dl class="docutils">
+<dt><em>Emitter</em> class extracts data at different frequences from Table.datarows</dt>
+<dd>from a list of Table() instances.</dd>
+</dl>
+<p><em>Frames</em> uses Emitter.collect_data() method to get data, creates pandas dataframes
+<em>Vintage</em> is a wrapper class to create and save dataframes based on year and month.</p>
+<p>Main call:</p>
+<blockquote>
+<div>Vintage(year, month).save()</div></blockquote>
+<dl class="class">
+<dt id="kep.vintage.Collection">
+<em class="property">class </em><code class="descclassname">kep.vintage.</code><code class="descname">Collection</code><a class="reference internal" href="_modules/kep/vintage.html#Collection"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Collection" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Methods to manipulate entire set of data releases.</p>
+<dl class="staticmethod">
+<dt id="kep.vintage.Collection.approve_all">
+<em class="property">static </em><code class="descname">approve_all</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Collection.approve_all"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Collection.approve_all" title="Permalink to this definition">¶</a></dt>
+<dd><p>Checks all dates, runs slow (about 20 sec.)
+May fail if dataset not complete.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Collection.approve_latest">
+<em class="property">static </em><code class="descname">approve_latest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Collection.approve_latest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Collection.approve_latest" title="Permalink to this definition">¶</a></dt>
+<dd><p>Quick check for algorithm on latest available data.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Collection.save_all_dataframes_to_csv">
+<em class="property">static </em><code class="descname">save_all_dataframes_to_csv</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Collection.save_all_dataframes_to_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Collection.save_all_dataframes_to_csv" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Collection.save_latest">
+<em class="property">static </em><code class="descname">save_latest</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Collection.save_latest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Collection.save_latest" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.vintage.DictMaker">
+<em class="property">class </em><code class="descclassname">kep.vintage.</code><code class="descname">DictMaker</code><span class="sig-paren">(</span><em>year</em>, <em>label</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#DictMaker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.DictMaker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="kep.vintage.DictMaker.a_dict">
+<code class="descname">a_dict</code><span class="sig-paren">(</span><em>val</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#DictMaker.a_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.DictMaker.a_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.vintage.DictMaker.m_dict">
+<code class="descname">m_dict</code><span class="sig-paren">(</span><em>val</em>, <em>m</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#DictMaker.m_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.DictMaker.m_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.vintage.DictMaker.q_dict">
+<code class="descname">q_dict</code><span class="sig-paren">(</span><em>val</em>, <em>q</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#DictMaker.q_dict"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.DictMaker.q_dict" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.vintage.Emitter">
+<em class="property">class </em><code class="descclassname">kep.vintage.</code><code class="descname">Emitter</code><span class="sig-paren">(</span><em>tables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Emitter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Emitter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Emitter extracts, holds and emits annual, quarterly and monthly values
+from list of defined Table() instances.</p>
+<dl class="method">
+<dt id="kep.vintage.Emitter.add_table">
+<code class="descname">add_table</code><span class="sig-paren">(</span><em>table</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Emitter.add_table"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Emitter.add_table" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.vintage.Emitter.collect_data">
+<code class="descname">collect_data</code><span class="sig-paren">(</span><em>freq</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Emitter.collect_data"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Emitter.collect_data" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.vintage.Frames">
+<em class="property">class </em><code class="descclassname">kep.vintage.</code><code class="descname">Frames</code><span class="sig-paren">(</span><em>tables</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Create pandas DataFrames.</p>
+<dl class="method">
+<dt id="kep.vintage.Frames.includes">
+<code class="descname">includes</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames.includes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames.includes" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Frames.reshape_a">
+<em class="property">static </em><code class="descname">reshape_a</code><span class="sig-paren">(</span><em>dfa</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames.reshape_a"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames.reshape_a" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns pandas dataframe with ANNUAL data.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Frames.reshape_m">
+<em class="property">static </em><code class="descname">reshape_m</code><span class="sig-paren">(</span><em>dfm</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames.reshape_m"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames.reshape_m" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns pandas dataframe with MONTHLY data.</p>
+</dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Frames.reshape_q">
+<em class="property">static </em><code class="descname">reshape_q</code><span class="sig-paren">(</span><em>dfq</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames.reshape_q"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames.reshape_q" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns pandas dataframe with QUARTERLY data.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.vintage.Frames.save">
+<code class="descname">save</code><span class="sig-paren">(</span><em>folder_path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames.save" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="staticmethod">
+<dt id="kep.vintage.Frames.validate">
+<em class="property">static </em><code class="descname">validate</code><span class="sig-paren">(</span><em>df</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Frames.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Frames.validate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.vintage.Vintage">
+<em class="property">class </em><code class="descclassname">kep.vintage.</code><code class="descname">Vintage</code><span class="sig-paren">(</span><em>year</em>, <em>month</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Vintage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Vintage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Represents dataset release for a given year and month.</p>
+<dl class="method">
+<dt id="kep.vintage.Vintage.dfs">
+<code class="descname">dfs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Vintage.dfs"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Vintage.dfs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Shorthand for obtaining dataframes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.vintage.Vintage.save">
+<code class="descname">save</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Vintage.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Vintage.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save dataframes to CSVs.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.vintage.Vintage.validate">
+<code class="descname">validate</code><span class="sig-paren">(</span><em>valid_datapoints=[{'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999}, {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999}, {'freq': 'a', 'label': 'EXPORT_GOODS_bln_usd', 'value': 75.6, 'year': 1999}, {'freq': 'q', 'label': 'IMPORT_GOODS_bln_usd', 'qtr': 1, 'value': 9.1, 'year': 1999}, {'freq': 'a', 'label': 'CPI_rog', 'value': 136.5, 'year': 1999}, {'freq': 'm', 'label': 'CPI_rog', 'value': 108.4, 'year': 1999, 'month': 1}]</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#Vintage.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.Vintage.validate" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.vintage.get_date_month_end">
+<code class="descclassname">kep.vintage.</code><code class="descname">get_date_month_end</code><span class="sig-paren">(</span><em>year</em>, <em>month</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#get_date_month_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.get_date_month_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.vintage.get_date_quarter_end">
+<code class="descclassname">kep.vintage.</code><code class="descname">get_date_quarter_end</code><span class="sig-paren">(</span><em>year</em>, <em>qtr</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#get_date_quarter_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.get_date_quarter_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.vintage.get_date_year_end">
+<code class="descclassname">kep.vintage.</code><code class="descname">get_date_year_end</code><span class="sig-paren">(</span><em>year</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#get_date_year_end"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.get_date_year_end" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.vintage.month_end_day">
+<code class="descclassname">kep.vintage.</code><code class="descname">month_end_day</code><span class="sig-paren">(</span><em>year</em>, <em>month</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#month_end_day"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.month_end_day" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.vintage.to_float">
+<code class="descclassname">kep.vintage.</code><code class="descname">to_float</code><span class="sig-paren">(</span><em>text</em>, <em>i=0</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/vintage.html#to_float"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.vintage.to_float" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="kep.tables.html">kep.tables module</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Evgeniy Pogrebnyak.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

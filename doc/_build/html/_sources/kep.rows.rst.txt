@@ -1,11 +1,7 @@
-kep package
-===========
+kep.rows module
+===============
 
-.. automodule:: kep
+.. automodule:: kep.rows
     :members:
     :undoc-members:
     :show-inheritance:
-
-
-
-

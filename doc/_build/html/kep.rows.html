@@ -1,0 +1,169 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>kep.rows module &#8212; Rosstat fuzzy MS Word/csv parser  documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="kep.spec module" href="kep.spec.html" />
+    <link rel="prev" title="kep.files module" href="kep.files.html" /> 
+  </head>
+  <body role="document">
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>Rosstat fuzzy MS Word/csv parser  documentation</span></a></h1>
+        <h2 class="heading"><span>kep.rows module</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="kep.files.html">kep.files module</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="kep.spec.html">kep.spec module</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="module-kep.rows">
+<span id="kep-rows-module"></span><h1>kep.rows module<a class="headerlink" href="#module-kep.rows" title="Permalink to this headline">¶</a></h1>
+<p>Read CSV file and represent it as a stream/list of Rows() instances.</p>
+<dl class="class">
+<dt id="kep.rows.Row">
+<em class="property">class </em><code class="descclassname">kep.rows.</code><code class="descname">Row</code><span class="sig-paren">(</span><em>row</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>CSV row representation.</p>
+<dl class="method">
+<dt id="kep.rows.Row.get_unit">
+<code class="descname">get_unit</code><span class="sig-paren">(</span><em>units_mapper_dict=OrderedDict([('млрд.долларов'</em>, <em>'bln_usd')</em>, <em>('млрд. долларов'</em>, <em>'bln_usd')</em>, <em>('млрд</em>, <em>долларов'</em>, <em>'bln_usd')</em>, <em>('млрд.рублей'</em>, <em>'bln_rub')</em>, <em>('млрд. рублей'</em>, <em>'bln_rub')</em>, <em>('рублей / rubles'</em>, <em>'rub')</em>, <em>('млн.рублей'</em>, <em>'mln_rub')</em>, <em>('Индекс физического объема произведенного ВВП</em>, <em>в %'</em>, <em>'yoy')</em>, <em>('в % к декабрю предыдущего года'</em>, <em>'ytd')</em>, <em>('в % к предыдущему месяцу'</em>, <em>'rog')</em>, <em>('в % к предыдущему периоду'</em>, <em>'rog')</em>, <em>('% к концу предыдущего периода'</em>, <em>'rog')</em>, <em>('период с начала отчетного года в % к соответствующему периоду предыдущего года'</em>, <em>'ytd')</em>, <em>('в % к соответствующему периоду предыдущего года'</em>, <em>'yoy')</em>, <em>('в % к соответствующему месяцу предыдущего года'</em>, <em>'yoy')</em>, <em>('отчетный месяц в % к предыдущему месяцу'</em>, <em>'rog')</em>, <em>('отчетный месяц в % к соответствующему месяцу предыдущего года'</em>, <em>'yoy')</em>, <em>('период с начала отчетного года'</em>, <em>'ytd')</em>, <em>('%'</em>, <em>'pct')</em>, <em>('в % к ВВП'</em>, <em>'gdp_percent')</em>, <em>('продукты питания'</em>, <em>'rog')</em>, <em>('алкогольные напитки'</em>, <em>'rog')</em>, <em>('непродовольственные товары'</em>, <em>'rog')</em>, <em>('непродовольст- венные товары'</em>, <em>'rog')</em>, <em>('услуги'</em>, <em>'rog')])</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.get_unit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.get_unit" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.Row.get_varname">
+<code class="descname">get_varname</code><span class="sig-paren">(</span><em>varnames_mapper_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.get_varname"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.get_varname" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.Row.get_year">
+<code class="descname">get_year</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.get_year"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.get_year" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.Row.is_datarow">
+<code class="descname">is_datarow</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.is_datarow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.is_datarow" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.Row.len">
+<code class="descname">len</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.len"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.len" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.Row.matches">
+<code class="descname">matches</code><span class="sig-paren">(</span><em>pat</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.matches"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.matches" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.Row.startswith">
+<code class="descname">startswith</code><span class="sig-paren">(</span><em>text</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#Row.startswith"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.Row.startswith" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.rows.RowStack">
+<em class="property">class </em><code class="descclassname">kep.rows.</code><code class="descname">RowStack</code><span class="sig-paren">(</span><em>rows</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#RowStack"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.RowStack" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
+<p>Holder for CSV rows. Allows extracting segments of CSV file and
+remaining part of CSV file, after all segments are extracted.</p>
+<p>Operates on list of Row() instances.</p>
+<dl class="method">
+<dt id="kep.rows.RowStack.pop">
+<code class="descname">pop</code><span class="sig-paren">(</span><em>start</em>, <em>end</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#RowStack.pop"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.RowStack.pop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Pops elements of self.rows between [start, end).
+Recognises element occurrences by index <em>i</em>.
+Modifies <em>self.rows</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.rows.RowStack.remaining_rows">
+<code class="descname">remaining_rows</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#RowStack.remaining_rows"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.RowStack.remaining_rows" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.rows.from_csv">
+<code class="descclassname">kep.rows.</code><code class="descname">from_csv</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#from_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.from_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get iterable of rows from <em>csv_path</em></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.rows.get_year">
+<code class="descclassname">kep.rows.</code><code class="descname">get_year</code><span class="sig-paren">(</span><em>string: str</em>, <em>rx=re.compile('(\\d{4}).*')</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#get_year"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.get_year" title="Permalink to this definition">¶</a></dt>
+<dd><p>Extracts year from string <em>string</em>.
+Returns False if year is not valid or not in plausible range.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.rows.is_year">
+<code class="descclassname">kep.rows.</code><code class="descname">is_year</code><span class="sig-paren">(</span><em>string: str</em><span class="sig-paren">)</span> &rarr; bool<a class="reference internal" href="_modules/kep/rows.html#is_year"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.is_year" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.rows.read_csv">
+<code class="descclassname">kep.rows.</code><code class="descname">read_csv</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#read_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.read_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Yield non-empty dictionaries with &#8216;head&#8217; and &#8216;data&#8217; keys from <em>path</em></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.rows.to_csv">
+<code class="descclassname">kep.rows.</code><code class="descname">to_csv</code><span class="sig-paren">(</span><em>rows</em>, <em>path</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/rows.html#to_csv"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.rows.to_csv" title="Permalink to this definition">¶</a></dt>
+<dd><p>Accept iterable of rows <em>rows</em> and write in to <em>csv_path</em></p>
+</dd></dl>
+
+</div>
+
+
+      </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="kep.files.html">kep.files module</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="kep.spec.html">kep.spec module</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Evgeniy Pogrebnyak.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
+  </body>
+</html>

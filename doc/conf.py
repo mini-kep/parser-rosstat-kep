@@ -19,7 +19,7 @@
 #
 import os
 import sys
-sys.path.insert(0, "C:/Users/Евгений/Documents/GitHub/mini-kep/src")
+sys.path.insert(0, os.path.abspath("../src"))
 
 
 # -- General configuration ------------------------------------------------
@@ -49,9 +49,9 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = 'kep'
-copyright = '2017, Author'
-author = 'Author'
+project = 'Rosstat fuzzy MS Word/csv parser'
+copyright = '2017, Evgeniy Pogrebnyak'
+author = 'Evgeniy Pogrebnyak'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -86,7 +86,7 @@ todo_include_todos = True
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'alabaster'
+html_theme = 'haiku'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -177,5 +177,3 @@ epub_copyright = copyright
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
-
-

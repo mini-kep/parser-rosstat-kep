@@ -6,9 +6,9 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>kep.spec &#8212; kep  documentation</title>
+    <title>kep.spec &#8212; Rosstat fuzzy MS Word/csv parser  documentation</title>
     
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     
     <script type="text/javascript">
@@ -25,22 +25,23 @@
     <script type="text/javascript" src="../../_static/underscore.js"></script>
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-   
-  <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="search" title="Search" href="../../search.html" /> 
   </head>
   <body role="document">
-  
+      <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
+          <span>Rosstat fuzzy MS Word/csv parser  documentation</span></a></h1>
+        <h2 class="heading"><span>kep.spec</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        <a class="uplink" href="../../index.html">Contents</a>
+        </p>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+      </div>
+      <div class="content">
+        
+        
   <h1>Source code for kep.spec</h1><div class="highlight"><pre>
 <span></span><span class="c1"># -*- coding: utf-8 -*-</span>
 <span class="sd">&quot;&quot;&quot;Parsing instruction contains:</span>
@@ -102,7 +103,7 @@
 <span class="k">assert</span> <span class="nb">set</span><span class="p">(</span><span class="n">UNIT_NAMES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">UNITS</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
 
-<div class="viewcode-block" id="Indicator"><a class="viewcode-back" href="../../kep.html#kep.spec.Indicator">[docs]</a><span class="k">class</span> <span class="nc">Indicator</span><span class="p">:</span>
+<div class="viewcode-block" id="Indicator"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Indicator">[docs]</a><span class="k">class</span> <span class="nc">Indicator</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;An economic indicator parsing instructions&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">varname</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">required_units</span><span class="p">,</span> <span class="n">desc</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">sample</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -140,20 +141,20 @@
         <span class="k">return</span> <span class="s2">&quot;Indicator (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
     <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Indicator.as_list"><a class="viewcode-back" href="../../kep.html#kep.spec.Indicator.as_list">[docs]</a>    <span class="k">def</span> <span class="nf">as_list</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+<div class="viewcode-block" id="Indicator.as_list"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Indicator.as_list">[docs]</a>    <span class="k">def</span> <span class="nf">as_list</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">x</span></div></div>
 
 
-<div class="viewcode-block" id="Definition"><a class="viewcode-back" href="../../kep.html#kep.spec.Definition">[docs]</a><span class="k">class</span> <span class="nc">Definition</span><span class="p">:</span>
+<div class="viewcode-block" id="Definition"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Definition">[docs]</a><span class="k">class</span> <span class="nc">Definition</span><span class="p">:</span>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">indicators</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">reader</span>
 
-<div class="viewcode-block" id="Definition.append"><a class="viewcode-back" href="../../kep.html#kep.spec.Definition.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Definition.append"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Definition.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">pdef</span> <span class="o">=</span> <span class="n">Indicator</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">indicators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pdef</span><span class="p">)</span></div>
 
@@ -173,7 +174,7 @@
                     <span class="k">yield</span> <span class="n">req</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">_yield</span><span class="p">())</span>
 
-<div class="viewcode-block" id="Definition.varnames"><a class="viewcode-back" href="../../kep.html#kep.spec.Definition.varnames">[docs]</a>    <span class="k">def</span> <span class="nf">varnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Definition.varnames"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Definition.varnames">[docs]</a>    <span class="k">def</span> <span class="nf">varnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">ind</span><span class="o">.</span><span class="n">varname</span> <span class="k">for</span> <span class="n">ind</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">indicators</span><span class="p">]</span></div>
 
     <span class="k">def</span> <span class="nf">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
@@ -185,7 +186,7 @@
         <span class="k">return</span> <span class="s2">&quot;Definition for </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">vns</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Scope"><a class="viewcode-back" href="../../kep.html#kep.spec.Scope">[docs]</a><span class="k">class</span> <span class="nc">Scope</span><span class="p">():</span>
+<div class="viewcode-block" id="Scope"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Scope">[docs]</a><span class="k">class</span> <span class="nc">Scope</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Start and end lines for CSV file segment and associated variables</span>
 <span class="sd">       defintion.</span>
 
@@ -199,16 +200,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">add_bounds</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">definition</span> <span class="o">=</span> <span class="n">Definition</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Scope.add_bounds"><a class="viewcode-back" href="../../kep.html#kep.spec.Scope.add_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">add_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
+<div class="viewcode-block" id="Scope.add_bounds"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Scope.add_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">add_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">start</span> <span class="ow">and</span> <span class="n">end</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">__markers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">dict</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="n">end</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot accept empty line as Scope() boundary&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Scope.append"><a class="viewcode-back" href="../../kep.html#kep.spec.Scope.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+<div class="viewcode-block" id="Scope.append"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Scope.append">[docs]</a>    <span class="k">def</span> <span class="nf">append</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">definition</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Scope.get_parsing_definition"><a class="viewcode-back" href="../../kep.html#kep.spec.Scope.get_parsing_definition">[docs]</a>    <span class="k">def</span> <span class="nf">get_parsing_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Scope.get_parsing_definition"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Scope.get_parsing_definition">[docs]</a>    <span class="k">def</span> <span class="nf">get_parsing_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">definition</span></div>
 
     <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -218,7 +219,7 @@
         <span class="n">msg2</span> <span class="o">=</span> <span class="s2">&quot;bound by start &lt;</span><span class="si">{}</span><span class="s2">...&gt;, end &lt;</span><span class="si">{}</span><span class="s2">...&gt;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
         <span class="k">return</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">msg1</span><span class="p">,</span> <span class="n">msg2</span><span class="p">])</span>
 
-<div class="viewcode-block" id="Scope.get_bounds"><a class="viewcode-back" href="../../kep.html#kep.spec.Scope.get_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">get_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
+<div class="viewcode-block" id="Scope.get_bounds"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Scope.get_bounds">[docs]</a>    <span class="k">def</span> <span class="nf">get_bounds</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rows</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Get start and end line markers, which can be found in *rows*&quot;&quot;&quot;</span>
         <span class="n">rows</span> <span class="o">=</span> <span class="p">[</span><span class="n">r</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">rows</span><span class="p">]</span>  <span class="c1"># consume iterator</span>
         <span class="k">for</span> <span class="n">marker</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__markers</span><span class="p">:</span>
@@ -248,7 +249,7 @@
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="Specification"><a class="viewcode-back" href="../../kep.html#kep.spec.Specification">[docs]</a><span class="k">class</span> <span class="nc">Specification</span><span class="p">:</span>
+<div class="viewcode-block" id="Specification"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Specification">[docs]</a><span class="k">class</span> <span class="nc">Specification</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Specification holds a list of defintions in two variables:</span>
 
 <span class="sd">       .main ()</span>
@@ -261,28 +262,28 @@
         <span class="c1"># local parsing definitions for segments</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span> <span class="o">=</span> <span class="p">[]</span>
 
-<div class="viewcode-block" id="Specification.add_scope"><a class="viewcode-back" href="../../kep.html#kep.spec.Specification.add_scope">[docs]</a>    <span class="k">def</span> <span class="nf">add_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
+<div class="viewcode-block" id="Specification.add_scope"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Specification.add_scope">[docs]</a>    <span class="k">def</span> <span class="nf">add_scope</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">scope</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">scope</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Specification.get_main_parsing_definition"><a class="viewcode-back" href="../../kep.html#kep.spec.Specification.get_main_parsing_definition">[docs]</a>    <span class="k">def</span> <span class="nf">get_main_parsing_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Specification.get_main_parsing_definition"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Specification.get_main_parsing_definition">[docs]</a>    <span class="k">def</span> <span class="nf">get_main_parsing_definition</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">main</span></div>
 
     <span class="k">def</span> <span class="nf">__all_definitions</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">main</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="n">sc</span><span class="o">.</span><span class="n">definition</span> <span class="k">for</span> <span class="n">sc</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scopes</span><span class="p">]</span>
 
-<div class="viewcode-block" id="Specification.varnames"><a class="viewcode-back" href="../../kep.html#kep.spec.Specification.varnames">[docs]</a>    <span class="k">def</span> <span class="nf">varnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Specification.varnames"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Specification.varnames">[docs]</a>    <span class="k">def</span> <span class="nf">varnames</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">varnames</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">pdef</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__all_definitions</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">pdef</span><span class="o">.</span><span class="n">varnames</span><span class="p">():</span>
                 <span class="n">varnames</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">varnames</span><span class="p">))</span></div>
 
-<div class="viewcode-block" id="Specification.validate"><a class="viewcode-back" href="../../kep.html#kep.spec.Specification.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Specification.validate"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Specification.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="c1"># FIXME: order of markers - ends are not starts</span>
         <span class="k">pass</span></div>
 
-<div class="viewcode-block" id="Specification.required"><a class="viewcode-back" href="../../kep.html#kep.spec.Specification.required">[docs]</a>    <span class="k">def</span> <span class="nf">required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Specification.required"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Specification.required">[docs]</a>    <span class="k">def</span> <span class="nf">required</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">pdef</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">__all_definitions</span><span class="p">():</span>
             <span class="k">for</span> <span class="n">req</span> <span class="ow">in</span> <span class="n">pdef</span><span class="o">.</span><span class="n">required</span><span class="p">:</span>
                 <span class="k">yield</span> <span class="n">req</span></div></div>
@@ -589,44 +590,18 @@
 <span class="c1">#    sc = Scope()</span>
 </pre></div>
 
-          </div>
-        </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper"><div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../../index.html">Documentation overview</a><ul>
-  <li><a href="../index.html">Module code</a><ul>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        <a class="uplink" href="../../index.html">Contents</a>
+        </p>
+
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2017, Author.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.5.1</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.9</a>
-      
-    </div>
 
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2017, Evgeniy Pogrebnyak.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+    </div>
   </body>
 </html>

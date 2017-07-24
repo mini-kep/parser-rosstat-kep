@@ -5,7 +5,7 @@ DONE
 - ```master_doc = 'index'``` is changeable + can this be ```index.md```?
 - ```html_theme = 'haiku'```
 - use ```os.path.abspath(".")``` to add current directory to ```sys.path``` in order to make import work 
-- 
+
 
 Understanding sphinx
 ====================
@@ -25,6 +25,9 @@ are in documentation, but not explicitly at first sight:
 links for one to another
 4. ```autodoc``` directives allow exploring your package/module/class/method/function API
 5. Most of this work can be done by ```sphinx-apidoc``` and ```sphinx-build``` commands.
+
+
+<https://stackoverflow.com/questions/25549321/minimal-working-example-for-package-documentation-using-sphinx-in-python>
 
 
 IDEAS
