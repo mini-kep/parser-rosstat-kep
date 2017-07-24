@@ -53,6 +53,14 @@ def lint(ctx, folder="src/kep"):
     # --max-line-length=100           
     ctx.run('flake8 {} --exclude test* --ignore E501'.format())
 
+# TODO:    
+# build new modules sphinx
+# sphinx-apidoc -feM -o. ../src/kep 
+
+# TODO:    
+# make bat 
+# make html (can use Echo to find out the command)
+
 
 
 @task
