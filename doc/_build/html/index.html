@@ -1,16 +1,13 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>Welcome to kep’s documentation! &#8212; Rosstat fuzzy MS Word/csv parser  documentation</title>
-    
+    <title>Welcome to mini-kep documentation &#8212; Rosstat fuzzy MS Word/csv parser  documentation</title>
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -28,10 +25,10 @@
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="kep package" href="kep.html" /> 
   </head>
-  <body role="document">
+  <body>
       <div class="header" role="banner"><h1 class="heading"><a href="#">
           <span>Rosstat fuzzy MS Word/csv parser  documentation</span></a></h1>
-        <h2 class="heading"><span>Welcome to kep’s documentation!</span></h2>
+        <h2 class="heading"><span>Welcome to mini-kep documentation</span></h2>
       </div>
       <div class="topnav" role="navigation" aria-label="top navigation">
       
@@ -45,8 +42,32 @@
       <div class="content">
         
         
-  <div class="section" id="welcome-to-kep-s-documentation">
-<h1>Welcome to kep&#8217;s documentation!<a class="headerlink" href="#welcome-to-kep-s-documentation" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="welcome-to-mini-kep-documentation">
+<h1>Welcome to mini-kep documentation<a class="headerlink" href="#welcome-to-mini-kep-documentation" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://github.com/epogrebnyak/mini-kep">mini-kep</a> aims to parse <a class="reference external" href="http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391">archived MS Word files from Rosstat</a>
+to obtain clean pandas dataframes with macroeconomic time series and save them as <a class="reference external" href="https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest">processed CSV files at stable URL</a> for further use.</p>
+<p>Steps involved in the parsing pipeline are the following:</p>
+<ul class="simple">
+<li><strong>manually</strong> (<em>FIXME</em>):<ul>
+<li>download zip/rar file for a specified month <a class="reference external" href="http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391">from Rosstat</a></li>
+<li>unpack MS Word files to a local folder</li>
+</ul>
+</li>
+<li><strong>word2csv</strong>: convert MS Word files to single interim CSV file (see <a class="reference external" href="https://github.com/epogrebnyak/mini-kep/blob/master/data/interim/2017/05/tab.csv">example</a>)</li>
+<li><strong>csv2df</strong>: parse interim CSV file to obtain <a class="reference external" href="https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest">processed CSV files</a> with annual, quarterly and monthly data.</li>
+</ul>
+<p>Also in <a class="reference external" href="https://github.com/epogrebnyak/mini-kep/tree/master/src">/src</a> folder:</p>
+<ul class="simple">
+<li><strong>access_data</strong>: sample code to download data from stable URL and save its local copy</li>
+<li><strong>frontpage</strong>: try making <a class="reference external" href="https://github.com/epogrebnyak/mini-kep/blob/master/README.md">README.md</a> a nice page with graphs</li>
+</ul>
+<div class="section" id="todo">
+<h2>TODO<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>provide CSV source example</li>
+<li>provide dataframe example</li>
+<li>more examples to examples.rst text</li>
+</ul>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
@@ -58,6 +79,7 @@
 <li class="toctree-l1"><a class="reference internal" href="kep.tables.html">kep.tables module</a></li>
 <li class="toctree-l1"><a class="reference internal" href="kep.vintage.html">kep.vintage module</a></li>
 </ul>
+</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">
@@ -82,7 +104,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Evgeniy Pogrebnyak.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

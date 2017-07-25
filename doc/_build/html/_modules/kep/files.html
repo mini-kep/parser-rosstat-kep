@@ -1,16 +1,13 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>kep.files &#8212; Rosstat fuzzy MS Word/csv parser  documentation</title>
-    
     <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
@@ -27,7 +24,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
       <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
           <span>Rosstat fuzzy MS Word/csv parser  documentation</span></a></h1>
         <h2 class="heading"><span>kep.files</span></h2>
@@ -120,7 +117,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 <span class="c1"># we are in src/kep</span>
 <span class="n">levels_up</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">data_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="n">levels_up</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;data&#39;</span>
+<span class="n">data_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="n">levels_up</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;data&#39;</span>
 <span class="n">rosstat_folder</span> <span class="o">=</span> <span class="n">data_folder</span> <span class="o">/</span> <span class="s1">&#39;interim&#39;</span>
 <span class="n">processed</span> <span class="o">=</span> <span class="n">data_folder</span> <span class="o">/</span> <span class="s1">&#39;processed&#39;</span>
 <span class="n">latest</span> <span class="o">=</span> <span class="n">processed</span> <span class="o">/</span> <span class="s1">&#39;latest&#39;</span>
@@ -140,8 +137,8 @@
 <div class="viewcode-block" id="InterimDataFolder"><a class="viewcode-back" href="../../kep.files.html#kep.files.InterimDataFolder">[docs]</a><span class="k">class</span> <span class="nc">InterimDataFolder</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Find latest month available in interim data folder&quot;&quot;&quot;</span>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="InterimDataFolder.list_subfolders"><a class="viewcode-back" href="../../kep.files.html#kep.files.InterimDataFolder.list_subfolders">[docs]</a>    <span class="k">def</span> <span class="nf">list_subfolders</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+<div class="viewcode-block" id="InterimDataFolder.list_subfolders"><a class="viewcode-back" href="../../kep.files.html#kep.files.InterimDataFolder.list_subfolders">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">list_subfolders</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
         <span class="k">return</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">folder</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()]</span></div>
 
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="n">rosstat_folder</span><span class="p">):</span>
@@ -191,7 +188,7 @@
     <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Updated folder *latest*&quot;</span><span class="p">)</span></div>
 
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">init_dirs</span><span class="p">(</span><span class="n">processed</span><span class="p">)</span>
     <span class="n">init_dirs</span><span class="p">(</span><span class="n">rosstat_folder</span><span class="p">)</span>
     <span class="n">copy_latest_csv_to_separate_folder</span><span class="p">()</span>
@@ -208,7 +205,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Evgeniy Pogrebnyak.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>

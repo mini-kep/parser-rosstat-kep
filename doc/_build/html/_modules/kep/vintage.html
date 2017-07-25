@@ -1,16 +1,13 @@
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
     <title>kep.vintage &#8212; Rosstat fuzzy MS Word/csv parser  documentation</title>
-    
     <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
@@ -27,7 +24,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head>
-  <body role="document">
+  <body>
       <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
           <span>Rosstat fuzzy MS Word/csv parser  documentation</span></a></h1>
         <h2 class="heading"><span>kep.vintage</span></h2>
@@ -121,7 +118,7 @@
             <span class="s1">&#39;month&#39;</span><span class="p">:</span> <span class="n">m</span><span class="p">}</span></div>
 
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">basedict</span><span class="o">.</span><span class="n">__str__</span><span class="p">()</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">basedict</span><span class="o">.</span><span class="fm">__str__</span><span class="p">()</span></div>
 
 
 <div class="viewcode-block" id="Emitter"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Emitter">[docs]</a><span class="k">class</span> <span class="nc">Emitter</span><span class="p">:</span>
@@ -212,16 +209,16 @@
 <div class="viewcode-block" id="Frames.includes"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Frames.includes">[docs]</a>    <span class="k">def</span> <span class="nf">includes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datapoints</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Frames.validate"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Frames.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+<div class="viewcode-block" id="Frames.validate"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Frames.validate">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
             <span class="n">dups</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="n">df</span><span class="o">.</span><span class="n">duplicated</span><span class="p">(</span><span class="n">keep</span><span class="o">=</span><span class="kc">False</span><span class="p">)]</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">dups</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
                 <span class="c1"># df must have no duplicate rows</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">dups</span><span class="p">)</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Frames.reshape_a"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Frames.reshape_a">[docs]</a>    <span class="k">def</span> <span class="nf">reshape_a</span><span class="p">(</span><span class="n">dfa</span><span class="p">):</span>
+<div class="viewcode-block" id="Frames.reshape_a"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Frames.reshape_a">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">reshape_a</span><span class="p">(</span><span class="n">dfa</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns pandas dataframe with ANNUAL data.&quot;&quot;&quot;</span>
         <span class="n">dfa</span><span class="p">[</span><span class="s2">&quot;time_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfa</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
             <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">get_date_year_end</span><span class="p">(</span>
@@ -232,8 +229,8 @@
         <span class="n">dfa</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">dfa</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Frames.reshape_q"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Frames.reshape_q">[docs]</a>    <span class="k">def</span> <span class="nf">reshape_q</span><span class="p">(</span><span class="n">dfq</span><span class="p">):</span>
+<div class="viewcode-block" id="Frames.reshape_q"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Frames.reshape_q">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">reshape_q</span><span class="p">(</span><span class="n">dfq</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns pandas dataframe with QUARTERLY data.&quot;&quot;&quot;</span>
         <span class="n">dfq</span><span class="p">[</span><span class="s2">&quot;time_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfq</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
             <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">get_date_quarter_end</span><span class="p">(</span>
@@ -245,8 +242,8 @@
         <span class="n">dfq</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">dfq</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Frames.reshape_m"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Frames.reshape_m">[docs]</a>    <span class="k">def</span> <span class="nf">reshape_m</span><span class="p">(</span><span class="n">dfm</span><span class="p">):</span>
+<div class="viewcode-block" id="Frames.reshape_m"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Frames.reshape_m">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">reshape_m</span><span class="p">(</span><span class="n">dfm</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns pandas dataframe with MONTHLY data.&quot;&quot;&quot;</span>
         <span class="n">dfm</span><span class="p">[</span><span class="s2">&quot;time_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dfm</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
             <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">get_date_month_end</span><span class="p">(</span>
@@ -320,24 +317,24 @@
 <div class="viewcode-block" id="Collection"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Collection">[docs]</a><span class="k">class</span> <span class="nc">Collection</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Methods to manipulate entire set of data releases.&quot;&quot;&quot;</span>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Collection.save_all_dataframes_to_csv"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Collection.save_all_dataframes_to_csv">[docs]</a>    <span class="k">def</span> <span class="nf">save_all_dataframes_to_csv</span><span class="p">():</span>
+<div class="viewcode-block" id="Collection.save_all_dataframes_to_csv"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Collection.save_all_dataframes_to_csv">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">save_all_dataframes_to_csv</span><span class="p">():</span>
         <span class="k">for</span> <span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span> <span class="ow">in</span> <span class="n">files</span><span class="o">.</span><span class="n">filled_dates</span><span class="p">():</span>
             <span class="n">Vintage</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Collection.save_latest"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Collection.save_latest">[docs]</a>    <span class="k">def</span> <span class="nf">save_latest</span><span class="p">():</span>
+<div class="viewcode-block" id="Collection.save_latest"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Collection.save_latest">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">save_latest</span><span class="p">():</span>
         <span class="n">vintage</span> <span class="o">=</span> <span class="n">Vintage</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="n">vintage</span><span class="o">.</span><span class="n">save</span><span class="p">()</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Collection.approve_latest"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Collection.approve_latest">[docs]</a>    <span class="k">def</span> <span class="nf">approve_latest</span><span class="p">():</span>
+<div class="viewcode-block" id="Collection.approve_latest"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Collection.approve_latest">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">approve_latest</span><span class="p">():</span>
         <span class="sd">&quot;&quot;&quot;Quick check for algorithm on latest available data.&quot;&quot;&quot;</span>
         <span class="n">vintage</span> <span class="o">=</span> <span class="n">Vintage</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
         <span class="n">vintage</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span></div>
 
-    <span class="nd">@staticmethod</span>
-<div class="viewcode-block" id="Collection.approve_all"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Collection.approve_all">[docs]</a>    <span class="k">def</span> <span class="nf">approve_all</span><span class="p">():</span>
+<div class="viewcode-block" id="Collection.approve_all"><a class="viewcode-back" href="../../kep.vintage.html#kep.vintage.Collection.approve_all">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">approve_all</span><span class="p">():</span>
         <span class="sd">&quot;&quot;&quot;Checks all dates, runs slow (about 20 sec.)</span>
 <span class="sd">           May fail if dataset not complete.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -346,7 +343,7 @@
             <span class="n">vintage</span><span class="o">.</span><span class="n">validate</span><span class="p">()</span></div></div>
 
 
-<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="n">Collection</span><span class="o">.</span><span class="n">approve_latest</span><span class="p">()</span>
     <span class="c1"># Collection.approve_all()</span>
     <span class="c1"># Collection.save_latest()</span>
@@ -395,7 +392,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Evgeniy Pogrebnyak.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>
