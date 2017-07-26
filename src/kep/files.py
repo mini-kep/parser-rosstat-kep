@@ -1,3 +1,36 @@
+"""File and folder locations for interim and processed CSV files. 
+
+Data directory structure:
+
+::
+    
+    \\data
+      \\interim
+          \\2017
+          \\2016
+          \\...
+      \\processed
+          \\latest
+          \\latest_json (may be depreciated)
+          \\2017
+          \\2016
+          \\...
+
+Tasks:
+
+- parsing (based of *Folder* class):
+
+    - **get_latest_date()** - find date for latest interim CSV folder
+    - **locate_csv()** - get interim CSV file for specified date
+    - **get_processed_folder()** - get processed folder by date
+    
+- housekeeping:  
+    
+   - **copy_latest()** - copy CSVs to *latest* folder with stable URL
+   - **init_dirs()** - make directory structure on startup
+   
+"""
+
 from pathlib import Path
 import shutil
 
@@ -5,11 +38,9 @@ import shutil
 ENC = 'utf8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
-
-def locate_csv(year: int=None, month: int=None):
-    year, month = filter_date(year, month)
-    return get_path_csv(year, month)
-
+# we are in src/kep
+levels_up = 2
+data_folder = Path(__file__).parents[levels_up] / 'data'
 
 # FIXME: hardcoded constant will not update to new months
 DATES = [(2009, 4), (2009, 5), (2009, 6),
@@ -39,114 +70,146 @@ DATES = [(2009, 4), (2009, 5), (2009, 6),
 
          (2017, 1), (2017, 2), (2017, 3), (2017, 4), (2017, 5)]
 
+# end user functions    
+def get_latest_date():
+    """Return year and month for latest available interim data folder.     
+    
+    Returns:            
+        (year, month) tuple of two integers
+    
+    """
+    return Folder.get_latest_date()  
 
-def filled_dates(available_dates=DATES):
-    for date in reversed(available_dates):
-        csv_path = get_path_csv(*date)
-        if csv_path.exists() and csv_path.stat().st_size > 0:
-            yield date
 
-
-def filter_date(year, month):
-    if not year and not month:
-        year, month = InterimDataFolder().get_latest_date()
-        return year, month
-    elif (year, month) in list(filled_dates()):
-        return year, month
+def locate_csv(year: int=None, month: int=None):    
+    """Return interim CSV file based on *year* and *month*. 
+    
+    Returns:            
+        pathlib.Path() instance
+    """            
+    folder = Folder(year, month).get_interim_folder() 
+    csv_path = folder / "tab.csv"
+    if csv_path.exists() and csv_path.stat().st_size > 0:
+        return csv_path
     else:
-        raise ValueError("Date not found: {} {}".format(year, month))
+        raise FileNotFoundError("Not found or has zero length: {}".format(csv_path))
 
 
-# TODO - account for latest in folder structure
-"""
-\data
-  \raw
-      \2017
-      \...
-  \interim
-      \2017
-      \...
-  \processed
-      \latest
-      \latest_json
-      \vintages
-      \2017
-      \...
-"""
-# we are in src/kep
-levels_up = 2
-data_folder = Path(__file__).parents[levels_up] / 'data'
-rosstat_folder = data_folder / 'interim'
-processed = data_folder / 'processed'
-latest = processed / 'latest'
-latest_json = processed / 'latest_json'
+def get_processed_folder(year, month):
+    """Return processed CSV file folder based on *year* and *month*. 
+    
+    The processed CSV file folder is used by Frames class 
+    to write output files (dfa.csv, dfq.csv, dfm.csv).
+    
+    Returns:            
+        pathlib.Path() instance
+    
+    """
+    return Folder(year, month).get_processed_folder()
 
 
-def init_dirs(root, available_dates=DATES):
-    for d in available_dates:
-        y, m = d
-        f = root / str(y)
-        sf = f / str(m).zfill(2)
-        for new_folder in [f, sf]:
-            if not new_folder.exists():
-                new_folder.mkdir()
+# folder locations
+class Folder:
+    interim = data_folder / 'interim'
+    processed = data_folder / 'processed'
+    latest = processed / 'latest' 
+    supported_dates = DATES    
+   
+    @classmethod  
+    def get_latest_date(cls):
+        root =  cls.interim
+        def max_subfolder(folder):
+            _lst = [f.name for f in folder.iterdir() if f.is_dir()] 
+            return int(max(_lst))
+        year = max_subfolder(root)
+        _subfolder = root / str(year)
+        month = max_subfolder(_subfolder)    
+        return year, month  
+            
+    def __init__(self, year=None, month=None):
+        # mask with latest date
+        if not year or not month:
+            year, month = Folder.get_latest_date()
+        # check if date is available     
+        if (year, month) in self.supported_dates:
+            self.year, self.month = year, month
+        else:
+            raise ValueError("Year and month not found: {} {}".format(year, month))        
+
+    def __local_folder(self, root):   
+        return root / str(self.year) / str(self.month).zfill(2)
+    
+    def get_interim_folder(self):
+        return self.__local_folder(root=self.interim) 
+            
+    def get_processed_folder(self):
+        return self.__local_folder(root=self.processed)  
+    
+    def __repr__(self):
+        return "Folder({}, {})".format(self.year, self.month)
+
+# FIXME: move to pytest file --------------------------------------------------        
+   
+year, month =  get_latest_date()   
+assert get_latest_date()[0] >= 2017
+assert get_latest_date()[1] >= 1 
+assert get_latest_date()[1] <= 12 
+
+assert locate_csv(year, month).exists() is True
+assert locate_csv().exists() is True
+
+#raises TypeError - not enough arguments
+#assert get_processed_folder().exists() is True
+assert get_processed_folder(year, month).exists() is True
 
 
-class InterimDataFolder():
-    """Find latest month available in interim data folder"""
+assert repr(Folder(2015, 5))
+assert Folder(2015, 5).get_processed_folder().exists()
+assert Folder(2015, 5).get_interim_folder().exists()
 
-    @staticmethod
-    def list_subfolders(folder):
-        return [f.name for f in folder.iterdir() if f.is_dir()]
+# raises ValueError
+# Folder(2030, 1)
+# end of tests ----------------------------------------------------------------
 
-    def __init__(self, folder=rosstat_folder):
-        self.folder = folder
-        assert self.get_latest_date() == DATES[-1]
+# create local data dirs for DATES
 
-    def max_year(self):
-        return max(self.list_subfolders(self.folder))
+def md(folder): 
+    """Create *folder* if not exists. 
+       Also create parent folder if needed. """
+    if not folder.exists():
+        parent = folder.parent
+        if not parent.exists():
+            parent.mkdir()        
+        folder.mkdir()                
+    
+def init_dirs(supported_dates=None):
+    """Create required directory structure in *data* folder.""" 
+    if not supported_dates:
+         supported_dates=DATES         
+    for (year, month) in supported_dates:                
+        f = Folder(year, month)
+        md(f.get_interim_folder())
+        md(f.get_processed_folder())
 
-    def max_month(self):
-        subfolder = self.folder / self.max_year()
-        return max(self.list_subfolders(subfolder))
+# housekeeping  - copy contents to 'prcessed/latest' folder
 
-    def get_latest_date(self):
-        return int(self.max_year()), int(self.max_month())
-
-    def get_latest_folder(self):
-        year, month = self.get_latest_date()
-        return __loc__(year, month, root=self.folder)
-
-
-def __loc__(year, month, root):
-    if not year and not month:
-        year, month = InterimDataFolder().get_latest_date()
-    if year and month:
-        month_dir = str(month).zfill(2)
-        return root / str(year) / month_dir
-
-
-def get_path_csv(year=None, month=None):
-    """Return interim CSV file path based on year and month"""
-    return __loc__(year, month, root=rosstat_folder) / 'tab.csv'
-
-
-def get_processed_folder(year=None, month=None):
-    """Return processed CSV file path based on year and month"""
-    return __loc__(year, month, root=processed)
-
-
-def copy_latest_csv_to_separate_folder(dst_folder=latest):
-    # copy all files from folder like 2017/4 to 'latest'
-    year, month = InterimDataFolder().get_latest_date()
+def copy_latest():
+    """Copy all files from folder like *processed/2017/04* to 
+       *processed/latest* folder.        
+       
+       Returns:
+           list of files copied
+    """
+    year, month = get_latest_date()
     src_folder = get_processed_folder(year, month)
+    copied = []
     for src in [f for f in src_folder.iterdir() if f.is_file()]:
-        dst = dst_folder / src.name
+        dst = Folder.latest / src.name
         shutil.copyfile(src, dst)
-    print("Updated folder *latest*")
-
-
+        copied.append(dst)
+    print("Updated folder", Folder.latest )
+    return copied
+    
 if __name__ == "__main__":
-    init_dirs(processed)
-    init_dirs(rosstat_folder)
-    copy_latest_csv_to_separate_folder()
+    init_dirs()
+    copy_latest()
