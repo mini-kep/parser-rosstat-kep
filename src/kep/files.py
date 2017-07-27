@@ -28,7 +28,7 @@ Functions based on :class:`kep.files.Folder` class methods:
 For housekeeping :mod:`kep.files` provides:
 
  - :func:`kep.files.init_dirs` (make directory structure on startup) 
- - :func:`kep.files.copy_latesst` (copy CSVs to *latest* folder which has stable URL)
+ - :func:`kep.files.copy_latest` (copy CSVs to *latest* folder which has stable URL)
    
 """
 
