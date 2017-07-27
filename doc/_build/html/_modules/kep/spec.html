@@ -1,13 +1,16 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
     <title>kep.spec &#8212; Rosstat fuzzy MS Word/csv parser  documentation</title>
+    
     <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
@@ -24,7 +27,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head>
-  <body>
+  <body role="document">
       <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
           <span>Rosstat fuzzy MS Word/csv parser  documentation</span></a></h1>
         <h2 class="heading"><span>kep.spec</span></h2>
@@ -137,8 +140,8 @@
         <span class="n">args</span> <span class="o">=</span> <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39;, </span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">, &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">varname</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">req</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">desc</span><span class="p">)</span>
         <span class="k">return</span> <span class="s2">&quot;Indicator (</span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Indicator.as_list"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Indicator.as_list">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">as_list</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Indicator.as_list"><a class="viewcode-back" href="../../kep.spec.html#kep.spec.Indicator.as_list">[docs]</a>    <span class="k">def</span> <span class="nf">as_list</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="k">return</span> <span class="p">[</span><span class="n">x</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
@@ -362,7 +365,7 @@
 <span class="c1"># - [ ] think of a better pattern to create SPEC</span>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="k">pass</span>
 
 
@@ -372,19 +375,19 @@
 <span class="c1">#d.add_header(&quot;Индекс физического объема произведенного ВВП, в %&quot;, &quot;GDP&quot;)</span>
 <span class="c1">#d.require(&quot;GDP&quot;, &quot;bln_rub&quot;)</span>
 <span class="c1">#d.require(&quot;GDP&quot;, &quot;yoy&quot;)</span>
-<span class="c1">## TODO: rename to IP</span>
+<span class="c1"># TODO: rename to IP</span>
 <span class="c1">#d.add_header(&quot;Индекс промышленного производства&quot;, &quot;IND_PROD&quot;, True)</span>
 <span class="c1">#d.require(&quot;IND_PROD&quot;, &quot;yoy&quot;)</span>
 <span class="c1">#d.require(&quot;IND_PROD&quot;, &quot;rog&quot;)</span>
 <span class="c1">##d.add_header(&quot;Уровень безработицы в возрасте 15-72 лет&quot;, &quot;UNEMPL&quot;)</span>
 <span class="c1">#d.add_header(&quot;Уровень безработицы&quot;, &quot;UNEMPL&quot;, True)</span>
 <span class="c1">#d.require(&quot;UNEMPL&quot;, &quot;pct&quot;)</span>
-<span class="c1">#d.add_header(</span>
+<span class="c1"># d.add_header(</span>
 <span class="c1">#    &quot;Среднемесячная номинальная начисленная заработная плата работников организаций&quot;,</span>
 <span class="c1">#    &quot;WAGE_NOMINAL&quot;)</span>
 <span class="c1">#d.add_desc(&quot;Среднемесячная заработная плата&quot;, &quot;WAGE_NOMINAL&quot;)</span>
 <span class="c1">#d.require(&quot;WAGE_NOMINAL&quot;, &quot;rub&quot;)</span>
-<span class="c1">#d.add_header(&quot;Реальная начисленная заработная плата работников организаций&quot;,</span>
+<span class="c1"># d.add_header(&quot;Реальная начисленная заработная плата работников организаций&quot;,</span>
 <span class="c1">#             &quot;WAGE_REAL&quot;)</span>
 <span class="c1">#d.add_desc(&quot;Реальная заработная плата&quot;, &quot;WAGE_REAL&quot;)</span>
 <span class="c1">#d.require(&quot;WAGE_REAL&quot;, &quot;rog&quot;)</span>
@@ -396,26 +399,26 @@
 <span class="c1">#SPEC = Specification(d)</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
-<span class="c1">## Коммерческий грузооборот транспорта, млрд. тонно-км / Commercial freight</span>
-<span class="c1">## turnover, bln ton-km</span>
+<span class="c1"># Коммерческий грузооборот транспорта, млрд. тонно-км / Commercial freight</span>
+<span class="c1"># turnover, bln ton-km</span>
 <span class="c1">#d = Definition(&quot;INVEST&quot;)</span>
-<span class="c1">#d.add_marker(&quot;1.6. Инвестиции в основной капитал&quot;,</span>
+<span class="c1"># d.add_marker(&quot;1.6. Инвестиции в основной капитал&quot;,</span>
 <span class="c1">#             &quot;1.6.1. Инвестиции в основной капитал организаций&quot;)</span>
-<span class="c1">#d.add_marker(&quot;1.7. Инвестиции в основной капитал&quot;,</span>
+<span class="c1"># d.add_marker(&quot;1.7. Инвестиции в основной капитал&quot;,</span>
 <span class="c1">#             &quot;1.7.1. Инвестиции в основной капитал организаций&quot;)</span>
 <span class="c1">#d.add_header(&quot;Инвестиции в основной капитал&quot;, &quot;INVESTMENT&quot;, True)</span>
 <span class="c1">#d.require(&quot;INVESTMENT&quot;, &quot;bln_rub&quot;)</span>
 <span class="c1">#d.require(&quot;INVESTMENT&quot;, &quot;yoy&quot;)</span>
 <span class="c1">#d.require(&quot;INVESTMENT&quot;, &quot;rog&quot;)</span>
-<span class="c1">#SPEC.append(d)</span>
+<span class="c1"># SPEC.append(d)</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
 <span class="c1">#d = Definition(&quot;EXIM&quot;)</span>
-<span class="c1">#d.add_marker(&quot;1.9. Внешнеторговый оборот – всего&quot;,</span>
+<span class="c1"># d.add_marker(&quot;1.9. Внешнеторговый оборот – всего&quot;,</span>
 <span class="c1">#             &quot;1.9.1. Внешнеторговый оборот со странами дальнего зарубежья&quot;)</span>
-<span class="c1">#d.add_marker(&quot;1.10. Внешнеторговый оборот – всего&quot;,</span>
+<span class="c1"># d.add_marker(&quot;1.10. Внешнеторговый оборот – всего&quot;,</span>
 <span class="c1">#             &quot;1.10.1. Внешнеторговый оборот со странами дальнего зарубежья&quot;)</span>
-<span class="c1">#d.add_marker(&quot;1.10. Внешнеторговый оборот – всего&quot;,</span>
+<span class="c1"># d.add_marker(&quot;1.10. Внешнеторговый оборот – всего&quot;,</span>
 <span class="c1">#             &quot;1.10.1.Внешнеторговый оборот со странами дальнего зарубежья&quot;)</span>
 <span class="c1">#d.add_header(&quot;экспорт товаров – всего&quot;, &quot;EXPORT_GOODS_TOTAL&quot;)</span>
 <span class="c1">#d.add_header(&quot;импорт товаров – всего&quot;, &quot;IMPORT_GOODS_TOTAL&quot;)</span>
@@ -423,63 +426,63 @@
 <span class="c1">#d.add_desc(&quot;Импорт товаров&quot;, &quot;IMPORT_GOODS_TOTAL&quot;)</span>
 <span class="c1">#d.require(&quot;EXPORT_GOODS_TOTAL&quot;, &quot;bln_usd&quot;)</span>
 <span class="c1">#d.require(&quot;IMPORT_GOODS_TOTAL&quot;, &quot;bln_usd&quot;)</span>
-<span class="c1">#SPEC.append(d)</span>
+<span class="c1"># SPEC.append(d)</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
 <span class="c1">#d = Definition(&quot;GOV_REVENUE_ACCUM&quot;)</span>
-<span class="c1">#d.add_reader(&quot;fiscal&quot;)</span>
-<span class="c1">#d.add_marker(&quot;2.1.1. Доходы (по данным Федерального казначейства)&quot;,</span>
+<span class="c1"># d.add_reader(&quot;fiscal&quot;)</span>
+<span class="c1"># d.add_marker(&quot;2.1.1. Доходы (по данным Федерального казначейства)&quot;,</span>
 <span class="c1">#             &quot;2.1.2. Расходы (по данным Федерального казначейства)&quot;)</span>
 <span class="c1">#d.add_header(&quot;Консолидированный бюджет&quot;, &quot;GOV_REVENUE_ACCUM_CONSOLIDATED&quot;)</span>
 <span class="c1">#d.add_header(&quot;Федеральный бюджет&quot;, &quot;GOV_REVENUE_ACCUM_FEDERAL&quot;)</span>
-<span class="c1">#d.add_header(</span>
+<span class="c1"># d.add_header(</span>
 <span class="c1">#    &quot;Консолидированные бюджеты субъектов Российской Федерации&quot;,</span>
 <span class="c1">#    &quot;GOV_REVENUE_ACCUM_SUBFEDERAL&quot;)</span>
 <span class="c1">#d.require(&quot;GOV_REVENUE_ACCUM_CONSOLIDATED&quot;, &quot;bln_rub&quot;)</span>
 <span class="c1">#d.require(&quot;GOV_REVENUE_ACCUM_FEDERAL&quot;, &quot;bln_rub&quot;)</span>
 <span class="c1">#d.require(&quot;GOV_REVENUE_ACCUM_SUBFEDERAL&quot;, &quot;bln_rub&quot;)</span>
-<span class="c1">#SPEC.append(d)</span>
+<span class="c1"># SPEC.append(d)</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
 <span class="c1">#d = Definition(&quot;GOV_EXPENSE_ACCUM&quot;)</span>
-<span class="c1">#d.add_reader(&quot;fiscal&quot;)</span>
-<span class="c1">#d.add_marker(</span>
+<span class="c1"># d.add_reader(&quot;fiscal&quot;)</span>
+<span class="c1"># d.add_marker(</span>
 <span class="c1">#    &quot;2.1.2. Расходы (по данным Федерального казначейства)&quot;,</span>
 <span class="c1">#    &quot;2.1.3. Превышение доходов над расходами&quot;)</span>
 <span class="c1">#d.add_header(&quot;Консолидированный бюджет&quot;, &quot;GOV_EXPENSE_ACCUM_CONSOLIDATED&quot;)</span>
 <span class="c1">#d.add_header(&quot;Федеральный бюджет&quot;, &quot;GOV_EXPENSE_ACCUM_FEDERAL&quot;)</span>
-<span class="c1">#d.add_header(</span>
+<span class="c1"># d.add_header(</span>
 <span class="c1">#    &quot;Консолидированные бюджеты субъектов Российской Федерации&quot;,</span>
 <span class="c1">#    &quot;GOV_EXPENSE_ACCUM_SUBFEDERAL&quot;)</span>
 <span class="c1">#d.require(&quot;GOV_EXPENSE_ACCUM_CONSOLIDATED&quot;, &quot;bln_rub&quot;)</span>
 <span class="c1">#d.require(&quot;GOV_EXPENSE_ACCUM_FEDERAL&quot;, &quot;bln_rub&quot;)</span>
 <span class="c1">#d.require(&quot;GOV_EXPENSE_ACCUM_SUBFEDERAL&quot;, &quot;bln_rub&quot;)</span>
-<span class="c1">#SPEC.append(d)</span>
+<span class="c1"># SPEC.append(d)</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
 <span class="c1">#d = Definition(&quot;GOV_SURPLUS_ACCUM&quot;)</span>
-<span class="c1">#d.add_reader(&quot;fiscal&quot;)</span>
-<span class="c1">#d.add_marker(&quot;2.1.3. Превышение доходов над расходами&quot;,</span>
+<span class="c1"># d.add_reader(&quot;fiscal&quot;)</span>
+<span class="c1"># d.add_marker(&quot;2.1.3. Превышение доходов над расходами&quot;,</span>
 <span class="c1">#             &quot;2.2. Сальдированный финансовый результат&quot;)</span>
 <span class="c1">#d.add_header(&quot;Федеральный бюджет&quot;, &quot;GOV_SURPLUS_ACCUM_FEDERAL&quot;)</span>
-<span class="c1">#d.add_header(</span>
+<span class="c1"># d.add_header(</span>
 <span class="c1">#    &quot;Консолидированные бюджеты субъектов Российской Федерации&quot;,</span>
 <span class="c1">#    &quot;GOV_SURPLUS_ACCUM_SUBFEDERAL&quot;)</span>
 <span class="c1">#d.require(&quot;GOV_SURPLUS_ACCUM_FEDERAL&quot;, &quot;bln_rub&quot;)</span>
 <span class="c1">#d.require(&quot;GOV_SURPLUS_ACCUM_SUBFEDERAL&quot;, &quot;bln_rub&quot;)</span>
-<span class="c1">#SPEC.append(d)</span>
+<span class="c1"># SPEC.append(d)</span>
 <span class="c1">#</span>
 <span class="c1">#d = Definition(&quot;RETAIL_SALES&quot;)</span>
-<span class="c1">#d.add_marker(&quot;1.12. Оборот розничной торговли&quot;,</span>
+<span class="c1"># d.add_marker(&quot;1.12. Оборот розничной торговли&quot;,</span>
 <span class="c1">#             &quot;1.12.1. Оборот общественного питания&quot;)</span>
-<span class="c1">#d.add_marker(&quot;1.13. Оборот розничной торговли&quot;,</span>
+<span class="c1"># d.add_marker(&quot;1.13. Оборот розничной торговли&quot;,</span>
 <span class="c1">#             &quot;1.13.1. Оборот общественного питания&quot;)</span>
 <span class="c1">#d.add_header(&quot;Оборот розничной торговли&quot;, &quot;RETAIL_SALES&quot;, True)</span>
 <span class="c1">#d.add_header(&quot;продовольственные товары&quot;, &quot;RETAIL_SALES_FOOD&quot;)</span>
-<span class="c1">#d.add_header(</span>
+<span class="c1"># d.add_header(</span>
 <span class="c1">#    &quot;пищевые продукты, включая напитки и табачные изделия&quot;,</span>
 <span class="c1">#    &quot;RETAIL_SALES_FOOD&quot;)</span>
-<span class="c1">#d.add_header(</span>
+<span class="c1"># d.add_header(</span>
 <span class="c1">#    &quot;пищевые продукты, включая напитки, и табачные изделия&quot;,</span>
 <span class="c1">#    &quot;RETAIL_SALES_FOOD&quot;)</span>
 <span class="c1">#d.add_header(&quot;непродовольственные товары&quot;, &quot;RETAIL_SALES_NONFOODS&quot;)</span>
@@ -491,18 +494,18 @@
 <span class="c1">#d.require(&quot;RETAIL_SALES_FOOD&quot;, &quot;bln_rub&quot;)</span>
 <span class="c1">#d.require(&quot;RETAIL_SALES_FOOD&quot;, &quot;yoy&quot;)</span>
 <span class="c1">#d.require(&quot;RETAIL_SALES_FOOD&quot;, &quot;rog&quot;)</span>
-<span class="c1">## TODO: change to RETAIL_SALES_NONFOOD</span>
+<span class="c1"># TODO: change to RETAIL_SALES_NONFOOD</span>
 <span class="c1">#d.require(&quot;RETAIL_SALES_NONFOODS&quot;, &quot;bln_rub&quot;)</span>
 <span class="c1">#d.require(&quot;RETAIL_SALES_NONFOODS&quot;, &quot;yoy&quot;)</span>
 <span class="c1">#d.require(&quot;RETAIL_SALES_NONFOODS&quot;, &quot;rog&quot;)</span>
-<span class="c1">#SPEC.append(d)</span>
+<span class="c1"># SPEC.append(d)</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
 <span class="c1">##d = Definition(&quot;PPI&quot;)</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
 <span class="c1">#d = Definition(&quot;CPI&quot;)</span>
-<span class="c1">#d.add_marker(start=&quot;3.5. Индекс потребительских цен&quot;,</span>
+<span class="c1"># d.add_marker(start=&quot;3.5. Индекс потребительских цен&quot;,</span>
 <span class="c1">#             end=&quot;4. Социальная сфера&quot;)</span>
 <span class="c1">#d.add_header(&quot;Индекс потребительских цен&quot;, &quot;CPI&quot;, True)</span>
 <span class="c1">#d.add_header(&quot;продукты питания&quot;, &quot;CPI_FOOD&quot;)</span>
@@ -519,26 +522,26 @@
 <span class="c1">#d.require(&quot;CPI_NONFOOD&quot;, &quot;rog&quot;)</span>
 <span class="c1">#d.require(&quot;CPI_ALCOHOL&quot;, &quot;rog&quot;)</span>
 <span class="c1">#d.require(&quot;CPI_SERVICES&quot;, &quot;rog&quot;)</span>
-<span class="c1">#SPEC.append(d)</span>
+<span class="c1"># SPEC.append(d)</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
-<span class="c1">## TODO: must check order of markers in additional definitions</span>
-<span class="c1">#SPEC.validate(None)</span>
+<span class="c1"># TODO: must check order of markers in additional definitions</span>
+<span class="c1"># SPEC.validate(None)</span>
 <span class="c1">#</span>
-<span class="c1">## units and spec are ready to use are parsing inputs</span>
-<span class="c1">#print(SPEC)</span>
+<span class="c1"># units and spec are ready to use are parsing inputs</span>
+<span class="c1"># print(SPEC)</span>
 <span class="c1">#</span>
-<span class="c1">## variable descriptions</span>
+<span class="c1"># variable descriptions</span>
 <span class="c1">#DESC = SPEC.reference_names()</span>
 <span class="c1">#</span>
-<span class="c1">## check 2: check all spec.required are listed in desc_dict and vice versus</span>
+<span class="c1"># check 2: check all spec.required are listed in desc_dict and vice versus</span>
 <span class="c1">## assert set(desc.keys()) == set(x for x, y in spec.required())</span>
 <span class="c1">#</span>
 <span class="c1">#a = set(DESC.keys())</span>
 <span class="c1">#b = set(x for x, y in SPEC.required())</span>
 <span class="c1">#not_in_a = set(x for x in b if x not in a)</span>
 <span class="c1">#not_in_b = set(x for x in a if x not in b)</span>
-<span class="c1">#assert not_in_a == {</span>
+<span class="c1"># assert not_in_a == {</span>
 <span class="c1">#    &#39;GOV_EXPENSE_ACCUM_CONSOLIDATED&#39;,</span>
 <span class="c1">#    &#39;GOV_EXPENSE_ACCUM_FEDERAL&#39;,</span>
 <span class="c1">#    &#39;GOV_EXPENSE_ACCUM_SUBFEDERAL&#39;,</span>
@@ -550,8 +553,8 @@
 <span class="c1">#assert not_in_b == set()</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
-<span class="c1">## frontend variable grouping</span>
-<span class="c1">#M_SECTIONS = odict([</span>
+<span class="c1"># frontend variable grouping</span>
+<span class="c1"># M_SECTIONS = odict([</span>
 <span class="c1">#    (&quot;Производство&quot;, [&quot;IND_PROD_rog&quot;, &quot;IND_PROD_yoy&quot;]),</span>
 <span class="c1">#    (&quot;Внешняя торговля&quot;, [&quot;EXPORT_GOODS_TOTAL_bln_usd&quot;, &quot;IMPORT_GOODS_TOTAL_bln_usd&quot;]),</span>
 <span class="c1">#    (&quot;Розничная торговля&quot;, [&quot;RETAIL_SALES_yoy&quot;, &quot;RETAIL_SALES_FOOD_yoy&quot;, &quot;RETAIL_SALES_NONFOODS_yoy&quot;]),</span>
@@ -559,7 +562,7 @@
 <span class="c1">#])</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
-<span class="c1">#SECTIONS = odict([</span>
+<span class="c1"># SECTIONS = odict([</span>
 <span class="c1">#    (&quot;ВВП и производство&quot;, [&quot;GDP&quot;, &quot;IND_PROD&quot;]),</span>
 <span class="c1">#    (&quot;Инвестиции&quot;, [&quot;INVESTMENT&quot;]),</span>
 <span class="c1">#    (&quot;Внешняя торговля&quot;, [&quot;EXPORT_GOODS_TOTAL&quot;, &quot;IMPORT_GOODS_TOTAL&quot;]),</span>
@@ -576,14 +579,14 @@
 <span class="c1">#                &#39;GOV_SURPLUS_ACCUM_SUBFEDERAL&#39;])</span>
 <span class="c1">#])</span>
 <span class="c1">#</span>
-<span class="c1">## check 3: sections includes all items in description</span>
+<span class="c1"># check 3: sections includes all items in description</span>
 <span class="c1">#set1 = set(SPEC.varnames())</span>
 <span class="c1">#set2 = set(itertools.chain.from_iterable(SECTIONS.values()))</span>
-<span class="c1">#if set1 != set2:</span>
+<span class="c1"># if set1 != set2:</span>
 <span class="c1">#    print(&quot;Must add to SECTIONS:&quot;, [x for x in set1 if x not in set2])</span>
 <span class="c1">#</span>
 <span class="c1">#</span>
-<span class="c1">#if __name__ == &quot;__main__&quot;:</span>
+<span class="c1"># if __name__ == &quot;__main__&quot;:</span>
 <span class="c1">#    sc = Scope()</span>
 </pre></div>
 
@@ -598,7 +601,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Evgeniy Pogrebnyak.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

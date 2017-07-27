@@ -1,13 +1,16 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
     <title>kep.tables module &#8212; Rosstat fuzzy MS Word/csv parser  documentation</title>
+    
     <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
@@ -26,7 +29,7 @@
     <link rel="next" title="kep.vintage module" href="kep.vintage.html" />
     <link rel="prev" title="kep.splitter module" href="kep.splitter.html" /> 
   </head>
-  <body>
+  <body role="document">
       <div class="header" role="banner"><h1 class="heading"><a href="index.html">
           <span>Rosstat fuzzy MS Word/csv parser  documentation</span></a></h1>
         <h2 class="heading"><span>kep.tables module</span></h2>
@@ -155,14 +158,14 @@
 
 <dl class="class">
 <dt id="kep.tables.Tables">
-<em class="property">class </em><code class="descclassname">kep.tables.</code><code class="descname">Tables</code><span class="sig-paren">(</span><em>_rows</em>, <em>spec=&lt;kep.spec.Specification object&gt;</em>, <em>units=OrderedDict([('млрд.долларов'</em>, <em>'bln_usd')</em>, <em>('млрд. долларов'</em>, <em>'bln_usd')</em>, <em>('млрд</em>, <em>долларов'</em>, <em>'bln_usd')</em>, <em>('млрд.рублей'</em>, <em>'bln_rub')</em>, <em>('млрд. рублей'</em>, <em>'bln_rub')</em>, <em>('рублей / rubles'</em>, <em>'rub')</em>, <em>('млн.рублей'</em>, <em>'mln_rub')</em>, <em>('Индекс физического объема произведенного ВВП</em>, <em>в %'</em>, <em>'yoy')</em>, <em>('в % к декабрю предыдущего года'</em>, <em>'ytd')</em>, <em>('в % к предыдущему месяцу'</em>, <em>'rog')</em>, <em>('в % к предыдущему периоду'</em>, <em>'rog')</em>, <em>('% к концу предыдущего периода'</em>, <em>'rog')</em>, <em>('период с начала отчетного года в % к соответствующему периоду предыдущего года'</em>, <em>'ytd')</em>, <em>('в % к соответствующему периоду предыдущего года'</em>, <em>'yoy')</em>, <em>('в % к соответствующему месяцу предыдущего года'</em>, <em>'yoy')</em>, <em>('отчетный месяц в % к предыдущему месяцу'</em>, <em>'rog')</em>, <em>('отчетный месяц в % к соответствующему месяцу предыдущего года'</em>, <em>'yoy')</em>, <em>('период с начала отчетного года'</em>, <em>'ytd')</em>, <em>('%'</em>, <em>'pct')</em>, <em>('в % к ВВП'</em>, <em>'gdp_percent')</em>, <em>('продукты питания'</em>, <em>'rog')</em>, <em>('алкогольные напитки'</em>, <em>'rog')</em>, <em>('непродовольственные товары'</em>, <em>'rog')</em>, <em>('непродовольст- венные товары'</em>, <em>'rog')</em>, <em>('услуги'</em>, <em>'rog')])</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Tables" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">kep.tables.</code><code class="descname">Tables</code><span class="sig-paren">(</span><em>_rows</em>, <em>spec=&lt;kep.spec.Specification object at 0x0000024DAEBC4080&gt;</em>, <em>units=OrderedDict([('млрд.долларов'</em>, <em>'bln_usd')</em>, <em>('млрд. долларов'</em>, <em>'bln_usd')</em>, <em>('млрд</em>, <em>долларов'</em>, <em>'bln_usd')</em>, <em>('млрд.рублей'</em>, <em>'bln_rub')</em>, <em>('млрд. рублей'</em>, <em>'bln_rub')</em>, <em>('рублей / rubles'</em>, <em>'rub')</em>, <em>('млн.рублей'</em>, <em>'mln_rub')</em>, <em>('Индекс физического объема произведенного ВВП</em>, <em>в %'</em>, <em>'yoy')</em>, <em>('в % к декабрю предыдущего года'</em>, <em>'ytd')</em>, <em>('в % к предыдущему месяцу'</em>, <em>'rog')</em>, <em>('в % к предыдущему периоду'</em>, <em>'rog')</em>, <em>('% к концу предыдущего периода'</em>, <em>'rog')</em>, <em>('период с начала отчетного года в % к соответствующему периоду предыдущего года'</em>, <em>'ytd')</em>, <em>('в % к соответствующему периоду предыдущего года'</em>, <em>'yoy')</em>, <em>('в % к соответствующему месяцу предыдущего года'</em>, <em>'yoy')</em>, <em>('отчетный месяц в % к предыдущему месяцу'</em>, <em>'rog')</em>, <em>('отчетный месяц в % к соответствующему месяцу предыдущего года'</em>, <em>'yoy')</em>, <em>('период с начала отчетного года'</em>, <em>'ytd')</em>, <em>('%'</em>, <em>'pct')</em>, <em>('в % к ВВП'</em>, <em>'gdp_percent')</em>, <em>('продукты питания'</em>, <em>'rog')</em>, <em>('алкогольные напитки'</em>, <em>'rog')</em>, <em>('непродовольственные товары'</em>, <em>'rog')</em>, <em>('непродовольст- венные товары'</em>, <em>'rog')</em>, <em>('услуги'</em>, <em>'rog')])</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Tables" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <p>Extract tables from <em>csv_path</em> using <em>Rows(csv_path)</em>.</p>
 <p>Parsing procedure:
 - cut out a segment of csv file as delimited by start and end line makers
 - hold remaining parts of csv file for further parsing
 - break csv segment into tables, each table containing headers and data rows
-- parse table headers to obtain variable name (“GDP”) and unit (“bln_rub”)</p>
+- parse table headers to obtain variable name (&#8220;GDP&#8221;) and unit (&#8220;bln_rub&#8221;)</p>
 <dl class="staticmethod">
 <dt id="kep.tables.Tables.extract_tables">
 <em class="property">static </em><code class="descname">extract_tables</code><span class="sig-paren">(</span><em>csv_segment</em>, <em>pdef</em>, <em>units_dict</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/tables.html#Tables.extract_tables"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.tables.Tables.extract_tables" title="Permalink to this definition">¶</a></dt>
@@ -247,7 +250,7 @@ Applies to tables without unknown rows.</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Evgeniy Pogrebnyak.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

@@ -1,13 +1,16 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
     <title>kep.tables &#8212; Rosstat fuzzy MS Word/csv parser  documentation</title>
+    
     <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
@@ -24,7 +27,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head>
-  <body>
+  <body role="document">
       <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
           <span>Rosstat fuzzy MS Word/csv parser  documentation</span></a></h1>
         <h2 class="heading"><span>kep.tables</span></h2>
@@ -101,7 +104,7 @@
 
 <div class="viewcode-block" id="Tables"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Tables">[docs]</a><span class="k">class</span> <span class="nc">Tables</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Extract tables from *csv_path* using *Rows(csv_path)*.</span>
-<span class="sd">    </span>
+
 <span class="sd">       Parsing procedure:</span>
 <span class="sd">       - cut out a segment of csv file as delimited by start and end line makers</span>
 <span class="sd">       - hold remaining parts of csv file for further parsing</span>
@@ -115,29 +118,29 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">required</span> <span class="o">=</span> <span class="p">[</span><span class="n">make_label</span><span class="p">(</span><span class="n">varname</span><span class="p">,</span> <span class="n">unit</span><span class="p">)</span>
                          <span class="k">for</span> <span class="n">varname</span><span class="p">,</span> <span class="n">unit</span> <span class="ow">in</span> <span class="n">spec</span><span class="o">.</span><span class="n">required</span><span class="p">()]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">make_queue</span><span class="p">()</span>
-    
+
 <div class="viewcode-block" id="Tables.make_queue"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Tables.make_queue">[docs]</a>    <span class="k">def</span> <span class="nf">make_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Init list of csv segments and parsing definitons&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">to_parse</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">scope</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">scopes</span><span class="p">:</span>
             <span class="c1"># find segemnt limits</span>
             <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get_bounds</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rowstack</span><span class="o">.</span><span class="n">rows</span><span class="p">)</span>
-            <span class="c1"># pop csv segment </span>
+            <span class="c1"># pop csv segment</span>
             <span class="n">csv_segment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rowstack</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span>
             <span class="c1"># get current parsing definition</span>
             <span class="n">pdef</span> <span class="o">=</span> <span class="n">scope</span><span class="o">.</span><span class="n">get_parsing_definition</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">to_parse</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">csv_segment</span><span class="p">,</span> <span class="n">pdef</span><span class="p">])</span> 
+            <span class="bp">self</span><span class="o">.</span><span class="n">to_parse</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">csv_segment</span><span class="p">,</span> <span class="n">pdef</span><span class="p">])</span>
         <span class="n">csv_segment</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rowstack</span><span class="o">.</span><span class="n">remaining_rows</span><span class="p">()</span>
-        <span class="n">pdef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">get_main_parsing_definition</span><span class="p">()</span>   
-        <span class="bp">self</span><span class="o">.</span><span class="n">to_parse</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">csv_segment</span><span class="p">,</span> <span class="n">pdef</span><span class="p">])</span> </div>
-        
+        <span class="n">pdef</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spec</span><span class="o">.</span><span class="n">get_main_parsing_definition</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">to_parse</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">csv_segment</span><span class="p">,</span> <span class="n">pdef</span><span class="p">])</span></div>
+
 <div class="viewcode-block" id="Tables.yield_tables"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Tables.yield_tables">[docs]</a>    <span class="k">def</span> <span class="nf">yield_tables</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">csv_segment</span><span class="p">,</span> <span class="n">pdef</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_parse</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extract_tables</span><span class="p">(</span><span class="n">csv_segment</span><span class="p">,</span> <span class="n">pdef</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">units</span><span class="p">):</span>
-                    <span class="k">yield</span> <span class="n">t</span></div>
+                <span class="k">yield</span> <span class="n">t</span></div>
 
-<div class="viewcode-block" id="Tables.extract_tables"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Tables.extract_tables">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">extract_tables</span><span class="p">(</span><span class="n">csv_segment</span><span class="p">,</span> <span class="n">pdef</span><span class="p">,</span> <span class="n">units_dict</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="Tables.extract_tables"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Tables.extract_tables">[docs]</a>    <span class="k">def</span> <span class="nf">extract_tables</span><span class="p">(</span><span class="n">csv_segment</span><span class="p">,</span> <span class="n">pdef</span><span class="p">,</span> <span class="n">units_dict</span><span class="p">):</span>
         <span class="c1"># yield tables from csv_segment</span>
         <span class="n">tables</span> <span class="o">=</span> <span class="n">split_to_tables</span><span class="p">(</span><span class="n">csv_segment</span><span class="p">)</span>
         <span class="c1"># parse tables to obtain labels</span>
@@ -160,16 +163,16 @@
 
 
 <span class="c1"># classes for split_to_tables()</span>
-<div class="viewcode-block" id="RowType"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.RowType">[docs]</a><span class="nd">@unique</span>
-<span class="k">class</span> <span class="nc">RowType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="nd">@unique</span>
+<div class="viewcode-block" id="RowType"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.RowType">[docs]</a><span class="k">class</span> <span class="nc">RowType</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">DATA</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">SECTION</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="n">HEADER</span> <span class="o">=</span> <span class="mi">3</span></div>
 
 
-<div class="viewcode-block" id="State"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.State">[docs]</a><span class="nd">@unique</span>
-<span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
+<span class="nd">@unique</span>
+<div class="viewcode-block" id="State"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.State">[docs]</a><span class="k">class</span> <span class="nc">State</span><span class="p">(</span><span class="n">Enum</span><span class="p">):</span>
     <span class="n">INIT</span> <span class="o">=</span> <span class="mi">1</span>
     <span class="n">DATA</span> <span class="o">=</span> <span class="mi">2</span>
     <span class="n">UNKNOWN</span> <span class="o">=</span> <span class="mi">3</span></div>
@@ -228,7 +231,7 @@
             <span class="k">if</span> <span class="n">unit</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="n">row</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">KNOWN</span>
-        <span class="k">return</span> <span class="bp">self</span>                  </div>
+        <span class="k">return</span> <span class="bp">self</span></div>
 
 <div class="viewcode-block" id="Table.set_splitter"><a class="viewcode-back" href="../../kep.tables.html#kep.tables.Table.set_splitter">[docs]</a>    <span class="k">def</span> <span class="nf">set_splitter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">funcname</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">funcname</span><span class="p">:</span>
@@ -274,7 +277,7 @@
                                                        <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">datarows</span><span class="p">))</span></div>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">kep</span> <span class="k">import</span> <span class="n">files</span>
     <span class="kn">from</span> <span class="nn">kep</span> <span class="k">import</span> <span class="n">rows</span>
     <span class="n">csv_path</span> <span class="o">=</span> <span class="n">files</span><span class="o">.</span><span class="n">locate_csv</span><span class="p">()</span>
@@ -296,7 +299,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Evgeniy Pogrebnyak.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

@@ -1,13 +1,16 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
 
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
     <title>kep.files &#8212; Rosstat fuzzy MS Word/csv parser  documentation</title>
+    
     <link rel="stylesheet" href="../../_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
@@ -24,7 +27,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
   </head>
-  <body>
+  <body role="document">
       <div class="header" role="banner"><h1 class="heading"><a href="../../index.html">
           <span>Rosstat fuzzy MS Word/csv parser  documentation</span></a></h1>
         <h2 class="heading"><span>kep.files</span></h2>
@@ -40,18 +43,50 @@
         
         
   <h1>Source code for kep.files</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
+<span></span><span class="sd">&quot;&quot;&quot;File and folder locations for interim and processed CSV files.</span>
+
+<span class="sd">Functions based on :class:`kep.files.Folder` class methods:</span>
+
+<span class="sd">    - :func:`kep.files.get_latest_date` returns latest available</span>
+<span class="sd">      year and month</span>
+<span class="sd">    - :func:`kep.files.locate_csv` retrieves interim CSV file for parsing</span>
+<span class="sd">      from *data/interim* folder by year and month</span>
+<span class="sd">    - based on year and month :func:`kep.files.get_processed_folder` provides </span>
+<span class="sd">      location to save parsing result in *data/processed* folder</span>
+
+
+<span class="sd">For housekeeping :mod:`kep.files` provides:</span>
+
+<span class="sd"> - :func:`kep.files.init_dirs` - make directory structure on startup</span>
+<span class="sd"> - :func:`kep.files.copy_latest` - copy CSVs to *latest* folder which </span>
+<span class="sd">   has stable URL</span>
+
+
+<span class="sd">For reference - data directory structure::</span>
+<span class="sd">        </span>
+<span class="sd">    \\data</span>
+<span class="sd">      \\interim</span>
+<span class="sd">          \\2017</span>
+<span class="sd">          \\2016</span>
+<span class="sd">          \\...</span>
+<span class="sd">      \\processed</span>
+<span class="sd">          \\latest</span>
+<span class="sd">          \\latest_json (may be depreciated)</span>
+<span class="sd">          \\2017</span>
+<span class="sd">          \\2016</span>
+<span class="sd">          \\...</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="k">import</span> <span class="n">Path</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 
 <span class="c1"># csv file parameters</span>
 <span class="n">ENC</span> <span class="o">=</span> <span class="s1">&#39;utf8&#39;</span>
 <span class="n">CSV_FORMAT</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\t</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">lineterminator</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
 
-
-<div class="viewcode-block" id="locate_csv"><a class="viewcode-back" href="../../kep.files.html#kep.files.locate_csv">[docs]</a><span class="k">def</span> <span class="nf">locate_csv</span><span class="p">(</span><span class="n">year</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="n">year</span><span class="p">,</span> <span class="n">month</span> <span class="o">=</span> <span class="n">filter_date</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">get_path_csv</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span></div>
-
+<span class="c1"># we are in src/kep</span>
+<span class="n">levels_up</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">data_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="n">levels_up</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;data&#39;</span>
 
 <span class="c1"># FIXME: hardcoded constant will not update to new months</span>
 <span class="n">DATES</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">2009</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">2009</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span> <span class="p">(</span><span class="mi">2009</span><span class="p">,</span> <span class="mi">6</span><span class="p">),</span>
@@ -81,117 +116,141 @@
 
          <span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">2</span><span class="p">),</span> <span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span> <span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">4</span><span class="p">),</span> <span class="p">(</span><span class="mi">2017</span><span class="p">,</span> <span class="mi">5</span><span class="p">)]</span>
 
-
-<div class="viewcode-block" id="filled_dates"><a class="viewcode-back" href="../../kep.files.html#kep.files.filled_dates">[docs]</a><span class="k">def</span> <span class="nf">filled_dates</span><span class="p">(</span><span class="n">available_dates</span><span class="o">=</span><span class="n">DATES</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">date</span> <span class="ow">in</span> <span class="nb">reversed</span><span class="p">(</span><span class="n">available_dates</span><span class="p">):</span>
-        <span class="n">csv_path</span> <span class="o">=</span> <span class="n">get_path_csv</span><span class="p">(</span><span class="o">*</span><span class="n">date</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">csv_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">csv_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">date</span></div>
+<span class="c1"># end user functions</span>
 
 
-<div class="viewcode-block" id="filter_date"><a class="viewcode-back" href="../../kep.files.html#kep.files.filter_date">[docs]</a><span class="k">def</span> <span class="nf">filter_date</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">month</span><span class="p">:</span>
-        <span class="n">year</span><span class="p">,</span> <span class="n">month</span> <span class="o">=</span> <span class="n">InterimDataFolder</span><span class="p">()</span><span class="o">.</span><span class="n">get_latest_date</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span>
-    <span class="k">elif</span> <span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">filled_dates</span><span class="p">()):</span>
-        <span class="k">return</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span>
+<div class="viewcode-block" id="get_latest_date"><a class="viewcode-back" href="../../kep.files.html#kep.files.get_latest_date">[docs]</a><span class="k">def</span> <span class="nf">get_latest_date</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Return year and month for latest available interim data folder.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        (year, month) tuple of two integers</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Folder</span><span class="o">.</span><span class="n">get_latest_date</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="locate_csv"><a class="viewcode-back" href="../../kep.files.html#kep.files.locate_csv">[docs]</a><span class="k">def</span> <span class="nf">locate_csv</span><span class="p">(</span><span class="n">year</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="p">:</span> <span class="nb">int</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return interim CSV file based on *year* and *month*.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pathlib.Path() instance</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">folder</span> <span class="o">=</span> <span class="n">Folder</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span><span class="o">.</span><span class="n">get_interim_folder</span><span class="p">()</span>
+    <span class="n">csv_path</span> <span class="o">=</span> <span class="n">folder</span> <span class="o">/</span> <span class="s2">&quot;tab.csv&quot;</span>
+    <span class="k">if</span> <span class="n">csv_path</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="ow">and</span> <span class="n">csv_path</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">csv_path</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Date not found: </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">))</span></div>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+            <span class="s2">&quot;Not found or has zero length: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">csv_path</span><span class="p">))</span></div>
 
 
-<span class="c1"># TODO - account for latest in folder structure</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">\data</span>
-<span class="sd">  \raw</span>
-<span class="sd">      \2017</span>
-<span class="sd">      \...</span>
-<span class="sd">  \interim</span>
-<span class="sd">      \2017</span>
-<span class="sd">      \...</span>
-<span class="sd">  \processed</span>
-<span class="sd">      \latest</span>
-<span class="sd">      \latest_json</span>
-<span class="sd">      \vintages</span>
-<span class="sd">      \2017</span>
-<span class="sd">      \...</span>
-<span class="sd">&quot;&quot;&quot;</span>
-<span class="c1"># we are in src/kep</span>
-<span class="n">levels_up</span> <span class="o">=</span> <span class="mi">2</span>
-<span class="n">data_folder</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parents</span><span class="p">[</span><span class="n">levels_up</span><span class="p">]</span> <span class="o">/</span> <span class="s1">&#39;data&#39;</span>
-<span class="n">rosstat_folder</span> <span class="o">=</span> <span class="n">data_folder</span> <span class="o">/</span> <span class="s1">&#39;interim&#39;</span>
-<span class="n">processed</span> <span class="o">=</span> <span class="n">data_folder</span> <span class="o">/</span> <span class="s1">&#39;processed&#39;</span>
-<span class="n">latest</span> <span class="o">=</span> <span class="n">processed</span> <span class="o">/</span> <span class="s1">&#39;latest&#39;</span>
-<span class="n">latest_json</span> <span class="o">=</span> <span class="n">processed</span> <span class="o">/</span> <span class="s1">&#39;latest_json&#39;</span>
+<div class="viewcode-block" id="get_processed_folder"><a class="viewcode-back" href="../../kep.files.html#kep.files.get_processed_folder">[docs]</a><span class="k">def</span> <span class="nf">get_processed_folder</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Return processed CSV file folder based on *year* and *month*.</span>
+
+<span class="sd">    The processed CSV file folder is used by Frames class</span>
+<span class="sd">    to write output files (dfa.csv, dfq.csv, dfm.csv).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        pathlib.Path() instance</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Folder</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span><span class="o">.</span><span class="n">get_processed_folder</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="init_dirs"><a class="viewcode-back" href="../../kep.files.html#kep.files.init_dirs">[docs]</a><span class="k">def</span> <span class="nf">init_dirs</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="n">available_dates</span><span class="o">=</span><span class="n">DATES</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">available_dates</span><span class="p">:</span>
-        <span class="n">y</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">d</span>
-        <span class="n">f</span> <span class="o">=</span> <span class="n">root</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">sf</span> <span class="o">=</span> <span class="n">f</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">new_folder</span> <span class="ow">in</span> <span class="p">[</span><span class="n">f</span><span class="p">,</span> <span class="n">sf</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">new_folder</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-                <span class="n">new_folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span></div>
+<span class="c1"># folder locations</span>
+<div class="viewcode-block" id="Folder"><a class="viewcode-back" href="../../kep.files.html#kep.files.Folder">[docs]</a><span class="k">class</span> <span class="nc">Folder</span><span class="p">:</span>
+    <span class="n">interim</span> <span class="o">=</span> <span class="n">data_folder</span> <span class="o">/</span> <span class="s1">&#39;interim&#39;</span>
+    <span class="n">processed</span> <span class="o">=</span> <span class="n">data_folder</span> <span class="o">/</span> <span class="s1">&#39;processed&#39;</span>
+    <span class="n">latest</span> <span class="o">=</span> <span class="n">processed</span> <span class="o">/</span> <span class="s1">&#39;latest&#39;</span>
+    <span class="n">supported_dates</span> <span class="o">=</span> <span class="n">DATES</span>
+
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Folder.get_latest_date"><a class="viewcode-back" href="../../kep.files.html#kep.files.Folder.get_latest_date">[docs]</a>    <span class="k">def</span> <span class="nf">get_latest_date</span><span class="p">(</span><span class="n">cls</span><span class="p">):</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">interim</span>
+
+        <span class="k">def</span> <span class="nf">max_subfolder</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+            <span class="n">_lst</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">folder</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()]</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">_lst</span><span class="p">))</span>
+        <span class="n">year</span> <span class="o">=</span> <span class="n">max_subfolder</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+        <span class="n">_subfolder</span> <span class="o">=</span> <span class="n">root</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span>
+        <span class="n">month</span> <span class="o">=</span> <span class="n">max_subfolder</span><span class="p">(</span><span class="n">_subfolder</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span></div>
+    
+    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="Folder.filter_date"><a class="viewcode-back" href="../../kep.files.html#kep.files.Folder.filter_date">[docs]</a>    <span class="k">def</span> <span class="nf">filter_date</span><span class="p">(</span><span class="n">cls</span><span class="p">,</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">):</span>
+        <span class="c1"># mask with latest date</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">month</span><span class="p">:</span>
+            <span class="n">year</span><span class="p">,</span> <span class="n">month</span> <span class="o">=</span> <span class="n">cls</span><span class="o">.</span><span class="n">get_latest_date</span><span class="p">()</span>
+        <span class="c1"># check if date is available</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span> <span class="ow">in</span> <span class="n">cls</span><span class="o">.</span><span class="n">supported_dates</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">year</span><span class="p">,</span> <span class="n">month</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;Year and month not found: </span><span class="si">{}</span><span class="s2"> </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">month</span> <span class="o">=</span> <span class="n">Folder</span><span class="o">.</span><span class="n">filter_date</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span>
+        
+    <span class="k">def</span> <span class="nf">_local_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">root</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">)</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">month</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Folder.get_interim_folder"><a class="viewcode-back" href="../../kep.files.html#kep.files.Folder.get_interim_folder">[docs]</a>    <span class="k">def</span> <span class="nf">get_interim_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_folder</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">interim</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Folder.get_processed_folder"><a class="viewcode-back" href="../../kep.files.html#kep.files.Folder.get_processed_folder">[docs]</a>    <span class="k">def</span> <span class="nf">get_processed_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_local_folder</span><span class="p">(</span><span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">processed</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Folder(</span><span class="si">{}</span><span class="s2">, </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">year</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">month</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="InterimDataFolder"><a class="viewcode-back" href="../../kep.files.html#kep.files.InterimDataFolder">[docs]</a><span class="k">class</span> <span class="nc">InterimDataFolder</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;Find latest month available in interim data folder&quot;&quot;&quot;</span>
-
-<div class="viewcode-block" id="InterimDataFolder.list_subfolders"><a class="viewcode-back" href="../../kep.files.html#kep.files.InterimDataFolder.list_subfolders">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">list_subfolders</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
-        <span class="k">return</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">folder</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()]</span></div>
-
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">folder</span><span class="o">=</span><span class="n">rosstat_folder</span><span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">=</span> <span class="n">folder</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_latest_date</span><span class="p">()</span> <span class="o">==</span> <span class="n">DATES</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-
-<div class="viewcode-block" id="InterimDataFolder.max_year"><a class="viewcode-back" href="../../kep.files.html#kep.files.InterimDataFolder.max_year">[docs]</a>    <span class="k">def</span> <span class="nf">max_year</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">list_subfolders</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">))</span></div>
-
-<div class="viewcode-block" id="InterimDataFolder.max_month"><a class="viewcode-back" href="../../kep.files.html#kep.files.InterimDataFolder.max_month">[docs]</a>    <span class="k">def</span> <span class="nf">max_month</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">subfolder</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">folder</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_year</span><span class="p">()</span>
-        <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">list_subfolders</span><span class="p">(</span><span class="n">subfolder</span><span class="p">))</span></div>
-
-<div class="viewcode-block" id="InterimDataFolder.get_latest_date"><a class="viewcode-back" href="../../kep.files.html#kep.files.InterimDataFolder.get_latest_date">[docs]</a>    <span class="k">def</span> <span class="nf">get_latest_date</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_year</span><span class="p">()),</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">max_month</span><span class="p">())</span></div>
-
-<div class="viewcode-block" id="InterimDataFolder.get_latest_folder"><a class="viewcode-back" href="../../kep.files.html#kep.files.InterimDataFolder.get_latest_folder">[docs]</a>    <span class="k">def</span> <span class="nf">get_latest_folder</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">year</span><span class="p">,</span> <span class="n">month</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_latest_date</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">__loc__</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">folder</span><span class="p">)</span></div></div>
+<span class="c1"># create local data dirs for DATES</span>
 
 
-<span class="k">def</span> <span class="nf">__loc__</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">root</span><span class="p">):</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">year</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">month</span><span class="p">:</span>
-        <span class="n">year</span><span class="p">,</span> <span class="n">month</span> <span class="o">=</span> <span class="n">InterimDataFolder</span><span class="p">()</span><span class="o">.</span><span class="n">get_latest_date</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">year</span> <span class="ow">and</span> <span class="n">month</span><span class="p">:</span>
-        <span class="n">month_dir</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">month</span><span class="p">)</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">root</span> <span class="o">/</span> <span class="nb">str</span><span class="p">(</span><span class="n">year</span><span class="p">)</span> <span class="o">/</span> <span class="n">month_dir</span>
+<span class="k">def</span> <span class="nf">md</span><span class="p">(</span><span class="n">folder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create *folder* if not exists.</span>
+<span class="sd">       Also create parent folder if needed. &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">folder</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">parent</span> <span class="o">=</span> <span class="n">folder</span><span class="o">.</span><span class="n">parent</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">parent</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
+        <span class="n">folder</span><span class="o">.</span><span class="n">mkdir</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="get_path_csv"><a class="viewcode-back" href="../../kep.files.html#kep.files.get_path_csv">[docs]</a><span class="k">def</span> <span class="nf">get_path_csv</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return interim CSV file path based on year and month&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">__loc__</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">rosstat_folder</span><span class="p">)</span> <span class="o">/</span> <span class="s1">&#39;tab.csv&#39;</span></div>
+<div class="viewcode-block" id="init_dirs"><a class="viewcode-back" href="../../kep.files.html#kep.files.init_dirs">[docs]</a><span class="k">def</span> <span class="nf">init_dirs</span><span class="p">(</span><span class="n">supported_dates</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create required directory structure in *data* folder.&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">supported_dates</span><span class="p">:</span>
+        <span class="n">supported_dates</span> <span class="o">=</span> <span class="n">DATES</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span> <span class="ow">in</span> <span class="n">supported_dates</span><span class="p">:</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">Folder</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span>
+        <span class="n">md</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">get_interim_folder</span><span class="p">())</span>
+        <span class="n">md</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">get_processed_folder</span><span class="p">())</span></div>
 
 
-<div class="viewcode-block" id="get_processed_folder"><a class="viewcode-back" href="../../kep.files.html#kep.files.get_processed_folder">[docs]</a><span class="k">def</span> <span class="nf">get_processed_folder</span><span class="p">(</span><span class="n">year</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">month</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Return processed CSV file path based on year and month&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">__loc__</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">,</span> <span class="n">root</span><span class="o">=</span><span class="n">processed</span><span class="p">)</span></div>
+<span class="c1"># housekeeping  - copy contents to &#39;processed/latest&#39; folder</span>
 
 
-<div class="viewcode-block" id="copy_latest_csv_to_separate_folder"><a class="viewcode-back" href="../../kep.files.html#kep.files.copy_latest_csv_to_separate_folder">[docs]</a><span class="k">def</span> <span class="nf">copy_latest_csv_to_separate_folder</span><span class="p">(</span><span class="n">dst_folder</span><span class="o">=</span><span class="n">latest</span><span class="p">):</span>
-    <span class="c1"># copy all files from folder like 2017/4 to &#39;latest&#39;</span>
-    <span class="n">year</span><span class="p">,</span> <span class="n">month</span> <span class="o">=</span> <span class="n">InterimDataFolder</span><span class="p">()</span><span class="o">.</span><span class="n">get_latest_date</span><span class="p">()</span>
+<div class="viewcode-block" id="copy_latest"><a class="viewcode-back" href="../../kep.files.html#kep.files.copy_latest">[docs]</a><span class="k">def</span> <span class="nf">copy_latest</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Copy all files from folder like *processed/2017/04* to</span>
+<span class="sd">       *processed/latest* folder.</span>
+
+<span class="sd">       Returns:</span>
+<span class="sd">           list of files copied</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">year</span><span class="p">,</span> <span class="n">month</span> <span class="o">=</span> <span class="n">get_latest_date</span><span class="p">()</span>
     <span class="n">src_folder</span> <span class="o">=</span> <span class="n">get_processed_folder</span><span class="p">(</span><span class="n">year</span><span class="p">,</span> <span class="n">month</span><span class="p">)</span>
+    <span class="n">copied</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">src</span> <span class="ow">in</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">src_folder</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span> <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">()]:</span>
-        <span class="n">dst</span> <span class="o">=</span> <span class="n">dst_folder</span> <span class="o">/</span> <span class="n">src</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">dst</span> <span class="o">=</span> <span class="n">Folder</span><span class="o">.</span><span class="n">latest</span> <span class="o">/</span> <span class="n">src</span><span class="o">.</span><span class="n">name</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Updated folder *latest*&quot;</span><span class="p">)</span></div>
+        <span class="n">copied</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dst</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Updated folder&quot;</span><span class="p">,</span> <span class="n">Folder</span><span class="o">.</span><span class="n">latest</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">copied</span></div>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
-    <span class="n">init_dirs</span><span class="p">(</span><span class="n">processed</span><span class="p">)</span>
-    <span class="n">init_dirs</span><span class="p">(</span><span class="n">rosstat_folder</span><span class="p">)</span>
-    <span class="n">copy_latest_csv_to_separate_folder</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">init_dirs</span><span class="p">()</span>
+    <span class="n">copy_latest</span><span class="p">()</span>
 </pre></div>
 
       </div>
@@ -205,7 +264,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2017, Evgeniy Pogrebnyak.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.5.1.
     </div>
   </body>
 </html>

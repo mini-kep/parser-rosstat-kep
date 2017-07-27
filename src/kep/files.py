@@ -1,7 +1,24 @@
 """File and folder locations for interim and processed CSV files.
 
-Data directory structure:
-::
+Functions based on :class:`kep.files.Folder` class methods:
+
+    - :func:`kep.files.get_latest_date` returns latest available
+      year and month
+    - :func:`kep.files.locate_csv` retrieves interim CSV file for parsing
+      from *data/interim* folder by year and month
+    - based on year and month :func:`kep.files.get_processed_folder` provides 
+      location to save parsing result in *data/processed* folder
+
+
+For housekeeping :mod:`kep.files` provides:
+
+ - :func:`kep.files.init_dirs` - make directory structure on startup
+ - :func:`kep.files.copy_latest` - copy CSVs to *latest* folder which 
+   has stable URL
+
+
+For reference - data directory structure::
+        
     \\data
       \\interim
           \\2017
@@ -13,24 +30,6 @@ Data directory structure:
           \\2017
           \\2016
           \\...
-
-
-Functions based on :class:`kep.files.Folder` class methods:
-
-    - :func:`kep.files.get_latest_date` returns latest available
-      year and month
-    - :func:`kep.files.locate_csv` retrieves interim CSV file for parsing
-      from *data/interim* folder by year and month
-    - :func:`kep.files.get_processed_folder` provides location to save parsing
-      result in *data/processed* folder
-
-
-For housekeeping :mod:`kep.files` provides:
-
- - :func:`kep.files.init_dirs` - make directory structure on startup
- - :func:`kep.files.copy_latest` - copy CSVs to *latest* folder which 
-                                   has stable URL
-
 """
 
 from pathlib import Path

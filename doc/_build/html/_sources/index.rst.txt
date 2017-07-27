@@ -6,52 +6,98 @@
 Welcome to mini-kep documentation
 ==================================
 
-`mini-kep <https://github.com/epogrebnyak/mini-kep>`_ aims to parse `archived MS Word files from Rosstat`_ 
-to obtain clean pandas dataframes with macroeconomic time series and save them as `processed CSV files at stable URL`_ for further use. 
+`mini-kep`_  parses MS Word files from `Rosstat 'KEP' publication`_. It results in pandas
+dataframes with macroeconomic time series and saves clean `processed CSV files at stable URL`_.
 
-.. _archived MS Word files from Rosstat:  http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
+Inspired / affected by:
 
-.. _processed CSV files at stable URL: https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest
+- `FRED`_, where economic data is handled so well
+- `cookiecutter-data-science`_, where `analysis is a DAG`_
+- intense attraction to reproducible analysis and clean code  
 
-.. _`from Rosstat`: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
+.. _FRED: https://fred.stlouisfed.org/
+.. _cookiecutter-data-science: https://github.com/drivendata/cookiecutter-data-science
+.. _analysis is a DAG: http://drivendata.github.io/cookiecutter-data-science/#analysis-is-a-dag
 
-Steps involved in the parsing pipeline are the following:
 
-- **manually** (*FIXME*):
+Parser pipeline
+~~~~~~~~~~~~~~~
 
-  - download zip/rar file for a specified month `from Rosstat`_
-  - unpack MS Word files to a local folder
+Steps involved in parsing pipeline are the following:
 
-- **word2csv**: convert MS Word files to single interim CSV file (see `example <https://github.com/epogrebnyak/mini-kep/blob/master/data/interim/2017/05/tab.csv>`_)
+-  **manually** (*FIXME*):
 
-- **csv2df**: parse interim CSV file to obtain `processed CSV files <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>`_ with annual, quarterly and monthly data.
+   -  download zip/rar file for a specified month `from Rosstat website`_
+   -  unpack MS Word files to a local folder
 
-Also in `/src <https://github.com/epogrebnyak/mini-kep/tree/master/src>`_ folder:
+-  **word2csv**: convert MS Word files to single interim CSV file (see
+   `example`_)
 
-- **access_data**: sample code to download data from stable URL and save its local copy   
-- **frontpage**: try making README.md_ a nice page with graphs
+-  **csv2df**: parse interim CSV file to obtain `processed CSV files`_
+   with annual, quarterly and monthly data.
 
+Also in `/src`_ folder:
+
+-  **access\_data**: sample code to download data from stable URL and
+   save a local copy
+-  **frontpage**: add tables and graphs to `README.md`_
+
+.. _mini-kep: https://github.com/epogrebnyak/mini-kep
+.. _Rosstat:  http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
+.. _Rosstat 'KEP' publication: Rosstat_
+.. _latest: https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest
+.. _processed CSV files at stable URL: latest_
+.. _from Rosstat website: Rosstat_
+.. _example: https://github.com/epogrebnyak/mini-kep/blob/master/data/interim/2017/05/tab.csv
+.. _processed CSV files: latest_
+.. _/src: https://github.com/epogrebnyak/mini-kep/tree/master/src
 .. _README.md: https://github.com/epogrebnyak/mini-kep/blob/master/README.md
 
-
-TODO
-----
-- provide CSV source example
-- provide dataframe example
-- more examples to examples.rst text
-
+**csv2df** modules
+-------------------
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
-
-   kep
+   
    kep.files
-   kep.rows
    kep.spec
+   kep.rows   
    kep.splitter
    kep.tables
    kep.vintage
+
+TODO
+----
+- sphinx-doc usage:
+
+   - include intro.md to index.rst
+   - warnings in compile (copying static files...  
+     WARNING: html_static_path entry '...mini-kep-master\\doc\\_static' does not exist)
+
+- examples:
+
+  - provide CSV source example
+  - provide dataframe example
+
+- commenting:
+
+  - add docstrings + may extract docstrings as list?
+  - what docstrign style for module level?
+  
+- coding:  
+
+  - change naming to **reader-parser-emitter**
+  - combine rows and splitter modules, make **reader**
+  - rename tables to **parser**
+  - make **emitter**?
+  - rename kep to csv2df
+  - (make folders a package)
+  
+- testing:
+
+  - check final values in a different fashion
+  - restore travis badge
+
 
 Indices and tables
 ==================
