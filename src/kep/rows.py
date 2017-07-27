@@ -10,6 +10,7 @@ CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
 # csv file access
 
+
 def to_csv(rows, path):
     """Accept iterable of rows *rows* and write in to *csv_path*"""
     with path.open('w', encoding=ENC) as csvfile:
@@ -83,7 +84,7 @@ class Row:
             if k in self.name:
                 return units_mapper_dict[k]
         return False
-    
+
     def __eq__(self, x):
         return bool(self.name == x.name and self.data == x.data)
 

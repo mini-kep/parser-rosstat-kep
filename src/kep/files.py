@@ -1,7 +1,7 @@
-"""File and folder locations for interim and processed CSV files. 
+"""File and folder locations for interim and processed CSV files.
 
-Data directory structure:     
-::    
+Data directory structure:
+::
     \\data
       \\interim
           \\2017
@@ -16,20 +16,20 @@ Data directory structure:
 
 
 Functions based on :class:`kep.files.Folder` class methods:
-    
+
     - :func:`kep.files.get_latest_date` returns latest available
       year and month
-    - :func:`kep.files.locate_csv` retrieves interim CSV file for parsing 
-      from *data/interim* folder by year and month 
-    - :func:`kep.files.get_processed_folder` provides location to save parsing 
+    - :func:`kep.files.locate_csv` retrieves interim CSV file for parsing
+      from *data/interim* folder by year and month
+    - :func:`kep.files.get_processed_folder` provides location to save parsing
       result in *data/processed* folder
-      
-      
+
+
 For housekeeping :mod:`kep.files` provides:
 
- - :func:`kep.files.init_dirs` (make directory structure on startup) 
+ - :func:`kep.files.init_dirs` (make directory structure on startup)
  - :func:`kep.files.copy_latest` (copy CSVs to *latest* folder which has stable URL)
-   
+
 """
 
 from pathlib import Path
@@ -71,40 +71,43 @@ DATES = [(2009, 4), (2009, 5), (2009, 6),
 
          (2017, 1), (2017, 2), (2017, 3), (2017, 4), (2017, 5)]
 
-# end user functions    
+# end user functions
+
+
 def get_latest_date():
-    """Return year and month for latest available interim data folder.     
-    
-    Returns:            
+    """Return year and month for latest available interim data folder.
+
+    Returns:
         (year, month) tuple of two integers
-    
+
     """
-    return Folder.get_latest_date()  
+    return Folder.get_latest_date()
 
 
-def locate_csv(year: int=None, month: int=None):    
-    """Return interim CSV file based on *year* and *month*. 
-    
-    Returns:            
+def locate_csv(year: int=None, month: int=None):
+    """Return interim CSV file based on *year* and *month*.
+
+    Returns:
         pathlib.Path() instance
-    """            
-    folder = Folder(year, month).get_interim_folder() 
+    """
+    folder = Folder(year, month).get_interim_folder()
     csv_path = folder / "tab.csv"
     if csv_path.exists() and csv_path.stat().st_size > 0:
         return csv_path
     else:
-        raise FileNotFoundError("Not found or has zero length: {}".format(csv_path))
+        raise FileNotFoundError(
+            "Not found or has zero length: {}".format(csv_path))
 
 
 def get_processed_folder(year, month):
-    """Return processed CSV file folder based on *year* and *month*. 
-    
-    The processed CSV file folder is used by Frames class 
+    """Return processed CSV file folder based on *year* and *month*.
+
+    The processed CSV file folder is used by Frames class
     to write output files (dfa.csv, dfq.csv, dfm.csv).
-    
-    Returns:            
+
+    Returns:
         pathlib.Path() instance
-    
+
     """
     return Folder(year, month).get_processed_folder()
 
@@ -113,92 +116,74 @@ def get_processed_folder(year, month):
 class Folder:
     interim = data_folder / 'interim'
     processed = data_folder / 'processed'
-    latest = processed / 'latest' 
-    supported_dates = DATES    
-   
-    @classmethod  
+    latest = processed / 'latest'
+    supported_dates = DATES
+
+    @classmethod
     def get_latest_date(cls):
-        root =  cls.interim
+        root = cls.interim
+
         def max_subfolder(folder):
-            _lst = [f.name for f in folder.iterdir() if f.is_dir()] 
+            _lst = [f.name for f in folder.iterdir() if f.is_dir()]
             return int(max(_lst))
         year = max_subfolder(root)
         _subfolder = root / str(year)
-        month = max_subfolder(_subfolder)    
-        return year, month  
-            
+        month = max_subfolder(_subfolder)
+        return year, month
+
     def __init__(self, year=None, month=None):
         # mask with latest date
         if not year or not month:
             year, month = Folder.get_latest_date()
-        # check if date is available     
+        # check if date is available
         if (year, month) in self.supported_dates:
             self.year, self.month = year, month
         else:
             msg = "Year and month not found: {} {}".format(year, month)
-            raise ValueError(msg)        
+            raise ValueError(msg)
 
-    def _local_folder(self, root):   
+    def _local_folder(self, root):
         return root / str(self.year) / str(self.month).zfill(2)
-    
+
     def get_interim_folder(self):
-        return self._local_folder(root=self.interim) 
-            
+        return self._local_folder(root=self.interim)
+
     def get_processed_folder(self):
-        return self._local_folder(root=self.processed)  
-    
+        return self._local_folder(root=self.processed)
+
     def __repr__(self):
         return "Folder({}, {})".format(self.year, self.month)
 
-# FIXME: move to pytest file --------------------------------------------------        
-   
-year, month =  get_latest_date()   
-assert get_latest_date()[0] >= 2017
-assert get_latest_date()[1] >= 1 
-assert get_latest_date()[1] <= 12 
-
-assert locate_csv(year, month).exists() is True
-assert locate_csv().exists() is True
-
-#raises TypeError - not enough arguments
-#assert get_processed_folder().exists() is True
-assert get_processed_folder(year, month).exists() is True
-
-
-assert repr(Folder(2015, 5))
-assert Folder(2015, 5).get_processed_folder().exists()
-assert Folder(2015, 5).get_interim_folder().exists()
-
-# raises ValueError
-# Folder(2030, 1)
-# end of tests ----------------------------------------------------------------
 
 # create local data dirs for DATES
 
-def md(folder): 
-    """Create *folder* if not exists. 
+
+def md(folder):
+    """Create *folder* if not exists.
        Also create parent folder if needed. """
     if not folder.exists():
         parent = folder.parent
         if not parent.exists():
-            parent.mkdir()        
-        folder.mkdir()                
-    
+            parent.mkdir()
+        folder.mkdir()
+
+
 def init_dirs(supported_dates=None):
-    """Create required directory structure in *data* folder.""" 
+    """Create required directory structure in *data* folder."""
     if not supported_dates:
-         supported_dates=DATES         
-    for (year, month) in supported_dates:                
+        supported_dates = DATES
+    for (year, month) in supported_dates:
         f = Folder(year, month)
         md(f.get_interim_folder())
         md(f.get_processed_folder())
 
 # housekeeping  - copy contents to 'prcessed/latest' folder
 
+
 def copy_latest():
-    """Copy all files from folder like *processed/2017/04* to 
-       *processed/latest* folder.        
-       
+    """Copy all files from folder like *processed/2017/04* to
+       *processed/latest* folder.
+
        Returns:
            list of files copied
     """
@@ -209,9 +194,10 @@ def copy_latest():
         dst = Folder.latest / src.name
         shutil.copyfile(src, dst)
         copied.append(dst)
-    print("Updated folder", Folder.latest )
+    print("Updated folder", Folder.latest)
     return copied
-    
+
+
 if __name__ == "__main__":
     init_dirs()
     copy_latest()

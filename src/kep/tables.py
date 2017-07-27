@@ -59,7 +59,7 @@ def missed_labels(tables, required):
 
 class Tables:
     """Extract tables from *csv_path* using *Rows(csv_path)*.
-    
+
        Parsing procedure:
        - cut out a segment of csv file as delimited by start and end line makers
        - hold remaining parts of csv file for further parsing
@@ -73,26 +73,26 @@ class Tables:
         self.required = [make_label(varname, unit)
                          for varname, unit in spec.required()]
         self.make_queue()
-    
+
     def make_queue(self):
         """Init list of csv segments and parsing definitons"""
         self.to_parse = []
         for scope in self.spec.scopes:
             # find segemnt limits
             start, end = scope.get_bounds(self.rowstack.rows)
-            # pop csv segment 
+            # pop csv segment
             csv_segment = self.rowstack.pop(start, end)
             # get current parsing definition
             pdef = scope.get_parsing_definition()
-            self.to_parse.append([csv_segment, pdef]) 
+            self.to_parse.append([csv_segment, pdef])
         csv_segment = self.rowstack.remaining_rows()
-        pdef = self.spec.get_main_parsing_definition()   
-        self.to_parse.append([csv_segment, pdef]) 
-        
+        pdef = self.spec.get_main_parsing_definition()
+        self.to_parse.append([csv_segment, pdef])
+
     def yield_tables(self):
         for csv_segment, pdef in self.to_parse:
             for t in self.extract_tables(csv_segment, pdef, self.units):
-                    yield t
+                yield t
 
     @staticmethod
     def extract_tables(csv_segment, pdef, units_dict):
@@ -186,7 +186,7 @@ class Table:
             if unit:
                 self.unit = unit
                 self.lines[row.name] = self.KNOWN
-        return self                  
+        return self
 
     def set_splitter(self, funcname):
         if funcname:

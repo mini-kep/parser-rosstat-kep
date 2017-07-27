@@ -89,9 +89,9 @@ class Emitter:
         self.q = []
         self.m = []
         for t in tables:
-            self.add_table(t)        
-        
-    def add_table(self, table):    
+            self.add_table(t)
+
+    def add_table(self, table):
         # defined Table() must have *label* and *splitter_func*
         if not table.is_defined():
             raise ValueError(table)
@@ -101,20 +101,22 @@ class Emitter:
             if a_value:
                 self.a.append(dmaker.a_dict(a_value))
             if q_values:
-                qs = [dmaker.q_dict(val, t + 1) for t, val in enumerate(q_values) if val]
+                qs = [dmaker.q_dict(val, t + 1)
+                      for t, val in enumerate(q_values) if val]
                 self.q.extend(qs)
             if m_values:
-                ms = [dmaker.m_dict(val, t + 1)  for t, val in enumerate(m_values) if val]
+                ms = [dmaker.m_dict(val, t + 1)
+                      for t, val in enumerate(m_values) if val]
                 self.m.extend(ms)
-    
+
     def collect_data(self, freq):
         if freq in "aqm":
-            return getattr(self, freq)        
+            return getattr(self, freq)
         else:
             raise ValueError(freq)
 
-## FIXME: may create Validator class
-#    
+# FIXME: may create Validator class
+#
 #   def get(self, freq, label=None, year=None):
 #        gen = self.emit_by_freq(freq)
 #        if label:
@@ -152,9 +154,9 @@ class Frames:
 
     def __init__(self, tables):
         self.emitter = Emitter(t for t in tables if t.is_defined())
-        self.datapoints = [x for freq in "aqm" 
-                             for x in self.emitter.collect_data(freq)]           
-        
+        self.datapoints = [x for freq in "aqm"
+                           for x in self.emitter.collect_data(freq)]
+
         dfa = pd.DataFrame(self.emitter.collect_data("a"))
         dfq = pd.DataFrame(self.emitter.collect_data("q"))
         dfm = pd.DataFrame(self.emitter.collect_data("m"))
@@ -163,7 +165,7 @@ class Frames:
         self.dfa = self.reshape_a(dfa)
         self.dfq = self.reshape_q(dfq)
         self.dfm = self.reshape_m(dfm)
-    
+
     def includes(self, x):
         return x in self.datapoints
 

@@ -6,9 +6,8 @@
 Welcome to mini-kep documentation
 ==================================
 
-`mini-kep`_ aims to parse MS Word files from `Rosstat 'KEP' publication`_  to obtain pandas
-dataframes with macroeconomic time series and save clean `processed CSV
-files at stable URL`_.
+`mini-kep`_  parses MS Word files from `Rosstat 'KEP' publication`_. It results in pandas
+dataframes with macroeconomic time series and saves clean `processed CSV files at stable URL`_.
 
 Inspired / affected by:
 
@@ -24,7 +23,7 @@ Inspired / affected by:
 Parser pipeline
 ~~~~~~~~~~~~~~~
 
-Steps involved in the parsing pipeline are the following:
+Steps involved in parsing pipeline are the following:
 
 -  **manually** (*FIXME*):
 
@@ -36,9 +35,6 @@ Steps involved in the parsing pipeline are the following:
 
 -  **csv2df**: parse interim CSV file to obtain `processed CSV files`_
    with annual, quarterly and monthly data.
-
-Additional files
-~~~~~~~~~~~~~~~~
 
 Also in `/src`_ folder:
 
@@ -75,8 +71,7 @@ TODO
 - sphinx-doc usage:
 
    - include intro.md to index.rst
-   - avoid default arguement expansion, if possible  
-   - warning in compile (copying static files...  
+   - warnings in compile (copying static files...  
      WARNING: html_static_path entry '...mini-kep-master\\doc\\_static' does not exist)
 
 - examples:
