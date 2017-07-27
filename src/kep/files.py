@@ -27,8 +27,9 @@ Functions based on :class:`kep.files.Folder` class methods:
 
 For housekeeping :mod:`kep.files` provides:
 
- - :func:`kep.files.init_dirs` (make directory structure on startup)
- - :func:`kep.files.copy_latest` (copy CSVs to *latest* folder which has stable URL)
+ - :func:`kep.files.init_dirs` - make directory structure on startup
+ - :func:`kep.files.copy_latest` - copy CSVs to *latest* folder which 
+                                   has stable URL
 
 """
 
@@ -182,7 +183,7 @@ def init_dirs(supported_dates=None):
         md(f.get_processed_folder())
 
 
-# housekeeping  - copy contents to 'prcessed/latest' folder
+# housekeeping  - copy contents to 'processed/latest' folder
 
 
 def copy_latest():

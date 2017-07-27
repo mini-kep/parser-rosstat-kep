@@ -12,16 +12,16 @@ frame = vint.frames
 #dpoints = vintage.Datapoints(tables)
 
 
-def test_Datapoints_get_annual_values_():
-    testpoints_1999a = [{'freq': 'a',
-                         'label': 'GDP_bln_rub',
-                         'value': 4823.0,
-                         'year': 1999},
-                        {'freq': 'a',
-                         'label': 'GDP_yoy',
-                         'value': 106.4,
-                         'year': 1999}]
-    assert list(dpoints.get("a", "GDP", 1999)) == testpoints_1999a
+#def test_Datapoints_get_annual_values_():
+#    testpoints_1999a = [{'freq': 'a',
+#                         'label': 'GDP_bln_rub',
+#                         'value': 4823.0,
+#                         'year': 1999},
+#                        {'freq': 'a',
+#                         'label': 'GDP_yoy',
+#                         'value': 106.4,
+#                         'year': 1999}]
+#    assert list(dpoints.get("a", "GDP", 1999)) == testpoints_1999a
 
 
 def test_end_to_end_latest_month():
