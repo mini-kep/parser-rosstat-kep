@@ -1,9 +1,7 @@
 """File and folder locations for interim and processed CSV files. 
 
-Data directory structure:
-
-::
-    
+Data directory structure:     
+::    
     \\data
       \\interim
           \\2017
@@ -16,18 +14,21 @@ Data directory structure:
           \\2016
           \\...
 
-Tasks:
 
-- parsing (based of *Folder* class):
+Functions based on :class:`kep.files.Folder` class methods:
+    
+    - :func:`kep.files.get_latest_date` returns latest available
+      year and month
+    - :func:`kep.files.locate_csv` retrieves interim CSV file for parsing 
+      from *data/interim* folder by year and month 
+    - :func:`kep.files.get_processed_folder` provides location to save parsing 
+      result in *data/processed* folder
+      
+      
+For housekeeping :mod:`kep.files` provides:
 
-    - **get_latest_date()** - find date for latest interim CSV folder
-    - **locate_csv()** - get interim CSV file for specified date
-    - **get_processed_folder()** - get processed folder by date
-    
-- housekeeping:  
-    
-   - **copy_latest()** - copy CSVs to *latest* folder with stable URL
-   - **init_dirs()** - make directory structure on startup
+ - :func:`kep.files.init_dirs` (make directory structure on startup) 
+ - :func:`kep.files.copy_latesst` (copy CSVs to *latest* folder which has stable URL)
    
 """
 
@@ -134,16 +135,17 @@ class Folder:
         if (year, month) in self.supported_dates:
             self.year, self.month = year, month
         else:
-            raise ValueError("Year and month not found: {} {}".format(year, month))        
+            msg = "Year and month not found: {} {}".format(year, month)
+            raise ValueError(msg)        
 
-    def __local_folder(self, root):   
+    def _local_folder(self, root):   
         return root / str(self.year) / str(self.month).zfill(2)
     
     def get_interim_folder(self):
-        return self.__local_folder(root=self.interim) 
+        return self._local_folder(root=self.interim) 
             
     def get_processed_folder(self):
-        return self.__local_folder(root=self.processed)  
+        return self._local_folder(root=self.processed)  
     
     def __repr__(self):
         return "Folder({}, {})".format(self.year, self.month)
