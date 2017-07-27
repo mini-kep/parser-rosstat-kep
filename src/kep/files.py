@@ -130,18 +130,22 @@ class Folder:
         _subfolder = root / str(year)
         month = max_subfolder(_subfolder)
         return year, month
-
-    def __init__(self, year=None, month=None):
+    
+    @classmethod
+    def filter_date(cls, year, month):
         # mask with latest date
         if not year or not month:
-            year, month = Folder.get_latest_date()
+            year, month = cls.get_latest_date()
         # check if date is available
-        if (year, month) in self.supported_dates:
-            self.year, self.month = year, month
+        if (year, month) in cls.supported_dates:
+            return year, month
         else:
             msg = "Year and month not found: {} {}".format(year, month)
             raise ValueError(msg)
 
+    def __init__(self, year=None, month=None):
+        self.year, self.month = Folder.filter_date(year, month)
+        
     def _local_folder(self, root):
         return root / str(self.year) / str(self.month).zfill(2)
 
@@ -176,6 +180,7 @@ def init_dirs(supported_dates=None):
         f = Folder(year, month)
         md(f.get_interim_folder())
         md(f.get_processed_folder())
+
 
 # housekeeping  - copy contents to 'prcessed/latest' folder
 

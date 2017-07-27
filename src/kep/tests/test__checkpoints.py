@@ -9,7 +9,7 @@ vint = vintage.Vintage(2017, 4)
 tables = vint.tables
 # convert stream values to pandas dataframes
 frame = vint.frames
-dpoints = vintage.Datapoints(tables)
+#dpoints = vintage.Datapoints(tables)
 
 
 def test_Datapoints_get_annual_values_():

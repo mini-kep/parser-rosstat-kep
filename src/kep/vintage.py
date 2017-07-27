@@ -240,7 +240,7 @@ class Vintage:
 
     def __init__(self, year, month):
         # save for reference and navigation
-        self.year, self.month = files.filter_date(year, month)
+        self.year, self.month = year, month
         # find csv
         self.csv_path = files.locate_csv(year, month)
         # rowstack
