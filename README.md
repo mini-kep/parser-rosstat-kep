@@ -8,6 +8,9 @@ See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com
 
 # Development notes
 
+- extend variable definitions
+  - show imported variables or varnames
+
 - delete from repo:
   - static html
 
