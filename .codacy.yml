@@ -3,3 +3,5 @@ exclude_paths:
   - src/kep/tests/*
   - src/kep/tests
   - 'test*.*'
+  - doc/
+  - doc/*
