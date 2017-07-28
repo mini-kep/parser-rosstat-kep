@@ -29,10 +29,9 @@ def pep8(ctx, folder="kep"):
     path = PROJECT_DIR / "src" / folder
     files = filter(lambda x: x.suffix == ".py", walk_files(path))
     for f in files:
-        print("Formatting...", f)
+        print("Formatting", f)
         # FIXME: may use 'import autopep8' without console
         ctx.run("autopep8 --aggressive --aggressive --in-place {}".format(f))
-        print("Done.", f)
 
 
 @task
@@ -94,6 +93,8 @@ ns.add_task(pep8)
 ns.add_task(ls)
 ns.add_task(cov)
 ns.add_task(test)
+ns.add_task(doc)
+ns.add_task(rst)
 
 # Workaround for Windows execution
 if platform == 'win32':
