@@ -6,7 +6,7 @@
 Welcome to mini-kep documentation
 ==================================
 
-`mini-kep`_  parses MS Word files from `Rosstat 'KEP' publication`_. It results in pandas
+`mini-kep`_  parses MS Word files from `Rosstat 'KEP' publication`_. It creates pandas
 dataframes with macroeconomic time series and saves clean `processed CSV files at stable URL`_.
 
 Inspired / affected by:
