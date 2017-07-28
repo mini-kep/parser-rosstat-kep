@@ -9,6 +9,7 @@ See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com
 # Development notes
 
 - delete from repo:
+  - static html
 
 - variable transformation layer:
   - GOV_ACCUM
