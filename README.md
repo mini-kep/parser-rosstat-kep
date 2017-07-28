@@ -37,6 +37,8 @@ See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com
   - uncomment tests
  
 - frontpage
+
+- try ```inv pep8 -f.```
  
 - aws:
   - read/copy from bucket as
