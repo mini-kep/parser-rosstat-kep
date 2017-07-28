@@ -8,6 +8,11 @@ See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com
 
 # Development notes
 
+- delete from repo:
+
+- variable transformation layer:
+  - GOV_ACCUM
+  
 - sphinx-doc usage:
   - include intro.md in index.rst
   - warnings in compile
