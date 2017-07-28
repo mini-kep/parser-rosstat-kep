@@ -56,10 +56,10 @@ def lint(ctx, folder="src/kep"):
 
 @task
 def rst(ctx):
-    ctx.run("doc/make.bat html")
     # TODO:    
     # build new modules sphinx
     # sphinx-apidoc -feM -o. ../src/kep 
+    pass
 
     
 @task
