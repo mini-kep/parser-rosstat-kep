@@ -29,9 +29,10 @@ def pep8(ctx, folder="kep"):
     path = PROJECT_DIR / "src" / folder
     files = filter(lambda x: x.suffix == ".py", walk_files(path))
     for f in files:
-        print("Formatting", f)
+        print("Formatting...", f)
         # FIXME: may use 'import autopep8' without console
         ctx.run("autopep8 --aggressive --aggressive --in-place {}".format(f))
+        print("Done.", f)
 
 
 @task
@@ -51,18 +52,23 @@ def lint(ctx, folder="src/kep"):
     """
     # E501 line too long
     # --max-line-length=100           
-    ctx.run('flake8 {} --exclude test* --ignore E501'.format())
-
-# TODO:    
-# build new modules sphinx
-# sphinx-apidoc -feM -o. ../src/kep 
-
-# TODO:    
-# make bat 
-# make html (can use Echo to find out the command)
+    ctx.run('flake8 {} --exclude test* --ignore E501'.format(folder))
 
 
+@task
+def rst(ctx):
+    ctx.run("doc/make.bat html")
+    # TODO:    
+    # build new modules sphinx
+    # sphinx-apidoc -feM -o. ../src/kep 
 
+    
+@task
+def doc(ctx):
+    ctx.run("doc/make.bat html")
+    # TODO: upload to aws
+
+    
 @task
 def test(ctx):
     ctx.run("py.test --cov=kep")
