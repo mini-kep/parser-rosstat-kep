@@ -1,11 +1,13 @@
 [![Build Status](https://travis-ci.org/epogrebnyak/mini-kep.svg?branch=master)](https://travis-ci.org/epogrebnyak/mini-kep) 
 
 # mini-kep
-Parse MS Word files from Rosstat 'KEP' publication and save clean CSV files with macroeconomic time series to stable URL.
+Parse MS Word files from Rosstat and save clean macroeconomic time series as CSV at stable URL.
 
 See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com)
 
 # Development notes
+
+- uncomment tests
 
 - sphinx-doc usage:
   - include intro.md in index.rst
@@ -25,5 +27,10 @@ See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com
 - testing:
  - check final values in a different procedure 
  
+- frontpage
+ 
 - aws:
-  - read from bucket
+  - read/copy from bucket as
+  - use boto with credentials 
+  - save deeper history to bucket
+  - gap (2013, x)
