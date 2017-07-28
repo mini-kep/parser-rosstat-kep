@@ -7,8 +7,6 @@ See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com
 
 # Development notes
 
-- uncomment tests
-
 - sphinx-doc usage:
   - include intro.md in index.rst
   - warnings in compile
@@ -25,7 +23,8 @@ See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com
   - make **emitter**
   
 - testing:
- - check final values in a different procedure 
+  - check final values in a different procedure 
+  - uncomment tests
  
 - frontpage
  
