@@ -66,39 +66,6 @@ Also in `/src`_ folder:
    kep.tables
    kep.vintage
 
-TODO
-----
-- sphinx-doc usage:
-
-   - include intro.md to index.rst
-   - warnings in compile (copying static files...  
-     WARNING: html_static_path entry '...mini-kep-master\\doc\\_static' does not exist)
-
-- examples:
-
-  - provide CSV source example
-  - provide dataframe example
-
-- commenting:
-
-  - add docstrings + may extract docstrings as list?
-  - what docstrign style for module level?
-  
-- coding:  
-
-  - change naming to **reader-parser-emitter**
-  - combine rows and splitter modules, make **reader**
-  - rename tables to **parser**
-  - make **emitter**?
-  - rename kep to csv2df
-  - (make folders a package)
-  
-- testing:
-
-  - check final values in a different fashion
-  - restore travis badge
-
-
 Indices and tables
 ==================
 
