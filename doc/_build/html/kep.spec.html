@@ -48,13 +48,55 @@
       <div class="content">
         
         
-  <div class="section" id="module-kep.spec">
-<span id="kep-spec-module"></span><h1>kep.spec module<a class="headerlink" href="#module-kep.spec" title="Permalink to this headline">¶</a></h1>
-<p>Parsing instruction contains:
-- text to match with variable name
-- required variable names
-- csv line boundaries (optional)
-- reader function name for unusual table formats (optional)</p>
+  <div class="section" id="kep-spec-module">
+<h1>kep.spec module<a class="headerlink" href="#kep-spec-module" title="Permalink to this headline">¶</a></h1>
+<span class="target" id="module-kep.spec"></span><p><a class="reference internal" href="#module-kep.spec" title="kep.spec"><code class="xref py py-mod docutils literal"><span class="pre">kep.spec</span></code></a> module contains data structures used as parsing instructions
+in <a class="reference internal" href="kep.tables.html#module-kep.tables" title="kep.tables"><code class="xref py py-mod docutils literal"><span class="pre">kep.tables</span></code></a>.</p>
+<p><a class="reference internal" href="kep.tables.html#module-kep.tables" title="kep.tables"><code class="xref py py-mod docutils literal"><span class="pre">kep.tables</span></code></a> relies on two global variables from <a class="reference internal" href="#module-kep.spec" title="kep.spec"><code class="xref py py-mod docutils literal"><span class="pre">kep.spec</span></code></a>:</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>UNITS</strong> (dict) is a mapper dictionary to extract units of measurement</li>
+</ul>
+</div></blockquote>
+<p>from table headers. It applies to all of CSV file.</p>
+<blockquote>
+<div><ul class="simple">
+<li><strong>SPEC</strong> (<a class="reference internal" href="#kep.spec.Specification" title="kep.spec.Specification"><code class="xref py py-class docutils literal"><span class="pre">kep.spec.Specification</span></code></a>) contains parsing instructions</li>
+</ul>
+</div></blockquote>
+<p>by segment of CSV file:</p>
+<blockquote>
+<div><blockquote>
+<div><ul class="simple">
+<li>segment start and end line</li>
+<li>header strings to match with variable name</li>
+<li>(optional) reader function name to extract data from ununsual tables</li>
+</ul>
+</div></blockquote>
+<p><strong>SPEC</strong> is constructed from main (default) and auxillary
+<a class="reference internal" href="#kep.spec.Definition" title="kep.spec.Definition"><code class="xref py py-class docutils literal"><span class="pre">kep.spec.Definition</span></code></a> instances, while <a class="reference internal" href="#kep.spec.Definition" title="kep.spec.Definition"><code class="xref py py-class docutils literal"><span class="pre">kep.spec.Definition</span></code></a>
+is basically a list of <a class="reference internal" href="#kep.spec.Indicator" title="kep.spec.Indicator"><code class="xref py py-class docutils literal"><span class="pre">kep.spec.Indicator</span></code></a> instances with
+start and end line strings, which delimit CSV file segment.</p>
+<p><a class="reference internal" href="#kep.spec.Indicator" title="kep.spec.Indicator"><code class="xref py py-class docutils literal"><span class="pre">kep.spec.Indicator</span></code></a> holds variable name, text string(s) to match in
+table header to locate this indicator and (...)</p>
+</div></blockquote>
+<p>Notes:</p>
+<ul class="simple">
+<li>we need parse CSV file by segment , because
+some table headers repeat themselves in across all of CSV file, so getting
+unique result would be a problem. Cutting a segment out of CSV file gives
+a very specific input for parsing. It is usually a few tables in length</li>
+<li>most indicators are defined in main (default) parsing definition,
+retrieved by <a href="#id1"><span class="problematic" id="id2">:method:`kep.spec.Specification.get_main_parsing_definition`</span></a></li>
+<li><dl class="first docutils">
+<dt><cite>kep.spec.Specification.get_additional_parsing_definitions</cite> provides</dt>
+<dd>segment parsing defintions</dd>
+</dl>
+</li>
+</ul>
+<p>Previously <strong>UNITS</strong> and <strong>SPEC</strong> were initialised based on yaml file, but this
+led to many errors, so these data structures were created to make definition of
+parsing instructions more stable.</p>
 <dl class="class">
 <dt id="kep.spec.Definition">
 <em class="property">class </em><code class="descclassname">kep.spec.</code><code class="descname">Definition</code><span class="sig-paren">(</span><em>reader=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Definition"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Definition" title="Permalink to this definition">¶</a></dt>
@@ -85,7 +127,22 @@
 <dt id="kep.spec.Indicator">
 <em class="property">class </em><code class="descclassname">kep.spec.</code><code class="descname">Indicator</code><span class="sig-paren">(</span><em>varname</em>, <em>text</em>, <em>required_units</em>, <em>desc=None</em>, <em>sample=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Indicator"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Indicator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
-<p>An economic indicator parsing instructions</p>
+<p>An economic indicator parsing instructions.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>varname</strong> (<em>string</em>) &#8211; variable name string like &#8216;GDP&#8217;, &#8216;CPI&#8217;, etc</li>
+<li><strong>text</strong> (<em>string</em><em> or </em><em>list</em>) &#8211; string(s) found in table header, eg  &#8216;Объем ВВП&#8217;, &#8216;Gross domestic product&#8217;</li>
+<li><strong>required_units</strong> (<em>string</em><em> or </em><em>list</em><em>) </em><em>- unit</em><em>(</em><em>s</em>) &#8211; examples: &#8216;rog&#8217;, [&#8216;rog&#8217;],  [&#8216;bln_rub&#8217;, &#8216;yoy&#8217;]</li>
+<li><strong>- indicator desciption string for frontpage</strong> (<em>desc</em>) &#8211; </li>
+<li><strong>- control string - one of raw CSV file rows</strong> (<em>sample</em>) &#8211; </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 <dl class="staticmethod">
 <dt id="kep.spec.Indicator.as_list">
 <em class="property">static </em><code class="descname">as_list</code><span class="sig-paren">(</span><em>x</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/kep/spec.html#Indicator.as_list"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#kep.spec.Indicator.as_list" title="Permalink to this definition">¶</a></dt>

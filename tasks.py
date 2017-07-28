@@ -64,7 +64,8 @@ def rst(ctx):
     
 @task
 def doc(ctx):
-    ctx.run("doc/make.bat html")
+    ctx.run("doc\make.bat html")
+    ctx.run("start doc\_build\html\index.html")
     # TODO: upload to aws
 
     

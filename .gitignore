@@ -1,7 +1,4 @@
-.idea
-
-# sphinx
-doc/_build
+*.idea
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -68,6 +65,7 @@ instance/
 
 # Sphinx documentation
 docs/_build/
+doc/_build/
 
 # PyBuilder
 target/

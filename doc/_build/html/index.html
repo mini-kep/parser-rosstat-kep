@@ -47,7 +47,7 @@
         
   <div class="section" id="welcome-to-mini-kep-documentation">
 <h1>Welcome to mini-kep documentation<a class="headerlink" href="#welcome-to-mini-kep-documentation" title="Permalink to this headline">¶</a></h1>
-<p><a class="reference external" href="https://github.com/epogrebnyak/mini-kep">mini-kep</a>  parses MS Word files from <a class="reference external" href="http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391">Rosstat &#8216;KEP&#8217; publication</a>. It results in pandas
+<p><a class="reference external" href="https://github.com/epogrebnyak/mini-kep">mini-kep</a>  parses MS Word files from <a class="reference external" href="http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391">Rosstat &#8216;KEP&#8217; publication</a>. It creates pandas
 dataframes with macroeconomic time series and saves clean <a class="reference external" href="https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest">processed CSV files at stable URL</a>.</p>
 <p>Inspired / affected by:</p>
 <ul class="simple">
@@ -87,48 +87,6 @@ save a local copy</li>
 <li class="toctree-l1"><a class="reference internal" href="kep.vintage.html">kep.vintage module</a></li>
 </ul>
 </div>
-</div>
-<div class="section" id="todo">
-<h3>TODO<a class="headerlink" href="#todo" title="Permalink to this headline">¶</a></h3>
-<ul>
-<li><p class="first">sphinx-doc usage:</p>
-<blockquote>
-<div><ul class="simple">
-<li>include intro.md to index.rst</li>
-<li>warnings in compile (copying static files...
-WARNING: html_static_path entry &#8216;...mini-kep-master\doc\_static&#8217; does not exist)</li>
-</ul>
-</div></blockquote>
-</li>
-<li><p class="first">examples:</p>
-<ul class="simple">
-<li>provide CSV source example</li>
-<li>provide dataframe example</li>
-</ul>
-</li>
-<li><p class="first">commenting:</p>
-<ul class="simple">
-<li>add docstrings + may extract docstrings as list?</li>
-<li>what docstrign style for module level?</li>
-</ul>
-</li>
-<li><p class="first">coding:</p>
-<ul class="simple">
-<li>change naming to <strong>reader-parser-emitter</strong></li>
-<li>combine rows and splitter modules, make <strong>reader</strong></li>
-<li>rename tables to <strong>parser</strong></li>
-<li>make <strong>emitter</strong>?</li>
-<li>rename kep to csv2df</li>
-<li>(make folders a package)</li>
-</ul>
-</li>
-<li><p class="first">testing:</p>
-<ul class="simple">
-<li>check final values in a different fashion</li>
-<li>restore travis badge</li>
-</ul>
-</li>
-</ul>
 </div>
 </div>
 </div>
