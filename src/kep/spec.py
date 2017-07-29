@@ -362,8 +362,7 @@ SPEC.add_scope(sc)
 
 # PROPOSAL:
 """
-
-# change 1 init of Definition
+# change 1 - init of Definition
 main = Definition(varname="GDP",
             text=["Oбъем ВВП",
                   "Индекс физического объема произведенного ВВП, в %",
@@ -372,13 +371,12 @@ main = Definition(varname="GDP",
             desc="Валовый внутренний продукт (ВВП)",
             sample="1999	4823	901	1102	1373	1447")
 SPEC = Specification(main)
-
 sc = Scope(start="3.5. Индекс потребительских цен",
            end="4. Социальная сфера")
-# change 2 method name
+# change 2 - method name
 sc.append(start="4.5. Индекс потребительских цен",
            end="5. Социальная сфера")           
-# change 3 init and composition
+# change 3 - init and composition
 d = Definition(sc, reader = None)
 d.append("CPI",
           text="Индекс потребительских цен",
@@ -389,12 +387,10 @@ d.append("CPI_NONFOOD",
                 "непродовольст- венные товары"],
           required_units="rog",
           desc="ИПЦ (непродтовары)")
-# change 4 some methods will ne depreciated
-# change 5 other changes?
+# change 4 - some methods will be depreciated
+# change 5 - other changes needed?
 SPEC.append(sc)
-
-# change 6 rewrite existing parsing instruction for SPEC
-# change 7 - is access from outside unaffected?
+# change 6 - is access from outside unaffected?
 """
 
 
