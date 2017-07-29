@@ -6,8 +6,60 @@ Parse MS Word files from Rosstat and save clean macroeconomic time series as CSV
 
 See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com)
 
+
 # Development notes
 
+##  Directions for work   
+
+### 1. Current stable version in master branch:
+
+Go by module:
+ - edit module docstrings:
+   - module
+   - classes, public methods and functions used in other parts of the program
+   - other docstrings/comments where needed
+ - code examples for documentation where needed 
+ - edit/enhance tests where needed
+ - make list of refactoring / enhancements by writing TODO and FIXME in code
+ 
+For docstrings we use <https://google.github.io/styleguide/pyguide.html#Comments>. 
+
+For testing we use py.test and make follwoing kinds of tests depending on situation:
+ - really simple unit test to make sure a method is callable without test values (like for ```__repr__()```)
+ - unit test with simple control values for a small fucntion / method
+ - behaviour tests with fixtures / mocks for larger functionalities
+ - end-to-end test on sample or real data.  
+
+ 
+Finished work example: **kep.files**:
+- code: <https://github.com/epogrebnyak/mini-kep/blob/master/src/kep/files.py>
+- test: https://github.com/epogrebnyak/mini-kep/blob/master/src/kep/tests/test_files.py
+- rst: <https://github.com/epogrebnyak/mini-kep/blob/master/doc/kep.files.rst>
+- documentation: <http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com/kep.files.html>
+
+Needs review:
+- [x] kep.files 
+- [ ] kep.spec 
+- [ ] kep.rows
+- [ ] kep.splitter
+- [ ] kep.tables
+- [ ] kep.vintage
+ 
+### 2. Extend parsing definitions
+
+See individual tasks below
+
+### 3. Frontend for parsing result
+
+See individual tasks below
+
+### 4. Extend functionality 
+
+- [ ] manage download file and unpack
+- [ ] managing resources on aws s3
+
+## Individial tasks
+ 
 - extend variable definitions
   - show imported variables or varnames
 
@@ -26,7 +78,7 @@ See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com
   - provide CSV source example
   - provide dataframe example
  
-- rename to **reader-parser-emitter**:
+- rename modules to **reader-parser-emitter**:
   - rename kep to csv2df
   - combine rows and splitter modules, make **reader**
   - rename tables to **parser**
@@ -38,7 +90,8 @@ See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com
  
 - frontpage
 
-- try ```inv pep8 -f.```
+- housekeeping:
+  - try ```inv pep8 -f.```
  
 - aws:
   - read/copy from bucket as
