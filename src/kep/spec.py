@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# TODO: edit docstring for better formatting in documentation (eg hanging lines)
 """:mod:`kep.spec` module contains data structures used as parsing instructions
 in :mod:`kep.tables`. 
 
@@ -352,12 +353,49 @@ sc.append("CPI_SERVICES",
           desc="ИПЦ (услуги)")
 SPEC.add_scope(sc)
 
-# TODO:
+# NOT TODO:
 # - [ ] migrate existing definitions to this file
 # NOT TODO:
 # - [ ] spec validation procedure
 # - [ ] use of sample row
 # - [ ] think of a better pattern to create SPEC
+
+# PROPOSAL:
+"""
+
+# change 1 init of Definition
+main = Definition(varname="GDP",
+            text=["Oбъем ВВП",
+                  "Индекс физического объема произведенного ВВП, в %",
+                  "Валовой внутренний продукт"],
+            required_units=["bln_rub", "yoy"],
+            desc="Валовый внутренний продукт (ВВП)",
+            sample="1999	4823	901	1102	1373	1447")
+SPEC = Specification(main)
+
+sc = Scope(start="3.5. Индекс потребительских цен",
+           end="4. Социальная сфера")
+# change 2 method name
+sc.append(start="4.5. Индекс потребительских цен",
+           end="5. Социальная сфера")           
+# change 3 init and composition
+d = Definition(sc, reader = None)
+d.append("CPI",
+          text="Индекс потребительских цен",
+          required_units="rog",
+          desc="Индекс потребительских цен (ИПЦ)")
+d.append("CPI_NONFOOD",
+          text=["непродовольственные товары",
+                "непродовольст- венные товары"],
+          required_units="rog",
+          desc="ИПЦ (непродтовары)")
+# change 4 some methods will ne depreciated
+# change 5 other changes?
+SPEC.append(sc)
+
+# change 6 rewrite existing parsing instruction for SPEC
+# change 7 - is access from outside unaffected?
+"""
 
 
 if __name__ == "__main__":
