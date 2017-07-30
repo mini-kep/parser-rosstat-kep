@@ -79,7 +79,7 @@ class Row:
         else:
             return False
 
-    def get_unit(self, units_mapper_dict=spec.UNITS):
+    def get_unit(self, units_mapper_dict): #=spec.UNITS):
         for k in units_mapper_dict.keys():
             if k in self.name:
                 return units_mapper_dict[k]

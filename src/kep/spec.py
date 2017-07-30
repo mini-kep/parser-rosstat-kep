@@ -118,63 +118,59 @@ class ParsingInstruction:
     
     """
     
-    def __init__(self, varname, text, required_units, desc=False):
-        kwargs = self._convert_args(varname, 
-                                    text, 
-                                    required_units, 
-                                    desc)
-        self._init(**kwargs)        
+    def __init__(self):
+        self.varname_mapper = odict()
+        self.required_labels = []
+        self.decriptions = odict()
         
-    def _init(self, varname: str, 
-                  header_strings: list, 
-                  required_units: list,
-                  description: str):
-        self.varname_mapper = odict([(hs, varname) for hs in header_strings])
-        # PROPOSAL: make label a module and store lables here, not pairs
-        # PROPOSAL: sample data also can go here
-        self.required_labels = list((varname, unit) for unit in required_units)
-        self.decriptions = odict({varname: description})
-        self.scope = False
-        self.reader = False
-
-    @staticmethod    
-    def _convert_args(varname, text, required_units, desc):
+        
+    def append(self, varname, text, required_units, desc=False):
+        # conversion from user interface
         header_strings = as_list(text)
         if desc is False:
              desc = header_strings[0]
-        return dict(varname=varname,
-                    header_strings = header_strings,
-                    required_units = as_list(required_units),
-                    description = desc) 
-        
-    def append(self, varname, text, required_units, desc=False):
-        p = ParsingInstruction(varname, text, required_units, desc)
-        self.__add__(p)       
+        required_units = as_list(required_units)
+        # adding values to mappeк
+        varname_mapper = odict([(hs, varname) for hs in header_strings])
+        self.varname_mapper.update(varname_mapper)        
+        # adding values to desc
+        self.decriptions.update({varname: desc})
+        # IDEA 1: make label a module and store lables here, not pairs
+        # IDEA2: sample data also can go here
+        # adding values to required
+        required_labels = list((varname, unit) for unit in required_units)
+        self.required_labels.extend(required_labels)       
 
-    def __add__(self, x):
-        self.varname_mapper.update(x.varname_mapper)        
-        self.decriptions.update(x.decriptions)        
-        self.required_labels.extend(x.required_labels)        
 
+    def __eq__(self, x):
+        flag1 = self.required_labels == x.required_labels 
+        flag2 = self.varname_mapper == x.varname_mapper 
+        return bool(flag1 and flag2)
+
+    
+class Definition(object):
+    
+    def __init__(self, scope=False, reader=False):
+        self.instr = ParsingInstruction()
+        self.scope = scope
+        self.reader = reader
+
+    def append(self, *arg, **kwarg):
+        self.instr.append(*arg, **kwarg)        
+    
     def set_scope(self, sc):
         self.scope = sc
 
     def set_reader(self, rdr):
         self.reader = rdr
 
-    def __eq__(self, x):
-        flag1 = self.required_labels == x.required_labels 
-        flag2 = self.varname_mapper == x.varname_mapper 
-        flag3 = self.descriptions == x.descriptions
-        return bool(flag1 and flag2 and flag3)
-    
-    def get_header_mapper(self):
+    def get_varname_mapper(self):
         """EDIT: Combine varname regex strings for all indicators."""
-        return self.header_mapper
+        return self.instr.varname_mapper
 
     def get_required_labels(self):
         """EDIT: Combine list of required variables for all indicators."""
-        return self.required
+        return self.instr.required_labels
 
     def get_varnames(self):
         return list(set(self.header_mapper.values()))
@@ -243,52 +239,52 @@ class Specification:
        
     """
 
-    def __init__(self, default_instruction):
-        # main parsing instruction
-        self._main = default_instruction
+    def __init__(self, default):
+        # main parsing definition
+        self.main = default
         # additional parsing instructions for segments
-        # FIXME: '_additionals' is bad naming
-        self._additionals = []
-        self._combined_instruction = default_instruction
+        self.segment_definitions = []
 
-    def append(self, instr):
-        self._additionals.append(instr)
-        #self.validate()
-        self._combined_instruction.__add__(instr)
-
-    #def validate(self):
-        # WONTFIX: order of markers - ends are not starts
-    #    pass
+    def append(self, pdef):
+        self.segment_definitions.append(pdef)
+        # WONTFIX: validate order of markers - ends are not starts
 
     def get_main_parsing_definition(self):
-        return self._main
+        return self.main
 
     def get_segment_parsing_definitions(self):
-        return self._additionals
+        return self.segment_definitions
+    
+    def all_definitions(self):        
+        return [self.main] + self.segment_definitions    
 
     def get_varnames(self):
-        return self._combined_instruction.get_varnames()
-
+        varnames = set()
+        for pdef in self.all_definitions():
+            varnames.add(pdef.get_varnames())
+        return list(varnames)
+    
     def get_required_labels(self):
-        """EDIT: Combine list of required variables for all indicators."""
-        return self._combined_instruction.get_required_labels()
-
+        req = []
+        for pdef in self.all_definitions():
+            req.extend(pdef.get_required_labels())
+        return req
 
 # global (default) parsing defintion
-main = ParsingInstruction(varname="GDP",
+main = Definition()
+main.append(varname="GDP",
             text=["Oбъем ВВП",
                   "Индекс физического объема произведенного ВВП, в %",
                   "Валовой внутренний продукт"],
             required_units=["bln_rub", "yoy"],
             desc="Валовый внутренний продукт (ВВП)")
-# PROPOSAL:  sample="1999	4823	901	1102	1373	1447"
-
+# sample="1999	4823	901	1102	1373	1447"
 main.append(varname="INDPRO",
             text="Индекс промышленного производства",
             required_units=["yoy", "rog"],
             desc="Промышленное производство")
 # create Specification based on 'main' parsing instruction
-SPEC = Specification(default_instruction=main)
+SPEC = Specification(default=main)
 
 # segment definitions
 # -- investment
@@ -296,30 +292,25 @@ sc = Scope("1.6. Инвестиции в основной капитал",
            "1.6.1. Инвестиции в основной капитал организаций")
 sc.add_bounds("1.7. Инвестиции в основной капитал",
               "1.7.1. Инвестиции в основной капитал организаций")
-p = ParsingInstruction("INVESTMENT",
+d = Definition(scope=sc)
+d.append("INVESTMENT",
           "Инвестиции в основной капитал",
           ["bln_rub", "yoy", "rog"])
-p.set_scope(sc)
-SPEC.append(p)
+SPEC.append(d)
 
 # -- CPI
 sc = Scope(start="3.5. Индекс потребительских цен",
            end="4. Социальная сфера")
 sc.add_bounds(start="4.5. Индекс потребительских цен",
               end="5. Социальная сфера")           
-p = ParsingInstruction("CPI",
+d = Definition(scope=sc)
+d.append("CPI",
           text="Индекс потребительских цен",
           required_units="rog",
           desc="Индекс потребительских цен (ИПЦ)")
-p.append("CPI_NONFOOD",
+d.append("CPI_NONFOOD",
           text=["непродовольственные товары",
                 "непродовольст- венные товары"],
           required_units="rog",
           desc="ИПЦ (непродтовары)")
-p.set_scope(sc)
-# may also use
-#p.set_reader()
-SPEC.append(p)
-
-#FIXME CITICAL:
-# usage of SPEC will change 
+SPEC.append(d)
