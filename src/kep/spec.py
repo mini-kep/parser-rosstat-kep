@@ -121,7 +121,7 @@ class ParsingInstruction:
     def __init__(self):
         self.varname_mapper = odict()
         self.required_labels = []
-        self.decriptions = odict()
+        self.descriptions = odict()
         
         
     def append(self, varname, text, required_units, desc=False):
@@ -134,7 +134,7 @@ class ParsingInstruction:
         varname_mapper = odict([(hs, varname) for hs in header_strings])
         self.varname_mapper.update(varname_mapper)        
         # adding values to desc
-        self.decriptions.update({varname: desc})
+        self.descriptions.update({varname: desc})
         # IDEA 1: make label a module and store lables here, not pairs
         # IDEA2: sample data also can go here
         # adding values to required
@@ -173,7 +173,8 @@ class Definition(object):
         return self.instr.required_labels
 
     def get_varnames(self):
-        return list(set(self.header_mapper.values()))
+        varnames = self.get_varname_mapper().values()
+        return list(set(varnames))
 
 
 class Scope():
@@ -258,17 +259,19 @@ class Specification:
     def all_definitions(self):        
         return [self.main] + self.segment_definitions    
 
-    def get_varnames(self):
-        varnames = set()
-        for pdef in self.all_definitions():
-            varnames.add(pdef.get_varnames())
-        return list(varnames)
-    
     def get_required_labels(self):
         req = []
         for pdef in self.all_definitions():
             req.extend(pdef.get_required_labels())
         return req
+
+    def get_varnames(self):
+        varnames = set()
+        for pdef in self.all_definitions():
+            varnames.add(pdef.get_varnames())
+        return list(varnames)
+
+
 
 # global (default) parsing defintion
 main = Definition()

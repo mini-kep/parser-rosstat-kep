@@ -5,7 +5,7 @@ import pytest
 from kep.rows import Row
 # testing
 from kep.tables import Table, Tables, split_to_tables
-from kep.spec import Indicator, Definition, Specification
+from kep.spec import ParsingInstruction, Definition, Specification
 
 # TODO: rename module 'rows'
 
@@ -49,8 +49,8 @@ class Spec_Sample:
                 'в % к соответствующему периоду предыдущего года': 'yoy'}
 
     def indicator(name):
-        inds = dict(GDP=Indicator(**gdp_def),
-                    INDPRO=Indicator(**indpro_def))
+        inds = dict(GDP=ParsingInstruction(**gdp_def),
+                    INDPRO=ParsingInstruction(**indpro_def))
         return inds[name]
 
     def pdef():
@@ -121,7 +121,7 @@ class Test_fixtures:
                                      Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])]
 
     def test_regression_same_string_used_in_first_row_and_pdef(self):
-        assert [k for k in Sample.pdef().headers][0] == \
+        assert [k for k in Sample.pdef().instr.varname_mapper][0] == \
             next(mock_rows()).name
 
 
@@ -171,10 +171,11 @@ class Test_Table_on_creation:
 class Test_Table_after_parsing:
 
     def setup_method(self):
-        self.table_after_parsing = Sample.table(0).parse(
-            varnames_dict={'Объем ВВП': 'GDP'},
-            units_dict={'млрд.рублей': 'bln_rub'},
-            funcname=None)
+        t = Sample.table(0)
+        t.set_label(varnames_dict={'Объем ВВП': 'GDP'},
+                    units_dict={'млрд.рублей': 'bln_rub'})
+        t.set_splitter(funcname=None)
+        self.table_after_parsing = t
 
     def test_set_label(self):
         table = Sample.table(0)
@@ -216,9 +217,8 @@ class Test_extract_tables_function:
 
     def test_table0_is_parsed_with_label_GDP_bln_rub(self):
         t0 = self.tables[0]
-        t0.parse(varnames_dict={'Объем ВВП': 'GDP'},
-                 units_dict={'млрд.рублей': 'bln_rub'},
-                 funcname=None)
+        t0.set_label(varnames_dict={'Объем ВВП': 'GDP'},
+                 units_dict={'млрд.рублей': 'bln_rub'})
         assert t0.label == 'GDP_bln_rub'
 
 
@@ -230,8 +230,8 @@ class Test_Tables_class_init:
 
     def test_spec_get_main_parsing_definition_returns_pdef(self,
                                                            ts=Sample.tables()):
-        assert ts.spec.get_main_parsing_definition() == Sample.pdef()
-
+        assert isinstance(ts.spec.get_main_parsing_definition(), Definition)
+        
 
 class Test_Tables_class_parsing_behaviour:
 
