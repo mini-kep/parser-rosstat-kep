@@ -161,7 +161,6 @@ class Definition(object):
     
     def __init__(self, scope=False, reader=False):
         self.instr = ParsingInstruction()
-        assert(isinstance(scope, Scope))
         self.scope = scope
         self.reader = reader
 
