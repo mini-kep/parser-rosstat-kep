@@ -73,12 +73,14 @@ UNITS = odict([  # 1. MONEY
     # 3. OTHER UNITS (keep below RATES OF CHANGE)
     ('%', 'pct'),
     ('в % к ВВП', 'gdp_percent'),
+    ('млрд. тонно-км', 'bln_tkm'), 
     # 4. stub for CPI section
     ("продукты питания", 'rog'),
     ("алкогольные напитки", 'rog'),
     ("непродовольственные товары", 'rog'),
     ("непродовольст- венные товары", 'rog'),
     ("услуги", 'rog')
+    
 ])
 
 # 'official' names of units used in project front
@@ -90,7 +92,8 @@ UNIT_NAMES = {'bln_rub': 'млрд.руб.',
               'rog': '% к пред. периоду',
               'yoy': '% год к году',
               'ytd': 'период с начала года',
-              'pct': '%'}
+              'pct': '%',
+              'bln_tkm': 'млрд. тонно-км'}
 
 # check: all units in mapper dict have an 'offical' name
 assert set(UNIT_NAMES.keys()) == set(UNITS.values())
@@ -272,8 +275,8 @@ class Specification:
         return list(varnames)
 
 
-
-# global (default) parsing defintion
+# creating definitions
+# step 1 - global (default) parsing defintion
 main = Definition()
 main.append(varname="GDP",
             text=["Oбъем ВВП",
@@ -286,10 +289,24 @@ main.append(varname="INDPRO",
             text="Индекс промышленного производства",
             required_units=["yoy", "rog"],
             desc="Промышленное производство")
-# create Specification based on 'main' parsing instruction
+main.append(varname="UNEMPL",
+            text=["Уровень безработицы"],
+            required_units=["pct"])
+main.append("WAGE_NOMINAL",
+            "Среднемесячная номинальная начисленная заработная плата работников организаций",
+            "rub")            
+main.append("WAGE_REAL",
+            "Реальная начисленная заработная плата работников организаций",
+            ["yoy", "rog"])
+main.append("TRANSPORT_FREIGHT",
+            "Коммерческий грузооборот транспорта",
+            "bln_tkm")
+
+# step 2 - create Specification based on 'main' 
 SPEC = Specification(default=main)
 
-# segment definitions
+
+# step 3 - segment definitions
 # -- investment
 sc = Scope("1.6. Инвестиции в основной капитал",
            "1.6.1. Инвестиции в основной капитал организаций")
@@ -301,11 +318,31 @@ d.append("INVESTMENT",
           ["bln_rub", "yoy", "rog"])
 SPEC.append(d)
 
+
+# -- EXIM
+sc = Scope("1.9. Внешнеторговый оборот – всего",
+           "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
+sc.add_bounds("1.10. Внешнеторговый оборот – всего",
+              "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")
+sc.add_bounds("1.10. Внешнеторговый оборот – всего",
+              "1.10.1.Внешнеторговый оборот со странами дальнего зарубежья")
+d = Definition(scope=sc)
+d.append("EXPORT_GOODS", 
+         ["экспорт товаров – всего",
+          "Экспорт товаров"],
+          "bln_usd")
+d.append("IMPORT_GOODS", 
+         ["импорт товаров – всего",
+          "Импорт товаров"],
+          "bln_usd")
+SPEC.append(d)
+
+# -- PPI
+# add here 
+
 # -- CPI
 sc = Scope(start="3.5. Индекс потребительских цен",
            end="4. Социальная сфера")
-sc.add_bounds(start="4.5. Индекс потребительских цен",
-              end="5. Социальная сфера")           
 d = Definition(scope=sc)
 d.append("CPI",
           text="Индекс потребительских цен",
@@ -316,160 +353,89 @@ d.append("CPI_NONFOOD",
                 "непродовольст- венные товары"],
           required_units="rog",
           desc="ИПЦ (непродтовары)")
+d.append("CPI_FOOD", 
+         "продукты питания",
+         ['rog'],
+         "ИПЦ (продтовары)")
+d.append("CPI_SERVICES", 
+         "услуги",
+         ['rog'],
+         "ИПЦ (услуги)")
+d.append("CPI_ALCOHOL", 
+         "алкогольные напитки",
+         ['rog'],
+         "ИПЦ (алкоголь)")
 SPEC.append(d)
 
 
-#d = Definition("MAIN")
-#d.add_header("Валовой внутренний продукт", "GDP", True)
-#d.add_header("Объем ВВП", "GDP")
-#d.add_header("Индекс физического объема произведенного ВВП, в %", "GDP")
-#d.require("GDP", "bln_rub")
-#d.require("GDP", "yoy")
-## TODO: rename to IP
-#d.add_header("Индекс промышленного производства", "IND_PROD", True)
-#d.require("IND_PROD", "yoy")
-#d.require("IND_PROD", "rog")
-##d.add_header("Уровень безработицы в возрасте 15-72 лет", "UNEMPL")
-#d.add_header("Уровень безработицы", "UNEMPL", True)
-#d.require("UNEMPL", "pct")
-#d.add_header(
-#    "Среднемесячная номинальная начисленная заработная плата работников организаций",
-#    "WAGE_NOMINAL")
-#d.add_desc("Среднемесячная заработная плата", "WAGE_NOMINAL")
-#d.require("WAGE_NOMINAL", "rub")
-#d.add_header("Реальная начисленная заработная плата работников организаций",
-#             "WAGE_REAL")
-#d.add_desc("Реальная заработная плата", "WAGE_REAL")
-#d.require("WAGE_REAL", "rog")
-#d.require("WAGE_REAL", "yoy")
-#
-##d.add_header("Коммерческий грузооборот транспорта", "TRANSPORT_FREIGHT", ref=True)
-##d.require("UNEMPL", "pct")
-#
-#SPEC = Specification(d)
-#
-#
-## Коммерческий грузооборот транспорта, млрд. тонно-км / Commercial freight
-## turnover, bln ton-km
-#d = Definition("INVEST")
-#d.add_marker("1.6. Инвестиции в основной капитал",
-#             "1.6.1. Инвестиции в основной капитал организаций")
-#d.add_marker("1.7. Инвестиции в основной капитал",
-#             "1.7.1. Инвестиции в основной капитал организаций")
-#d.add_header("Инвестиции в основной капитал", "INVESTMENT", True)
-#d.require("INVESTMENT", "bln_rub")
-#d.require("INVESTMENT", "yoy")
-#d.require("INVESTMENT", "rog")
-#SPEC.append(d)
-#
-#
-#d = Definition("EXIM")
-#d.add_marker("1.9. Внешнеторговый оборот – всего",
-#             "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
-#d.add_marker("1.10. Внешнеторговый оборот – всего",
-#             "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")
-#d.add_marker("1.10. Внешнеторговый оборот – всего",
-#             "1.10.1.Внешнеторговый оборот со странами дальнего зарубежья")
-#d.add_header("экспорт товаров – всего", "EXPORT_GOODS_TOTAL")
-#d.add_header("импорт товаров – всего", "IMPORT_GOODS_TOTAL")
-#d.add_desc("Экспорт товаров", "EXPORT_GOODS_TOTAL")
-#d.add_desc("Импорт товаров", "IMPORT_GOODS_TOTAL")
-#d.require("EXPORT_GOODS_TOTAL", "bln_usd")
-#d.require("IMPORT_GOODS_TOTAL", "bln_usd")
-#SPEC.append(d)
-#
-#
-#d = Definition("GOV_REVENUE_ACCUM")
-#d.add_reader("fiscal")
-#d.add_marker("2.1.1. Доходы (по данным Федерального казначейства)",
-#             "2.1.2. Расходы (по данным Федерального казначейства)")
-#d.add_header("Консолидированный бюджет", "GOV_REVENUE_ACCUM_CONSOLIDATED")
-#d.add_header("Федеральный бюджет", "GOV_REVENUE_ACCUM_FEDERAL")
-#d.add_header(
-#    "Консолидированные бюджеты субъектов Российской Федерации",
-#    "GOV_REVENUE_ACCUM_SUBFEDERAL")
-#d.require("GOV_REVENUE_ACCUM_CONSOLIDATED", "bln_rub")
-#d.require("GOV_REVENUE_ACCUM_FEDERAL", "bln_rub")
-#d.require("GOV_REVENUE_ACCUM_SUBFEDERAL", "bln_rub")
-#SPEC.append(d)
-#
-#
-#d = Definition("GOV_EXPENSE_ACCUM")
-#d.add_reader("fiscal")
-#d.add_marker(
-#    "2.1.2. Расходы (по данным Федерального казначейства)",
-#    "2.1.3. Превышение доходов над расходами")
-#d.add_header("Консолидированный бюджет", "GOV_EXPENSE_ACCUM_CONSOLIDATED")
-#d.add_header("Федеральный бюджет", "GOV_EXPENSE_ACCUM_FEDERAL")
-#d.add_header(
-#    "Консолидированные бюджеты субъектов Российской Федерации",
-#    "GOV_EXPENSE_ACCUM_SUBFEDERAL")
-#d.require("GOV_EXPENSE_ACCUM_CONSOLIDATED", "bln_rub")
-#d.require("GOV_EXPENSE_ACCUM_FEDERAL", "bln_rub")
-#d.require("GOV_EXPENSE_ACCUM_SUBFEDERAL", "bln_rub")
-#SPEC.append(d)
-#
-#
-#d = Definition("GOV_SURPLUS_ACCUM")
-#d.add_reader("fiscal")
-#d.add_marker("2.1.3. Превышение доходов над расходами",
-#             "2.2. Сальдированный финансовый результат")
-#d.add_header("Федеральный бюджет", "GOV_SURPLUS_ACCUM_FEDERAL")
-#d.add_header(
-#    "Консолидированные бюджеты субъектов Российской Федерации",
-#    "GOV_SURPLUS_ACCUM_SUBFEDERAL")
-#d.require("GOV_SURPLUS_ACCUM_FEDERAL", "bln_rub")
-#d.require("GOV_SURPLUS_ACCUM_SUBFEDERAL", "bln_rub")
-#SPEC.append(d)
-#
-#d = Definition("RETAIL_SALES")
-#d.add_marker("1.12. Оборот розничной торговли",
-#             "1.12.1. Оборот общественного питания")
-#d.add_marker("1.13. Оборот розничной торговли",
-#             "1.13.1. Оборот общественного питания")
-#d.add_header("Оборот розничной торговли", "RETAIL_SALES", True)
-#d.add_header("продовольственные товары", "RETAIL_SALES_FOOD")
-#d.add_header(
-#    "пищевые продукты, включая напитки и табачные изделия",
-#    "RETAIL_SALES_FOOD")
-#d.add_header(
-#    "пищевые продукты, включая напитки, и табачные изделия",
-#    "RETAIL_SALES_FOOD")
-#d.add_header("непродовольственные товары", "RETAIL_SALES_NONFOODS")
-#d.add_desc("Оборот розничной торговли (продтовары)", "RETAIL_SALES_FOOD")
-#d.add_desc("Оборот розничной торговли (непродтовары)", "RETAIL_SALES_NONFOODS")
-#d.require("RETAIL_SALES", "bln_rub")
-#d.require("RETAIL_SALES", "yoy")
-#d.require("RETAIL_SALES", "rog")
-#d.require("RETAIL_SALES_FOOD", "bln_rub")
-#d.require("RETAIL_SALES_FOOD", "yoy")
-#d.require("RETAIL_SALES_FOOD", "rog")
-## TODO: change to RETAIL_SALES_NONFOOD
-#d.require("RETAIL_SALES_NONFOODS", "bln_rub")
-#d.require("RETAIL_SALES_NONFOODS", "yoy")
-#d.require("RETAIL_SALES_NONFOODS", "rog")
-#SPEC.append(d)
-#
-#
-##d = Definition("PPI")
-#
-#
-#d = Definition("CPI")
-#d.add_marker(start="3.5. Индекс потребительских цен",
-#             end="4. Социальная сфера")
-#d.add_header("Индекс потребительских цен", "CPI", True)
-#d.add_header("продукты питания", "CPI_FOOD")
-#d.add_header("алкогольные напитки", "CPI_ALCOHOL")
-#d.add_header("непродовольственные товары", "CPI_NONFOOD")
-#d.add_header("непродовольст- венные товары", "CPI_NONFOOD")
-#d.add_header("услуги", "CPI_SERVICES")
-#d.add_desc("ИПЦ (продтовары)", "CPI_FOOD")
-#d.add_desc("ИПЦ (алкоголь)", "CPI_ALCOHOL")
-#d.add_desc("ИПЦ (непродтовары)", "CPI_NONFOOD")
-#d.add_desc("ИПЦ (услуги)", "CPI_SERVICES")
-#d.require("CPI", "rog")
-#d.require("CPI_FOOD", "rog")
-#d.require("CPI_NONFOOD", "rog")
-#d.require("CPI_ALCOHOL", "rog")
-#d.require("CPI_SERVICES", "rog")
-#SPEC.append(d)
+sc = Scope("1.12. Оборот розничной торговли",
+           "1.12.1. Оборот общественного питания")
+sc.add_bounds("1.13. Оборот розничной торговли",
+              "1.13.1. Оборот общественного питания")
+d = Definition(scope=sc)
+d.append("RETAIL_SALES",
+         "Оборот розничной торговли",
+         ["bln_rub", "yoy", "rog"])
+d.append("RETAIL_SALES_FOOD",
+         ["продовольственные товары",
+          "пищевые продукты, включая напитки и табачные изделия",
+          "пищевые продукты, включая напитки, и табачные изделия"],
+         ["bln_rub", "yoy", "rog"])
+d.append("RETAIL_SALES_NONFOOD",
+         "непродовольственные товары",
+         ["bln_rub", "yoy", "rog"])
+SPEC.append(d)
+
+sc = Scope("2.1.1. Доходы (по данным Федерального казначейства)",
+           "2.1.2. Расходы (по данным Федерального казначейства)")
+d = Definition(scope=sc, reader="fiscal")
+d.append("GOV_REVENUE_ACCUM_CONSOLIDATED",
+         "Консолидированный бюджет",
+         "bln_rub")
+d.append("GOV_REVENUE_ACCUM_FEDERAL",
+         "Федеральный бюджет",
+         "bln_rub")
+d.append("GOV_REVENUE_ACCUM_SUBFEDERAL",
+         "Консолидированные бюджеты субъектов Российской Федерации",
+         "bln_rub")
+SPEC.append(d)
+
+
+sc = Scope("2.1.2. Расходы (по данным Федерального казначейства)",
+           "2.1.3. Превышение доходов над расходами")
+d = Definition(scope=sc, reader="fiscal")
+d.append("GOV_EXPENSE_ACCUM_CONSOLIDATED",
+         "Консолидированный бюджет",
+         "bln_rub")
+d.append("GOV_EXPENSE_ACCUM_FEDERAL",
+         "Федеральный бюджет",
+         "bln_rub")
+d.append("GOV_EXPENSE_ACCUM_SUBFEDERAL",
+         "Консолидированные бюджеты субъектов Российской Федерации",
+         "bln_rub")
+SPEC.append(d)
+
+
+sc = Scope("2.1.3. Превышение доходов над расходами",
+           "2.2. Сальдированный финансовый результат")
+d = Definition(scope=sc, reader="fiscal")
+d.append("GOV_SURPLUS_ACCUM_FEDERAL",
+         "Федеральный бюджет",
+         "bln_rub")
+d.append("GOV_SURPLUS_ACCUM_SUBFEDERAL",
+         "Консолидированные бюджеты субъектов Российской Федерации",
+         "bln_rub")
+SPEC.append(d)
+
+
+# *** PRIORITY_HIGHER:
+
+# FIXME: bring usage examples from issue #38 to documentation - module docstrings
+# FIXME: write docstrings
+# FIXME: asserts/tests
+
+# ** PRIORITY_LOWER:
+
+# TODO: add more definitons
+# TODO: transformations layer diff GOV_ACCUM
+# PROPOSAL/DISCUSS: use sample in required
