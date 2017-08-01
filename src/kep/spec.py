@@ -102,8 +102,10 @@ assert set(UNIT_NAMES.keys()) == set(UNITS.values())
 def as_list(x):
     if isinstance(x, str):
         return [x]
-    else:
+    elif isinstance(x, (list, tuple)):
         return x
+    else:
+        raise ValueError("Wrong type {0} <{1}>. list or str expected.".format(x, type(x)))
 
 
 class ParsingInstruction:
@@ -132,21 +134,25 @@ class ParsingInstruction:
         header_strings = as_list(text)
         if desc is False:
              desc = header_strings[0]
-        required_units = as_list(required_units)
-        # adding values to mappeк
+        # adding values to varname_mapper
         varname_mapper = odict([(hs, varname) for hs in header_strings])
         self.varname_mapper.update(varname_mapper)        
-        # adding values to desc
+        # adding values to descriptions
         self.descriptions.update({varname: desc})
         # IDEA 1: make label a module and store lables here, not pairs
         # IDEA2: sample data also can go here
         # adding values to required
+        required_units = as_list(required_units)
+        for unit in required_units:
+            assert(unit in UNIT_NAMES.keys())
         required_labels = list((varname, unit) for unit in required_units)
         self.required_labels.extend(required_labels)       
 
 
     def __eq__(self, x):
-        flag1 = self.required_labels == x.required_labels 
+        assert(isinstance(x, ParsingInstruction))
+        # different order of required_labels will make objects not equal, is this right?
+        flag1 = self.required_labels == x.required_labels
         flag2 = self.varname_mapper == x.varname_mapper 
         return bool(flag1 and flag2)
 
@@ -162,6 +168,7 @@ class Definition(object):
         self.instr.append(*arg, **kwarg)        
     
     def set_scope(self, sc):
+        assert(isinstance(sc, Scope))
         self.scope = sc
 
     def set_reader(self, rdr):
@@ -169,11 +176,11 @@ class Definition(object):
 
     def get_varname_mapper(self):
         """EDIT: Combine varname regex strings for all indicators."""
-        return self.instr.varname_mapper
+        return self.instr.varname_mapper # direct access to internals.
 
     def get_required_labels(self):
         """EDIT: Combine list of required variables for all indicators."""
-        return self.instr.required_labels
+        return self.instr.required_labels # direct access to internals.
 
     def get_varnames(self):
         varnames = self.get_varname_mapper().values()
@@ -189,7 +196,7 @@ class Scope():
        headers for same table at various releases.
     """
 
-    def __init__(self, start, end, reader=None):
+    def __init__(self, start, end): #, reader=None):
         self.__markers = []
         self.add_bounds(start, end)
     #     self.definition = Definition(reader)
@@ -202,6 +209,7 @@ class Scope():
 
     def get_bounds(self, rows):
         """Get start and end line markers, which can be found in *rows*"""
+        #rows = list(rows) #faster
         rows = [r for r in rows]  # consume iterator
         for marker in self.__markers:
             s = marker['start']
@@ -229,7 +237,7 @@ class Scope():
             msg.append("is_found: {} <{}>".format(self.__is_found(e, rows), e))
         return "\n".join(msg)
 
-    def __repr__(self):
+    def __repr__(self): # possible misuse of special method consider using __str__
         s = self.__markers[0]['start'][:10]
         e = self.__markers[0]['end'][:10]
         return "bound by start <{}...> and end <{}...>".format(s, e)
