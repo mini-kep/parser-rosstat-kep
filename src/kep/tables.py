@@ -157,7 +157,7 @@ class Table:
     """Representation of CSV table, has headers and datarows."""
 
     # [4, 5, 12, 13, 17]
-    VALID_ROW_LENGTHS = list(splitter.ROW_LENGTH_TO_FUNC_MAPPER.keys())
+    VALID_ROW_LENGTHS = list(splitter.FUNC_MAPPER.keys())
     KNOWN = "+"
     UNKNOWN = "-"
 
@@ -170,10 +170,6 @@ class Table:
         self.coln = max(row.len() for row in self.datarows)
         self.splitter_func = None
 
-    # def parse(self, varnames_dict, units_dict, funcname):
-    #    self.set_label(varnames_dict, units_dict)
-    #    self.set_splitter(funcname)
-    #    return self
 
     def set_label(self, varnames_dict, units_dict):
         for row in self.headers:
@@ -188,17 +184,7 @@ class Table:
         return self
 
     def set_splitter(self, funcname):
-        if funcname:
-            # custom reader from pdef has highest priority
-            self.splitter_func = splitter.get_custom_splitter(funcname)
-        elif self.coln in self.VALID_ROW_LENGTHS:
-            # use standard splitters for standard number of columns
-            self.splitter_func = splitter.get_splitter(self.coln)
-        else:
-            # Trying to parse a table without <year> <values> structure.
-            # Such tables are currently out of scope of parsing, issue warning.
-            msg = "unexpected row length {}\n{}".format(self.coln, self)
-            warnings.warn(msg)
+        self.splitter_func = splitter.get_splitter(funcname or self.coln)
         return self
 
     @property

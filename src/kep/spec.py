@@ -131,7 +131,7 @@ assert as_list(tup) == ["a", "b"]
 
 
 class ParsingInstruction:
-    """Parsing instructions to extract variables names from table headers.
+    """Parsing instructions to extract variable names from table headers.
 
     Parsing instruction for a variable consists of:
 
@@ -150,11 +150,7 @@ class ParsingInstruction:
         varname_mapper (OrderedDict)
         required_labels (list of tuples)
         descriptions (OrderedDict)
-
-    -----------------------
-
-    # IDEA 1: make label a module and store lables here, not value pairs
-    # IDEA 2: sample data also can go here and make required a dict
+    
     """
 
     def __init__(self):
@@ -222,26 +218,40 @@ class Definition(object):
 
     def __init__(self, scope=False, reader=False):
         self.instr = ParsingInstruction()
-        self.scope = scope
-        self.reader = reader
+        if scope:
+            self.set_scope(scope)
+        else:
+            self.scope = False
+        if reader:    
+            self.set_reader(reader)
+        else:
+            self.reader = False
 
     def append(self, *arg, **kwarg):
         self.instr.append(*arg, **kwarg)
 
     def set_scope(self, sc):
-        assert(isinstance(sc, Scope))
-        self.scope = sc
+        if isinstance(sc, Scope):
+            self.scope = sc
+        else:
+            raise TypeError(sc)
 
-    def set_reader(self, rdr):
-        self.reader = rdr
+    def set_reader(self, rdr: str):
+        import kep.splitter 
+        if not isinstance(rdr, str):
+            raise TypeError(rdr)
+        elif rdr not in kep.splitter.FUNC_MAPPER.keys():
+            raise ValueError(rdr)
+        else:        
+            self.reader = rdr
 
     def get_varname_mapper(self):
-        """EDIT: Combine varname regex strings for all indicators."""
-        return self.instr.varname_mapper  # direct access to internals.
+        # WONTFIX: direct access to internals
+        return self.instr.varname_mapper
 
     def get_required_labels(self):
-        """EDIT: Combine list of required variables for all indicators."""
-        return self.instr.required_labels  # direct access to internals.
+        # WONTFIX: direct access to internals
+        return self.instr.required_labels 
 
     def get_varnames(self):
         varnames = self.get_varname_mapper().values()
@@ -275,27 +285,27 @@ class Scope():
         for marker in self.__markers:
             s = marker['start']
             e = marker['end']
-            if self.__is_found(s, rows) and self.__is_found(e, rows):
+            if self._is_found(s, rows) and self._is_found(e, rows):
                 return s, e
-        msg = self.__error_message(rows)
+        msg = self._error_message(rows)
         raise ValueError(msg)
 
     @staticmethod
-    def __is_found(line, rows):
+    def _is_found(line, rows):
         """Return True, is *line* found at start of any entry in *rows*"""
         for r in rows:
             if r.startswith(line):
                 return True
         return False
 
-    def __error_message(self, rows):
+    def _error_message(self, rows):
         msg = []
         msg.append("start or end line not found in *rows*")
         for marker in self.__markers:
             s = marker['start']
             e = marker['end']
-            msg.append("is_found: {} <{}>".format(self.__is_found(s, rows), s))
-            msg.append("is_found: {} <{}>".format(self.__is_found(e, rows), e))
+            msg.append("is_found: {} <{}>".format(self._is_found(s, rows), s))
+            msg.append("is_found: {} <{}>".format(self._is_found(e, rows), e))
         return "\n".join(msg)
 
     def __repr__(self):  # possible misuse of special method consider using __str__
