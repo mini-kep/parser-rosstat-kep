@@ -6,19 +6,19 @@ Functions based on :class:`kep.files.Folder` class methods:
       year and month
     - :func:`kep.files.locate_csv` retrieves interim CSV file for parsing
       from *data/interim* folder by year and month
-    - based on year and month :func:`kep.files.get_processed_folder` provides 
+    - based on year and month :func:`kep.files.get_processed_folder` provides
       location to save parsing result in *data/processed* folder
 
 
 For housekeeping :mod:`kep.files` provides:
 
  - :func:`kep.files.init_dirs` - make directory structure on startup
- - :func:`kep.files.copy_latest` - copy CSVs to *latest* folder which 
+ - :func:`kep.files.copy_latest` - copy CSVs to *latest* folder which
    has stable URL
 
 
 For reference - data directory structure::
-        
+
     \\data
       \\interim
           \\2017
@@ -130,7 +130,7 @@ class Folder:
         _subfolder = root / str(year)
         month = max_subfolder(_subfolder)
         return year, month
-    
+
     @classmethod
     def filter_date(cls, year, month):
         # mask with latest date
@@ -145,7 +145,7 @@ class Folder:
 
     def __init__(self, year=None, month=None):
         self.year, self.month = Folder.filter_date(year, month)
-        
+
     def _local_folder(self, root):
         return root / str(self.year) / str(self.month).zfill(2)
 

@@ -69,26 +69,7 @@ def emit_nones(row):
     print(row)
     return [None] * len(row)
 
-
-ROW_LENGTH_TO_FUNC_MAPPER = {1 + 4 + 12: split_row_by_periods,
-                             1 + 4: split_row_by_year_and_qtr,
-                             1 + 12: split_row_by_months_and_annual,
-                             12: split_row_by_months,
-                             4: split_row_by_accum_qtrs}
-
-
-def get_splitter(coln):
-    try:
-        return ROW_LENGTH_TO_FUNC_MAPPER[coln]
-    except KeyError:
-        return emit_nones
-# FIXME: source of warnings?
-# WARNING: unexpected row with length 3
-# WARNING: unexpected row with length 14
-# WARNING: unexpected row with length 14
-
 # Custom splitter functions
-
 
 '''
 #	Год Year	Янв. Jan.	Янв-фев. Jan-Feb	I квартал Q1	Янв-апр. Jan-Apr	Янв-май Jan-May	I полугод. 1st half year	Янв-июль Jan-Jul	Янв-авг. Jan-Aug	Янв-cент. Jan-Sent	Янв-окт. Jan-Oct	Янв-нояб. Jan-Nov
@@ -97,7 +78,6 @@ def get_splitter(coln):
 #   0	    1	   2      3 	   4	    5	    6	    7	    8	    9	   10	   11	   12
 #          0     1      2     3       4      5      6      7     8      9     10     11
 '''
-
 
 def split_row_fiscal(row):
     """
@@ -110,15 +90,18 @@ def split_row_fiscal(row):
     return row[0], [row[x] for x in [3, 6, 9, 0]], row[1:1 + 12] + [row[0]]
 
 
-SPECIAL_FUNC_NAMES_TO_FUNC_MAPPER = {'fiscal': split_row_fiscal}
+FUNC_MAPPER = {1 + 4 + 12: split_row_by_periods,
+                    1 + 4: split_row_by_year_and_qtr,
+                   1 + 12: split_row_by_months_and_annual,
+                       12: split_row_by_months,
+                        4: split_row_by_accum_qtrs,
+                 'fiscal': split_row_fiscal}
 
-
-def get_custom_splitter(func_name):
+def get_splitter(arg):
     try:
-        return SPECIAL_FUNC_NAMES_TO_FUNC_MAPPER[func_name]
+        return FUNC_MAPPER[arg]
     except KeyError:
-        raise KeyError("ERROR: custom function name not found:", func_name)
-
+        return emit_nones
 
 if __name__ == "__main__":
     pass

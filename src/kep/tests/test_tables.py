@@ -218,7 +218,7 @@ class Test_extract_tables_function:
     def test_table0_is_parsed_with_label_GDP_bln_rub(self):
         t0 = self.tables[0]
         t0.set_label(varnames_dict={'Объем ВВП': 'GDP'},
-                 units_dict={'млрд.рублей': 'bln_rub'})
+                     units_dict={'млрд.рублей': 'bln_rub'})
         assert t0.label == 'GDP_bln_rub'
 
 
@@ -231,7 +231,7 @@ class Test_Tables_class_init:
     def test_spec_get_main_parsing_definition_returns_pdef(self,
                                                            ts=Sample.tables()):
         assert isinstance(ts.spec.get_main_parsing_definition(), Definition)
-        
+
 
 class Test_Tables_class_parsing_behaviour:
 

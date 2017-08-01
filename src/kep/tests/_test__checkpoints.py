@@ -12,7 +12,7 @@ frame = vint.frames
 #dpoints = vintage.Datapoints(tables)
 
 
-#def test_Datapoints_get_annual_values_():
+# def test_Datapoints_get_annual_values_():
 #    testpoints_1999a = [{'freq': 'a',
 #                         'label': 'GDP_bln_rub',
 #                         'value': 4823.0,
