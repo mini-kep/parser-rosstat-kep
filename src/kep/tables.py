@@ -50,9 +50,9 @@ def fix_multitable_units(tables):
             table.varname = prev_table.varname
 
 
-def missed_labels(tables, required):
+def missed_labels(tables, pdef):
     labels_required = [make_label(varname, unit)
-                       for varname, unit in required]
+                       for varname, unit in pdef.get_required_labels()]
     labels_in_tables = [t.label for t in tables]
     return [x for x in labels_required if x not in labels_in_tables]
 
@@ -71,19 +71,18 @@ class Tables:
         self.spec = spec
         self.units = units
         self.required = [make_label(varname, unit)
-                         for varname, unit in spec.required()]
+                         for varname, unit in spec.get_required_labels()]
         self.make_queue()
 
     def make_queue(self):
         """Init list of csv segments and parsing definitons"""
         self.to_parse = []
-        for scope in self.spec.scopes:
+        for pdef in self.spec.get_segment_parsing_definitions():
             # find segemnt limits
-            start, end = scope.get_bounds(self.rowstack.rows)
+            start, end = pdef.scope.get_bounds(self.rowstack.rows)
             # pop csv segment
             csv_segment = self.rowstack.pop(start, end)
             # get current parsing definition
-            pdef = scope.get_parsing_definition()
             self.to_parse.append([csv_segment, pdef])
         csv_segment = self.rowstack.remaining_rows()
         pdef = self.spec.get_main_parsing_definition()
@@ -99,13 +98,13 @@ class Tables:
         # yield tables from csv_segment
         tables = split_to_tables(csv_segment)
         # parse tables to obtain labels
-        varnames_dict = pdef.headers
+        varnames_dict = pdef.get_varname_mapper()
         tables = [t.set_label(varnames_dict, units_dict) for t in tables]
         tables = [t.set_splitter(pdef.reader) for t in tables]
         # another run to assign trailing units to some tables
         fix_multitable_units(tables)
         # were all required tables read?
-        labels_missed = missed_labels(tables, pdef.required)
+        labels_missed = missed_labels(tables, pdef)
         if labels_missed:
             raise ValueError("Missed labels: {}".format(labels_missed))
         return tables
@@ -171,10 +170,10 @@ class Table:
         self.coln = max(row.len() for row in self.datarows)
         self.splitter_func = None
 
-    def parse(self, varnames_dict, units_dict, funcname):
-        self.set_label(varnames_dict, units_dict)
-        self.set_splitter(funcname)
-        return self
+    #def parse(self, varnames_dict, units_dict, funcname):
+    #    self.set_label(varnames_dict, units_dict)
+    #    self.set_splitter(funcname)
+    #    return self
 
     def set_label(self, varnames_dict, units_dict):
         for row in self.headers:
