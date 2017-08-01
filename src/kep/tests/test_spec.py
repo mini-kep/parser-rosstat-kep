@@ -33,7 +33,7 @@ class Test_as_list():
         #        -: "other options" are endless, and we can rather raise
         #           error in bulk if we think that probability of bordercase
         #           appeareing if low. as_list operates on written instruction,
-        #           so here we can assume one follows convention. appearance of 
+        #           so here we can assume one follows convention. appearance of
         #           tuple is a rare hapening.
         #
         #           In other words, it is a bit of 'made-up' situation and probably
@@ -68,7 +68,7 @@ class Test_ParsingInstruction:
 
     def test_attribute_varname_mapper_after_signle_append(self):
         assert self.p.varname_mapper == odict(
-            [('Oбъем ВВП', 'GDP'), 
+            [('Oбъем ВВП', 'GDP'),
              ('Индекс физического объема произведенного ВВП, в %', 'GDP')])
 
     def test_attribute_descriptions_after_signle_append(self):

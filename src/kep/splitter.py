@@ -71,6 +71,7 @@ def emit_nones(row):
 
 # Custom splitter functions
 
+
 '''
 #	Год Year	Янв. Jan.	Янв-фев. Jan-Feb	I квартал Q1	Янв-апр. Jan-Apr	Янв-май Jan-May	I полугод. 1st half year	Янв-июль Jan-Jul	Янв-авг. Jan-Aug	Янв-cент. Jan-Sent	Янв-окт. Jan-Oct	Янв-нояб. Jan-Nov
 # Консолидированные бюджеты субъектов Российской Федерации, млрд.рублей / Consolidated budgets of constituent entities of the Russian Federation, bln rubles
@@ -78,6 +79,7 @@ def emit_nones(row):
 #   0	    1	   2      3 	   4	    5	    6	    7	    8	    9	   10	   11	   12
 #          0     1      2     3       4      5      6      7     8      9     10     11
 '''
+
 
 def split_row_fiscal(row):
     """
@@ -91,17 +93,19 @@ def split_row_fiscal(row):
 
 
 FUNC_MAPPER = {1 + 4 + 12: split_row_by_periods,
-                    1 + 4: split_row_by_year_and_qtr,
-                   1 + 12: split_row_by_months_and_annual,
-                       12: split_row_by_months,
-                        4: split_row_by_accum_qtrs,
-                 'fiscal': split_row_fiscal}
+               1 + 4: split_row_by_year_and_qtr,
+               1 + 12: split_row_by_months_and_annual,
+               12: split_row_by_months,
+               4: split_row_by_accum_qtrs,
+               'fiscal': split_row_fiscal}
+
 
 def get_splitter(arg):
     try:
         return FUNC_MAPPER[arg]
     except KeyError:
         return emit_nones
+
 
 if __name__ == "__main__":
     pass

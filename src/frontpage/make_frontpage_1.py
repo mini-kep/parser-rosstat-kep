@@ -27,9 +27,11 @@ import access_data
 # TABLE 1 - Sections with required varnames
 # FIXME: cfg.yield_variable_descriptions_with_subheaders
 
+
 def bold(s):
     return"**{}**".format(s)
-    
+
+
 def yield_variable_descriptions_with_subheaders(sections=cfg.SECTIONS,
                                                 desc=cfg.DESC):
 
@@ -37,7 +39,6 @@ def yield_variable_descriptions_with_subheaders(sections=cfg.SECTIONS,
         yield([bold(section_name), ""])
         for label in labels:
             yield([desc[label], label])
-
 
 
 md1 = to_markdown(body=yield_variable_descriptions_with_subheaders(),
@@ -120,19 +121,20 @@ class Sparkline():
     def markdown(self):
         path = self.GITHUB_FOLDER.format(self.filename())
         return '![]{}'.format(path)
-    
+
+
 def make_sparks(df, save=False):
     df = df.drop(['year', 'month'], 1)
     for vn in df.columns:
         ts = df[vn]
-        Sparkline(ts).save()    
-        
+        Sparkline(ts).save()
 
-#TODO: make quarterly spark pngs
 
-if  __name__=="__main__":
+# TODO: make quarterly spark pngs
+
+if __name__ == "__main__":
     make_sparks(dfm)
-    #print(md1)
-    #print(md2)
-    #print(md3)
+    # print(md1)
+    # print(md2)
+    # print(md3)
     pass
