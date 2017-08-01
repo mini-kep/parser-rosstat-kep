@@ -54,10 +54,11 @@ def tabulate(table):
     table.extend(body)
     return '\n'.join(table)
 
+
 def to_markdown(body, header=None):
     """Return markdown table as string."""
     if header:
-        table = [header] 
+        table = [header]
     else:
         table = []
     table.extend([row for row in body])

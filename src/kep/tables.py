@@ -170,7 +170,6 @@ class Table:
         self.coln = max(row.len() for row in self.datarows)
         self.splitter_func = None
 
-
     def set_label(self, varnames_dict, units_dict):
         for row in self.headers:
             varname = row.get_varname(varnames_dict)

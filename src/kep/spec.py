@@ -150,7 +150,7 @@ class ParsingInstruction:
         varname_mapper (OrderedDict)
         required_labels (list of tuples)
         descriptions (OrderedDict)
-    
+
     """
 
     def __init__(self):
@@ -198,14 +198,16 @@ class ParsingInstruction:
         self.required_labels.extend(_required_labels)
         self.descriptions.update(_desc)
 
-    # RFE(EP): keep __eq__() only if it used in testing, delete this method otherwise
+    # RFE(EP): keep __eq__() only if it used in testing, delete this method
+    # otherwise
     def __eq__(self, x):
         # FIXME: after reading delete this code and comment
         # ERROR: in testing x may be a mock object of
         #        different type, just a class, restricting it to ParsingInstruction is wrong
         # assert(isinstance(x, ParsingInstruction))
 
-        # WARNING: different order of required_labels will make objects not equal
+        # WARNING: different order of required_labels will make objects not
+        # equal
         flag1 = self.required_labels == x.required_labels
         flag2 = self.varname_mapper == x.varname_mapper
         return bool(flag1 and flag2)
@@ -222,7 +224,7 @@ class Definition(object):
             self.set_scope(scope)
         else:
             self.scope = False
-        if reader:    
+        if reader:
             self.set_reader(reader)
         else:
             self.reader = False
@@ -237,12 +239,12 @@ class Definition(object):
             raise TypeError(sc)
 
     def set_reader(self, rdr: str):
-        import kep.splitter 
+        import kep.splitter
         if not isinstance(rdr, str):
             raise TypeError(rdr)
         elif rdr not in kep.splitter.FUNC_MAPPER.keys():
             raise ValueError(rdr)
-        else:        
+        else:
             self.reader = rdr
 
     def get_varname_mapper(self):
@@ -251,7 +253,7 @@ class Definition(object):
 
     def get_required_labels(self):
         # WONTFIX: direct access to internals
-        return self.instr.required_labels 
+        return self.instr.required_labels
 
     def get_varnames(self):
         varnames = self.get_varname_mapper().values()

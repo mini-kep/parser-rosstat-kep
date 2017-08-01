@@ -26,9 +26,11 @@ import access_data
 # TABLE 1 - Sections with required varnames
 # FIXME: cfg.yield_variable_descriptions_with_subheaders
 
+
 def bold(s):
     return"**{}**".format(s)
-    
+
+
 def yield_variable_descriptions_with_subheaders(sections=cfg.SECTIONS,
                                                 desc=cfg.DESC):
 
@@ -36,7 +38,6 @@ def yield_variable_descriptions_with_subheaders(sections=cfg.SECTIONS,
         yield([bold(section_name), ""])
         for label in labels:
             yield([desc[label], label])
-
 
 
 md1 = to_markdown(body=yield_variable_descriptions_with_subheaders(),
@@ -89,7 +90,7 @@ class Sparkline():
 
     def __init__(self, ts):
         self.ts = ts
-        
+
     def path(self):
         return Namer(self.ts.name).path()
 
@@ -116,10 +117,10 @@ class Namer():
     LOCAL_FOLDER = get_root() / "output" / "png"
     GITHUB_FOLDER = \
         "https://github.com/epogrebnyak/mini-kep/raw/master/output/png/{}"
-    
+
     def __init__(self, label):
         self.label = label
-    
+
     def path(self):
         return str(self.LOCAL_FOLDER / self.filename())
 
@@ -129,19 +130,20 @@ class Namer():
     def markdown(self):
         path = self.GITHUB_FOLDER.format(self.filename())
         return '![]({})'.format(path)
-    
+
+
 def make_sparks(df, save=False):
     df = df.drop(['year', 'month'], 1)
     for vn in df.columns:
         ts = df[vn]
-        Sparkline(ts).save()    
-        
+        Sparkline(ts).save()
 
-#TODO: make quarterly spark pngs
 
-if  __name__=="__main__":
+# TODO: make quarterly spark pngs
+
+if __name__ == "__main__":
     make_sparks(dfm)
-    #print(md1)
-    #print(md2)
-    #print(md3)
+    # print(md1)
+    # print(md2)
+    # print(md3)
     pass

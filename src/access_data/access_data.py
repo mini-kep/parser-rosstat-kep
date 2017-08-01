@@ -3,10 +3,12 @@
 
 import pandas as pd
 
+
 def read_csv(source):
     """Canonical wrapper for pd.read_csv"""
     return pd.read_csv(source, converters={'time_index': pd.to_datetime},
                        index_col='time_index')
+
 
 def get_url(freq):
     """Make URL for CSV files"""
@@ -22,7 +24,8 @@ def get_dfs_from_web():
     dfm = read_csv(get_url('m'))
     return dfa, dfq, dfm
 
-#TODO: save to local cache, update cache
+# TODO: save to local cache, update cache
+
 
 # json's
 from pathlib import Path
