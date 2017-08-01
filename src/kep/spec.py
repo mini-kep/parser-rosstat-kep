@@ -1,46 +1,45 @@
 # -*- coding: utf-8 -*-
-# TODO: edit docstring for better formatting in documentation (eg hanging lines)
+# TODO: edit docstring for better formatting in documentation (eg hanging
+# lines)
 """:mod:`kep.spec` module contains data structures used as parsing instructions
-in :mod:`kep.tables`. 
+in :mod:`kep.tables`.
 
 :mod:`kep.tables` relies on two global variables from :mod:`kep.spec`:
-    
-   - **UNITS** (dict) is a mapper dictionary to extract units of measurement 
-from table headers. It applies to all of CSV file. 
-     
-   - **SPEC** (:class:`kep.spec.Specification`) contains parsing instructions 
+
+   - **UNITS** (dict) is a mapper dictionary to extract units of measurement
+from table headers. It applies to all of CSV file.
+
+   - **SPEC** (:class:`kep.spec.Specification`) contains parsing instructions
 by segment of CSV file:
-       
-       - segment start and end line 
-       - header strings to match with variable name 
-       - (optional) reader function name to extract data from ununsual tables 
-   
- **SPEC** is constructed from main (default) and auxillary 
- :class:`kep.spec.Definition` instances, while :class:`kep.spec.Definition` 
- is basically a list of :class:`kep.spec.Indicator` instances with 
- start and end line strings, which delimit CSV file segment.   
- 
- :class:`kep.spec.Indicator` holds variable name, text string(s) to match in 
- table header to locate this indicator and (...)
- 
-        
+
+       - segment start and end line
+       - header strings to match with variable name
+       - (optional) reader function name to extract data from ununsual tables
+
+ **SPEC** is constructed from main (default) and auxillary
+ :class:`kep.spec.Definition` instances, while :class:`kep.spec.Definition`
+ is basically a list of :class:`kep.spec.Indicator` instances with
+ start and end line strings, which delimit CSV file segment.
+
+
+
 Notes:
-    
-- we need parse CSV file by segment , because 
-  some table headers repeat themselves in across all of CSV file, so getting 
-  unique result would be a problem. Cutting a segment out of CSV file gives 
+
+- we need parse CSV file by segment , because
+  some table headers repeat themselves in across all of CSV file, so getting
+  unique result would be a problem. Cutting a segment out of CSV file gives
   a very specific input for parsing. It is usually a few tables in length
-   
-- most indicators are defined in main (default) parsing definition, 
+
+- most indicators are defined in main (default) parsing definition,
   retrieved by :method:`kep.spec.Specification.get_main_parsing_definition`
-     
-- `kep.spec.Specification.get_additional_parsing_definitions` provides 
-   segment parsing defintions 
- 
-   
-Previously **UNITS** and **SPEC** were initialised based on yaml file, but this 
-led to many errors, so these data structures were created to make definition of 
-parsing instructions more stable.    
+
+- `kep.spec.Specification.get_additional_parsing_definitions` provides
+   segment parsing defintions
+
+
+Previously **UNITS** and **SPEC** were initialised based on yaml file, but this
+led to many errors, so these data structures were created to make definition of
+parsing instructions more stable.
 """
 
 from collections import OrderedDict as odict
@@ -73,14 +72,14 @@ UNITS = odict([  # 1. MONEY
     # 3. OTHER UNITS (keep below RATES OF CHANGE)
     ('%', 'pct'),
     ('в % к ВВП', 'gdp_percent'),
-    ('млрд. тонно-км', 'bln_tkm'), 
+    ('млрд. тонно-км', 'bln_tkm'),
     # 4. stub for CPI section
     ("продукты питания", 'rog'),
     ("алкогольные напитки", 'rog'),
     ("непродовольственные товары", 'rog'),
     ("непродовольст- венные товары", 'rog'),
     ("услуги", 'rog')
-    
+
 ])
 
 # 'official' names of units used in project front
@@ -95,78 +94,140 @@ UNIT_NAMES = {'bln_rub': 'млрд.руб.',
               'pct': '%',
               'bln_tkm': 'млрд. тонно-км'}
 
-# check: all units in mapper dict have an 'offical' name
+# validation: all units in mapper dict have an 'offical' name
+# this assert is not to be deleted from spec.py
 assert set(UNIT_NAMES.keys()) == set(UNITS.values())
 
 
-def as_list(x):
+def as_list(x: str):
+    """Transform string *x* to *[x]*.
+
+       Applied to format user input in ParsingInstruction class.
+
+       Returns:
+           list
+    """
     if isinstance(x, str):
         return [x]
-    elif isinstance(x, (list, tuple)):
+    elif isinstance(x, list):
         return x
+    # tuple is a rare border case, not intended use
+    elif isinstance(x, tuple):
+        return list(x)
     else:
-        raise ValueError("Wrong type {0} <{1}>. list or str expected.".format(x, type(x)))
+        msg = "{0} has wrong type <{1}>.".format(
+            x, type(x)) + "list or str expected."
+        raise TypeError(msg)
+
+
+# NOTE: these are the assert's you might have wanted to write out before
+#       before going to tests
+# FIXME: delete this code and note after reading
+assert as_list("a") == ["a"]
+assert as_list(["a"]) == ["a"]
+assert as_list(["a", "b"]) == ["a", "b"]
+tup = tuple(["a", "b"])
+assert as_list(tup) == ["a", "b"]
 
 
 class ParsingInstruction:
-    #FIXME: edit docstring to Google style + heavy editing/rewrite
-    """An economic indicator parsing instructions.
-    
-     Args:     
-        varname(string): variable name string like 'GDP', 'CPI', etc
-        text(string or list): string(s) found in table header, eg  'Объем ВВП', 'Gross domestic product'
-        required_units(string or list) - unit(s) of measurement required for this indicator
-                         examples: 'rog', ['rog'],  ['bln_rub', 'yoy']
-        desc           - indicator desciption string for frontpage
-        sample         - control string - one of raw CSV file rows (not implemented)
+    """Parsing instructions to extract variables names from table headers.
 
-    
+    Parsing instruction for a variable consists of:
+
+       - variable name (eg 'GDP')
+       - one or several table header strings that correspond to this variable
+         (eg "Oбъем ВВП", "Индекс физического объема произведенного ВВП")
+       - one or several required units of measurement for this variable
+         (eg 'rog', 'rub')
+
+    May also hold following optional information:
+
+        - nicer variable description string ("Валовой внутренний продукт")
+        - sample data row for each unit (not implemented yet)
+
+    Attributes:
+        varname_mapper (OrderedDict)
+        required_labels (list of tuples)
+        descriptions (OrderedDict)
+
+    -----------------------
+
+    # IDEA 1: make label a module and store lables here, not value pairs
+    # IDEA 2: sample data also can go here and make required a dict
     """
-    
+
     def __init__(self):
         self.varname_mapper = odict()
         self.required_labels = []
         self.descriptions = odict()
-        
-        
+
+    def _verify_inputs(self, varname, required_units):
+        # must define variable only once
+        if varname in self.varname_mapper.values():
+            msg = "Variable name <{}> already defined".format(varname)
+            raise ValueError(msg)
+        # *units* must be UNITS.values()
+        for ru in as_list(required_units):
+            if ru not in UNITS.values():
+                msg = "Unit <{}> not defined".format(ru)
+                raise ValueError(msg)
+
     def append(self, varname, text, required_units, desc=False):
-        # conversion from user interface
+        """Parsing instructions for several variables accumulated by .append() method.
+
+            Args:
+              varname (str):
+              text (str or list):
+              required_units (str or list):
+              desc (str): (optional)
+        """
+
+        # step 0 - validate arguments
+        self._verify_inputs(varname, required_units)
+
+        # step 1 - conversion from user interface
         header_strings = as_list(text)
         if desc is False:
-             desc = header_strings[0]
-        # adding values to varname_mapper
-        varname_mapper = odict([(hs, varname) for hs in header_strings])
-        self.varname_mapper.update(varname_mapper)        
-        # adding values to descriptions
-        self.descriptions.update({varname: desc})
-        # IDEA 1: make label a module and store lables here, not pairs
-        # IDEA2: sample data also can go here
-        # adding values to required
+            desc = header_strings[0]
         required_units = as_list(required_units)
-        for unit in required_units:
-            assert(unit in UNIT_NAMES.keys())
-        required_labels = list((varname, unit) for unit in required_units)
-        self.required_labels.extend(required_labels)       
 
+        # step 2 - making internal variables
+        _vmapper = odict([(hs, varname) for hs in header_strings])
+        _required_labels = list((varname, unit) for unit in required_units)
+        _desc = {varname: desc}
 
+        # step 3 - updating instance variables by dict update and list extend
+        self.varname_mapper.update(_vmapper)
+        self.required_labels.extend(_required_labels)
+        self.descriptions.update(_desc)
+
+    # RFE(EP): keep __eq__() only if it used in testing, delete this method otherwise
     def __eq__(self, x):
-        assert(isinstance(x, ParsingInstruction))
-        # different order of required_labels will make objects not equal, is this right?
+        # FIXME: after reading delete this code and comment
+        # ERROR: in testing x may be a mock object of
+        #        different type, just a class, restricting it to ParsingInstruction is wrong
+        # assert(isinstance(x, ParsingInstruction))
+
+        # WARNING: different order of required_labels will make objects not equal
         flag1 = self.required_labels == x.required_labels
-        flag2 = self.varname_mapper == x.varname_mapper 
+        flag2 = self.varname_mapper == x.varname_mapper
         return bool(flag1 and flag2)
 
-    
+# EP: not edited below this line
+# -----------------------------------------------------------------------------
+
+
 class Definition(object):
-    
+
     def __init__(self, scope=False, reader=False):
         self.instr = ParsingInstruction()
         self.scope = scope
         self.reader = reader
 
     def append(self, *arg, **kwarg):
-        self.instr.append(*arg, **kwarg)        
-    
+        self.instr.append(*arg, **kwarg)
+
     def set_scope(self, sc):
         assert(isinstance(sc, Scope))
         self.scope = sc
@@ -176,11 +237,11 @@ class Definition(object):
 
     def get_varname_mapper(self):
         """EDIT: Combine varname regex strings for all indicators."""
-        return self.instr.varname_mapper # direct access to internals.
+        return self.instr.varname_mapper  # direct access to internals.
 
     def get_required_labels(self):
         """EDIT: Combine list of required variables for all indicators."""
-        return self.instr.required_labels # direct access to internals.
+        return self.instr.required_labels  # direct access to internals.
 
     def get_varnames(self):
         varnames = self.get_varname_mapper().values()
@@ -196,7 +257,7 @@ class Scope():
        headers for same table at various releases.
     """
 
-    def __init__(self, start, end): #, reader=None):
+    def __init__(self, start, end):  # , reader=None):
         self.__markers = []
         self.add_bounds(start, end)
     #     self.definition = Definition(reader)
@@ -209,7 +270,7 @@ class Scope():
 
     def get_bounds(self, rows):
         """Get start and end line markers, which can be found in *rows*"""
-        #rows = list(rows) #faster
+        # rows = list(rows) #faster
         rows = [r for r in rows]  # consume iterator
         for marker in self.__markers:
             s = marker['start']
@@ -237,7 +298,7 @@ class Scope():
             msg.append("is_found: {} <{}>".format(self.__is_found(e, rows), e))
         return "\n".join(msg)
 
-    def __repr__(self): # possible misuse of special method consider using __str__
+    def __repr__(self):  # possible misuse of special method consider using __str__
         s = self.__markers[0]['start'][:10]
         e = self.__markers[0]['end'][:10]
         return "bound by start <{}...> and end <{}...>".format(s, e)
@@ -248,7 +309,7 @@ class Specification:
 
        .main ()
        .scope (segment defintitions)
-       
+
     """
 
     def __init__(self, default):
@@ -266,9 +327,9 @@ class Specification:
 
     def get_segment_parsing_definitions(self):
         return self.segment_definitions
-    
-    def all_definitions(self):        
-        return [self.main] + self.segment_definitions    
+
+    def all_definitions(self):
+        return [self.main] + self.segment_definitions
 
     def get_required_labels(self):
         req = []
@@ -300,9 +361,10 @@ main.append(varname="INDPRO",
 main.append(varname="UNEMPL",
             text=["Уровень безработицы"],
             required_units=["pct"])
-main.append("WAGE_NOMINAL",
-            "Среднемесячная номинальная начисленная заработная плата работников организаций",
-            "rub")            
+main.append(
+    "WAGE_NOMINAL",
+    "Среднемесячная номинальная начисленная заработная плата работников организаций",
+    "rub")
 main.append("WAGE_REAL",
             "Реальная начисленная заработная плата работников организаций",
             ["yoy", "rog"])
@@ -310,7 +372,7 @@ main.append("TRANSPORT_FREIGHT",
             "Коммерческий грузооборот транспорта",
             "bln_tkm")
 
-# step 2 - create Specification based on 'main' 
+# step 2 - create Specification based on 'main'
 SPEC = Specification(default=main)
 
 
@@ -322,8 +384,8 @@ sc.add_bounds("1.7. Инвестиции в основной капитал",
               "1.7.1. Инвестиции в основной капитал организаций")
 d = Definition(scope=sc)
 d.append("INVESTMENT",
-          "Инвестиции в основной капитал",
-          ["bln_rub", "yoy", "rog"])
+         "Инвестиции в основной капитал",
+         ["bln_rub", "yoy", "rog"])
 SPEC.append(d)
 
 
@@ -335,41 +397,41 @@ sc.add_bounds("1.10. Внешнеторговый оборот – всего",
 sc.add_bounds("1.10. Внешнеторговый оборот – всего",
               "1.10.1.Внешнеторговый оборот со странами дальнего зарубежья")
 d = Definition(scope=sc)
-d.append("EXPORT_GOODS", 
+d.append("EXPORT_GOODS",
          ["экспорт товаров – всего",
           "Экспорт товаров"],
-          "bln_usd")
-d.append("IMPORT_GOODS", 
+         "bln_usd")
+d.append("IMPORT_GOODS",
          ["импорт товаров – всего",
           "Импорт товаров"],
-          "bln_usd")
+         "bln_usd")
 SPEC.append(d)
 
 # -- PPI
-# add here 
+# add here
 
 # -- CPI
 sc = Scope(start="3.5. Индекс потребительских цен",
            end="4. Социальная сфера")
 d = Definition(scope=sc)
 d.append("CPI",
-          text="Индекс потребительских цен",
-          required_units="rog",
-          desc="Индекс потребительских цен (ИПЦ)")
+         text="Индекс потребительских цен",
+         required_units="rog",
+         desc="Индекс потребительских цен (ИПЦ)")
 d.append("CPI_NONFOOD",
-          text=["непродовольственные товары",
-                "непродовольст- венные товары"],
-          required_units="rog",
-          desc="ИПЦ (непродтовары)")
-d.append("CPI_FOOD", 
+         text=["непродовольственные товары",
+               "непродовольст- венные товары"],
+         required_units="rog",
+         desc="ИПЦ (непродтовары)")
+d.append("CPI_FOOD",
          "продукты питания",
          ['rog'],
          "ИПЦ (продтовары)")
-d.append("CPI_SERVICES", 
+d.append("CPI_SERVICES",
          "услуги",
          ['rog'],
          "ИПЦ (услуги)")
-d.append("CPI_ALCOHOL", 
+d.append("CPI_ALCOHOL",
          "алкогольные напитки",
          ['rog'],
          "ИПЦ (алкоголь)")

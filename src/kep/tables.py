@@ -170,7 +170,7 @@ class Table:
         self.coln = max(row.len() for row in self.datarows)
         self.splitter_func = None
 
-    #def parse(self, varnames_dict, units_dict, funcname):
+    # def parse(self, varnames_dict, units_dict, funcname):
     #    self.set_label(varnames_dict, units_dict)
     #    self.set_splitter(funcname)
     #    return self
