@@ -7,11 +7,11 @@ Parse MS Word files from Rosstat and save clean macroeconomic time series as CSV
 See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com)
 
 
-# Development notes
+#  Directions for work   
 
-##  Directions for work   
+## D1. Review modules in src/kep:
 
-### 1. Review modules (current stable version in master branch):
+Intent: document and test current stable version (found in *master* branch)
 
 Review modules:
 - [x] kep.files 
@@ -21,7 +21,7 @@ Review modules:
 - [ ] kep.tables
 - [ ] kep.vintage
 
-Go by module:
+By module do:
  - (optional) propose/discuss/commit/eye review changes to code  
  - write assert statements and edit/enhance tests
  - edit module docstrings:
@@ -40,63 +40,79 @@ For testing we use py.test and make follwoing kinds of tests depending on situat
  - behaviour tests with fixtures / mocks for larger functionalities
  - end-to-end test on sample or real data  
 
+Current issue:
+
+- [#38 document and refactor kep.spec](https://github.com/epogrebnyak/mini-kep/issues/38)
+
 Finished work example: **kep.files**:
 - code: <https://github.com/epogrebnyak/mini-kep/blob/master/src/kep/files.py>
 - test: https://github.com/epogrebnyak/mini-kep/blob/master/src/kep/tests/test_files.py
 - rst: <https://github.com/epogrebnyak/mini-kep/blob/master/doc/kep.files.rst>
 - documentation: <http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com/kep.files.html>
 
+
+## D2. List refactroing proposals as issues
+
  
-### 2. Extend parsing definitions
+## D3. Extend parsing definitions
 
-See individual tasks below + link to <reference/definitions>
+See [reference]<https://github.com/epogrebnyak/mini-kep/tree/master/reference/parsing_definitions>
 
-### 3. Frontend for parsing result
+## D4. Frontend for parsing result
 
-See individual tasks below
+See <> and individual tasks below
 
-### 4. Extend functionality 
+## D5. Extend functionality 
 
 - [ ] manage download file and unpack
 - [ ] managing resources on aws s3
 
-## Individial tasks
- 
-- extend variable definitions
-  - show imported variables or varnames
+# Task list
 
-- delete from repo:
-  - static html
+## Cricital path tasks 
+
+- extend variable definition (= **D3**)
 
 - variable transformation layer:
   - GOV_ACCUM
-  
-- sphinx-doc usage:
-  - include intro.md in index.rst
-  - warnings in compile
-  - hanging kep.rst
-   
+
 - examples:
   - provide CSV source example
   - provide dataframe example
  
+- testing:
+  - check final values in a different procedure using sample 
+  - uncomment end-to-end tests
+ 
+- frontpage (=**D4**):
+  - show imported variables or varnames in README.md
+
+## Enhancements
+
+- aws (part of **D5**):
+  - use boto with credentials 
+  - read/copy data from bucket  
+  - save deeper history to bucket
+  - document gap (2013, x)
+  
+## Lower priority
+
 - rename modules to **reader-parser-emitter**:
   - rename kep to csv2df
   - combine rows and splitter modules, make **reader**
   - rename tables to **parser**
   - make **emitter**
-  
-- testing:
-  - check final values in a different procedure 
-  - uncomment tests
- 
-- frontpage
 
 - housekeeping:
   - try ```inv pep8 -f.```
- 
-- aws:
-  - read/copy from bucket as
-  - use boto with credentials 
-  - save deeper history to bucket
-  - gap (2013, x)
+
+- sphinx-doc usage:
+  - include intro.md in index.rst
+  - warnings in compile
+  - hanging kep.rst
+  
+## **WONTFIX**
+- [online coverage badge](https://github.com/epogrebnyak/mini-kep/issues/23)
+
+## Done
+- [x] delete from repo: static html
