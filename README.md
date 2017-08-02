@@ -35,7 +35,7 @@ For docstrings we use <https://google.github.io/styleguide/pyguide.html#Comments
 
 For testing we use py.test and make follwoing kinds of tests depending on situation:
  - unit tests:
-   - make sure a method is callable (like for ```__repr__()```), no control values 
+   - a dumb tests with no control values to make sure a method is callable (like for ```__repr__()```), 
    - unit test with simple control values for a small fucntion / method, ususally public ones 
  - behaviour tests with fixtures / mocks for larger functionalities
  - end-to-end test on sample or real data  
@@ -60,7 +60,7 @@ See [reference]<https://github.com/epogrebnyak/mini-kep/tree/master/reference/pa
 
 ## D4. Frontend for parsing result
 
-See <> and individual tasks below
+See <https://github.com/epogrebnyak/mini-kep/tree/master/src/frontend> and individual tasks below
 
 ## D5. Extend functionality 
 
@@ -103,9 +103,6 @@ See <> and individual tasks below
   - rename tables to **parser**
   - make **emitter**
 
-- housekeeping:
-  - try ```inv pep8 -f.```
-
 - sphinx-doc usage:
   - include intro.md in index.rst
   - warnings in compile
@@ -116,3 +113,5 @@ See <> and individual tasks below
 
 ## Done
 - [x] delete from repo: static html
+- [x] try ```inv pep8 -f.``` works
+

@@ -1,45 +1,60 @@
 # -*- coding: utf-8 -*-
-# TODO: edit docstring for better formatting in documentation (eg hanging
-# lines)
 """:mod:`kep.spec` module contains data structures used as parsing instructions
-in :mod:`kep.tables`.
-
-:mod:`kep.tables` relies on two global variables from :mod:`kep.spec`:
+in :mod:`kep.tables`. Two global variables are used in :mod:`kep.tables`:
 
    - **UNITS** (dict) is a mapper dictionary to extract units of measurement
-from table headers. It applies to all of CSV file.
+     from table headers. It applies to all of CSV file.
 
    - **SPEC** (:class:`kep.spec.Specification`) contains parsing instructions
-by segment of CSV file:
+     by segment of CSV file:
 
-       - segment start and end line
-       - header strings to match with variable name
-       - (optional) reader function name to extract data from ununsual tables
+        - :func:`kep.spec.Specification.get_main_parsing_definition` retrieves
+          main (default) parsing definition where most indicators are defined
 
- **SPEC** is constructed from main (default) and auxillary
- :class:`kep.spec.Definition` instances, while :class:`kep.spec.Definition`
- is basically a list of :class:`kep.spec.Indicator` instances with
- start and end line strings, which delimit CSV file segment.
-
-
-
-Notes:
-
-- we need parse CSV file by segment , because
-  some table headers repeat themselves in across all of CSV file, so getting
-  unique result would be a problem. Cutting a segment out of CSV file gives
-  a very specific input for parsing. It is usually a few tables in length
-
-- most indicators are defined in main (default) parsing definition,
-  retrieved by :method:`kep.spec.Specification.get_main_parsing_definition`
-
-- `kep.spec.Specification.get_additional_parsing_definitions` provides
-   segment parsing defintions
-
+        - :func:`kep.spec.Specification.get_segment_parsing_definitions` provides
+          a list of parsing defintions by segment. We parse CSV file by segment,
+          because some table headers repeat themselves in CSV file. Extracting
+          a piece out of CSV file gives a very specific input for parsing.
 
 Previously **UNITS** and **SPEC** were initialised based on yaml file, but this
-led to many errors, so these data structures were created to make definition of
-parsing instructions more stable.
+led to many errors, so these data structures are now created internally in
+*spec.py*.
+
+*Definition* .get_* methods return the following:
+
+        - *.get_varname_mapper()* - text-to-varname mapper dictionary
+        - *.get_required_labels()* - list of (varname, unit) pairs
+        - *.get_bounds()* - segment start and end line
+        - *.get_reader()* - function name to extract data from unconventional tables
+
+
+Usage in :mod:`kep.tables`:
+
+.. code-block:: python
+
+    from kep.spec import UNITS, SPEC
+
+    class Tables:
+        def __init__(self, _rows, spec=SPEC, units=UNITS):
+
+            self.spec = spec
+            self.units = units
+            self.required = [make_label(varname, unit) for varname, unit in spec.get_required_labels()]
+
+        def yield_tables(self):
+            for csv_segment, pdef in self.make_queue():
+                for t in self.extract_tables(csv_segment,
+                                             varnames_dict = pdef.get_varname_mapper(),
+                                             units_dict = self.units,
+                                             funcname = pdef.get_reader(),
+                                             required = pdef.get_required_labels()):
+                    yield t
+
+        def make_queue(self):
+            # has calls:
+            for pdef in self.spec.get_segment_parsing_definitions():
+                start, end = pdef.get_bounds(self.rowstack.rows)
+            pdef = self.spec.get_main_parsing_definition()
 """
 
 from collections import OrderedDict as odict
@@ -132,19 +147,14 @@ assert as_list(tup) == ["a", "b"]
 
 class ParsingInstruction:
     """Parsing instructions to extract variable names from table headers.
+       Consists of:
 
-    Parsing instruction for a variable consists of:
-
-       - variable name (eg 'GDP')
-       - one or several table header strings that correspond to this variable
+       - variable names (eg 'GDP')
+       - table header string(s) that correspond to a variable name
          (eg "Oбъем ВВП", "Индекс физического объема произведенного ВВП")
-       - one or several required units of measurement for this variable
-         (eg 'rog', 'rub')
-
-    May also hold following optional information:
-
-        - nicer variable description string ("Валовой внутренний продукт")
-        - sample data row for each unit (not implemented yet)
+       - required unit(s) of measurement for a variable (eg 'rog', 'rub')
+       - (optional) variable description string ("Валовой внутренний продукт")
+       - (optional, not implemented) sample data row for each unit
 
     Attributes:
         varname_mapper (OrderedDict)
@@ -170,7 +180,7 @@ class ParsingInstruction:
                 raise ValueError(msg)
 
     def append(self, varname, text, required_units, desc=False):
-        """Parsing instructions for several variables accumulated by .append() method.
+        """Add a parsing instructions for an individual variable.
 
             Args:
               varname (str):
@@ -179,21 +189,21 @@ class ParsingInstruction:
               desc (str): (optional)
         """
 
-        # step 0 - validate arguments
+        # validate arguments
         self._verify_inputs(varname, required_units)
 
-        # step 1 - conversion from user interface
+        # convert from user interface
         header_strings = as_list(text)
         if desc is False:
             desc = header_strings[0]
         required_units = as_list(required_units)
 
-        # step 2 - making internal variables
+        # make internal variables
         _vmapper = odict([(hs, varname) for hs in header_strings])
         _required_labels = list((varname, unit) for unit in required_units)
         _desc = {varname: desc}
 
-        # step 3 - updating instance variables by dict update and list extend
+        # update internal variables (by dict update and list extend)
         self.varname_mapper.update(_vmapper)
         self.required_labels.extend(_required_labels)
         self.descriptions.update(_desc)
@@ -238,26 +248,30 @@ class Definition(object):
         else:
             raise TypeError(sc)
 
-    def set_reader(self, rdr: str):
-        import kep.splitter
-        if not isinstance(rdr, str):
-            raise TypeError(rdr)
-        elif rdr not in kep.splitter.FUNC_MAPPER.keys():
-            raise ValueError(rdr)
+    def set_reader(self, funcname: str):
+        from kep.splitter import FUNC_MAPPER
+        if isinstance(funcname, str) and funcname in FUNC_MAPPER.keys():
+            self.reader = funcname
         else:
-            self.reader = rdr
-
-    def get_varname_mapper(self):
-        # WONTFIX: direct access to internals
-        return self.instr.varname_mapper
-
-    def get_required_labels(self):
-        # WONTFIX: direct access to internals
-        return self.instr.required_labels
+            raise ValueError(funcname)
 
     def get_varnames(self):
         varnames = self.get_varname_mapper().values()
         return list(set(varnames))
+
+    # WONTFIX: direct access to internals
+
+    def get_varname_mapper(self):
+        return self.instr.varname_mapper
+
+    def get_required_labels(self):
+        return self.instr.required_labels
+
+    def get_reader(self):
+        return self.reader
+
+    def get_bounds(self, rows):
+        return self.scope.get_bounds(rows)
 
 
 class Scope():
