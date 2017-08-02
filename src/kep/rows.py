@@ -3,8 +3,6 @@
 import csv
 import re
 
-import kep.spec as spec
-
 ENC = 'utf-8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
