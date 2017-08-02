@@ -201,9 +201,12 @@ class Test_Table_after_parsing:
 
 class Test_extract_tables_function:
     extract_tables = Tables.extract_tables
+    pdef = Sample.pdef()
     tables = extract_tables(csv_segment=mock_rows(),
-                            pdef=Sample.pdef(),
-                            units_dict=Sample.units())
+                            varnames_dict=pdef.get_varname_mapper(),
+                            units_dict=Sample.units(),
+                            funcname=pdef.get_reader(),
+                            required=pdef.get_required_labels())
 
     # FIXME:  more functions in extract_tables other than split tables
 
