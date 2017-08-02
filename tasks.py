@@ -11,8 +11,8 @@ PROJECT_DIR = Path(__file__).parent
 def walk_files(directory: Path):
     for _insider in directory.iterdir():
         if _insider.is_dir():
-            subs =  walk_files(_insider.resolve())
-            for _sub in subs:  
+            subs = walk_files(_insider.resolve())
+            for _sub in subs:
                 yield _sub.resolve()
         else:
             yield _insider.resolve()
@@ -45,30 +45,30 @@ def clean(ctx):
 @task
 def lint(ctx, folder="src/kep"):
     """Check style with flake8
-    
+
        See more flake8 usage at:
            https://habrahabr.ru/company/dataart/blog/318776/
     """
     # E501 line too long
-    # --max-line-length=100           
+    # --max-line-length=100
     ctx.run('flake8 {} --exclude test* --ignore E501'.format(folder))
 
 
 @task
 def rst(ctx):
-    # TODO:    
+    # TODO:
     # build new modules sphinx
-    # sphinx-apidoc -feM -o. ../src/kep 
+    # sphinx-apidoc -feM -o. ../src/kep
     pass
 
-    
+
 @task
 def doc(ctx):
     ctx.run("doc\make.bat html")
     ctx.run("start doc\_build\html\index.html")
     # TODO: upload to aws
 
-    
+
 @task
 def test(ctx):
     ctx.run("py.test --cov=kep")
@@ -103,37 +103,37 @@ if platform == 'win32':
     ns.configure({'run': {'shell': environ['COMSPEC']}})
 
 
-#################################################################################
+##########################################################################
 # GLOBALS                                                                       #
-#################################################################################
+##########################################################################
 
-#PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
+# PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 #BUCKET = {{ cookiecutter.s3_bucket }}
 #PROFILE = {{ cookiecutter.aws_profile }}
 #PROJECT_NAME = {{ cookiecutter.repo_name }}
 #PYTHON_INTERPRETER = {{ cookiecutter.python_interpreter }}
 
-#################################################################################
+##########################################################################
 # COMMANDS                                                                      #
-#################################################################################
+##########################################################################
 
-## Make Dataset
+# Make Dataset
 #data: requirements
 #	$(PYTHON_INTERPRETER) src/data/make_dataset.py
 
 
-## Upload Data to S3
-#sync_data_to_s3:
-#ifeq (default,$(PROFILE))
+# Upload Data to S3
+# sync_data_to_s3:
+# ifeq (default,$(PROFILE))
 #	aws s3 sync data/ s3://$(BUCKET)/data/
-#else
+# else
 #	aws s3 sync data/ s3://$(BUCKET)/data/ --profile $(PROFILE)
-#endif
+# endif
 
-### Download Data from S3
-#sync_data_from_s3:
-#ifeq (default,$(PROFILE))
+# Download Data from S3
+# sync_data_from_s3:
+# ifeq (default,$(PROFILE))
 #	aws s3 sync s3://$(BUCKET)/data/ data/
-#else
+# else
 #	aws s3 sync s3://$(BUCKET)/data/ data/ --profile $(PROFILE)
-#endif
+# endif
