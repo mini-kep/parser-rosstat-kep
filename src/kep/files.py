@@ -73,7 +73,6 @@ DATES = [(2009, 4), (2009, 5), (2009, 6),
 
 # end user functions
 
-
 def get_latest_date():
     """Return year and month for latest available interim data folder.
 
