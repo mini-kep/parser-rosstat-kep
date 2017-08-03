@@ -58,6 +58,7 @@ Usage in :mod:`kep.tables`:
 """
 
 from collections import OrderedDict as odict
+from kep.label import make_label
 
 # mapper dictionary to convert text in table headers to unit of measurement
 UNITS = odict([  # 1. MONEY
@@ -71,6 +72,7 @@ UNITS = odict([  # 1. MONEY
     # 2. RATES OF CHANGE
     ("Индекс физического объема произведенного ВВП, в %", 'yoy'),
     ('в % к декабрю предыдущего года', 'ytd'),
+    ('в % к прошлому периоду', 'rog'),
     ('в % к предыдущему месяцу', 'rog'),
     ('в % к предыдущему периоду', 'rog'),
     ('% к концу предыдущего периода', 'rog'),
@@ -200,7 +202,7 @@ class ParsingInstruction:
 
         # make internal variables
         _vmapper = odict([(hs, varname) for hs in header_strings])
-        _required_labels = list((varname, unit) for unit in required_units)
+        _required_labels = list(make_label(varname, unit) for unit in required_units)
         _desc = {varname: desc}
 
         # update internal variables (by dict update and list extend)
@@ -263,6 +265,9 @@ class Definition(object):
 
     def get_varname_mapper(self):
         return self.instr.varname_mapper
+
+    def get_units_mapper(self):
+        return UNITS
 
     def get_required_labels(self):
         return self.instr.required_labels

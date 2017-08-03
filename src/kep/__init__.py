@@ -1,34 +1,14 @@
-DEFAULT_SPEC = None
-CHECKPOINTS = None
+from kep.files import locate_csv
 
-def get_csv(date):
-    from kep.files import locate_csv
-    path = locate_csv(date['year'], date['month'])
-    return path  
-    
-class DataFrameHolder(object):
-    
-    def __init__(self, dfa, dfq, dfm):
-        self.dfa = dfa
-        self.dfq = dfq
-        self.dfm = dfm
-        
-    def annual(self):
-        return self.dfa
-    
-    def quarterly(self):
-        return self.dfq
-        
-    def monthly(self):  
-        return self.dfm
-    
-    def includes(self, x):
-        return True 
-    
-    def save(self, date):
-        pass
-    
-def csv2df(fp, spec):
+from kep.spec import SPEC as DEFAULT_SPEC
+from kep.spec import UNITS
+#from kep.convert import csv2frames
 
-    return DataFrameHolder(1,2,3)
-         
+CHECKPOINTS = False
+    
+
+
+if __name__ == "__main__":
+    locate_csv(2015, 7)
+    DEFAULT_SPEC         
+    UNITS

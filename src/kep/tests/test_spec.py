@@ -75,10 +75,8 @@ class Test_ParsingInstruction:
         assert self.p.descriptions == odict(
             {"GDP": "Валовый внутренний продукт"})
 
-    # FIXME: we need to test required_labels seprately, because here changes
-    # are possible
     def test_attribute_required_labels_after_signle_append(self):
-        assert self.p.required_labels == [('GDP', 'bln_rub'), ('GDP', 'yoy')]
+        assert self.p.required_labels == ['GDP_bln_rub', 'GDP_yoy']
 
     def test_can_add_variable_only_once(self):
         p = self.p

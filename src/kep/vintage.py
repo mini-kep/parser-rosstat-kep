@@ -22,9 +22,10 @@ import calendar
 
 import pandas as pd
 
-import kep.rows as rows
-import kep.tables as tables
-import kep.files as files
+from kep.rows import read_csv
+from kep.files import locate_csv, get_processed_folder, filled_dates
+from kep.tables import get_tables
+from kep.spec import SPEC
 
 
 # use'always' or 'ignore'
@@ -221,7 +222,13 @@ class Frames:
         self.dfm.to_csv(folder_path / 'dfm.csv')
         print("Saved dataframes to", folder_path)
 
+    def dfs(self):
+        """Shorthand for obtaining dataframes."""
+        return self.dfa, self.dfq, self.dfm
 
+        
+        
+        
 VALID_DATAPOINTS = [
     {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
     {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999},
@@ -235,6 +242,7 @@ VALID_DATAPOINTS = [
 ]
 
 
+
 class Vintage:
     """Represents dataset release for a given year and month."""
 
@@ -242,22 +250,22 @@ class Vintage:
         # save for reference and navigation
         self.year, self.month = year, month
         # find csv
-        self.csv_path = files.locate_csv(year, month)
+        self.csv_path = locate_csv(year, month)
         # rowstack
-        self.rows = rows.read_csv(self.csv_path)
+        self.rows = read_csv(self.csv_path)
         # break csv to tables with variable names
-        self.tables = tables.Tables(self.rows).get_required()
+        self.tables = get_tables(self.rows, spec = SPEC)
         # convert stream values to pandas dataframes
         self.frames = Frames(tables=self.tables)
 
     def save(self):
         """Save dataframes to CSVs."""
-        processed_folder = files.get_processed_folder(self.year, self.month)
+        processed_folder = get_processed_folder(self.year, self.month)
         self.frames.save(processed_folder)
 
     def dfs(self):
         """Shorthand for obtaining dataframes."""
-        return self.frames.dfa, self.frames.dfq, self.frames.dfm
+        return self.frames.dfs()
 
     def __str__(self):
         return repr(self)
@@ -279,7 +287,7 @@ class Collection:
 
     @staticmethod
     def save_all_dataframes_to_csv():
-        for (year, month) in files.filled_dates():
+        for (year, month) in filled_dates():
             Vintage(year, month).save()
 
     @staticmethod
@@ -298,7 +306,7 @@ class Collection:
         """Checks all dates, runs slow (about 20 sec.)
            May fail if dataset not complete.
         """
-        for (year, month) in files.filled_dates():
+        for (year, month) in filled_dates():
             vintage = Vintage(year, month)
             vintage.validate()
 
