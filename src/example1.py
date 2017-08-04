@@ -12,6 +12,7 @@ year, month = 2017, 5
 path = locate_csv(year, month)
 
 # parse csv file form 'path' using 'spec' inputs 
+# note: df is DataHolder class
 df = csv2frames(path, spec=DEFAULT_SPEC)
 
 # control values are read
