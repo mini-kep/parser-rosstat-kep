@@ -45,16 +45,16 @@ def extract_tables(csv_segment, pdef):
     return tables
 
 
-def get_tables(_rows, spec):
-    return [t for t in yield_tables(_rows, spec)
-            if t.label in spec.get_required_labels()]
-
-
 def yield_tables(_rows, spec):
     rowstack = RowStack(_rows)
     for csv_segment, pdef in rowstack.yield_segment_with_defintion(spec):
         for t in extract_tables(csv_segment, pdef):
             yield t
+
+
+def get_tables(_rows, spec):
+    return [t for t in yield_tables(_rows, spec)
+            if t.label in spec.get_required_labels()]
 
 
 # classes for split_to_tables()

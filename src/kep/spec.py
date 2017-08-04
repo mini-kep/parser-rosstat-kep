@@ -297,32 +297,6 @@ class Definition(object):
     def required(self):
         return self.instr.required_labels
 
-    # FIXME: may also use setters (PRI: low)
-    #@x.setter
-    # def x(self, value):
-    #    print("setter of x called")
-    #    self._x = value
-
-# DELETE: -------------------------------------------------------------------
-#    # unpack pdef
-#    varnames_dict = pdef.get_varname_mapper()
-#    units_dict = pdef.get_units_mapper()
-#    funcname = pdef.get_reader()
-#    required = pdef.get_required_labels()
-#
-#    def get_varname_mapper(self):
-#        return self.instr.varname_mapper
-#
-#    def get_units_mapper(self):
-#        return UNITS
-#
-#    def get_required_labels(self):
-#        return self.instr.required_labels
-#
-#    def get_reader(self):
-#        return self.reader
-# --------------------------------------------------------------------------
-
     def get_bounds(self, rows):
         if self.scope:
             return self.scope.get_bounds(rows)
