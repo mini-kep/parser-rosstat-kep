@@ -91,7 +91,7 @@ UNIT_NAMES = {'bln_rub': 'млрд.руб.',
 assert set(UNIT_NAMES.keys()) == set(UNITS.values())
 
 
-def as_list(x: str):
+def as_list(x): #: str): # not only str is intended input type
     """Transform string *x* to *[x]*.
 
        Applied to format user input in ParsingInstruction class.
@@ -137,13 +137,21 @@ class ParsingInstruction:
         self.descriptions = odict()
 
     def _verify_varname(self, varname):
-        """Must define variable only once in specification"""
+        """Must define variable only once in specification
+        
+        Raises:
+            ValueError: if varname is already specified
+        """
         if varname in self.varname_mapper.values():
             msg = "Variable name <{}> already defined".format(varname)
             raise ValueError(msg)
 
     def _verify_units(self, required_units):
-        """*required_units* must be in UNITS.values()"""
+        """*required_units* must be in UNITS.values()
+        
+        Raises:
+            ValueError: if required_units is not an "official" unit
+        """
         for ru in as_list(required_units):
             if ru not in UNITS.values():
                 msg = "Unit <{}> not defined".format(ru)
@@ -190,21 +198,31 @@ class Scope():
        headers for same table at various releases.
     """
 
-    def __init__(self, start, end):  # , reader=None):
+    def __init__(self, start, end):
         self.__markers = []
         self.add_bounds(start, end)
-    #     self.definition = Definition(reader)
 
     def add_bounds(self, start, end):
+        """Adds start and end bounds.
+        
+        Raises:
+            ValueError: if any of input vars is empty string.
+        """
         if start and end:
             self.__markers.append(dict(start=start, end=end))
         else:
             raise ValueError("Cannot accept empty line as Scope() boundary")
 
     def get_bounds(self, rows):
-        """Get start and end line markers, which can be found in *rows*"""
-        # rows = list(rows) #faster
-        rows = [r for r in rows]  # consume iterator
+        """Get start and end line markers, which can be found in *rows*
+        
+        Raises:
+            ValueError: 
+        """
+        #TODO explain the reason of ValueError
+        
+        rows = list(rows) # faster way to consume iterators
+        # rows = [r for r in rows]  # consume iterator
         for marker in self.__markers:
             s = marker['start']
             e = marker['end']
@@ -269,6 +287,10 @@ class Definition(object):
             raise TypeError(sc)
 
     def set_reader(self, funcname: str):
+        """
+        Raises:
+            ValueError: if funcname is not valid.
+        """
         from kep.splitter import FUNC_MAPPER
         if isinstance(funcname, str) and funcname in FUNC_MAPPER.keys():
             self.reader = funcname
