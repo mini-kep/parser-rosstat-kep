@@ -242,6 +242,46 @@ VALID_DATAPOINTS = [
 ]
 
 
+class DataFrameHolder(object):
+    
+    def __init__(self, dfa, dfq, dfm):
+        self.dfa = dfa
+        self.dfq = dfq
+        self.dfm = dfm
+        
+    def annual(self):
+        return self.dfa
+    
+    def quarterly(self):
+        return self.dfq
+        
+    def monthly(self):  
+        return self.dfm
+    
+    def includes(self, x):
+        return True 
+    
+    def get_error_message(self, x):
+        return "some error found"
+        
+    def _all(self):
+        yield self.dfa, self.dfq, self.dfm
+    
+    def save(self, year, month):
+        folder_path = get_processed_folder(year, month)
+        self.dfa.to_csv(folder_path / 'dfa.csv')
+        self.dfq.to_csv(folder_path / 'dfq.csv')
+        self.dfm.to_csv(folder_path / 'dfm.csv')
+        print("Saved dataframes to", folder_path)
+        
+def csv2frames(path, spec):
+    # rowstack
+    _rows = read_csv(path)
+    # convert stream values to pandas dataframes
+    _tables = get_tables(_rows, spec)
+    dfs = Frames(tables=_tables).dfs()
+    return DataFrameHolder(*dfs)
+
 
 class Vintage:
     """Represents dataset release for a given year and month."""

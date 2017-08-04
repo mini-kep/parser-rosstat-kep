@@ -8,42 +8,6 @@ from kep.rows import read_csv
 from kep.vintage import Frames 
 from kep.tables import get_tables
 
-class DataFrameHolder(object):
-    
-    def __init__(self, dfa, dfq, dfm):
-        self.dfa = dfa
-        self.dfq = dfq
-        self.dfm = dfm
-        
-    def annual(self):
-        return self.dfa
-    
-    def quarterly(self):
-        return self.dfq
-        
-    def monthly(self):  
-        return self.dfm
-    
-    def includes(self, x):
-        return True 
-    
-    def get_error_message(self, x):
-        return "some error found"
-        
-    def _all(self):
-        yield self.dfa, self.dfq, self.dfm
-    
-    def save(self, year, month):
-        pass
-
-def csv2frames(path, spec, units):
-    # rowstack
-    _rows = read_csv(path)
-    # convert stream values to pandas dataframes
-    _tables = get_tables(_rows, spec, units)
-    frames = Frames(tables=_tables)
-    return DataFrameHolder(*frames.dfs())
-
 
 
             

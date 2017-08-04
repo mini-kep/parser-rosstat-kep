@@ -2,7 +2,7 @@ import pandas as pd
 
 from kep import locate_csv
 from kep import csv2frames 
-from kep import DEFAULT_SPEC, UNITS
+from kep import DEFAULT_SPEC
 from kep import CHECKPOINTS
 
 #each month release is addressed by year and month
@@ -12,9 +12,10 @@ year, month = 2017, 5
 path = locate_csv(year, month)
 
 # parse csv file form 'path' using 'spec' inputs 
-dfs = csv2frames(path, spec=DEFAULT_SPEC, units=UNITS)
+dfs = csv2frames(path, spec=DEFAULT_SPEC)
 
 # control values are read
+#fixme: DOES NOT WORK, A MOCK
 if not dfs.includes(CHECKPOINTS):
     msg = dfs.get_error_message(CHECKPOINTS)
     raise ValueError(msg)
