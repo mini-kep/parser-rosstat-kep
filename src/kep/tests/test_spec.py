@@ -96,6 +96,7 @@ class Test_ParsingInstruction:
                  required_units=["yoy", "rog"],
                  desc="Промышленное производство")
 
+
 class Test_Definition:
 
     main = Definition()
@@ -115,18 +116,17 @@ class Test_Definition:
         assert isinstance(self.main.get_varnames(), list)
         assert isinstance(self.main.get_units_mapper(), odict)
         assert isinstance(self.main.get_required_labels(), list)
-        
-    def test_reader_is_not_defined(self):    
+
+    def test_reader_is_not_defined(self):
         assert self.main.get_reader() is False
-        
-    def test_scope_is_not_defined(self):        
-        assert self.main.get_bounds(rows=["more lines here", 
+
+    def test_scope_is_not_defined(self):
+        assert self.main.get_bounds(rows=["more lines here",
                                           "more lines here"]) is False
-    
+
     def test_repr(self):
         assert repr(self.main)
 
-        
 
 class Test_Scope:
     sc = Scope("Header 1", "Header 2")
@@ -146,17 +146,17 @@ class Test_Scope:
         assert s, e == self.ah
 
 
-class Test_Specification:    
+class Test_Specification:
     def test_public_getter_methods_are_callable(self):
         from kep.spec import SPEC
         assert SPEC.get_main_parsing_definition()
         assert SPEC.get_segment_parsing_definitions()
         assert SPEC.get_required_labels()
-        
-    def test_get_varnames(self):    
-        from kep.spec import SPEC        
-        assert SPEC.get_varnames()  
-            
+
+    def test_get_varnames(self):
+        from kep.spec import SPEC
+        assert SPEC.get_varnames()
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

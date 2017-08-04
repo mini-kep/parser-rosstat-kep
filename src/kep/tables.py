@@ -51,12 +51,12 @@ def fix_multitable_units(tables):
 
 
 def extract_tables(csv_segment, pdef):
-    #unpack pdef
-    varnames_dict=pdef.get_varname_mapper()
-    units_dict=pdef.get_units_mapper()
-    funcname=pdef.get_reader()
-    required=pdef.get_required_labels()
-    
+    # unpack pdef
+    varnames_dict = pdef.get_varname_mapper()
+    units_dict = pdef.get_units_mapper()
+    funcname = pdef.get_reader()
+    required = pdef.get_required_labels()
+
     # yield tables from csv_segment
     tables = split_to_tables(csv_segment)
     # parse tables to obtain labels
@@ -80,9 +80,11 @@ def extract_tables(csv_segment, pdef):
        - break csv segment into tables, each table containing headers and data rows
        - parse table headers to obtain variable name ("GDP") and unit ("bln_rub")"""
 
+
 def get_tables(_rows, spec):
-    return [t for t in yield_tables(_rows, spec) 
+    return [t for t in yield_tables(_rows, spec)
             if t.label in spec.get_required_labels()]
+
 
 def yield_tables(_rows, spec):
     rowstack = RowStack(_rows)
@@ -126,6 +128,7 @@ def split_to_tables(rows):
     # still have some data left
     if len(headers) > 0 and len(datarows) > 0:
         yield Table(headers, datarows)
+
 
 class Table:
     """Representation of CSV table, has headers and datarows."""
