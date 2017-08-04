@@ -137,26 +137,17 @@ def as_list(x: str):
         raise TypeError(msg)
 
 
-# NOTE: these are the assert's you might have wanted to write out before
-#       before going to tests
-# FIXME: delete this code and note after reading
-assert as_list("a") == ["a"]
-assert as_list(["a"]) == ["a"]
-assert as_list(["a", "b"]) == ["a", "b"]
-tup = tuple(["a", "b"])
-assert as_list(tup) == ["a", "b"]
-
-
 class ParsingInstruction:
     """Parsing instructions to extract variable names from table headers.
-       Consists of:
+    
+       Parsing instructions consist of:
 
-       - variable names (eg 'GDP')
-       - table header string(s) that correspond to a variable name
-         (eg "Oбъем ВВП", "Индекс физического объема произведенного ВВП")
-       - required unit(s) of measurement for a variable (eg 'rog', 'rub')
-       - (optional) variable description string ("Валовой внутренний продукт")
-       - (optional, not implemented) sample data row for each unit
+       - variable names 
+       - table header string(s) that correspond to a variable name         
+       - required unit(s) of measurement for a variable 
+       - (optional) variable description string 
+       - (optional, not implemented) sample data row for each required unit
+       
 
     Attributes:
         varname_mapper (OrderedDict)
@@ -170,12 +161,14 @@ class ParsingInstruction:
         self.required_labels = []
         self.descriptions = odict()
 
-    def _verify_inputs(self, varname, required_units):
-        # must define variable only once
+    def _verify_varname(self, varname):
+        """Must define variable only once in specification"""
         if varname in self.varname_mapper.values():
             msg = "Variable name <{}> already defined".format(varname)
             raise ValueError(msg)
-        # *units* must be UNITS.values()
+            
+    def _verify_units(self, required_units):      
+        """*required_units* must be in UNITS.values()"""
         for ru in as_list(required_units):
             if ru not in UNITS.values():
                 msg = "Unit <{}> not defined".format(ru)
@@ -185,14 +178,15 @@ class ParsingInstruction:
         """Add a parsing instructions for an individual variable.
 
             Args:
-              varname (str):
-              text (str or list):
-              required_units (str or list):
-              desc (str): (optional)
+              varname (str): like 'GDP'
+              text (str or list) : like "Oбъем ВВП" or ["Oбъем ВВП", "Индекс физического объема произведенного ВВП"]
+              required_units (str or list): like 'bln_usd' or ['rog', 'rub']
+              desc (str): (optional) like "Валовой внутренний продукт"
         """
 
         # validate arguments
-        self._verify_inputs(varname, required_units)
+        self._verify_varname(varname)
+        self._verify_units(required_units)
 
         # convert from user interface
         header_strings = as_list(text)
@@ -209,74 +203,6 @@ class ParsingInstruction:
         self.varname_mapper.update(_vmapper)
         self.required_labels.extend(_required_labels)
         self.descriptions.update(_desc)
-
-    # RFE(EP): keep __eq__() only if it used in testing, delete this method
-    # otherwise
-    def __eq__(self, x):
-        # FIXME: after reading delete this code and comment
-        # ERROR: in testing x may be a mock object of
-        #        different type, just a class, restricting it to ParsingInstruction is wrong
-        # assert(isinstance(x, ParsingInstruction))
-
-        # WARNING: different order of required_labels will make objects not
-        # equal
-        flag1 = self.required_labels == x.required_labels
-        flag2 = self.varname_mapper == x.varname_mapper
-        return bool(flag1 and flag2)
-
-# EP: not edited below this line
-# -----------------------------------------------------------------------------
-
-
-class Definition(object):
-
-    def __init__(self, scope=False, reader=False):
-        self.instr = ParsingInstruction()
-        if scope:
-            self.set_scope(scope)
-        else:
-            self.scope = False
-        if reader:
-            self.set_reader(reader)
-        else:
-            self.reader = False
-
-    def append(self, *arg, **kwarg):
-        self.instr.append(*arg, **kwarg)
-
-    def set_scope(self, sc):
-        if isinstance(sc, Scope):
-            self.scope = sc
-        else:
-            raise TypeError(sc)
-
-    def set_reader(self, funcname: str):
-        from kep.splitter import FUNC_MAPPER
-        if isinstance(funcname, str) and funcname in FUNC_MAPPER.keys():
-            self.reader = funcname
-        else:
-            raise ValueError(funcname)
-
-    def get_varnames(self):
-        varnames = self.get_varname_mapper().values()
-        return list(set(varnames))
-
-    # WONTFIX: direct access to internals
-
-    def get_varname_mapper(self):
-        return self.instr.varname_mapper
-
-    def get_units_mapper(self):
-        return UNITS
-
-    def get_required_labels(self):
-        return self.instr.required_labels
-
-    def get_reader(self):
-        return self.reader
-
-    def get_bounds(self, rows):
-        return self.scope.get_bounds(rows)
 
 
 class Scope():
@@ -335,12 +261,73 @@ class Scope():
         return "bound by start <{}...> and end <{}...>".format(s, e)
 
 
+class Definition(object):
+
+    def __init__(self, scope=False, reader=False):
+        self.instr = ParsingInstruction()
+        if scope:
+            self.set_scope(scope)
+        else:
+            self.scope = False
+        if reader:
+            self.set_reader(reader)
+        else:
+            self.reader = False
+
+    def append(self, *arg, **kwarg):
+        self.instr.append(*arg, **kwarg)
+
+    def set_scope(self, sc):
+        if isinstance(sc, Scope):
+            self.scope = sc
+        else:
+            raise TypeError(sc)
+
+    def set_reader(self, funcname: str):
+        from kep.splitter import FUNC_MAPPER
+        if isinstance(funcname, str) and funcname in FUNC_MAPPER.keys():
+            self.reader = funcname
+        else:
+            raise ValueError(funcname)
+
+    def get_varnames(self):
+        varnames = self.get_varname_mapper().values()
+        return list(set(varnames))
+
+    # WONTFIX: direct access to internals
+
+    def get_varname_mapper(self):
+        return self.instr.varname_mapper
+
+    def get_units_mapper(self):
+        return UNITS
+
+    def get_required_labels(self):
+        return self.instr.required_labels
+
+    def get_reader(self):
+        return self.reader
+
+    def get_bounds(self, rows):
+        if self.scope:
+            return self.scope.get_bounds(rows)
+        else:
+            return False
+
+
 class Specification:
-    """EDIT: Specification holds a list of defintions in two variables:
-
-       .main ()
-       .scope (segment defintitions)
-
+    """Specification class holds default and segment definitions.    
+        
+    Getters:    
+        
+      - get_main_parsing_definition() - returns Definition()
+      - get_segment_parsing_definitions() - retruns list of Definition() instances
+      - get_required_labels() - returns list of strings   
+       
+    Diagnostics:
+        
+      - get_varnames() - returns list of strings
+    
     """
 
     def __init__(self, default):
@@ -371,7 +358,8 @@ class Specification:
     def get_varnames(self):
         varnames = set()
         for pdef in self.all_definitions():
-            varnames.add(pdef.get_varnames())
+            for vn in pdef.get_varnames():
+                varnames.add(vn)
         return list(varnames)
 
 
