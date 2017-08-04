@@ -12,21 +12,21 @@ year, month = 2017, 5
 path = locate_csv(year, month)
 
 # parse csv file form 'path' using 'spec' inputs 
-dfs = csv2frames(path, spec=DEFAULT_SPEC)
+df = csv2frames(path, spec=DEFAULT_SPEC)
 
 # control values are read
 #fixme: DOES NOT WORK, A MOCK
-if not dfs.includes(CHECKPOINTS):
-    msg = dfs.get_error_message(CHECKPOINTS)
+if not df.includes(CHECKPOINTS):
+    msg = df.get_error_message(CHECKPOINTS)
     raise ValueError(msg)
 
 # pandas dataframes at different frequencies
-dfa = dfs.annual()
-dfq = dfs.quarterly()
-dfm = dfs.monthly()
+dfa = df.annual()
+dfq = df.quarterly()
+dfm = df.monthly()
 
 for _df in [dfa, dfq, dfm]:
    assert isinstance(_df, pd.DataFrame) 
 
 # save dataframes to 'data/processed' folder
-dfs.save(year, month)
+df.save(year, month)
