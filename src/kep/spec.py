@@ -276,22 +276,52 @@ class Definition(object):
             raise ValueError(funcname)
 
     def get_varnames(self):
-        varnames = self.get_varname_mapper().values()
+        varnames = self.varnames_dict.values()
         return list(set(varnames))
 
     # WONTFIX: direct access to internals in methods below
 
-    def get_varname_mapper(self):
+    @property
+    def varnames_dict(self):
         return self.instr.varname_mapper
 
-    def get_units_mapper(self):
+    @property
+    def units_dict(self):
         return UNITS
 
-    def get_required_labels(self):
+    @property
+    def funcname(self):
+        return self.reader
+
+    @property
+    def required(self):
         return self.instr.required_labels
 
-    def get_reader(self):
-        return self.reader
+    # FIXME: may also use setters (PRI: low)
+    #@x.setter
+    # def x(self, value):
+    #    print("setter of x called")
+    #    self._x = value
+
+# DELETE: -------------------------------------------------------------------
+#    # unpack pdef
+#    varnames_dict = pdef.get_varname_mapper()
+#    units_dict = pdef.get_units_mapper()
+#    funcname = pdef.get_reader()
+#    required = pdef.get_required_labels()
+#
+#    def get_varname_mapper(self):
+#        return self.instr.varname_mapper
+#
+#    def get_units_mapper(self):
+#        return UNITS
+#
+#    def get_required_labels(self):
+#        return self.instr.required_labels
+#
+#    def get_reader(self):
+#        return self.reader
+# --------------------------------------------------------------------------
 
     def get_bounds(self, rows):
         if self.scope:
@@ -337,7 +367,7 @@ class Specification:
     def get_required_labels(self):
         req = []
         for pdef in self.all_definitions():
-            req.extend(pdef.get_required_labels())
+            req.extend(pdef.required)
         return req
 
     def get_varnames(self):
@@ -504,3 +534,4 @@ SPEC.append(d)
 # TODO: add more definitons
 # TODO: transformations layer diff GOV_ACCUM
 # TODO: use sample in required
+# TODO: short names for variables in FRED style, short=

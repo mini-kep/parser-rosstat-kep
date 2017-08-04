@@ -3,10 +3,9 @@ import pytest
 from collections import OrderedDict as odict
 
 import kep.spec as spec
-from kep.spec import as_list, ParsingInstruction, Definition, Scope, Specification
+from kep.spec import as_list, ParsingInstruction, Definition, Scope
 
-# EP: we are mixing test_ funcs and Test_ classes, subjectively (test_ for
-# small pieces)
+from kep.spec import Specification
 
 
 def test_UNITS():
@@ -97,6 +96,26 @@ class Test_ParsingInstruction:
                  desc="Промышленное производство")
 
 
+class Mock:
+
+    main = Definition()
+    main.append(varname="GDP",
+                text=["Oбъем ВВП",
+                      "Индекс физического объема произведенного ВВП, в %"],
+                required_units=["bln_rub", "yoy"],
+                desc="Валовый внутренний продукт (ВВП)"
+                #, sample="1999	4823	901	1102	1373	1447"
+                )
+    main.append(varname="INDPRO",
+                text="Индекс промышленного производства",
+                required_units=["yoy", "rog"],
+                desc="Промышленное производство")
+
+    @classmethod
+    def pdef(cls):
+        return cls.main
+
+
 class Test_Definition:
 
     main = Definition()
@@ -112,17 +131,18 @@ class Test_Definition:
                 required_units=["yoy", "rog"],
                 desc="Промышленное производство")
 
-    def test_public_getter_methods_are_callable(self):
-        assert isinstance(self.main.get_varnames(), list)
-        assert isinstance(self.main.get_units_mapper(), odict)
-        assert isinstance(self.main.get_required_labels(), list)
-
-    def test_reader_is_not_defined(self):
-        assert self.main.get_reader() is False
+    def test_public_attribs_are_callable(self):
+        assert isinstance(self.main.varnames_dict, odict)
+        assert isinstance(self.main.units_dict, odict)
+        assert self.main.funcname is False
+        assert isinstance(self.main.required, list)
 
     def test_scope_is_not_defined(self):
         assert self.main.get_bounds(rows=["more lines here",
                                           "more lines here"]) is False
+
+    def test_infomethod_get_varnames_is_callable(self):
+        assert isinstance(self.main.get_varnames(), list)
 
     def test_repr(self):
         assert repr(self.main)

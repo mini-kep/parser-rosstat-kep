@@ -7,38 +7,15 @@ Main call:
 
 from enum import Enum, unique
 from collections import OrderedDict as odict
-import itertools
 import warnings
 
 from kep import splitter
 from kep.rows import RowStack
 from kep.spec import SPEC
-from kep.spec import UNITS
+from kep.label import make_label
 
 # use'always' or 'ignore'
 warnings.simplefilter('ignore', UserWarning)
-
-# label handling
-
-
-def make_label(vn, unit, sep="_"):
-    return vn + sep + unit
-
-
-def split_label(label):
-    return extract_varname(label), extract_unit(label)
-
-
-def extract_varname(label):
-    words = label.split('_')
-    return '_'.join(itertools.takewhile(lambda word: word.isupper(), words))
-
-
-def extract_unit(label):
-    words = label.split('_')
-    return '_'.join(itertools.dropwhile(lambda word: word.isupper(), words))
-
-# handling tables
 
 
 def fix_multitable_units(tables):
@@ -51,34 +28,21 @@ def fix_multitable_units(tables):
 
 
 def extract_tables(csv_segment, pdef):
-    # unpack pdef
-    varnames_dict = pdef.get_varname_mapper()
-    units_dict = pdef.get_units_mapper()
-    funcname = pdef.get_reader()
-    required = pdef.get_required_labels()
-
+    """Extract tables from *csv_segment* using *pdef* defintion.
+    """
     # yield tables from csv_segment
     tables = split_to_tables(csv_segment)
     # parse tables to obtain labels
-    tables = [t.set_label(varnames_dict, units_dict) for t in tables]
-    tables = [t.set_splitter(funcname) for t in tables]
+    tables = [t.set_label(pdef.varnames_dict, pdef.units_dict) for t in tables]
+    tables = [t.set_splitter(pdef.funcname) for t in tables]
     # another run to assign trailing units to some tables
     fix_multitable_units(tables)
     # were all required tables read?
-    labels_in_tables = [t.label for t in tables]
-    labels_missed = [x for x in required if x not in labels_in_tables]
-    if labels_missed:
-        raise ValueError("Missed labels: {}".format(labels_missed))
+    _labels_in_tables = [t.label for t in tables]
+    _labels_missed = [x for x in pdef.required if x not in _labels_in_tables]
+    if _labels_missed:
+        raise ValueError("Missed labels: {}".format(_labels_missed))
     return tables
-
-
-"""Extract tables from *csv_path* using *Rows(csv_path)*.
-
-       Parsing procedure:
-       - cut out a segment of csv file as delimited by start and end line makers
-       - hold remaining parts of csv file for further parsing
-       - break csv segment into tables, each table containing headers and data rows
-       - parse table headers to obtain variable name ("GDP") and unit ("bln_rub")"""
 
 
 def get_tables(_rows, spec):
