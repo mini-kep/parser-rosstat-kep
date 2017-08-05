@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-# TODO: edit code blocks
+# TODO: run sphynx to checl html appearance
 
 """:mod:`kep.spec` module contains data structures used as parsing instructions.
 
@@ -217,9 +217,9 @@ class Scope():
         """Get start and end line markers, which can be found in *rows*
         
         Raises:
-            ValueError: 
+            ValueError: none of Scope() start/end line pairs was found in *rows*. 
+            
         """
-        #TODO explain the reason of ValueError
         
         rows = list(rows) # faster way to consume iterators
         # rows = [r for r in rows]  # consume iterator
@@ -241,7 +241,7 @@ class Scope():
 
     def _error_message(self, rows):
         msg = []
-        msg.append("start or end line not found in *rows*")
+        msg.append("start or end line markers not found in *rows*")
         for marker in self.__markers:
             s = marker['start']
             e = marker['end']
@@ -256,14 +256,8 @@ class Scope():
 
 
 class Definition(object):
-    """Methods used in parsing:
-
-        - get_varname_mapper() - text-to-varname mapper dictionary
-        - get_units_mapper() - retruns global UNITS ordered dict
-        - get_required_labels() - list of (varname, unit) pairs
-        - get_bounds(rows) - segment start and end line
-        - get_reader() - function name for unconventional tables
-
+    # TODO: write docstring
+    """
     """
 
     def __init__(self, scope=False, reader=False):
@@ -332,7 +326,7 @@ class Specification:
     Getters:
 
       - get_main_parsing_definition() - returns Definition()
-      - get_segment_parsing_definitions() - retruns list of Definition() instances
+      - get_segment_parsing_definitions() - returns list of Definition() instances
       - get_required_labels() - returns list of strings
 
     Diagnostics:
