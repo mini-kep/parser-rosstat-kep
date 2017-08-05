@@ -226,9 +226,7 @@ class Frames:
         """Shorthand for obtaining dataframes."""
         return self.dfa, self.dfq, self.dfm
 
-        
-        
-        
+
 VALID_DATAPOINTS = [
     {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
     {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999},
@@ -243,37 +241,38 @@ VALID_DATAPOINTS = [
 
 
 class DataFrameHolder(object):
-    
+
     def __init__(self, dfa, dfq, dfm):
         self.dfa = dfa
         self.dfq = dfq
         self.dfm = dfm
-        
+
     def annual(self):
         return self.dfa
-    
+
     def quarterly(self):
         return self.dfq
-        
-    def monthly(self):  
+
+    def monthly(self):
         return self.dfm
-    
+
     def includes(self, x):
-        return True 
-    
+        return True
+
     def get_error_message(self, x):
         return "some error found"
-        
+
     def _all(self):
         yield self.dfa, self.dfq, self.dfm
-    
+
     def save(self, year, month):
         folder_path = get_processed_folder(year, month)
         self.dfa.to_csv(folder_path / 'dfa.csv')
         self.dfq.to_csv(folder_path / 'dfq.csv')
         self.dfm.to_csv(folder_path / 'dfm.csv')
         print("Saved dataframes to", folder_path)
-        
+
+
 def csv2frames(path, spec):
     # rowstack
     _rows = read_csv(path)
@@ -294,7 +293,7 @@ class Vintage:
         # rowstack
         self.rows = read_csv(self.csv_path)
         # break csv to tables with variable names
-        self.tables = get_tables(self.rows, spec = SPEC)
+        self.tables = get_tables(self.rows, spec=SPEC)
         # convert stream values to pandas dataframes
         self.frames = Frames(tables=self.tables)
 

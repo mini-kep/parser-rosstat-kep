@@ -3,10 +3,9 @@ import pytest
 from collections import OrderedDict as odict
 
 import kep.spec as spec
-from kep.spec import as_list, ParsingInstruction, Definition, Scope, Specification
+from kep.spec import as_list, ParsingInstruction, Definition, Scope
 
-# EP: we are mixing test_ funcs and Test_ classes, subjectively (test_ for
-# small pieces)
+from kep.spec import Specification
 
 
 def test_UNITS():
@@ -96,8 +95,25 @@ class Test_ParsingInstruction:
                  required_units=["yoy", "rog"],
                  desc="Промышленное производство")
 
-# EP: not edited below
-# -----------------------------------------------------------------------------
+
+class Mock:
+
+    main = Definition()
+    main.append(varname="GDP",
+                text=["Oбъем ВВП",
+                      "Индекс физического объема произведенного ВВП, в %"],
+                required_units=["bln_rub", "yoy"],
+                desc="Валовый внутренний продукт (ВВП)"
+                #, sample="1999	4823	901	1102	1373	1447"
+                )
+    main.append(varname="INDPRO",
+                text="Индекс промышленного производства",
+                required_units=["yoy", "rog"],
+                desc="Промышленное производство")
+
+    @classmethod
+    def pdef(cls):
+        return cls.main
 
 
 class Test_Definition:
@@ -115,12 +131,21 @@ class Test_Definition:
                 required_units=["yoy", "rog"],
                 desc="Промышленное производство")
 
+    def test_public_attribs_are_callable(self):
+        assert isinstance(self.main.varnames_dict, odict)
+        assert isinstance(self.main.units_dict, odict)
+        assert self.main.funcname is False
+        assert isinstance(self.main.required, list)
+
+    def test_scope_is_not_defined(self):
+        assert self.main.get_bounds(rows=["more lines here",
+                                          "more lines here"]) is False
+
+    def test_infomethod_get_varnames_is_callable(self):
+        assert isinstance(self.main.get_varnames(), list)
+
     def test_repr(self):
         assert repr(self.main)
-
-    def test_get_methods(self):
-        assert isinstance(self.main.get_varnames(), list)
-        assert isinstance(self.main.get_required_labels(), list)
 
 
 class Test_Scope:
@@ -142,16 +167,15 @@ class Test_Scope:
 
 
 class Test_Specification:
-    # TODO:
-    # test_code
-    #assert isinstance(SPEC, Specification)
-    #assert isinstance(SPEC.main, Definition)
-    #assert SPEC.main.headers
-    #assert SPEC.main.required
-    #assert SPEC.main.reader is None
-    # for scope in SPEC.scopes:
-    #    assert isinstance(scope.definition, Definition)
-    pass
+    def test_public_getter_methods_are_callable(self):
+        from kep.spec import SPEC
+        assert SPEC.get_main_parsing_definition()
+        assert SPEC.get_segment_parsing_definitions()
+        assert SPEC.get_required_labels()
+
+    def test_get_varnames(self):
+        from kep.spec import SPEC
+        assert SPEC.get_varnames()
 
 
 if __name__ == "__main__":

@@ -97,7 +97,6 @@ class Sample(Spec_Sample):
         return ['GDP_bln_rub', 'GDP_rog', 'INDPRO_yoy'][i]
 
 
-
 @pytest.fixture
 def mock_rows():
     gen = iter(Sample.rows(i) for i in [0, 1, 2])
@@ -196,8 +195,8 @@ class Test_Table_after_parsing:
 
 
 class Test_extract_tables_function:
-    
-    tables = extract_tables(csv_segment=mock_rows(),  pdef = Sample.pdef())
+
+    tables = extract_tables(csv_segment=mock_rows(), pdef=Sample.pdef())
 
     # FIXME:  more functions in extract_tables other than split tables
 
@@ -216,13 +215,12 @@ class Test_extract_tables_function:
         assert t0.label == 'GDP_bln_rub'
 
 
-#FIXME:
+# FIXME:
 #    def test_yield_tables(self, ts=Sample.tables()):
 #        gen = ts.yield_tables()
 #        for i, t in enumerate(gen):
 #            assert t == Sample.table(i)
 #            assert t.label == Sample.label(i)
-
 
 
 if __name__ == "__main__":

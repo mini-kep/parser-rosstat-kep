@@ -148,7 +148,7 @@ class RowStack:
                 # else is very important, wrong indexing without it
                 i += 1
         return segment
-    
+
     def yield_segment_with_defintion(self, spec):
         """Yield csv segments and with corresponding parsing definitons"""
         for pdef in spec.get_segment_parsing_definitions():

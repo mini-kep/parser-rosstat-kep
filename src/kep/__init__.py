@@ -8,5 +8,5 @@ CHECKPOINTS = False
 
 if __name__ == "__main__":
     locate_csv(2015, 7)
-    DEFAULT_SPEC         
+    DEFAULT_SPEC
     UNITS
