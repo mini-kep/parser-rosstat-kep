@@ -7,111 +7,78 @@ Parse MS Word files from Rosstat and save clean macroeconomic time series as CSV
 See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com)
 
 
-#  Directions for work   
+# TODO stream 1: refactoring-documentation-examples-testing 
 
-## D1. Review modules in src/kep:
+## Refactoring and testing 
 
-Intent: document and test current stable version (found in *master* branch)
+See <todo_refactoring.md>:
 
-Review modules:
-- [x] kep.files 
-- [ ] kep.spec 
-- [ ] kep.rows
-- [ ] kep.splitter
-- [ ] kep.tables
-- [ ] kep.vintage
-
-By module do:
- - (optional) propose/discuss/commit/eye review changes to code  
- - write assert statements and edit/enhance tests
- - edit module docstrings:
-   - module
-   - classes, public methods and functions used in other parts of the program
-   - other docstrings/comments where needed
- - code examples for documentation where needed  
- - make list of refactoring / enhancements by writing TODO and FIXME in code 
- 
-For docstrings we use <https://google.github.io/styleguide/pyguide.html#Comments>. 
-
-For testing we use py.test and make follwoing kinds of tests depending on situation:
- - unit tests:
-   - a dumb tests with no control values to make sure a method is callable (like for ```__repr__()```), 
-   - unit test with simple control values for a small fucntion / method, ususally public ones 
- - behaviour tests with fixtures / mocks for larger functionalities
- - end-to-end test on sample or real data  
-
-Current issue:
-
-- [#38 document and refactor kep.spec](https://github.com/epogrebnyak/mini-kep/issues/38)
-
-Finished work example: **kep.files**:
-- code: <https://github.com/epogrebnyak/mini-kep/blob/master/src/kep/files.py>
-- test: https://github.com/epogrebnyak/mini-kep/blob/master/src/kep/tests/test_files.py
-- rst: <https://github.com/epogrebnyak/mini-kep/blob/master/doc/kep.files.rst>
-- documentation: <http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com/kep.files.html>
-
-
-## D2. List refactroing proposals as issues
-
- 
-## D3. Extend parsing definitions
-
-See [reference]<https://github.com/epogrebnyak/mini-kep/tree/master/reference/parsing_definitions>
-
-## D4. Frontend for parsing result
-
-See <https://github.com/epogrebnyak/mini-kep/tree/master/src/frontend> and individual tasks below
-
-## D5. Extend functionality 
-
-- [ ] manage download file and unpack
-- [ ] managing resources on aws s3
-
-# Task list
-
-## Cricital path tasks 
-
-- extend variable definition (= **D3**)
-
-- variable transformation layer:
-  - GOV_ACCUM
-
-- examples:
+## Examples
   - provide CSV source example
   - provide dataframe example
- 
-- testing:
-  - check final values in a different procedure using sample 
-  - uncomment end-to-end tests
- 
-- frontpage (=**D4**):
-  - show imported variables or varnames in README.md
 
-## Enhancements
+## Testing 
 
-- aws (part of **D5**):
-  - use boto with credentials 
-  - read/copy data from bucket  
-  - save deeper history to bucket
-  - document gap (2013, x)
+- test coverage annotate 
+- check values from sample rows in spec  
+- uncomment end-to-end tests
+- see previous testing guidelines  
+
+# TODO stream 2: frontpage
+
+## Frontpage:
+
+Show imported variables or varnames in README.md
+
+See <https://github.com/epogrebnyak/mini-kep/tree/master/src/frontend>
+
+
+## Parsing result statistics
+
+How many variable were read?
+
+# TODO stream 3: parsing parameters 
+
+## More definitions 
+
+Extend variable definitions
+See also <https://github.com/epogrebnyak/mini-kep/tree/master/reference/parsing_definitions>
+
+# TODO stream 4: other
+
+## Transformations
+
+Variable transformation layer:
+  - need to diff the GOV_ACCUM
   
-## Lower priority
+## Download and s3
 
-- rename modules to **reader-parser-emitter**:
-  - rename kep to csv2df
-  - combine rows and splitter modules, make **reader**
-  - rename tables to **parser**
-  - make **emitter**
+- Download file and unpack
+
+- Sync with aws s3 - <dev_todo/task_boto_download.py>:
+  - [ ] local to S3 
+  - [ ] S3 to local 
+
+- Manually save more files to s3
+  - save deeper history to bucket
+  
+- **filled_dates** mechanism   
+ 
+# WONTFIX
+ 
+- <not_todo_rename_everything.md>
 
 - sphinx-doc usage:
   - include intro.md in index.rst
   - warnings in compile
   - hanging kep.rst
   
-## **WONTFIX**
 - [online coverage badge](https://github.com/epogrebnyak/mini-kep/issues/23)
 
-## Done
+- document gap (2013, x)
+  
+  
+## DONE
 - [x] delete from repo: static html
 - [x] try ```inv pep8 -f.``` works
 
