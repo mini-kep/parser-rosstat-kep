@@ -4,7 +4,7 @@ import pytest
 # fixtures
 from kep.rows import Row
 # testing
-from kep.tables import Table, Tables, split_to_tables
+from kep.tables import Table, split_to_tables, extract_tables
 from kep.spec import ParsingInstruction, Definition, Specification
 
 # TODO: rename module 'rows'
@@ -95,11 +95,6 @@ class Sample(Spec_Sample):
 
     def label(i):
         return ['GDP_bln_rub', 'GDP_rog', 'INDPRO_yoy'][i]
-
-    # TODO: not tested - Scope
-
-    def tables():
-        return Tables(mock_rows(), spec=Sample.spec(), units=Sample.units())
 
 
 @pytest.fixture
@@ -200,13 +195,8 @@ class Test_Table_after_parsing:
 
 
 class Test_extract_tables_function:
-    extract_tables = Tables.extract_tables
-    pdef = Sample.pdef()
-    tables = extract_tables(csv_segment=mock_rows(),
-                            varnames_dict=pdef.get_varname_mapper(),
-                            units_dict=Sample.units(),
-                            funcname=pdef.get_reader(),
-                            required=pdef.get_required_labels())
+
+    tables = extract_tables(csv_segment=mock_rows(), pdef=Sample.pdef())
 
     # FIXME:  more functions in extract_tables other than split tables
 
@@ -218,33 +208,19 @@ class Test_extract_tables_function:
         assert isinstance(t0, Table)
         assert t0 == Sample.table(0)
 
-    def test_table0_is_parsed_with_label_GDP_bln_rub(self):
+    def test_table0_can_be_parsed_with_label_GDP_bln_rub(self):
         t0 = self.tables[0]
         t0.set_label(varnames_dict={'Объем ВВП': 'GDP'},
                      units_dict={'млрд.рублей': 'bln_rub'})
         assert t0.label == 'GDP_bln_rub'
 
 
-class Test_Tables_class_init:
-
-    # WONTFIX: test attibutes on creation
-
-    # TODO: test ts.to_parse  /  make_queue()
-
-    def test_spec_get_main_parsing_definition_returns_pdef(self,
-                                                           ts=Sample.tables()):
-        assert isinstance(ts.spec.get_main_parsing_definition(), Definition)
-
-
-class Test_Tables_class_parsing_behaviour:
-
-    def test_yield_tables(self, ts=Sample.tables()):
-        gen = ts.yield_tables()
-        for i, t in enumerate(gen):
-            assert t == Sample.table(i)
-            assert t.label == Sample.label(i)
-
-    # if Scope is used
+# FIXME:
+#    def test_yield_tables(self, ts=Sample.tables()):
+#        gen = ts.yield_tables()
+#        for i, t in enumerate(gen):
+#            assert t == Sample.table(i)
+#            assert t.label == Sample.label(i)
 
 
 if __name__ == "__main__":

@@ -1,63 +1,39 @@
 # -*- coding: utf-8 -*-
-""":mod:`kep.spec` module contains data structures used as parsing instructions
-in :mod:`kep.tables`. Two global variables are used in :mod:`kep.tables`:
 
-   - **UNITS** (dict) is a mapper dictionary to extract units of measurement
-     from table headers. It applies to all of CSV file.
+# TODO: run sphynx to checl html appearance
 
-   - **SPEC** (:class:`kep.spec.Specification`) contains parsing instructions
-     by segment of CSV file:
+""":mod:`kep.spec` module contains data structures used as parsing instructions.
 
-        - :func:`kep.spec.Specification.get_main_parsing_definition` retrieves
-          main (default) parsing definition where most indicators are defined
+Global variable  **SPEC** (:class:`kep.spec.Specification`) is the parsing
+instruction. It allows access to parsing definitions (by segment) and
+and required variables list.
 
-        - :func:`kep.spec.Specification.get_segment_parsing_definitions` provides
-          a list of parsing defintions by segment. We parse CSV file by segment,
-          because some table headers repeat themselves in CSV file. Extracting
-          a piece out of CSV file gives a very specific input for parsing.
+  - :func:`kep.spec.Specification.get_main_parsing_definition` retrieves
+     main (default) parsing definition where most indicators are defined
 
-Previously **UNITS** and **SPEC** were initialised based on yaml file, but this
-led to many errors, so these data structures are now created internally in
-*spec.py*.
+  - :func:`kep.spec.Specification.get_segment_parsing_definitions` provides
+    a list of parsing defintions by segment. We parse CSV file by segment,
+    because some table headers repeat themselves in CSV file. Extracting
+    a piece out of CSV file gives a very specific input for parsing.
 
-*Definition* .get_* methods return the following:
+  - :func:`kep.spec.Specification.get_required_labels` limits output to
+    required variable labels only
 
-        - *.get_varname_mapper()* - text-to-varname mapper dictionary
-        - *.get_required_labels()* - list of (varname, unit) pairs
-        - *.get_bounds()* - segment start and end line
-        - *.get_reader()* - function name to extract data from unconventional tables
+Previously  and **SPEC** was initialised fromyaml file, but this
+led to many errors, so these data structures are now created
+internally in *spec.py*.
 
 
-Usage in :mod:`kep.tables`:
+**SPEC** is used by:
 
-.. code-block:: python
+    - :class:`kep.rows.Rowstack`
+    - :func:`kep.tables.extract_tables`
+    - :func:`kep.tables.get_tables`
 
-    from kep.spec import UNITS, SPEC
-
-    class Tables:
-        def __init__(self, _rows, spec=SPEC, units=UNITS):
-
-            self.spec = spec
-            self.units = units
-            self.required = [make_label(varname, unit) for varname, unit in spec.get_required_labels()]
-
-        def yield_tables(self):
-            for csv_segment, pdef in self.make_queue():
-                for t in self.extract_tables(csv_segment,
-                                             varnames_dict = pdef.get_varname_mapper(),
-                                             units_dict = self.units,
-                                             funcname = pdef.get_reader(),
-                                             required = pdef.get_required_labels()):
-                    yield t
-
-        def make_queue(self):
-            # has calls:
-            for pdef in self.spec.get_segment_parsing_definitions():
-                start, end = pdef.get_bounds(self.rowstack.rows)
-            pdef = self.spec.get_main_parsing_definition()
 """
 
 from collections import OrderedDict as odict
+from kep.label import make_label
 
 # mapper dictionary to convert text in table headers to unit of measurement
 UNITS = odict([  # 1. MONEY
@@ -71,6 +47,7 @@ UNITS = odict([  # 1. MONEY
     # 2. RATES OF CHANGE
     ("Индекс физического объема произведенного ВВП, в %", 'yoy'),
     ('в % к декабрю предыдущего года', 'ytd'),
+    ('в % к прошлому периоду', 'rog'),
     ('в % к предыдущему месяцу', 'rog'),
     ('в % к предыдущему периоду', 'rog'),
     ('% к концу предыдущего периода', 'rog'),
@@ -114,7 +91,7 @@ UNIT_NAMES = {'bln_rub': 'млрд.руб.',
 assert set(UNIT_NAMES.keys()) == set(UNITS.values())
 
 
-def as_list(x: str):
+def as_list(x): #: str): # not only str is intended input type
     """Transform string *x* to *[x]*.
 
        Applied to format user input in ParsingInstruction class.
@@ -135,26 +112,17 @@ def as_list(x: str):
         raise TypeError(msg)
 
 
-# NOTE: these are the assert's you might have wanted to write out before
-#       before going to tests
-# FIXME: delete this code and note after reading
-assert as_list("a") == ["a"]
-assert as_list(["a"]) == ["a"]
-assert as_list(["a", "b"]) == ["a", "b"]
-tup = tuple(["a", "b"])
-assert as_list(tup) == ["a", "b"]
-
-
 class ParsingInstruction:
     """Parsing instructions to extract variable names from table headers.
-       Consists of:
 
-       - variable names (eg 'GDP')
+       Parsing instructions consist of:
+
+       - variable names
        - table header string(s) that correspond to a variable name
-         (eg "Oбъем ВВП", "Индекс физического объема произведенного ВВП")
-       - required unit(s) of measurement for a variable (eg 'rog', 'rub')
-       - (optional) variable description string ("Валовой внутренний продукт")
-       - (optional, not implemented) sample data row for each unit
+       - required unit(s) of measurement for a variable
+       - (optional) variable description string
+       - (optional, not implemented) sample data row for each required unit
+
 
     Attributes:
         varname_mapper (OrderedDict)
@@ -168,12 +136,22 @@ class ParsingInstruction:
         self.required_labels = []
         self.descriptions = odict()
 
-    def _verify_inputs(self, varname, required_units):
-        # must define variable only once
+    def _verify_varname(self, varname):
+        """Must define variable only once in specification
+        
+        Raises:
+            ValueError: if varname is already specified
+        """
         if varname in self.varname_mapper.values():
             msg = "Variable name <{}> already defined".format(varname)
             raise ValueError(msg)
-        # *units* must be UNITS.values()
+
+    def _verify_units(self, required_units):
+        """*required_units* must be in UNITS.values()
+        
+        Raises:
+            ValueError: if required_units is not an "official" unit
+        """
         for ru in as_list(required_units):
             if ru not in UNITS.values():
                 msg = "Unit <{}> not defined".format(ru)
@@ -183,14 +161,15 @@ class ParsingInstruction:
         """Add a parsing instructions for an individual variable.
 
             Args:
-              varname (str):
-              text (str or list):
-              required_units (str or list):
-              desc (str): (optional)
+              varname (str): like 'GDP'
+              text (str or list) : like "Oбъем ВВП" or ["Oбъем ВВП", "Индекс физического объема произведенного ВВП"]
+              required_units (str or list): like 'bln_usd' or ['rog', 'rub']
+              desc (str): (optional) like "Валовой внутренний продукт"
         """
 
         # validate arguments
-        self._verify_inputs(varname, required_units)
+        self._verify_varname(varname)
+        self._verify_units(required_units)
 
         # convert from user interface
         header_strings = as_list(text)
@@ -200,7 +179,8 @@ class ParsingInstruction:
 
         # make internal variables
         _vmapper = odict([(hs, varname) for hs in header_strings])
-        _required_labels = list((varname, unit) for unit in required_units)
+        _required_labels = list(make_label(varname, unit)
+                                for unit in required_units)
         _desc = {varname: desc}
 
         # update internal variables (by dict update and list extend)
@@ -208,25 +188,77 @@ class ParsingInstruction:
         self.required_labels.extend(_required_labels)
         self.descriptions.update(_desc)
 
-    # RFE(EP): keep __eq__() only if it used in testing, delete this method
-    # otherwise
-    def __eq__(self, x):
-        # FIXME: after reading delete this code and comment
-        # ERROR: in testing x may be a mock object of
-        #        different type, just a class, restricting it to ParsingInstruction is wrong
-        # assert(isinstance(x, ParsingInstruction))
 
-        # WARNING: different order of required_labels will make objects not
-        # equal
-        flag1 = self.required_labels == x.required_labels
-        flag2 = self.varname_mapper == x.varname_mapper
-        return bool(flag1 and flag2)
+class Scope():
+    """Start and end lines for CSV file segment and associated variables
+       defintion.
 
-# EP: not edited below this line
-# -----------------------------------------------------------------------------
+       Holds several versions of start and end line, return applicable line
+       for a particular CSV file versions. This solves problem of different
+       headers for same table at various releases.
+    """
+
+    def __init__(self, start, end):
+        self.__markers = []
+        self.add_bounds(start, end)
+
+    def add_bounds(self, start, end):
+        """Adds start and end bounds.
+        
+        Raises:
+            ValueError: if any of input vars is empty string.
+        """
+        if start and end:
+            self.__markers.append(dict(start=start, end=end))
+        else:
+            raise ValueError("Cannot accept empty line as Scope() boundary")
+
+    def get_bounds(self, rows):
+        """Get start and end line markers, which can be found in *rows*
+        
+        Raises:
+            ValueError: none of Scope() start/end line pairs was found in *rows*. 
+            
+        """
+        
+        rows = list(rows) # faster way to consume iterators
+        # rows = [r for r in rows]  # consume iterator
+        for marker in self.__markers:
+            s = marker['start']
+            e = marker['end']
+            if self._is_found(s, rows) and self._is_found(e, rows):
+                return s, e
+        msg = self._error_message(rows)
+        raise ValueError(msg)
+
+    @staticmethod
+    def _is_found(line, rows):
+        """Return True, is *line* found at start of any entry in *rows*"""
+        for r in rows:
+            if r.startswith(line):
+                return True
+        return False
+
+    def _error_message(self, rows):
+        msg = []
+        msg.append("start or end line markers not found in *rows*")
+        for marker in self.__markers:
+            s = marker['start']
+            e = marker['end']
+            msg.append("is_found: {} <{}>".format(self._is_found(s, rows), s))
+            msg.append("is_found: {} <{}>".format(self._is_found(e, rows), e))
+        return "\n".join(msg)
+
+    def __repr__(self):  # possible misuse of special method consider using __str__
+        s = self.__markers[0]['start'][:10]
+        e = self.__markers[0]['end'][:10]
+        return "bound by start <{}...> and end <{}...>".format(s, e)
 
 
 class Definition(object):
+    # TODO: write docstring
+    """
+    """
 
     def __init__(self, scope=False, reader=False):
         self.instr = ParsingInstruction()
@@ -249,6 +281,10 @@ class Definition(object):
             raise TypeError(sc)
 
     def set_reader(self, funcname: str):
+        """
+        Raises:
+            ValueError: if funcname is not valid.
+        """
         from kep.splitter import FUNC_MAPPER
         if isinstance(funcname, str) and funcname in FUNC_MAPPER.keys():
             self.reader = funcname
@@ -256,85 +292,46 @@ class Definition(object):
             raise ValueError(funcname)
 
     def get_varnames(self):
-        varnames = self.get_varname_mapper().values()
+        varnames = self.varnames_dict.values()
         return list(set(varnames))
 
-    # WONTFIX: direct access to internals
+    # WONTFIX: direct access to internals in methods below
 
-    def get_varname_mapper(self):
+    @property
+    def varnames_dict(self):
         return self.instr.varname_mapper
 
-    def get_required_labels(self):
-        return self.instr.required_labels
+    @property
+    def units_dict(self):
+        return UNITS
 
-    def get_reader(self):
+    @property
+    def funcname(self):
         return self.reader
 
+    @property
+    def required(self):
+        return self.instr.required_labels
+
     def get_bounds(self, rows):
-        return self.scope.get_bounds(rows)
-
-
-class Scope():
-    """Start and end lines for CSV file segment and associated variables
-       defintion.
-
-       Holds several versions of start and end line, return applicable line
-       for a particular CSV file versions. This solves problem of different
-       headers for same table at various releases.
-    """
-
-    def __init__(self, start, end):  # , reader=None):
-        self.__markers = []
-        self.add_bounds(start, end)
-    #     self.definition = Definition(reader)
-
-    def add_bounds(self, start, end):
-        if start and end:
-            self.__markers.append(dict(start=start, end=end))
+        if self.scope:
+            return self.scope.get_bounds(rows)
         else:
-            raise ValueError("Cannot accept empty line as Scope() boundary")
-
-    def get_bounds(self, rows):
-        """Get start and end line markers, which can be found in *rows*"""
-        # rows = list(rows) #faster
-        rows = [r for r in rows]  # consume iterator
-        for marker in self.__markers:
-            s = marker['start']
-            e = marker['end']
-            if self._is_found(s, rows) and self._is_found(e, rows):
-                return s, e
-        msg = self._error_message(rows)
-        raise ValueError(msg)
-
-    @staticmethod
-    def _is_found(line, rows):
-        """Return True, is *line* found at start of any entry in *rows*"""
-        for r in rows:
-            if r.startswith(line):
-                return True
-        return False
-
-    def _error_message(self, rows):
-        msg = []
-        msg.append("start or end line not found in *rows*")
-        for marker in self.__markers:
-            s = marker['start']
-            e = marker['end']
-            msg.append("is_found: {} <{}>".format(self._is_found(s, rows), s))
-            msg.append("is_found: {} <{}>".format(self._is_found(e, rows), e))
-        return "\n".join(msg)
-
-    def __repr__(self):  # possible misuse of special method consider using __str__
-        s = self.__markers[0]['start'][:10]
-        e = self.__markers[0]['end'][:10]
-        return "bound by start <{}...> and end <{}...>".format(s, e)
+            return False
 
 
 class Specification:
-    """EDIT: Specification holds a list of defintions in two variables:
+    """Specification class holds default and segment definitions.
 
-       .main ()
-       .scope (segment defintitions)
+    Getters:
+
+      - get_main_parsing_definition() - returns Definition()
+      - get_segment_parsing_definitions() - returns list of Definition() instances
+      - get_required_labels() - returns list of strings
+
+    Diagnostics:
+
+      - get_varnames() - returns list of strings
 
     """
 
@@ -360,13 +357,14 @@ class Specification:
     def get_required_labels(self):
         req = []
         for pdef in self.all_definitions():
-            req.extend(pdef.get_required_labels())
+            req.extend(pdef.required)
         return req
 
     def get_varnames(self):
         varnames = set()
         for pdef in self.all_definitions():
-            varnames.add(pdef.get_varnames())
+            for vn in pdef.get_varnames():
+                varnames.add(vn)
         return list(varnames)
 
 
@@ -523,15 +521,7 @@ d.append("GOV_SURPLUS_ACCUM_SUBFEDERAL",
          "bln_rub")
 SPEC.append(d)
 
-
-# *** PRIORITY_HIGHER:
-
-# FIXME: bring usage examples from issue #38 to documentation - module docstrings
-# FIXME: write docstrings
-# FIXME: asserts/tests
-
-# ** PRIORITY_LOWER:
-
 # TODO: add more definitons
 # TODO: transformations layer diff GOV_ACCUM
-# PROPOSAL/DISCUSS: use sample in required
+# TODO: use sample in required
+# TODO: short names for variables in FRED style, short=

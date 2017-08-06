@@ -7,38 +7,15 @@ Main call:
 
 from enum import Enum, unique
 from collections import OrderedDict as odict
-import itertools
 import warnings
 
 from kep import splitter
 from kep.rows import RowStack
 from kep.spec import SPEC
-from kep.spec import UNITS
+from kep.label import make_label
 
 # use'always' or 'ignore'
 warnings.simplefilter('ignore', UserWarning)
-
-# label handling
-
-
-def make_label(vn, unit, sep="_"):
-    return vn + sep + unit
-
-
-def split_label(label):
-    return extract_varname(label), extract_unit(label)
-
-
-def extract_varname(label):
-    words = label.split('_')
-    return '_'.join(itertools.takewhile(lambda word: word.isupper(), words))
-
-
-def extract_unit(label):
-    words = label.split('_')
-    return '_'.join(itertools.dropwhile(lambda word: word.isupper(), words))
-
-# handling tables
 
 
 def fix_multitable_units(tables):
@@ -50,75 +27,34 @@ def fix_multitable_units(tables):
             table.varname = prev_table.varname
 
 
-def missed_labels(tables, required):
-    labels_required = [make_label(varname, unit) for varname, unit in required]
-    labels_in_tables = [t.label for t in tables]
-    return [x for x in labels_required if x not in labels_in_tables]
+def extract_tables(csv_segment, pdef):
+    """Extract tables from *csv_segment* using *pdef* defintion.
+    """
+    # yield tables from csv_segment
+    tables = split_to_tables(csv_segment)
+    # parse tables to obtain labels
+    tables = [t.set_label(pdef.varnames_dict, pdef.units_dict) for t in tables]
+    tables = [t.set_splitter(pdef.funcname) for t in tables]
+    # another run to assign trailing units to some tables
+    fix_multitable_units(tables)
+    # were all required tables read?
+    _labels_in_tables = [t.label for t in tables]
+    _labels_missed = [x for x in pdef.required if x not in _labels_in_tables]
+    if _labels_missed:
+        raise ValueError("Missed labels: {}".format(_labels_missed))
+    return tables
 
 
-class Tables:
-    """Extract tables from *csv_path* using *Rows(csv_path)*.
+def yield_tables(_rows, spec):
+    rowstack = RowStack(_rows)
+    for csv_segment, pdef in rowstack.yield_segment_with_defintion(spec):
+        for t in extract_tables(csv_segment, pdef):
+            yield t
 
-       Parsing procedure:
-       - cut out a segment of csv file as delimited by start and end line makers
-       - hold remaining parts of csv file for further parsing
-       - break csv segment into tables, each table containing headers and data rows
-       - parse table headers to obtain variable name ("GDP") and unit ("bln_rub")"""
 
-    def __init__(self, _rows, spec=SPEC, units=UNITS):
-        self.rowstack = RowStack(_rows)
-        self.spec = spec
-        self.units = units
-        self.required = [make_label(varname, unit)
-                         for varname, unit in spec.get_required_labels()]
-
-    def make_queue(self):
-        """Yield csv segments and with corresponding parsing definitons"""
-        self.to_parse = []
-        for pdef in self.spec.get_segment_parsing_definitions():
-            start, end = pdef.get_bounds(self.rowstack.rows)
-            csv_segment = self.rowstack.pop(start, end)
-            yield csv_segment, pdef
-        csv_segment = self.rowstack.remaining_rows()
-        pdef = self.spec.get_main_parsing_definition()
-        yield csv_segment, pdef
-
-    def yield_tables(self):
-        for csv_segment, pdef in self.make_queue():
-            for t in self.extract_tables(
-                    csv_segment,
-                    varnames_dict=pdef.get_varname_mapper(),
-                    units_dict=self.units,
-                    funcname=pdef.get_reader(),
-                    required=pdef.get_required_labels()):
-                yield t
-
-    @staticmethod
-    def extract_tables(
-            csv_segment,
-            varnames_dict,
-            units_dict,
-            funcname,
-            required):
-        # yield tables from csv_segment
-        tables = split_to_tables(csv_segment)
-        # parse tables to obtain labels
-        tables = [t.set_label(varnames_dict, units_dict) for t in tables]
-        tables = [t.set_splitter(funcname) for t in tables]
-        # another run to assign trailing units to some tables
-        fix_multitable_units(tables)
-        # were all required tables read?
-        labels_missed = missed_labels(tables, required)
-        if labels_missed:
-            raise ValueError("Missed labels: {}".format(labels_missed))
-        return tables
-
-    def get(self):
-        return list(self.yield_tables())
-
-    def get_required(self):
-        # BUG: does not guaratee self.required if fulfilled
-        return [t for t in self.get() if t.label in self.required]
+def get_tables(_rows, spec):
+    return [t for t in yield_tables(_rows, spec)
+            if t.label in spec.get_required_labels()]
 
 
 # classes for split_to_tables()
@@ -226,7 +162,7 @@ if __name__ == "__main__":
     from kep import rows
     csv_path = files.locate_csv()
     _rows = rows.read_csv(csv_path)
-    tables = Tables(_rows).get_required()
+    tables = get_tables(_rows, SPEC)
     for t in tables:
         print()
         print(t)

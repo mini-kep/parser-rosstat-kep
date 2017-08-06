@@ -149,6 +149,14 @@ class RowStack:
                 i += 1
         return segment
 
+    def yield_segment_with_defintion(self, spec):
+        """Yield csv segments and with corresponding parsing definitons"""
+        for pdef in spec.get_segment_parsing_definitions():
+            start, end = pdef.get_bounds(self.rows)
+            csv_segment = self.pop(start, end)
+            yield csv_segment, pdef
+        yield self.remaining_rows(), spec.get_main_parsing_definition()
+
 
 if __name__ == "__main__":
     assert Row(["1. abcd"]).get_varname({'1. ab': "ZZZ"}) == 'ZZZ'
