@@ -118,18 +118,7 @@ class Mock:
 
 class Test_Definition:
 
-    main = Definition()
-    main.append(varname="GDP",
-                text=["Oбъем ВВП",
-                      "Индекс физического объема произведенного ВВП, в %"],
-                required_units=["bln_rub", "yoy"],
-                desc="Валовый внутренний продукт (ВВП)"
-                #, sample="1999	4823	901	1102	1373	1447"
-                )
-    main.append(varname="INDPRO",
-                text="Индекс промышленного производства",
-                required_units=["yoy", "rog"],
-                desc="Промышленное производство")
+    main = Mock.pdef()
 
     def test_public_attribs_are_callable(self):
         assert isinstance(self.main.varnames_dict, odict)
@@ -141,7 +130,7 @@ class Test_Definition:
         assert self.main.get_bounds(rows=["more lines here",
                                           "more lines here"]) is False
 
-    def test_infomethod_get_varnames_is_callable(self):
+    def test_get_varnames_is_callable(self):
         assert isinstance(self.main.get_varnames(), list)
 
     def test_repr(self):
@@ -171,7 +160,6 @@ class Test_Specification:
         from kep.spec import SPEC
         assert SPEC.get_main_parsing_definition()
         assert SPEC.get_segment_parsing_definitions()
-        assert SPEC.get_required_labels()
 
     def test_get_varnames(self):
         from kep.spec import SPEC

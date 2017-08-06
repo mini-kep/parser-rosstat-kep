@@ -1,7 +1,7 @@
-"""Parse raw CSV file into Tables() instances using parsing specification from spec.py
+"""Parse CSV file rows into Tables() using parsing specification from spec.py
 
 Main call:
-   tables = Tables(rowstack).get_required():
+   tables = get_tables(rows, SPEC)
 
 """
 
@@ -42,7 +42,7 @@ def extract_tables(csv_segment, pdef):
     _labels_missed = [x for x in pdef.required if x not in _labels_in_tables]
     if _labels_missed:
         raise ValueError("Missed labels: {}".format(_labels_missed))
-    return tables
+    return [t for t in tables if t.label in pdef.required]
 
 
 def yield_tables(_rows, spec):
@@ -53,8 +53,7 @@ def yield_tables(_rows, spec):
 
 
 def get_tables(_rows, spec):
-    return [t for t in yield_tables(_rows, spec)
-            if t.label in spec.get_required_labels()]
+    return list(yield_tables(_rows, spec))
 
 
 # classes for split_to_tables()
