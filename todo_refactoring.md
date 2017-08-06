@@ -1,13 +1,5 @@
 Intent: document and test current stable version (found in *master* branch)
 
-Review modules:
-- [x] kep.files 
-- [ ] kep.spec 
-- [ ] kep.rows
-- [ ] kep.splitter
-- [ ] kep.tables
-- [ ] kep.vintage
-
 By module do:
  - (optional) propose/discuss/commit/eye review changes to code  
  - write assert statements and edit/enhance tests
