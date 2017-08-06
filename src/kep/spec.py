@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# TODO: run sphynx to checl html appearance
-
 """:mod:`kep.spec` module contains data structures used as parsing instructions.
 
 Global variable  **SPEC** (:class:`kep.spec.Specification`) allows access to
@@ -11,7 +9,7 @@ parsing definitions:
     main (default) parsing definition, where most indicators are defined
 
   - :func:`kep.spec.Specification.get_segment_parsing_definitions` provides
-    a list of parsing defintions by segment
+    a list of parsing defintions by csv segment
 
 We parse CSV file by segment, because some table headers repeat themselves in
 CSV file. Extracting a piece out of CSV file gives a very specific input for
@@ -22,8 +20,9 @@ led to many errors, so the parsing instructions are now created
 internally in *spec.py*.
 
 **SPEC** is used by:
-    - :class:`kep.rows.Rowstack`
-    - :func:`kep.tables.extract_tables`
+    
+  - :class:`kep.rows.RowStack`
+  - :func:`kep.tables.extract_tables`
 
 """
 
@@ -121,7 +120,7 @@ class ParsingInstruction:
 
     Attributes:
         varname_mapper (OrderedDict)
-        required_labels (list of tuples)
+        required_labels (list of strings)
         descriptions (OrderedDict)
 
     """
@@ -145,7 +144,7 @@ class ParsingInstruction:
         """*required_units* must be in UNITS.values()
 
         Raises:
-            ValueError: if required_units is not an "official" unit
+            ValueError: if required_units is not an "official" unit list
         """
         for ru in as_list(required_units):
             if ru not in UNITS.values():
@@ -155,13 +154,17 @@ class ParsingInstruction:
     def append(self, varname, text, required_units, desc=False):
         """Add a parsing instructions for an individual variable.
 
-            Args:
-              varname (str): like 'GDP'
-              text (str or list) : like "Oбъем ВВП" or ["Oбъем ВВП", "Индекс физического объема произведенного ВВП"]
-              required_units (str or list): like 'bln_usd' or ['rog', 'rub']
-              desc (str): (optional) like "Валовой внутренний продукт"
+        Args:
+            varname (str): varaible name, eg 'GDP'
+            text (str or list): header string(s) associated with 
+                                variable names, eg "Oбъем ВВП" or 
+                                 ["Oбъем ВВП", "Индекс физического объема произведенного ВВП"]
+            required_units (str or list): required units of measurement for 
+                                          *varname*, like 'bln_usd' or ['rog', 'rub']
+            desc (str): (optional) variable desciption like "Валовой внутренний продукт"
+                        If not provided, *text[0]* is used.
         """
-
+        
         # validate arguments
         self._verify_varname(varname)
         self._verify_units(required_units)
@@ -251,8 +254,8 @@ class Scope():
 
 
 class Definition(object):
-    # TODO: write docstring
-    """
+    """Holds together parsing instruction, scope and (optional) 
+       custom reader function name.
     """
 
     def __init__(self, scope=False, reader=False):
@@ -278,7 +281,7 @@ class Definition(object):
     def set_reader(self, funcname: str):
         """
         Raises:
-            ValueError: if funcname is not valid.
+            ValueError: if *funcname* is not valid.
         """
         from kep.splitter import FUNC_MAPPER
         if isinstance(funcname, str) and funcname in FUNC_MAPPER.keys():
