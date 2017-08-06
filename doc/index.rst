@@ -27,13 +27,14 @@ How it works
 
 ::
 
-    (1) Rosstat -> (2) mini-kep -> (3) CSV files at https://goo.gl/Cr5mSZ -> (4) your code in R/pandas
+    (1) Rosstat -> (2) mini-kep -> (3) clean CSV files -> (4) your code in R/pandas
 
 #. Rosstat publishes KEP publication every month as archive of Word
    files
 #. mini-kep parses Word files and saves output as three CSV files
    (annual, quarterly and monthly)
-#. CSV files are available at https://goo.gl/Cr5mSZ
+#. CSV files are available at https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest,
+   or https://goo.gl/Cr5mSZ
 #. you can import Russian macroeconomic indicators to your R/pandas code
    from these files
 
