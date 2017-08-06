@@ -1,14 +1,25 @@
-[![Gitter chat](https://badges.gitter.im/mini-kep/gitter.png)](https://gitter.im/mini-kep)
 [![Build Status](https://travis-ci.org/epogrebnyak/mini-kep.svg?branch=master)](https://travis-ci.org/epogrebnyak/mini-kep) 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8a467743314641b4a22b66b327834367)](https://www.codacy.com/app/epogrebnyak/mini-kep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=epogrebnyak/mini-kep&amp;utm_campaign=Badge_Grade)
 
 # mini-kep
 Parse MS Word files from Rosstat and save clean macroeconomic time series as CSV at stable URL.
 
-See documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com)
+Documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com)
+
+Examples [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example1.py)
 
 
 # TODO 1: refactoring-documentation-examples-testing 
+
+Review modules:
+- [x] kep.files 
+- [x] kep.spec 
+- [ ] kep.rows
+- [x] kep.splitter
+- [ ] kep.tables
+- [ ] kep.vintage
+
+
 
 ## Refactoring 
 
