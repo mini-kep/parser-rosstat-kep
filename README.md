@@ -65,7 +65,7 @@ Refactoring, documentation testing for:
 
 - [ ] Unpack zip/rar files 
 
-- [#51: Sync with aws s3](https://github.com/epogrebnyak/mini-kep/issues/51)
+- [ ] [#51: Sync with aws s3](https://github.com/epogrebnyak/mini-kep/issues/51)
   at [task_boto_download.py](https://github.com/epogrebnyak/mini-kep/blob/dev/todo_task_boto_s3_sync.py):
   - [ ] local to S3 
   - [ ] S3 to local 
