@@ -258,16 +258,24 @@ class Definition(object):
        custom reader function name.
     """
 
-    def __init__(self, scope=False, reader=False):
+    def __init__(self, scope=False, reader=False, units=False):
         self.instr = ParsingInstruction()
+        #scope
         if scope:
             self.set_scope(scope)
         else:
             self.scope = False
+        #reader    
         if reader:
             self.set_reader(reader)
         else:
             self.reader = False
+        #set units    
+        if not units:
+            self.units = UNITS
+        else:
+            self.units = units
+            
 
     def append(self, *arg, **kwarg):
         self.instr.append(*arg, **kwarg)
@@ -301,7 +309,7 @@ class Definition(object):
 
     @property
     def units_dict(self):
-        return UNITS
+        return self.units
 
     @property
     def funcname(self):
@@ -337,6 +345,7 @@ class Specification:
         self.main = default
         # additional parsing instructions for segments
         self.segment_definitions = []
+
 
     def append(self, pdef):
         self.segment_definitions.append(pdef)

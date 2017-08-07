@@ -22,11 +22,10 @@ import calendar
 
 import pandas as pd
 
-from kep.rows import read_csv
+from kep.rows import read_csv, to_rows, open_csv
 from kep.files import locate_csv, get_processed_folder, filled_dates, get_latest_date
 from kep.tables import get_tables
 from kep.spec import SPEC
-
 
 
 # use'always' or 'ignore'
@@ -81,6 +80,28 @@ class DictMaker:
         return self.basedict.__str__()
 
 
+# dataframe dates handling  
+
+def _month_end_day(year, month):
+    return calendar.monthrange(year, month)[1]
+
+
+def get_date_month_end(year, month):
+    day = _month_end_day(year, month)
+    return pd.Timestamp(date(year, month, day))
+
+
+def get_date_quarter_end(year, qtr):
+    # quarter number should be based at 1
+    assert qtr <= 4 and qtr >= 1
+    month = qtr * 3
+    return get_date_month_end(year, month)
+
+def get_date_year_end(year):
+    return pd.Timestamp(date(year, 12, 31))
+
+
+
 class Emitter:
     """Emitter extracts, holds and emits annual, quarterly and monthly values
        from list of defined Table() instances.
@@ -94,9 +115,8 @@ class Emitter:
             self._add_table(t)
 
     def _add_table(self, table):
-        # defined Table() must have *label* and *splitter_func*
         if not table.is_defined():
-            raise ValueError(table)
+            raise ValueError("Undefined table:\n{}".format(table))
         for row in table.datarows:
             dmaker = DictMaker(row.get_year(), table.label)
             a_value, q_values, m_values = table.splitter_func(row.data)
@@ -117,213 +137,138 @@ class Emitter:
         else:
             raise ValueError(freq)
             
-    def get_all_datapoints(self):
-        """Iterate over all frequencies and make return list of datapoints"""
-        # concat three lists
-        return  [x for freq in "aqm"
-                   for x in self.collect_data(freq)]
-
-
-   
-
-
-# dataframe dates handling
-
-
-def month_end_day(year, month):
-    return calendar.monthrange(year, month)[1]
-
-
-def get_date_month_end(year, month):
-    day = month_end_day(year, month)
-    return pd.Timestamp(date(year, month, day))
-
-
-def get_date_quarter_end(year, qtr):
-    # quarter number should be based at 1
-    assert qtr <= 4 and qtr >= 1
-    month = qtr * 3
-    return get_date_month_end(year, month)
-
-
-def get_date_year_end(year):
-    return pd.Timestamp(date(year, 12, 31))
-
-
-def make_dataframes(tables):
-    return DataframeMaker(tables).get_dataframes()
-
-    
-class DataframeMaker(object):
-    """Create pandas DataFrames.
-    
-    Public method:        
-      -  get_dataframes()
-
-    """
-
-    def __init__(self, tables):
-        self.emitter = Emitter(t for t in tables if t.is_defined())
-        dfa = pd.DataFrame(self.emitter.collect_data("a"))
-        dfq = pd.DataFrame(self.emitter.collect_data("q"))
-        dfm = pd.DataFrame(self.emitter.collect_data("m"))
-        for df in dfa, dfq, dfm:
-            self._validate(df)
-        self.dfa = self._reshape_a(dfa)
-        self.dfq = self._reshape_q(dfq)
-        self.dfm = self._reshape_m(dfm)
-        
-    def get_dataframes(self):
-        return self.dfa, self.dfq, self.dfm 
-    
-    @staticmethod
-    def _get_duplicate_rows(df):
+    def get_dataframe(self, freq):
+        df = pd.DataFrame(self.collect_data(freq))
         if df.empty:
             return df
+        self.no_duplicate_rows(df)
+        funcs = dict(a=lambda x: get_date_year_end(x['year']),
+                     q=lambda x: get_date_quarter_end(x['year'], x['qtr']),
+                     m=lambda x: get_date_month_end(x['year'], x['month']))        
+        df["time_index"]=df.apply(funcs[freq], axis=1)
+        df = df.pivot(columns='label', values='value', index='time_index')
+        df.insert(0, "year", df.index.year)
+        if freq == "q":
+            df.insert(1, "qtr", df.index.quarter)
+        elif freq == "m":
+            df.insert(1, "month", df.index.month)
+        df.columns.name = None
+        df.index.name = None
+        return df
+
+    @staticmethod
+    def no_duplicate_rows(df):
+        if df.empty:
+            dups = df
         else:
-            return df[df.duplicated(keep=False)]
-                
-    def _validate(self, df):
-        dups = self._get_duplicate_rows(df)
+            dups = df[df.duplicated(keep=False)]
         if not dups.empty:           # 
            raise ValueError("Duplicate rows found {}".format(dups))
+ 
 
-    @staticmethod
-    def _reshape_a(dfa):
-        """Returns pandas dataframe with ANNUAL data."""
-        dfa["time_index"] = dfa.apply(
-            lambda x: get_date_year_end(
-                x['year']), axis=1)
-        dfa = dfa.pivot(columns='label', values='value', index='time_index')
-        dfa.insert(0, "year", dfa.index.year)
-        dfa.columns.name = None
-        dfa.index.name = None
-        return dfa
-
-    @staticmethod
-    def _reshape_q(dfq):
-        """Returns pandas dataframe with QUARTERLY data."""
-        dfq["time_index"] = dfq.apply(
-            lambda x: get_date_quarter_end(
-                x['year'], x['qtr']), axis=1)
-        dfq = dfq.pivot(columns='label', values='value', index='time_index')
-        dfq.insert(0, "year", dfq.index.year)
-        dfq.insert(1, "qtr", dfq.index.quarter)
-        dfq.columns.name = None
-        dfq.index.name = None
-        return dfq
-
-    @staticmethod
-    def _reshape_m(dfm):
-        """Returns pandas dataframe with MONTHLY data."""
-        dfm["time_index"] = dfm.apply(
-            lambda x: get_date_month_end(
-                x['year'], x['month']), axis=1)
-        dfm = dfm.pivot(columns='label', values='value', index='time_index')
-        dfm.insert(0, "year", dfm.index.year)
-        dfm.insert(1, "month", dfm.index.month)
-        dfm.columns.name = None
-        dfm.index.name = None
-        return dfm
-
-
-
-class DataframeHolder(object):
-
-    def __init__(self, dfa, dfq, dfm):
-        self.dfa = dfa
-        self.dfq = dfq
-        self.dfm = dfm
-
-    def annual(self):
-        return self.dfa
-
-    def quarterly(self):
-        return self.dfq
-
-    def monthly(self):
-        return self.dfm
-
-    def dfs(self):
-        """Shorthand for obtaining all three dataframes."""
-        return self.dfa, self.dfq, self.dfm  
-
-    # TODO: need new validation procedure
-    def includes(self, x):
-        return True
-
-    def save(self, year, month):
-        folder_path = get_processed_folder(year, month)
-        self.dfa.to_csv(folder_path / 'dfa.csv')
-        self.dfq.to_csv(folder_path / 'dfq.csv')
-        self.dfm.to_csv(folder_path / 'dfm.csv')
-        print("Saved dataframes to", folder_path)
-        
-
-def csv2frames(csv_path, spec=SPEC):
-    # Row() instances
-    rows = read_csv(csv_path)
-    # convert Row() to Table()
+def csvfile_to_dataframes(csvfile, spec=SPEC):
+    rows = to_rows(csvfile)
     tables = get_tables(rows, spec)    
-    # extract dataframces 
-    dfa, dfq, dfm =  DataframeMaker(tables).get_dataframes()
-    return DataframeHolder(dfa, dfq, dfm)
+    emitter = Emitter(tables)
+    dfa = emitter.get_dataframe(freq="a")
+    dfq = emitter.get_dataframe(freq="q")
+    dfm = emitter.get_dataframe(freq="m")
+    return dfa, dfq, dfm
 
-# TODO: need new validation procedure
-#    def includes(self, x):
-#        return x in self.datapoints   
 
 
 VALID_DATAPOINTS = [
-    {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
-    {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999},
-    {'freq': 'a', 'label': 'EXPORT_GOODS_bln_usd', 'value': 75.6, 'year': 1999},
-    {'freq': 'q', 'label': 'IMPORT_GOODS_bln_usd',
-        'qtr': 1, 'value': 9.1, 'year': 1999},
-    {'freq': 'a', 'label': 'CPI_rog', 'value': 136.5, 'year': 1999},
-    {'freq': 'm', 'label': 'CPI_rog', 'value': 108.4, 'year': 1999, 'month': 1}
-    # FIXME: found only in latest, need some monthly value
-    #{'freq': 'm', 'label': 'IND_PROD_yoy', 'month': 4, 'value': 102.3, 'year': 2017}
+      dict(label='GDP_bln_rub', year=1999, a=4823.0)
+    , dict(label='GDP_bln_rub', year=1999, q={4: 1447})
+    , dict(label='GDP_yoy',     year=1999, a=106.4)    
+    , dict(label='EXPORT_GOODS_bln_usd', year=1999, m={12:9.7})
+    , dict(label='IMPORT_GOODS_bln_usd', year=1999, m={12:4.0})
+    , dict(label='CPI_rog',     year=1999, a=136.5)
+    , dict(label='CPI_rog',     year=1999, q={1:116.0, 2:107.3, 3:105.6, 4:103.9})
+    , dict(label='CPI_rog',     year=1999, m={1:108.4, 6:101.9, 12:101.3})    
 ]
 
 
-# TODO: need new validation procedure
+class Validator():
+    
+    def __init__(self, dfa, dfq, dfm):
+        self.dfa = dfa
+        self.dfq = dfq
+        self.dfm = dfm          
+    
+    
+    def must_include(self, pt):  
+        not_included = list(self.missing_datapoints(pt))
+        if not_included:
+            msg = "Not found in dataset: {}".format(not_included)
+            raise ValueError(msg)        
+        
+        
+    def missing_datapoints(self, pt):    
+        label=pt['label']
+        year=pt['year']
+        if 'a' in pt.keys():
+            a = pt['a']
+            if self.get_value(self.dfa, label, year) != a:
+                yield dict(label=label, year=year, a=a)
+        if 'q' in pt.keys():            
+            for q, val in pt['q'].items(): 
+               if self.get_value(self.dfq, label, year, qtr=q) != val:
+                   yield dict(label=label, year=year, q={q:val})                   
+        if 'm' in pt.keys():    
+            for m, val in pt['m'].items():
+               if self.get_value(self.dfm, label, year, month=m) != val:   
+                   yield dict(label=label, year=year, q={q:val})
+
+    @staticmethod    
+    def get_value(df, label, year, qtr=False, month=False): 
+        try:
+            df = df[df['year']==year]            
+            ix = df.year == year # FIXME: just all True values
+            if qtr:
+               ix = df['qtr'] == qtr
+            if month:
+               ix = df['month'] == month
+            return df[ix][label][0]
+        except KeyError:
+            return False
+        
+ 
+def filter_date(year, month):
+    # set to latest date if omitted
+    latest_year, latest_month = get_latest_date()
+    return year or latest_year, month or latest_month         
 
 
 class Vintage:
     """Represents dataset release for a given year and month."""
 
-    def __init__(self, year=False, month=False):
-        # set to latest date if omitted
-        latest_year, latest_month = get_latest_date()
-        self.year, self.month = year or latest_year, month or latest_month
-        # find csv file
+    def __init__(self, year=False, month=False):        
+        self.year, self.month = filter_date(year, month)        
         csv_path = locate_csv(self.year, self.month)
-        # make dataframes
-        self.df_holder = csv2frames(csv_path)
-
-    def save(self):
-        """Save dataframes to CSVs."""
-        self.frames.save(self.year, self.month)
+        with open_csv(csv_path) as csvfile:            
+            self.dfa, self.dfq, self.dfm = csvfile_to_dataframes(csvfile)
 
     def dfs(self):
-        """Shorthand for obtaining dataframes."""
-        return self.df_holder.dfs()
+        """Shorthand for obtaining three dataframes."""
+        return self.dfa, self.dfq, self.dfm 
+    
+    def save(self):
+        folder_path = get_processed_folder(self.year, self.month)
+        self.dfa.to_csv(folder_path / 'dfa.csv')
+        self.dfq.to_csv(folder_path / 'dfq.csv')
+        self.dfm.to_csv(folder_path / 'dfm.csv')
+        print("Saved dataframes to", folder_path)
+        
+    def validate(self):
+        v = Validator(self.dfa, self.dfq, self.dfm) 
+        for pt in VALID_DATAPOINTS: 
+            v.must_include(pt)
+        print("Test values parsed OK for", self)    
 
     def __repr__(self):
         return "Vintage ({}, {})".format(self.year, self.month)
-
-    # TODO: need new validation procedure
-    def validate(self, valid_datapoints=VALID_DATAPOINTS):
-        for x in valid_datapoints:
-            if not self.frames.includes(x):
-                msg = "Not found in dataset: {}\nFile: {}".format(
-                    x, self.csv_path)
-                raise ValueError(msg)
-        print("Test values parsed OK for", self)
-     
-
-
+    
 
 class Collection:
     """Methods to manipulate entire set of data releases."""
@@ -342,7 +287,7 @@ class Collection:
     def approve_latest():
         """Quick check for algorithm on latest available data."""
         vintage = Vintage(year=None, month=None)
-        #vintage.validate()
+        vintage.validate()
 
     @staticmethod
     def approve_all():
@@ -363,13 +308,3 @@ if __name__ == "__main__":
     year, month = 2017, 5
     vint = Vintage(year, month)
     dfa, dfq, dfm = vint.dfs()
-
-    # TODO: some notebook work
-#    iq = ["GDP_yoy", "IND_PROD_yoy", "INVESTMENT_yoy", "RETAIL_SALES_yoy", "WAGE_REAL_yoy"]
-#    last_q = dfq[iq]['2017-03'].transpose()
-#    im = [           "IND_PROD",                       "RETAIL_SALES",     "WAGE_REAL"]
-#    im1 = ["{}_yoy".format(x) for x in im]
-#    last_m1 = dfm[im1]['2017-05'].transpose()
-#    im2 = ["{}_rog".format(x) for x in im]
-#    last_m2 = dfm[im2]['2017-05'].transpose()
-
