@@ -16,7 +16,7 @@ path = locate_csv(year, month)
 df = csv2frames(path, spec=DEFAULT_SPEC)
 
 # control values are read
-#fixme: DOES NOT WORK, A MOCK
+# TODO: need new validation procedure
 if not df.includes(CHECKPOINTS):
     msg = df.get_error_message(CHECKPOINTS)
     raise ValueError(msg)

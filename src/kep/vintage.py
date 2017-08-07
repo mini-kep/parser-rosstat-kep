@@ -248,6 +248,7 @@ class DataframeHolder(object):
         """Shorthand for obtaining all three dataframes."""
         return self.dfa, self.dfq, self.dfm  
 
+    # TODO: need new validation procedure
     def includes(self, x):
         return True
 
@@ -268,7 +269,7 @@ def csv2frames(csv_path, spec=SPEC):
     dfa, dfq, dfm =  DataframeMaker(tables).get_dataframes()
     return DataframeHolder(dfa, dfq, dfm)
 
-# FIXME: not validation now            
+# TODO: need new validation procedure
 #    def includes(self, x):
 #        return x in self.datapoints   
 
@@ -286,7 +287,7 @@ VALID_DATAPOINTS = [
 ]
 
 
-# need new validation procedure
+# TODO: need new validation procedure
 
 
 class Vintage:
@@ -312,6 +313,7 @@ class Vintage:
     def __repr__(self):
         return "Vintage ({}, {})".format(self.year, self.month)
 
+    # TODO: need new validation procedure
     def validate(self, valid_datapoints=VALID_DATAPOINTS):
         for x in valid_datapoints:
             if not self.frames.includes(x):
