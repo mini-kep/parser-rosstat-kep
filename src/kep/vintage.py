@@ -176,21 +176,23 @@ def csvfile_to_dataframes(csvfile, spec=SPEC):
     return dfa, dfq, dfm
 
 
-VALID_DATAPOINTS = [
-    dict(
-        label='GDP_bln_rub', year=1999, a=4823.0), dict(
-            label='GDP_bln_rub', year=1999, q={
-                4: 1447}), dict(
-                    label='GDP_yoy', year=1999, a=106.4), dict(
-                        label='EXPORT_GOODS_bln_usd', year=1999, m={
-                            12: 9.7}), dict(
-                                label='IMPORT_GOODS_bln_usd', year=1999, m={
-                                    12: 4.0}), dict(
-                                        label='CPI_rog', year=1999, a=136.5), dict(
-                                            label='CPI_rog', year=1999, q={
-                                                1: 116.0, 2: 107.3, 3: 105.6, 4: 103.9}), dict(
-                                                    label='CPI_rog', year=1999, m={
-                                                        1: 108.4, 6: 101.9, 12: 101.3})]
+ANNUAL = [dict(label='GDP_bln_rub', year=1999, a=4823.0),
+          dict(label='GDP_yoy', year=1999, a=106.4)]
+
+QTR = [dict(label='CPI_rog', year=1999, q={1: 116.0, 
+                                           2: 107.3, 
+                                           3: 105.6, 
+                                           4: 103.9}), 
+       dict(label='GDP_bln_rub', year=1999, q={4: 1447})] 
+       
+MONTHLY = [dict(label='CPI_rog', year=1999, m={1: 108.4, 
+                                               6: 101.9, 
+                                               12: 101.3}), 
+           dict(label='EXPORT_GOODS_bln_usd', year=1999, m={12: 9.7}),
+           dict(label='IMPORT_GOODS_bln_usd', year=1999, m={12: 4.0})]
+
+
+VALID_DATAPOINTS = ANNUAL + QTR + MONTHLY
 
 
 class Validator():
@@ -206,21 +208,31 @@ class Validator():
             msg = "Not found in dataset: {}".format(not_included)
             raise ValueError(msg)
 
+    def is_included(self, pt):
+        not_included = list(self.missing_datapoints(pt))
+        if not_included:
+            return False
+        else:
+            return True        
+    
     def missing_datapoints(self, pt):
         label = pt['label']
         year = pt['year']
         if 'a' in pt.keys():
             a = pt['a']
-            if self.get_value(self.dfa, label, year) != a:
+            b = self.get_value(self.dfa, label, year)
+            if b != a:
                 yield dict(label=label, year=year, a=a)
         if 'q' in pt.keys():
             for q, val in pt['q'].items():
-                if self.get_value(self.dfq, label, year, qtr=q) != val:
+                b = self.get_value(self.dfq, label, year, qtr=q) 
+                if b != val:
                     yield dict(label=label, year=year, q={q: val})
         if 'm' in pt.keys():
             for m, val in pt['m'].items():
-                if self.get_value(self.dfm, label, year, month=m) != val:
-                    yield dict(label=label, year=year, q={q: val})
+                b = self.get_value(self.dfm, label, year, month=m) 
+                if b != val:
+                    yield dict(label=label, year=year, m={m: val})
 
     @staticmethod
     def get_value(df, label, year, qtr=False, month=False):
