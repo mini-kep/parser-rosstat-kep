@@ -80,7 +80,7 @@ class DictMaker:
         return self.basedict.__str__()
 
 
-# dataframe dates handling  
+# dataframe dates handling
 
 def _month_end_day(year, month):
     return calendar.monthrange(year, month)[1]
@@ -97,9 +97,9 @@ def get_date_quarter_end(year, qtr):
     month = qtr * 3
     return get_date_month_end(year, month)
 
+
 def get_date_year_end(year):
     return pd.Timestamp(date(year, 12, 31))
-
 
 
 class Emitter:
@@ -136,7 +136,7 @@ class Emitter:
             return getattr(self, freq)
         else:
             raise ValueError(freq)
-            
+
     def get_dataframe(self, freq):
         df = pd.DataFrame(self.collect_data(freq))
         if df.empty:
@@ -144,8 +144,8 @@ class Emitter:
         self.no_duplicate_rows(df)
         funcs = dict(a=lambda x: get_date_year_end(x['year']),
                      q=lambda x: get_date_quarter_end(x['year'], x['qtr']),
-                     m=lambda x: get_date_month_end(x['year'], x['month']))        
-        df["time_index"]=df.apply(funcs[freq], axis=1)
+                     m=lambda x: get_date_month_end(x['year'], x['month']))
+        df["time_index"] = df.apply(funcs[freq], axis=1)
         df = df.pivot(columns='label', values='value', index='time_index')
         df.insert(0, "year", df.index.year)
         if freq == "q":
@@ -162,13 +162,13 @@ class Emitter:
             dups = df
         else:
             dups = df[df.duplicated(keep=False)]
-        if not dups.empty:           # 
-           raise ValueError("Duplicate rows found {}".format(dups))
- 
+        if not dups.empty:           #
+            raise ValueError("Duplicate rows found {}".format(dups))
+
 
 def csvfile_to_dataframes(csvfile, spec=SPEC):
     rows = to_rows(csvfile)
-    tables = get_tables(rows, spec)    
+    tables = get_tables(rows, spec)
     emitter = Emitter(tables)
     dfa = emitter.get_dataframe(freq="a")
     dfq = emitter.get_dataframe(freq="q")
@@ -176,99 +176,101 @@ def csvfile_to_dataframes(csvfile, spec=SPEC):
     return dfa, dfq, dfm
 
 
-
 VALID_DATAPOINTS = [
-      dict(label='GDP_bln_rub', year=1999, a=4823.0)
-    , dict(label='GDP_bln_rub', year=1999, q={4: 1447})
-    , dict(label='GDP_yoy',     year=1999, a=106.4)    
-    , dict(label='EXPORT_GOODS_bln_usd', year=1999, m={12:9.7})
-    , dict(label='IMPORT_GOODS_bln_usd', year=1999, m={12:4.0})
-    , dict(label='CPI_rog',     year=1999, a=136.5)
-    , dict(label='CPI_rog',     year=1999, q={1:116.0, 2:107.3, 3:105.6, 4:103.9})
-    , dict(label='CPI_rog',     year=1999, m={1:108.4, 6:101.9, 12:101.3})    
-]
+    dict(
+        label='GDP_bln_rub', year=1999, a=4823.0), dict(
+            label='GDP_bln_rub', year=1999, q={
+                4: 1447}), dict(
+                    label='GDP_yoy', year=1999, a=106.4), dict(
+                        label='EXPORT_GOODS_bln_usd', year=1999, m={
+                            12: 9.7}), dict(
+                                label='IMPORT_GOODS_bln_usd', year=1999, m={
+                                    12: 4.0}), dict(
+                                        label='CPI_rog', year=1999, a=136.5), dict(
+                                            label='CPI_rog', year=1999, q={
+                                                1: 116.0, 2: 107.3, 3: 105.6, 4: 103.9}), dict(
+                                                    label='CPI_rog', year=1999, m={
+                                                        1: 108.4, 6: 101.9, 12: 101.3})]
 
 
 class Validator():
-    
+
     def __init__(self, dfa, dfq, dfm):
         self.dfa = dfa
         self.dfq = dfq
-        self.dfm = dfm          
-    
-    
-    def must_include(self, pt):  
+        self.dfm = dfm
+
+    def must_include(self, pt):
         not_included = list(self.missing_datapoints(pt))
         if not_included:
             msg = "Not found in dataset: {}".format(not_included)
-            raise ValueError(msg)        
-        
-        
-    def missing_datapoints(self, pt):    
-        label=pt['label']
-        year=pt['year']
+            raise ValueError(msg)
+
+    def missing_datapoints(self, pt):
+        label = pt['label']
+        year = pt['year']
         if 'a' in pt.keys():
             a = pt['a']
             if self.get_value(self.dfa, label, year) != a:
                 yield dict(label=label, year=year, a=a)
-        if 'q' in pt.keys():            
-            for q, val in pt['q'].items(): 
-               if self.get_value(self.dfq, label, year, qtr=q) != val:
-                   yield dict(label=label, year=year, q={q:val})                   
-        if 'm' in pt.keys():    
+        if 'q' in pt.keys():
+            for q, val in pt['q'].items():
+                if self.get_value(self.dfq, label, year, qtr=q) != val:
+                    yield dict(label=label, year=year, q={q: val})
+        if 'm' in pt.keys():
             for m, val in pt['m'].items():
-               if self.get_value(self.dfm, label, year, month=m) != val:   
-                   yield dict(label=label, year=year, q={q:val})
+                if self.get_value(self.dfm, label, year, month=m) != val:
+                    yield dict(label=label, year=year, q={q: val})
 
-    @staticmethod    
-    def get_value(df, label, year, qtr=False, month=False): 
+    @staticmethod
+    def get_value(df, label, year, qtr=False, month=False):
         try:
-            df = df[df['year']==year]            
-            ix = df.year == year # FIXME: just all True values
+            df = df[df['year'] == year]
+            ix = df.year == year  # FIXME: just all True values
             if qtr:
-               ix = df['qtr'] == qtr
+                ix = df['qtr'] == qtr
             if month:
-               ix = df['month'] == month
+                ix = df['month'] == month
             return df[ix][label][0]
         except KeyError:
             return False
-        
- 
+
+
 def filter_date(year, month):
     # set to latest date if omitted
     latest_year, latest_month = get_latest_date()
-    return year or latest_year, month or latest_month         
+    return year or latest_year, month or latest_month
 
 
 class Vintage:
     """Represents dataset release for a given year and month."""
 
-    def __init__(self, year=False, month=False):        
-        self.year, self.month = filter_date(year, month)        
+    def __init__(self, year=False, month=False):
+        self.year, self.month = filter_date(year, month)
         csv_path = locate_csv(self.year, self.month)
-        with open_csv(csv_path) as csvfile:            
+        with open_csv(csv_path) as csvfile:
             self.dfa, self.dfq, self.dfm = csvfile_to_dataframes(csvfile)
 
     def dfs(self):
         """Shorthand for obtaining three dataframes."""
-        return self.dfa, self.dfq, self.dfm 
-    
+        return self.dfa, self.dfq, self.dfm
+
     def save(self):
         folder_path = get_processed_folder(self.year, self.month)
         self.dfa.to_csv(folder_path / 'dfa.csv')
         self.dfq.to_csv(folder_path / 'dfq.csv')
         self.dfm.to_csv(folder_path / 'dfm.csv')
         print("Saved dataframes to", folder_path)
-        
+
     def validate(self):
-        v = Validator(self.dfa, self.dfq, self.dfm) 
-        for pt in VALID_DATAPOINTS: 
+        v = Validator(self.dfa, self.dfq, self.dfm)
+        for pt in VALID_DATAPOINTS:
             v.must_include(pt)
-        print("Test values parsed OK for", self)    
+        print("Test values parsed OK for", self)
 
     def __repr__(self):
         return "Vintage ({}, {})".format(self.year, self.month)
-    
+
 
 class Collection:
     """Methods to manipulate entire set of data releases."""

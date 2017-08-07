@@ -20,7 +20,7 @@ led to many errors, so the parsing instructions are now created
 internally in *spec.py*.
 
 **SPEC** is used by:
-    
+
   - :class:`kep.rows.RowStack`
   - :func:`kep.tables.extract_tables`
 
@@ -156,15 +156,15 @@ class ParsingInstruction:
 
         Args:
             varname (str): varaible name, eg 'GDP'
-            text (str or list): header string(s) associated with 
-                                variable names, eg "Oбъем ВВП" or 
+            text (str or list): header string(s) associated with
+                                variable names, eg "Oбъем ВВП" or
                                  ["Oбъем ВВП", "Индекс физического объема произведенного ВВП"]
-            required_units (str or list): required units of measurement for 
+            required_units (str or list): required units of measurement for
                                           *varname*, like 'bln_usd' or ['rog', 'rub']
             desc (str): (optional) variable desciption like "Валовой внутренний продукт"
                         If not provided, *text[0]* is used.
         """
-        
+
         # validate arguments
         self._verify_varname(varname)
         self._verify_units(required_units)
@@ -254,28 +254,27 @@ class Scope():
 
 
 class Definition(object):
-    """Holds together parsing instruction, scope and (optional) 
+    """Holds together parsing instruction, scope and (optional)
        custom reader function name.
     """
 
     def __init__(self, scope=False, reader=False, units=False):
         self.instr = ParsingInstruction()
-        #scope
+        # scope
         if scope:
             self.set_scope(scope)
         else:
             self.scope = False
-        #reader    
+        # reader
         if reader:
             self.set_reader(reader)
         else:
             self.reader = False
-        #set units    
+        # set units
         if not units:
             self.units = UNITS
         else:
             self.units = units
-            
 
     def append(self, *arg, **kwarg):
         self.instr.append(*arg, **kwarg)
@@ -345,7 +344,6 @@ class Specification:
         self.main = default
         # additional parsing instructions for segments
         self.segment_definitions = []
-
 
     def append(self, pdef):
         self.segment_definitions.append(pdef)

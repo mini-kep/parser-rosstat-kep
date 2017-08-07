@@ -17,37 +17,40 @@ def to_csv(rows, path):
             filewriter.writerow(row)
     return path
 
+
 def open_csv(path):
     return path.open(encoding=ENC)
+
 
 def read_csv(path):
     with path.open(encoding=ENC) as csvfile:
         for row in to_rows(csvfile):
             yield row
-        
+
 
 def yield_csv_rows(csvfile, fmt=CSV_FORMAT):
-    """Yield CSV rows from *csvfile*.    
-    
+    """Yield CSV rows from *csvfile*.
+
     Arg:
-        csvfile - file connection or StringIO     
-    
+        csvfile - file connection or StringIO
+
     Yields:
-        list of strings    
+        list of strings
     """
     for row in csv.reader(csvfile, **fmt):
-        yield row    
-    
+        yield row
+
+
 def to_rows(csvfile):
-    """Filter and yield Row() instances from *csvfile*.    
-    
+    """Filter and yield Row() instances from *csvfile*.
+
     Arg:
-        csvfile - file connection or StringIO         
-    
+        csvfile - file connection or StringIO
+
     Yields:
         Row() instances
     """
-    csv_rows =  yield_csv_rows(csvfile)
+    csv_rows = yield_csv_rows(csvfile)
     filled = filter(lambda row: row and row[0], csv_rows)
     no_comments = filter(lambda row: not row[0].startswith("___"), filled)
     return map(Row, no_comments)
