@@ -1,34 +1,28 @@
 # -*- coding: utf-8 -*-
 
-# TODO: run sphynx to checl html appearance
-
 """:mod:`kep.spec` module contains data structures used as parsing instructions.
 
-Global variable  **SPEC** (:class:`kep.spec.Specification`) is the parsing
-instruction. It allows access to parsing definitions (by segment) and
-and required variables list.
+Global variable  **SPEC** (:class:`kep.spec.Specification`) allows access to
+parsing definitions:
 
   - :func:`kep.spec.Specification.get_main_parsing_definition` retrieves
-     main (default) parsing definition where most indicators are defined
+    main (default) parsing definition, where most indicators are defined
 
   - :func:`kep.spec.Specification.get_segment_parsing_definitions` provides
-    a list of parsing defintions by segment. We parse CSV file by segment,
-    because some table headers repeat themselves in CSV file. Extracting
-    a piece out of CSV file gives a very specific input for parsing.
+    a list of parsing defintions by csv segment
 
-  - :func:`kep.spec.Specification.get_required_labels` limits output to
-    required variable labels only
+We parse CSV file by segment, because some table headers repeat themselves in
+CSV file. Extracting a piece out of CSV file gives a very specific input for
+parsing.
 
-Previously  and **SPEC** was initialised fromyaml file, but this
-led to many errors, so these data structures are now created
+Previously **SPEC** was initialised from yaml file, but this
+led to many errors, so the parsing instructions are now created
 internally in *spec.py*.
-
 
 **SPEC** is used by:
 
-    - :class:`kep.rows.Rowstack`
-    - :func:`kep.tables.extract_tables`
-    - :func:`kep.tables.get_tables`
+  - :class:`kep.rows.RowStack`
+  - :func:`kep.tables.extract_tables`
 
 """
 
@@ -91,10 +85,10 @@ UNIT_NAMES = {'bln_rub': 'млрд.руб.',
 assert set(UNIT_NAMES.keys()) == set(UNITS.values())
 
 
-def as_list(x): #: str): # not only str is intended input type
-    """Transform string *x* to *[x]*.
+def as_list(x):  # : str): # not only str is intended input type
+    """Transform string *x* to list *[x]*.
 
-       Applied to format user input in ParsingInstruction class.
+       Formats user input in ParsingInstruction class.
 
        Returns:
            list
@@ -126,7 +120,7 @@ class ParsingInstruction:
 
     Attributes:
         varname_mapper (OrderedDict)
-        required_labels (list of tuples)
+        required_labels (list of strings)
         descriptions (OrderedDict)
 
     """
@@ -138,7 +132,7 @@ class ParsingInstruction:
 
     def _verify_varname(self, varname):
         """Must define variable only once in specification
-        
+
         Raises:
             ValueError: if varname is already specified
         """
@@ -148,9 +142,9 @@ class ParsingInstruction:
 
     def _verify_units(self, required_units):
         """*required_units* must be in UNITS.values()
-        
+
         Raises:
-            ValueError: if required_units is not an "official" unit
+            ValueError: if required_units is not an "official" unit list
         """
         for ru in as_list(required_units):
             if ru not in UNITS.values():
@@ -160,11 +154,15 @@ class ParsingInstruction:
     def append(self, varname, text, required_units, desc=False):
         """Add a parsing instructions for an individual variable.
 
-            Args:
-              varname (str): like 'GDP'
-              text (str or list) : like "Oбъем ВВП" or ["Oбъем ВВП", "Индекс физического объема произведенного ВВП"]
-              required_units (str or list): like 'bln_usd' or ['rog', 'rub']
-              desc (str): (optional) like "Валовой внутренний продукт"
+        Args:
+            varname (str): varaible name, eg 'GDP'
+            text (str or list): header string(s) associated with
+                                variable names, eg "Oбъем ВВП" or
+                                 ["Oбъем ВВП", "Индекс физического объема произведенного ВВП"]
+            required_units (str or list): required units of measurement for
+                                          *varname*, like 'bln_usd' or ['rog', 'rub']
+            desc (str): (optional) variable desciption like "Валовой внутренний продукт"
+                        If not provided, *text[0]* is used.
         """
 
         # validate arguments
@@ -204,7 +202,7 @@ class Scope():
 
     def add_bounds(self, start, end):
         """Adds start and end bounds.
-        
+
         Raises:
             ValueError: if any of input vars is empty string.
         """
@@ -215,13 +213,13 @@ class Scope():
 
     def get_bounds(self, rows):
         """Get start and end line markers, which can be found in *rows*
-        
+
         Raises:
-            ValueError: none of Scope() start/end line pairs was found in *rows*. 
-            
+            ValueError: none of Scope() start/end line pairs was found in *rows*.
+
         """
-        
-        rows = list(rows) # faster way to consume iterators
+
+        rows = list(rows)  # faster way to consume iterators
         # rows = [r for r in rows]  # consume iterator
         for marker in self.__markers:
             s = marker['start']
@@ -256,20 +254,27 @@ class Scope():
 
 
 class Definition(object):
-    # TODO: write docstring
-    """
+    """Holds together parsing instruction, scope and (optional)
+       custom reader function name.
     """
 
-    def __init__(self, scope=False, reader=False):
+    def __init__(self, scope=False, reader=False, units=False):
         self.instr = ParsingInstruction()
+        # scope
         if scope:
             self.set_scope(scope)
         else:
             self.scope = False
+        # reader
         if reader:
             self.set_reader(reader)
         else:
             self.reader = False
+        # set units
+        if not units:
+            self.units = UNITS
+        else:
+            self.units = units
 
     def append(self, *arg, **kwarg):
         self.instr.append(*arg, **kwarg)
@@ -283,7 +288,7 @@ class Definition(object):
     def set_reader(self, funcname: str):
         """
         Raises:
-            ValueError: if funcname is not valid.
+            ValueError: if *funcname* is not valid.
         """
         from kep.splitter import FUNC_MAPPER
         if isinstance(funcname, str) and funcname in FUNC_MAPPER.keys():
@@ -303,7 +308,7 @@ class Definition(object):
 
     @property
     def units_dict(self):
-        return UNITS
+        return self.units
 
     @property
     def funcname(self):
@@ -327,7 +332,6 @@ class Specification:
 
       - get_main_parsing_definition() - returns Definition()
       - get_segment_parsing_definitions() - returns list of Definition() instances
-      - get_required_labels() - returns list of strings
 
     Diagnostics:
 
@@ -351,21 +355,12 @@ class Specification:
     def get_segment_parsing_definitions(self):
         return self.segment_definitions
 
-    def all_definitions(self):
-        return [self.main] + self.segment_definitions
-
-    def get_required_labels(self):
-        req = []
-        for pdef in self.all_definitions():
-            req.extend(pdef.required)
-        return req
-
     def get_varnames(self):
-        varnames = set()
-        for pdef in self.all_definitions():
+        varnames = set(self.main.get_varnames())
+        for pdef in self.segment_definitions:
             for vn in pdef.get_varnames():
                 varnames.add(vn)
-        return list(varnames)
+        return sorted(list(varnames))
 
 
 # creating definitions
@@ -479,6 +474,7 @@ d.append("RETAIL_SALES_NONFOOD",
          "непродовольственные товары",
          ["bln_rub", "yoy", "rog"])
 SPEC.append(d)
+
 
 sc = Scope("2.1.1. Доходы (по данным Федерального казначейства)",
            "2.1.2. Расходы (по данным Федерального казначейства)")

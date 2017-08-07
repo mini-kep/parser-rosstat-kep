@@ -6,24 +6,41 @@
 Welcome to mini-kep documentation
 ==================================
 
-`mini-kep`_  parses MS Word files from `Rosstat 'KEP' publication`_. It creates pandas
-dataframes with macroeconomic time series and saves clean `processed CSV files at stable URL`_.
+`mini-kep`_ parses MS Word files from `Rosstat KEP publication`_, 
+creates pandas dataframes with macroeconomic time series and saves 
+them as `CSV files at stable URL <https://goo.gl/Cr5mSZ>`_. 
+Inspired by `FRED`_ and `cookiecutter-data-science`_.
 
-Inspired / affected by:
-
-- `FRED`_, where economic data is handled so well
-- `cookiecutter-data-science`_, where `analysis is a DAG`_
-- intense attraction to reproducible analysis and clean code  
-
+.. _mini-kep: https://github.com/epogrebnyak/mini-kep
+.. _Rosstat KEP publication: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
+.. _processed CSV files: https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest
 .. _FRED: https://fred.stlouisfed.org/
 .. _cookiecutter-data-science: https://github.com/drivendata/cookiecutter-data-science
-.. _analysis is a DAG: http://drivendata.github.io/cookiecutter-data-science/#analysis-is-a-dag
 
+Check documentation `here`_  and examples `here <https://github.com/epogrebnyak/mini-kep/blob/dev/src/example1.py>`__.
+
+.. _here: http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com
+
+
+How it works
+============
+
+::
+
+    (1) Rosstat -> (2) mini-kep -> (3) clean CSV files -> (4) your code in R/pandas
+
+#. Rosstat publishes KEP publication every month as archive of Word
+   files
+#. mini-kep parses Word files and saves output as three CSV files
+   (annual, quarterly and monthly)
+#. CSV files are available at https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest,
+   or https://goo.gl/Cr5mSZ
+#. you can import Russian macroeconomic indicators to your R/pandas code
+   from these files
 
 Parser pipeline
-~~~~~~~~~~~~~~~
-
-Steps involved in parsing pipeline are the following:
+===============
+**mini-kep** work involves following stages:
 
 -  **manually** (*FIXME*):
 
@@ -32,7 +49,6 @@ Steps involved in parsing pipeline are the following:
 
 -  **word2csv**: convert MS Word files to single interim CSV file (see
    `example`_)
-
 -  **csv2df**: parse interim CSV file to obtain `processed CSV files`_
    with annual, quarterly and monthly data.
 
@@ -42,16 +58,10 @@ Also in `/src`_ folder:
    save a local copy
 -  **frontpage**: add tables and graphs to `README.md`_
 
-.. _mini-kep: https://github.com/epogrebnyak/mini-kep
-.. _Rosstat:  http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
-.. _Rosstat 'KEP' publication: Rosstat_
-.. _latest: https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest
-.. _processed CSV files at stable URL: latest_
-.. _from Rosstat website: Rosstat_
+.. _from Rosstat website: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
 .. _example: https://github.com/epogrebnyak/mini-kep/blob/master/data/interim/2017/05/tab.csv
-.. _processed CSV files: latest_
 .. _/src: https://github.com/epogrebnyak/mini-kep/tree/master/src
-.. _README.md: https://github.com/epogrebnyak/mini-kep/blob/master/README.md
+.. _README.md: https://github.com/epogrebnyak/mini-kep/blob/master/VALUES.md
 
 **csv2df** modules
 -------------------

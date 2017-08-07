@@ -1,13 +1,5 @@
 Intent: document and test current stable version (found in *master* branch)
 
-Review modules:
-- [x] kep.files 
-- [ ] kep.spec 
-- [ ] kep.rows
-- [ ] kep.splitter
-- [ ] kep.tables
-- [ ] kep.vintage
-
 By module do:
  - (optional) propose/discuss/commit/eye review changes to code  
  - write assert statements and edit/enhance tests
@@ -26,10 +18,6 @@ For testing we use py.test and make follwoing kinds of tests depending on situat
    - unit test with simple control values for a small fucntion / method, ususally public ones 
  - behaviour tests with fixtures / mocks for larger functionalities
  - end-to-end test on sample or real data  
-
-Current issue:
-
-- [#38 document and refactor kep.spec](https://github.com/epogrebnyak/mini-kep/issues/38)
 
 Finished work example: **kep.files**:
 - code: <https://github.com/epogrebnyak/mini-kep/blob/master/src/kep/files.py>
