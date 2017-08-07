@@ -23,9 +23,10 @@ import calendar
 import pandas as pd
 
 from kep.rows import read_csv
-from kep.files import locate_csv, get_processed_folder, filled_dates
+from kep.files import locate_csv, get_processed_folder, filled_dates, get_latest_date
 from kep.tables import get_tables
 from kep.spec import SPEC
+
 
 
 # use'always' or 'ignore'
@@ -90,9 +91,9 @@ class Emitter:
         self.q = []
         self.m = []
         for t in tables:
-            self.add_table(t)
+            self._add_table(t)
 
-    def add_table(self, table):
+    def _add_table(self, table):
         # defined Table() must have *label* and *splitter_func*
         if not table.is_defined():
             raise ValueError(table)
@@ -115,16 +116,15 @@ class Emitter:
             return getattr(self, freq)
         else:
             raise ValueError(freq)
+            
+    def get_all_datapoints(self):
+        """Iterate over all frequencies and make return list of datapoints"""
+        # concat three lists
+        return  [x for freq in "aqm"
+                   for x in self.collect_data(freq)]
 
-# FIXME: may create Validator class
-#
-#   def get(self, freq, label=None, year=None):
-#        gen = self.emit_by_freq(freq)
-#        if label:
-#            gen = filter(lambda x: x['label'].startswith(label), gen)
-#        if year:
-#            gen = filter(lambda x: x['year'] == year, gen)
-#        return list(gen)
+
+   
 
 
 # dataframe dates handling
@@ -150,36 +150,46 @@ def get_date_year_end(year):
     return pd.Timestamp(date(year, 12, 31))
 
 
-class Frames:
-    """Create pandas DataFrames."""
+def make_dataframes(tables):
+    return DataframeMaker(tables).get_dataframes()
+
+    
+class DataframeMaker(object):
+    """Create pandas DataFrames.
+    
+    Public method:        
+      -  get_dataframes()
+
+    """
 
     def __init__(self, tables):
         self.emitter = Emitter(t for t in tables if t.is_defined())
-        self.datapoints = [x for freq in "aqm"
-                           for x in self.emitter.collect_data(freq)]
-
         dfa = pd.DataFrame(self.emitter.collect_data("a"))
         dfq = pd.DataFrame(self.emitter.collect_data("q"))
         dfm = pd.DataFrame(self.emitter.collect_data("m"))
         for df in dfa, dfq, dfm:
-            self.validate(df)
-        self.dfa = self.reshape_a(dfa)
-        self.dfq = self.reshape_q(dfq)
-        self.dfm = self.reshape_m(dfm)
-
-    def includes(self, x):
-        return x in self.datapoints
+            self._validate(df)
+        self.dfa = self._reshape_a(dfa)
+        self.dfq = self._reshape_q(dfq)
+        self.dfm = self._reshape_m(dfm)
+        
+    def get_dataframes(self):
+        return self.dfa, self.dfq, self.dfm 
+    
+    @staticmethod
+    def _get_duplicate_rows(df):
+        if df.empty:
+            return df
+        else:
+            return df[df.duplicated(keep=False)]
+                
+    def _validate(self, df):
+        dups = self._get_duplicate_rows(df)
+        if not dups.empty:           # 
+           raise ValueError("Duplicate rows found {}".format(dups))
 
     @staticmethod
-    def validate(df):
-        if not df.empty:
-            dups = df[df.duplicated(keep=False)]
-            if not dups.empty:
-                # df must have no duplicate rows
-                raise ValueError(dups)
-
-    @staticmethod
-    def reshape_a(dfa):
+    def _reshape_a(dfa):
         """Returns pandas dataframe with ANNUAL data."""
         dfa["time_index"] = dfa.apply(
             lambda x: get_date_year_end(
@@ -191,7 +201,7 @@ class Frames:
         return dfa
 
     @staticmethod
-    def reshape_q(dfq):
+    def _reshape_q(dfq):
         """Returns pandas dataframe with QUARTERLY data."""
         dfq["time_index"] = dfq.apply(
             lambda x: get_date_quarter_end(
@@ -204,7 +214,7 @@ class Frames:
         return dfq
 
     @staticmethod
-    def reshape_m(dfm):
+    def _reshape_m(dfm):
         """Returns pandas dataframe with MONTHLY data."""
         dfm["time_index"] = dfm.apply(
             lambda x: get_date_month_end(
@@ -216,31 +226,9 @@ class Frames:
         dfm.index.name = None
         return dfm
 
-    def save(self, folder_path):
-        self.dfa.to_csv(folder_path / 'dfa.csv')
-        self.dfq.to_csv(folder_path / 'dfq.csv')
-        self.dfm.to_csv(folder_path / 'dfm.csv')
-        print("Saved dataframes to", folder_path)
-
-    def dfs(self):
-        """Shorthand for obtaining dataframes."""
-        return self.dfa, self.dfq, self.dfm
 
 
-VALID_DATAPOINTS = [
-    {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
-    {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999},
-    {'freq': 'a', 'label': 'EXPORT_GOODS_bln_usd', 'value': 75.6, 'year': 1999},
-    {'freq': 'q', 'label': 'IMPORT_GOODS_bln_usd',
-        'qtr': 1, 'value': 9.1, 'year': 1999},
-    {'freq': 'a', 'label': 'CPI_rog', 'value': 136.5, 'year': 1999},
-    {'freq': 'm', 'label': 'CPI_rog', 'value': 108.4, 'year': 1999, 'month': 1}
-    # FIXME: found only in latest, need some monthly value
-    #{'freq': 'm', 'label': 'IND_PROD_yoy', 'month': 4, 'value': 102.3, 'year': 2017}
-]
-
-
-class DataFrameHolder(object):
+class DataframeHolder(object):
 
     def __init__(self, dfa, dfq, dfm):
         self.dfa = dfa
@@ -256,14 +244,12 @@ class DataFrameHolder(object):
     def monthly(self):
         return self.dfm
 
+    def dfs(self):
+        """Shorthand for obtaining all three dataframes."""
+        return self.dfa, self.dfq, self.dfm  
+
     def includes(self, x):
         return True
-
-    def get_error_message(self, x):
-        return "some error found"
-
-    def _all(self):
-        yield self.dfa, self.dfq, self.dfm
 
     def save(self, year, month):
         folder_path = get_processed_folder(year, month)
@@ -271,43 +257,57 @@ class DataFrameHolder(object):
         self.dfq.to_csv(folder_path / 'dfq.csv')
         self.dfm.to_csv(folder_path / 'dfm.csv')
         print("Saved dataframes to", folder_path)
+        
+
+def csv2frames(csv_path, spec=SPEC):
+    # Row() instances
+    rows = read_csv(csv_path)
+    # convert Row() to Table()
+    tables = get_tables(rows, spec)    
+    # extract dataframces 
+    dfa, dfq, dfm =  DataframeMaker(tables).get_dataframes()
+    return DataframeHolder(dfa, dfq, dfm)
+
+# FIXME: not validation now            
+#    def includes(self, x):
+#        return x in self.datapoints   
 
 
-def csv2frames(path, spec):
-    # rowstack
-    _rows = read_csv(path)
-    # convert stream values to pandas dataframes
-    _tables = get_tables(_rows, spec)
-    dfs = Frames(tables=_tables).dfs()
-    return DataFrameHolder(*dfs)
+VALID_DATAPOINTS = [
+    {'freq': 'a', 'label': 'GDP_bln_rub', 'value': 4823.0, 'year': 1999},
+    {'freq': 'a', 'label': 'GDP_yoy', 'value': 106.4, 'year': 1999},
+    {'freq': 'a', 'label': 'EXPORT_GOODS_bln_usd', 'value': 75.6, 'year': 1999},
+    {'freq': 'q', 'label': 'IMPORT_GOODS_bln_usd',
+        'qtr': 1, 'value': 9.1, 'year': 1999},
+    {'freq': 'a', 'label': 'CPI_rog', 'value': 136.5, 'year': 1999},
+    {'freq': 'm', 'label': 'CPI_rog', 'value': 108.4, 'year': 1999, 'month': 1}
+    # FIXME: found only in latest, need some monthly value
+    #{'freq': 'm', 'label': 'IND_PROD_yoy', 'month': 4, 'value': 102.3, 'year': 2017}
+]
+
+
+# need new validation procedure
 
 
 class Vintage:
     """Represents dataset release for a given year and month."""
 
-    def __init__(self, year, month):
-        # save for reference and navigation
-        self.year, self.month = year, month
-        # find csv
-        self.csv_path = locate_csv(year, month)
-        # rowstack
-        self.rows = read_csv(self.csv_path)
-        # break csv to tables with variable names
-        self.tables = get_tables(self.rows, spec=SPEC)
-        # convert stream values to pandas dataframes
-        self.frames = Frames(tables=self.tables)
+    def __init__(self, year=False, month=False):
+        # set to latest date if omitted
+        latest_year, latest_month = get_latest_date()
+        self.year, self.month = year or latest_year, month or latest_month
+        # find csv file
+        csv_path = locate_csv(self.year, self.month)
+        # make dataframes
+        self.df_holder = csv2frames(csv_path)
 
     def save(self):
         """Save dataframes to CSVs."""
-        processed_folder = get_processed_folder(self.year, self.month)
-        self.frames.save(processed_folder)
+        self.frames.save(self.year, self.month)
 
     def dfs(self):
         """Shorthand for obtaining dataframes."""
-        return self.frames.dfs()
-
-    def __str__(self):
-        return repr(self)
+        return self.df_holder.dfs()
 
     def __repr__(self):
         return "Vintage ({}, {})".format(self.year, self.month)
@@ -319,6 +319,8 @@ class Vintage:
                     x, self.csv_path)
                 raise ValueError(msg)
         print("Test values parsed OK for", self)
+     
+
 
 
 class Collection:
@@ -338,7 +340,7 @@ class Collection:
     def approve_latest():
         """Quick check for algorithm on latest available data."""
         vintage = Vintage(year=None, month=None)
-        vintage.validate()
+        #vintage.validate()
 
     @staticmethod
     def approve_all():
@@ -360,9 +362,7 @@ if __name__ == "__main__":
     vint = Vintage(year, month)
     dfa, dfq, dfm = vint.dfs()
 
-    # TODO: need parsing result
-
-    # some notebook work
+    # TODO: some notebook work
 #    iq = ["GDP_yoy", "IND_PROD_yoy", "INVESTMENT_yoy", "RETAIL_SALES_yoy", "WAGE_REAL_yoy"]
 #    last_q = dfq[iq]['2017-03'].transpose()
 #    im = [           "IND_PROD",                       "RETAIL_SALES",     "WAGE_REAL"]
@@ -370,19 +370,4 @@ if __name__ == "__main__":
 #    last_m1 = dfm[im1]['2017-05'].transpose()
 #    im2 = ["{}_rog".format(x) for x in im]
 #    last_m2 = dfm[im2]['2017-05'].transpose()
-    # print(last_m1)
-    # print(last_m2)
 
-    # TODO:
-    # all_names = set(dfa.columns + dfq.columns + dfm.columns)
-
-    #from kep.tables import extract_varname
-#    print("Всего переменных: {}".format(len(list(cfg.SPEC.required()))))
-#    for k, v in cfg.SECTIONS.items():
-#        print("\n**{}**:".format(k))
-#        for vn in v:
-#            z = []
-#            for x in cfg.SPEC.required():
-#                if x[0] == vn:
-#                    z.append(x[1])
-#            print("- {}({})".format(vn, ", ".join(z)))
