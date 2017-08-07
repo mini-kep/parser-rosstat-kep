@@ -66,7 +66,23 @@ def rst(ctx):
 def doc(ctx):
     ctx.run("doc\make.bat html")
     ctx.run("start doc\_build\html\index.html")
-    # TODO: upload to aws
+    # TODO: 
+    # upload all files from doc\_build\html\ 
+    # to aws https://mini-kep-docs.s3.amazonaws.com/
+    # mini-kep-docs + is region neded?
+
+
+@task
+def github(ctx):
+    ctx.run("start https://github.com/epogrebnyak/mini-kep")
+
+
+@task
+def issues(ctx): 
+    pass
+    # NOT TODO NOW: open a new issueon github
+    # https://github.com/epogrebnyak/mini-kep/issues/new
+    # https://gist.github.com/JeffPaine/3145490    
 
 
 @task
@@ -89,13 +105,9 @@ def ls(ctx):
 
 
 ns = Collection()
-ns.add_task(clean)
-ns.add_task(pep8)
-ns.add_task(ls)
-ns.add_task(cov)
-ns.add_task(test)
-ns.add_task(doc)
-ns.add_task(rst)
+for t in [clean, pep8, ls, cov, test, doc, rst, github]:
+    ns.add_task(t)
+
 
 # Workaround for Windows execution
 if platform == 'win32':
