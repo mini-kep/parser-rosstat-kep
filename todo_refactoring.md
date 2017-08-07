@@ -19,10 +19,6 @@ For testing we use py.test and make follwoing kinds of tests depending on situat
  - behaviour tests with fixtures / mocks for larger functionalities
  - end-to-end test on sample or real data  
 
-Current issue:
-
-- [#38 document and refactor kep.spec](https://github.com/epogrebnyak/mini-kep/issues/38)
-
 Finished work example: **kep.files**:
 - code: <https://github.com/epogrebnyak/mini-kep/blob/master/src/kep/files.py>
 - test: https://github.com/epogrebnyak/mini-kep/blob/master/src/kep/tests/test_files.py
