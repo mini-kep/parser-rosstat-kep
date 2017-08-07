@@ -79,32 +79,35 @@ Prepare tasks
 See [this tag](https://github.com/epogrebnyak/mini-kep/issues?q=is%3Aissue+is%3Aopen+label%3A%22edit+task+specification%22) for tasks requiring more specification. 
 
 Add more parsing definitions:
-  - see [#33 Add more variable definitions ](https://github.com/epogrebnyak/mini-kep/issues/33) 	
+  - [ ] see [#33 Add more variable definitions ](https://github.com/epogrebnyak/mini-kep/issues/33) 	
   
 frontpage (AS?):
-   - Issue [#18](https://github.com/epogrebnyak/mini-kep/issues/18). See also <https://github.com/epogrebnyak/mini-kep/tree/master/src/frontend>.
-   - show imported variables or varnames
-   - How many variable were read?
+   - [ ] issue [#18](https://github.com/epogrebnyak/mini-kep/issues/18) + see also <https://github.com/epogrebnyak/mini-kep/tree/master/src/frontend>.
+   - [ ] show imported variables or varnames
+   - [ ] how many variable were read?
 
 transformations (AS?):
   - [ ] Variable transformation layer - need to diff the GOV_ACCUM  
    
 testing: 
-  - see <https://github.com/epogrebnyak/mini-kep/issues?q=is%3Aissue+is%3Aopen+label%3Atesting>
+  - [ ] see <https://github.com/epogrebnyak/mini-kep/issues?q=is%3Aissue+is%3Aopen+label%3Atesting>
   - [ ] test coverage annotate 
   - [ ] check values from sample rows in spec  
   - [ ] uncomment end-to-end tests
   - [ ] review previous testing guidelines    
    
 [Simplify procedure to update new month #29](https://github.com/epogrebnyak/mini-kep/issues/29):
-  -  may also review **filled_dates** mechanism in files.py 
+  - [ ] may also review **filled_dates** mechanism in files.py 
  
 follow-up tasks from spec.py:
-   - ```# TODO: use sample in required```
-   - ```# TODO: short names for variables in FRED style, short=```
+   - [ ] ```# TODO: use sample in required```
+   - [ ] ```# TODO: short names for variables in FRED style, short=```
  
-[#35 naming modules](https://github.com/epogrebnyak/mini-kep/issues/35)
-  
+[naming modules](https://github.com/epogrebnyak/mini-kep/issues/35)
+   - [ ] rename kep to csv2df
+   - [ ] csv2df.reader, parser, emitter
+   
+   
 NOT TODO
 ========
 
