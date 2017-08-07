@@ -43,7 +43,7 @@ Also in [/src] folder:
 Active tasks 
 ============
 
-### [# 52 review rows.py, tables.py, vintage.py](https://github.com/epogrebnyak/mini-kep/issues/52)
+### [Review rows.py, tables.py, vintage.py](https://github.com/epogrebnyak/mini-kep/issues/52)
 
 Refactoring, documentation testing for:
 - [x] kep.files 
@@ -53,13 +53,13 @@ Refactoring, documentation testing for:
 - [ ] kep.tables
 - [ ] kep.vintage
 
-### [#53 edit example1.py](https://github.com/epogrebnyak/mini-kep/issues/53)
+### [Edit example1.py](https://github.com/epogrebnyak/mini-kep/issues/53)
 
 - [provide CSV example](https://github.com/epogrebnyak/mini-kep/issues/9)
 
-### [#50 validation procedure for parsing result with checkpoints](https://github.com/epogrebnyak/mini-kep/issues/50)
+### [Validation procedure for parsing result with checkpoints](https://github.com/epogrebnyak/mini-kep/issues/50)
 
-### download and s3 sync
+### Download and s3 sync
 
 - [ ] [Download files](https://github.com/epogrebnyak/mini-kep/issues/30)
 
@@ -73,8 +73,8 @@ Refactoring, documentation testing for:
   - [ ] manually save deeper history of s3 files to bucket
 
   
-Prepare issues
---------------
+Prepare tasks
+=============
 
 See [this tag](https://github.com/epogrebnyak/mini-kep/issues?q=is%3Aissue+is%3Aopen+label%3A%22edit+task+specification%22) for tasks requiring more specification. 
 
@@ -105,7 +105,8 @@ follow-up tasks from spec.py:
  
 [#35 naming modules](https://github.com/epogrebnyak/mini-kep/issues/35)
   
-# NOT TODO
+NOT TODO
+========
 
 - sphinx-doc usage:
   - include intro.md in index.rst
@@ -116,7 +117,8 @@ follow-up tasks from spec.py:
 
 - document gap (2013, x)
   
-# DONE
+DONE
+====
 
 - [x] delete from repo: static html
 - [x] try ```inv pep8 -f.``` works
