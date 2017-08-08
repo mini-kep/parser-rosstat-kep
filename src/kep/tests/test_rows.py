@@ -42,9 +42,9 @@ class Test_Row_Properies_and_Some_Methods(Test_Row):
         assert self.row3.data == ['1', '2']
 
     def test_len_method(self):
-        assert self.row1.len() == 4
-        assert self.row2.len() == 5
-        assert self.row3.len() == 2
+        assert len(self.row1) == 4
+        assert len(self.row2) == 5
+        assert len(self.row3) == 2
 
     def test_is_datarow(self):
         assert self.row1.is_datarow() is False
