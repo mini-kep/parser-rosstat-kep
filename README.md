@@ -41,10 +41,13 @@ Also in [/src](https://github.com/epogrebnyak/mini-kep/tree/master/src) folder:
 Glossary
 ========
     
+**Parsing specification** - set of instructions about what information to extract from CSV file.      
+    
 **Resulting dataframes** - pandas dataframes with parsing result, usually denoted as ```dfa, dfq, dfm```. 
                            Hold time series at annual, quarterly and monthly frequency respectively.   
 
-**Stable URL** - a web address, from where an end user can read a canonical dataset. 
+**Stable URL** - a web address, from where an end user can read a canonical dataset. Stable URL is 
+<https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>.
  
   
 Active tasks 
@@ -63,7 +66,7 @@ Refactoring, documentation testing for:
 ### [Edit example1.py](https://github.com/epogrebnyak/mini-kep/issues/53)
 
 Todo:
-- [ ] comment this 
+- [ ] comment current version 
 - [ ] larger example with several tables + maybe segment
 - [ ] use this example in end-to-end testing 
 
@@ -77,11 +80,14 @@ Reference:
   - [ ] Variable transformation layer - need to diff the GOV_ACCUM see <issues/todo_df_check.py>
 
 
-### Download and s3 sync
+### Download files
 
 - [ ] [Download files](https://github.com/epogrebnyak/mini-kep/issues/30)
-
 - [ ] Unpack zip/rar files 
+
+### s3 sync
+
+Rules:
 
 - [ ] [#51: Sync with aws s3](https://github.com/epogrebnyak/mini-kep/issues/51)
   at [task_boto_download.py](https://github.com/epogrebnyak/mini-kep/blob/dev/todo_task_boto_s3_sync.py):
