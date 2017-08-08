@@ -1,8 +1,6 @@
 """Create pandas dataframes based on data in Table() instances and save to CSV.
 
-
 *Emitter* class extracts data at different frequences Table() instances.
-
 
 *Vintage* class addresses dataset by year and month:
     
@@ -247,8 +245,9 @@ class Collection:
 
     @staticmethod
     def approve_all():
-        """Checks all dates, runs slow (about 20 sec.)
-           May fail if dataset not complete.
+        """Checks all dates, runs for about 1-2 min of a fast computer.
+           May fail if dataset not complete, eg word2csv written only part 
+           of CSV file. 
         """
         for year, month in filled_dates():
             print("Checking", year, month)
@@ -268,4 +267,5 @@ if __name__ == "__main__":
 
     year, month = 2017, 5
     vint = Vintage(year, month)
+    vint.validate()
     dfa, dfq, dfm = vint.dfs()

@@ -13,15 +13,15 @@ and examples [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example
 ```
 (1) Rosstat -> (2) mini-kep -> (3) clean CSV files -> (4) your code with R/pandas
 ```
-1. Rosstat publishes KEP publication every month as archive of Word files
+1. Rosstat publishes KEP publication every month as zipped Word files
 2. mini-kep parses Word files and saves output as three CSV files (annual, quarterly and monthly)
-3. CSV files are available at <https://goo.gl/Cr5mSZ> 
+3. CSV files are available at <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>, 
+   or <https://goo.gl/Cr5mSZ> 
 4. you can import Russian macroeconomic indicators to your R/pandas code from these files  
 
 
 Parser pipeline
 ===============
-
 -   **manually** (*FIXME*):
     -   download zip/rar file for a specified month [from Rosstat website]
     -   unpack MS Word files to a local folder
@@ -55,7 +55,13 @@ Refactoring, documentation testing for:
 
 ### [Edit example1.py](https://github.com/epogrebnyak/mini-kep/issues/53)
 
-- [provide CSV example](https://github.com/epogrebnyak/mini-kep/issues/9)
+Todo:
+- [ ] larger example with several tables + maybe segment
+- [ ] use this example in end-to-end testing 
+
+Reference: 
+
+- [CSV mock proposal](https://github.com/epogrebnyak/mini-kep/issues/9)
 
 ### [Validation procedure for parsing result with checkpoints](https://github.com/epogrebnyak/mini-kep/issues/50)
 
