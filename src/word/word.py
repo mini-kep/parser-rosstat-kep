@@ -200,5 +200,5 @@ if __name__ == "__main__":
     #WORD_ROOT = Path("D:/digital/kep_data2")
     #word_folder = get_word_folder(2012, 11, WORD_ROOT)
 
-    word_folder = Path("C:/Users/Евгений/Desktop/ind05")
+    word_folder = Path("D:/digital/kep_data/2015_01")
     folder_to_csv(word_folder)

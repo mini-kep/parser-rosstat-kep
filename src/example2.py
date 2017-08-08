@@ -1,15 +1,6 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Tue Aug  8 11:01:45 2017
-
-@author: PogrebnyakEV
-"""
-
 import pandas as pd
 from io import StringIO
-
-import kep.validator as vldr
-
 
 def to_dataframe(text):
     return pd.read_csv(StringIO(text), sep="\t")
@@ -59,48 +50,17 @@ dfa = to_dataframe(dfa_text)
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
 
-def yield_checkpoints():
-    for c in vldr.ANNUAL + vldr.QTR + vldr.MONTHLY:
-        for pt in vldr.serialise(c):
-            yield(pt)
+# TODO #61 https://github.com/epogrebnyak/mini-kep/issues/61
 
-assert vldr.CHECKPOINTS == list(yield_checkpoints())
+"""In src/exmple2.py will make an entry point for checks on resulting dataframes, based on following rules:
 
-checkpoint = ('a', 'GDP_bln_rub', 1999, 4823.0)
-assert next(
-    vldr.serialise(checkpoint)) == {
-        'freq': 'a',
-        'label': 'GDP_bln_rub',
-        'period': False,
-        'value': 4823.0,
-    'year': 1999}
+    absolute values by month/qtr accumulate to qtr/year (with tolerance)
+    rog rates accumulate to yoy (with tolerance)
+    other rules for consistency checks
 
-checkpoint2 = ('q', 'CPI_rog', 1999, {1: 116.0, 2: 107.3, 3: 105.6, 4: 103.9})
-gen2 = vldr.serialise(checkpoint2)
-assert next(gen2) == {
-    'freq': 'q',
-    'label': 'CPI_rog',
-    'year': 1999,
-    'period': 1,
-    'value': 116.0}
-assert next(gen2) == {
-    'freq': 'q',
-    'label': 'CPI_rog',
-    'year': 1999,
-    'period': 2,
-    'value': 107.3}
 
-checker = vldr.Validator(dfa, dfq, dfm)
+# TODO: transform GOV_ACCUM_variables to non-accumulated values (by substacting)."""
 
-pt = {
-    'freq': 'a',
-    'label': 'GDP_bln_rub',
-    'period': False,
-    'value': 4823.0,
-    'year': 1999}
-z = checker.get_value(pt)
-assert z == 4823
-assert checker.is_included(pt)
+gov_vars =[x for x in dfa.columns if x.startswith('GOV') and "ACCUM" in x]
 
-for p in vldr.CHECKPOINTS:
-    assert checker.is_included(p)
+

@@ -1,16 +1,14 @@
 """Create pandas dataframes based on data in Table() instances and save to CSV.
 
-
 *Emitter* class extracts data at different frequences Table() instances.
 
-
 *Vintage* class addresses dataset by year and month:
-    
+
    Vintage(year, month).validate()
    Vintage(year, month).save()
-   
-*Collection* manipulates all datasets, released at various dates: 
-    
+
+*Collection* manipulates all datasets, released at various dates:
+
     - save_all()
     - save_latest()
     - approve_latest()
@@ -109,12 +107,12 @@ def get_date_year_end(year):
 
 class Emitter:
     """Emitter extracts, holds and emits annual, quarterly and monthly values
-       from list or stream Table() instances. Table() must be defined with 
+       from list or stream Table() instances. Table() must be defined with
        label and splitter function.
-       
+
        Raises:
            ValueError if any input table is not defined.
-           
+
        Method:
            get_dataframe(freq)
     """
@@ -122,7 +120,7 @@ class Emitter:
     def __init__(self, tables):
         self.a = []
         self.q = []
-        self.m = []        
+        self.m = []
         for t in tables:
             self._add_table(t)
 
@@ -143,12 +141,11 @@ class Emitter:
                       for t, val in enumerate(m_values) if val]
                 self.m.extend(ms)
 
-
     def _collect(self, freq):
         if freq in "aqm":
             return dict(a=self.a, q=self.q, m=self.m)[freq]
         else:
-            raise ValueError(freq)          
+            raise ValueError(freq)
 
     @staticmethod
     def _assert_has_no_duplicate_rows(df):
@@ -174,14 +171,19 @@ class Emitter:
             df.insert(1, "qtr", df.index.quarter)
         elif freq == "m":
             df.insert(1, "month", df.index.month)
-        # delete some internals for better df formatting    
+        # delete some internals for better df formatting
         df.columns.name = None
         df.index.name = None
         return df
 
 
-
 def csvfile_to_dataframes(csvfile, spec=SPEC):
+    """Extract dataframes from *csvfile* using *spec* parsing instructions.
+
+    Arg:
+      csvfile (file connection or StringIO) - CSV file for parsing
+      spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
+    """
     rows = to_rows(csvfile)
     tables = get_tables(rows, spec)
     emitter = Emitter(tables)
@@ -247,8 +249,9 @@ class Collection:
 
     @staticmethod
     def approve_all():
-        """Checks all dates, runs slow (about 20 sec.)
-           May fail if dataset not complete.
+        """Checks all dates, runs for about 1-2 min of a fast computer.
+           May fail if dataset not complete, eg word2csv written only part
+           of CSV file.
         """
         for year, month in filled_dates():
             print("Checking", year, month)
@@ -257,15 +260,14 @@ class Collection:
 
 
 if __name__ == "__main__":
-    # Collection.approve_latest()
-    
-    # ERROR: approve all will fail on new definitons in 2009 4
-    # ValueError: Missed labels: ['UNEMPL_pct', 'WAGE_NOMINAL_rub', 'WAGE_REAL_yoy', 'WAGE_REAL_rog']    
-    Collection.approve_all()
-    
+    # Collection calls
+    Collection.approve_latest()
+    # Collection.approve_all()
     # Collection.save_latest()
     # Collection.save_all()
 
+    # sample dfa, dfq, dfm  and Vintage calls
     year, month = 2017, 5
     vint = Vintage(year, month)
+    vint.validate()
     dfa, dfq, dfm = vint.dfs()

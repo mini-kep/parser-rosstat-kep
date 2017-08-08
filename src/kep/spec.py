@@ -6,18 +6,17 @@ Global variable  **SPEC** (:class:`kep.spec.Specification`) allows access to
 parsing definitions:
 
   - :func:`kep.spec.Specification.get_main_parsing_definition` retrieves
-    main (default) parsing definition, where most indicators are defined
+    main (default) parsing definition, where most indicators are defined;
 
   - :func:`kep.spec.Specification.get_segment_parsing_definitions` provides
-    a list of parsing defintions by csv segment
+    a list of parsing defintions by csv segment.
 
 We parse CSV file by segment, because some table headers repeat themselves in
-CSV file. Extracting a piece out of CSV file gives a very specific input for
+CSV file. Extracting a piece out of CSV file gives a good isolated input for
 parsing.
 
-Previously **SPEC** was initialised from yaml file, but this
-led to many errors, so the parsing instructions are now created
-internally in *spec.py*.
+Previously **SPEC** was initialised from yaml file, but this led to many errors,
+so the parsing instructions are now created internally in *spec.py*.
 
 **SPEC** is used by:
 
@@ -37,6 +36,7 @@ UNITS = odict([  # 1. MONEY
     ('млрд.рублей', 'bln_rub'),
     ('млрд. рублей', 'bln_rub'),
     ('рублей / rubles', 'rub'),
+    ('рублей', 'rub'),
     ('млн.рублей', 'mln_rub'),
     # 2. RATES OF CHANGE
     ("Индекс физического объема произведенного ВВП, в %", 'yoy'),
@@ -56,6 +56,7 @@ UNITS = odict([  # 1. MONEY
     ('отчетный месяц в % к соответствующему месяцу предыдущего года', 'yoy'),
     ('период с начала отчетного года', 'ytd'),
     # 3. OTHER UNITS (keep below RATES OF CHANGE)
+    ("в % к экономически активному населению", "pct"),
     ('%', 'pct'),
     ('в % к ВВП', 'gdp_percent'),
     ('млрд. тонно-км', 'bln_tkm'),
@@ -214,8 +215,11 @@ class Scope():
     def get_bounds(self, rows):
         """Get start and end line markers, which can be found in *rows*
 
+        Returns:
+            start, end - tuple of start and end strings found in *rows*
+
         Raises:
-            ValueError: none of Scope() start/end line pairs was found in *rows*.
+            ValueError: no start/end line pairs was found in *rows*.
 
         """
 
@@ -231,13 +235,22 @@ class Scope():
 
     @staticmethod
     def _is_found(line, rows):
-        """Return True, is *line* found at start of any entry in *rows*"""
+        """
+        Return:
+           True, if *line* found at start of some entry in *rows*
+           False otherwise
+        """
         for r in rows:
             if r.startswith(line):
                 return True
         return False
 
     def _error_message(self, rows):
+        """Prepare error message with diagnostics.
+
+        Returns:
+            string with message text
+        """
         msg = []
         msg.append("start or end line markers not found in *rows*")
         for marker in self.__markers:
@@ -254,8 +267,8 @@ class Scope():
 
 
 class Definition(object):
-    """Holds together parsing instruction, scope and (optional)
-       custom reader function name.
+    """Holds together parsing instruction, (optional) scope and (optional)
+       custom reader function name. Also initialised with units.
     """
 
     def __init__(self, scope=False, reader=False, units=False):
@@ -280,6 +293,10 @@ class Definition(object):
         self.instr.append(*arg, **kwarg)
 
     def set_scope(self, sc):
+        """
+        Raises:
+            TypeError: if *sc* is not Scope().
+        """
         if isinstance(sc, Scope):
             self.scope = sc
         else:
@@ -378,14 +395,16 @@ main.append(varname="INDPRO",
             required_units=["yoy", "rog"],
             desc="Промышленное производство")
 main.append(varname="UNEMPL",
-            text=["Уровень безработицы"],
+            text=["Уровень безработицы", "Общая численность безработных"],
             required_units=["pct"])
 main.append(
     "WAGE_NOMINAL",
-    "Среднемесячная номинальная начисленная заработная плата работников организаций",
+    ["Среднемесячная номинальная начисленная заработная плата работников организаций",
+     "Среднемесячная номинальная начисленная заработная плата одного работника"],
     "rub")
 main.append("WAGE_REAL",
-            "Реальная начисленная заработная плата работников организаций",
+            ["Реальная начисленная заработная плата работников организаций",
+             "Реальная начисленная заработная плата одного работника"],
             ["yoy", "rog"])
 main.append("TRANSPORT_FREIGHT",
             "Коммерческий грузооборот транспорта",

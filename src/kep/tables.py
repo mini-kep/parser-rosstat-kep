@@ -20,7 +20,9 @@ warnings.simplefilter('ignore', UserWarning)
 
 def fix_multitable_units(tables):
     """For tables without *varname* copy *varname* from previous table.
-        Applies to tables without unknown rows.
+    
+       Applies to tables without unknown rows.
+       
     """
     for prev_table, table in zip(tables, tables[1:]):
         if table.varname is None and not table.has_unknown_lines():
