@@ -1,6 +1,6 @@
 """Create pandas dataframes based on data in Table() instances and save to CSV.
 
-*Emitter* class extracts data at different frequences Table() instances.
+*Emitter* class extracts data at different frequences from Table() instances.
 
 *Vintage* class addresses dataset by year and month:
 
@@ -159,19 +159,22 @@ class Emitter:
     def get_dataframe(self, freq):
         df = pd.DataFrame(self._collect(freq))
         if df.empty:
-            return df
+            return pd.Dataframe()
         self._assert_has_no_duplicate_rows(df)
+        #make time index
         funcs = dict(a=lambda x: get_date_year_end(x['year']),
                      q=lambda x: get_date_quarter_end(x['year'], x['qtr']),
                      m=lambda x: get_date_month_end(x['year'], x['month']))
         df["time_index"] = df.apply(funcs[freq], axis=1)
+        #reshape
         df = df.pivot(columns='label', values='value', index='time_index')
+        #add yeay and period
         df.insert(0, "year", df.index.year)
         if freq == "q":
             df.insert(1, "qtr", df.index.quarter)
         elif freq == "m":
             df.insert(1, "month", df.index.month)
-        # delete some internals for better df formatting
+        # delete some df internals for better view
         df.columns.name = None
         df.index.name = None
         return df

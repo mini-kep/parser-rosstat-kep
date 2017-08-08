@@ -1,4 +1,5 @@
-"""Parse CSV file rows into Tables() using parsing specification from spec.py
+"""Parse CSV file rows into Table() instanses using parsing specification 
+   from spec.py.
 
 Main call:
    tables = get_tables(rows, SPEC)
@@ -154,7 +155,7 @@ class Table:
         return "\n".join(show)
 
     def __repr__(self):
-        return "Table(headers={}, datarows={})".format(repr(self.headers),
+        return "Table(headers={},\ndatarows={})".format(repr(self.headers),
                                                        repr(self.datarows))
 
 
