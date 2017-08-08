@@ -36,17 +36,22 @@ assert isinstance(dfq, pd.DataFrame)
 assert isinstance(dfm, pd.DataFrame) # dfm is empty
 
 # 2. content validation procedure
-from kep.vintage import Validator
-check_point1 = dict(label='GDP_bln_rub', year=1999, a=4823.0, q={1:901, 4:1447})        
-assert Validator(dfa, dfq, dfm).is_included(check_point1) 
+from kep.validator import Validator, serialise
+check_points = [{'freq': 'a', 'label': 'GDP_bln_rub', 'period': False, 'value': 4823.0, 'year': 1999},
+                {'freq': 'q', 'label': 'GDP_bln_rub', 'period': 1, 'value': 901.0, 'year': 1999},
+                {'freq': 'q', 'label': 'GDP_bln_rub', 'period': 4, 'value': 2044, 'year': 2000}]
+checker = Validator(dfa, dfq, dfm)
+for c in check_points:
+    assert checker.is_included(c) 
 
 
-# 3. read by month/year and save to 'data/processed' folder
+# 3. read by month/year
 from kep.vintage import Vintage
 year, month = 2017, 5
 vint = Vintage(year, month)
-vint.save()
-# can also validate agint checkpoints
 vint.validate()
+dfa2, dfq2, dfm2 = vint.dfs()
+# may also save to 'data/processed' folder
+# vint.save()
 
 # TODO: parse several tables with a larger parsing definitoin (from test folder)

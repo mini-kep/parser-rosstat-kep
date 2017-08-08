@@ -256,15 +256,13 @@ class Collection:
 
 
 if __name__ == "__main__":
-    # Collection.approve_latest()
-    
-    # ERROR: approve all will fail on new definitons in 2009 4
-    # ValueError: Missed labels: ['UNEMPL_pct', 'WAGE_NOMINAL_rub', 'WAGE_REAL_yoy', 'WAGE_REAL_rog']    
-    Collection.approve_all()
-    
+    # Collection calls
+    Collection.approve_latest()
+    # Collection.approve_all()
     # Collection.save_latest()
     # Collection.save_all()
 
+    # sample dfa, dfq, dfm  and Vintage calls 
     year, month = 2017, 5
     vint = Vintage(year, month)
     vint.validate()
