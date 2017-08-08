@@ -259,7 +259,8 @@ class Collection:
 if __name__ == "__main__":
     # Collection.approve_latest()
     
-    # ERROR: approve all will fail on new definitons
+    # ERROR: approve all will fail on new definitons in 2009 4
+    # ValueError: Missed labels: ['UNEMPL_pct', 'WAGE_NOMINAL_rub', 'WAGE_REAL_yoy', 'WAGE_REAL_rog']    
     Collection.approve_all()
     
     # Collection.save_latest()
