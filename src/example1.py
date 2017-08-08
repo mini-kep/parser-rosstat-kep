@@ -9,6 +9,11 @@ from kep.vintage import Emitter
 
 
 def csvfile_to_dataframes(csvfile, spec):
+    """
+    Arg:
+      csvfile (file connection or StringIO) - CSV file for parsing
+      spec (spec.Specification) - pasing instructions
+    """
     rows = to_rows(csvfile)
     tables = get_tables(rows, spec)    
     emitter = Emitter(tables)

@@ -180,6 +180,12 @@ class Emitter:
 
 
 def csvfile_to_dataframes(csvfile, spec=SPEC):
+    """Extract dataframes from *csvfile* using *spec* parsing instructions. 
+   
+    Arg:
+      csvfile (file connection or StringIO) - CSV file for parsing
+      spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
+    """
     rows = to_rows(csvfile)
     tables = get_tables(rows, spec)
     emitter = Emitter(tables)
