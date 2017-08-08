@@ -3,19 +3,19 @@
 import csv
 import re
 
-ENC = 'utf-8'
-CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
+ENC = "utf-8"
+CSV_FORMAT = dict(delimiter="\t", lineterminator="\n")
 
 # csv file access
 
 
 def to_csv(rows, path):
     """Accept iterable of rows *rows* and write in to *csv_path*"""
-    with path.open('w', encoding=ENC) as csvfile:
+    with path.open("w", encoding=ENC) as csvfile:
         filewriter = csv.writer(csvfile, **CSV_FORMAT)
         for row in rows:
             filewriter.writerow(row)
-    return path
+    return path # Why return path?
 
 
 def open_csv(path):
@@ -63,7 +63,8 @@ class Row:
         self.name = row[0]
         self.data = row[1:]
 
-    def len(self):
+    def __len__(self):
+        # Special method designated to len() function
         return len(self.data)
 
     def is_datarow(self):
@@ -75,13 +76,10 @@ class Row:
         text = text.replace('"', '')
         return r.startswith(text)
 
-    # FIXME: identical to startswith?
+    # FIXME: identical to startswith? -- No it's not \b matches at a word boundary i.e. start of any word
     def matches(self, pat):
         rx = r"\b{}".format(pat)
-        if re.search(rx, self.name):
-            return True
-        else:
-            return False
+        return bool(re.search(rx, self.name))
 
     def get_year(self):
         return get_year(self.name)
@@ -99,7 +97,7 @@ class Row:
         else:
             return False
 
-    def get_unit(self, units_mapper_dict):  # =spec.UNITS):
+    def get_unit(self, units_mapper_dict):
         for k in units_mapper_dict.keys():
             if k in self.name:
                 return units_mapper_dict[k]
@@ -110,7 +108,7 @@ class Row:
 
     def __str__(self):
         if "".join(self.data):
-            return "<{} | {}>".format(self.name, ' '.join(self.data))
+            return "<{} | {}>".format(self.name, " ".join(self.data))
         else:
             return "<{}>".format(self.name)
 
@@ -118,9 +116,10 @@ class Row:
         return "Row({})".format([self.name] + self.data)
 
 
-YEAR_CATCHER = re.compile('(\d{4}).*')
+YEAR_CATCHER = re.compile("(\d{4}).*")
 
-
+# is this method intended to use outside of Row class?
+# maybe it should be staticmethod?
 def get_year(string: str, rx=YEAR_CATCHER):
     """Extracts year from string *string*.
        Returns False if year is not valid or not in plausible range."""
@@ -131,7 +130,8 @@ def get_year(string: str, rx=YEAR_CATCHER):
             return year
     return False
 
-
+# is this method intended to use outside of Row class?
+# maybe it should be staticmethod?
 def is_year(string: str) -> bool:
     return get_year(string) is not False
 
@@ -144,7 +144,7 @@ class RowStack:
 
     def __init__(self, rows):
         # consume *rows*, likely it is a generator
-        self.rows = [r for r in rows]
+        self.rows = list(rows)
 
     def remaining_rows(self):
         return self.rows
@@ -181,12 +181,12 @@ class RowStack:
 
 
 if __name__ == "__main__":
-    assert Row(["1. abcd"]).get_varname({'1. ab': "ZZZ"}) == 'ZZZ'
-    assert Row(["1. abcd"]).get_varname({'bc': "ZZZ"}) is False
+    assert Row(["1. abcd"]).get_varname({"1. ab": "ZZZ"}) == "ZZZ"
+    assert Row(["1. abcd"]).get_varname({"bc": "ZZZ"}) is False
     import pytest
     with pytest.raises(ValueError):
-        assert Row(["1. abcd"]).get_varname({'1. ab': "ZZZ", '1. abcd': "YYY"})
-    assert Row(["1. abcd, %"]).get_unit({'%': "pct"}) == 'pct'
+        assert Row(["1. abcd"]).get_varname({"1. ab": "ZZZ", "1. abcd": "YYY"})
+    assert Row(["1. abcd, %"]).get_unit({"%": "pct"}) == "pct"
 
     def mock_read_csv():
         yield Row(["apt", "1", "2"])
@@ -202,5 +202,8 @@ if __name__ == "__main__":
     b = rows.pop("apt", "wed")
     assert len(b) == 2
     c = rows.remaining_rows()
-    assert c[0] == Row(['wed', '1', '2'])
-    assert c[1] == Row(['zed'])
+    assert c[0] == Row(["wed", "1", "2"])
+    assert c[1] == Row(["zed"])
+    
+    assert len(Row(["wed", "1", "2"])) == 2
+    assert eval(repr(Row(["wed", "1", "2"]))) == Row(["wed", "1", "2"])
