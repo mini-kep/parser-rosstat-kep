@@ -28,24 +28,24 @@ Parser pipeline
 -   **word2csv**: convert MS Word files to single interim CSV file (see [example])
 -   **csv2df**: parse interim CSV file to obtain [processed CSV files][processed CSV files at stable URL] with annual, quarterly and monthly data.
 
-Also in [/src] folder:
+Also in [/src](https://github.com/epogrebnyak/mini-kep/tree/master/src) folder:
 
 -   **access\_data**: sample code to download data from stable URL and save a local copy
--   **frontpage**: add tables and graphs to [README.md]
+-   **frontpage**: add tables and graphs to [README.md](https://github.com/epogrebnyak/mini-kep/blob/master/VALUES.md)
 
   [mini-kep]: https://github.com/epogrebnyak/mini-kep
   [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
   [backend]: https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest
   [example]: https://github.com/epogrebnyak/mini-kep/blob/master/data/interim/2017/05/tab.csv
-  [/src]: https://github.com/epogrebnyak/mini-kep/tree/master/src
-  [README.md]: https://github.com/epogrebnyak/mini-kep/blob/master/VALUES.md
-
+  
 Glossary
 ========
     
-**resulting dataframes** - pandas dataframes with parsing result, usually denoted as ```dfa, dfq, dfm```, 
-                           Hold timeseries at annual, quarterly and monthly frequencies respectively.   
-  
+**Resulting dataframes** - pandas dataframes with parsing result, usually denoted as ```dfa, dfq, dfm```. 
+                           Hold time series at annual, quarterly and monthly frequency respectively.   
+
+**Stable URL** - a web address, from where an end user can read a canonical dataset. 
+ 
   
 Active tasks 
 ============
@@ -63,14 +63,19 @@ Refactoring, documentation testing for:
 ### [Edit example1.py](https://github.com/epogrebnyak/mini-kep/issues/53)
 
 Todo:
+- [ ] comment this 
 - [ ] larger example with several tables + maybe segment
 - [ ] use this example in end-to-end testing 
 
 Reference: 
-
 - [CSV mock proposal](https://github.com/epogrebnyak/mini-kep/issues/9)
 
 ### [Validation procedure for parsing result with checkpoints](https://github.com/epogrebnyak/mini-kep/issues/50)
+
+
+### transformations:
+  - [ ] Variable transformation layer - need to diff the GOV_ACCUM see <issues/todo_df_check.py>
+
 
 ### Download and s3 sync
 
@@ -89,7 +94,10 @@ Reference:
 Prepare tasks
 =============
 
-See [this tag](https://github.com/epogrebnyak/mini-kep/issues?q=is%3Aissue+is%3Aopen+label%3A%22edit+task+specification%22) for tasks requiring more specification. 
+> See [this tag](https://github.com/epogrebnyak/mini-kep/issues?q=is%3Aissue+is%3Aopen+label%3A%22edit+task+specification%22) for tasks requiring more specification. 
+
+
+Global config file with dates
 
 Add more parsing definitions:
   - [ ] see [#33 Add more variable definitions ](https://github.com/epogrebnyak/mini-kep/issues/33) 	
@@ -98,10 +106,7 @@ frontpage (AS?):
    - [ ] issue [#18](https://github.com/epogrebnyak/mini-kep/issues/18) + see also <https://github.com/epogrebnyak/mini-kep/tree/master/src/frontend>.
    - [ ] show imported variables or varnames
    - [ ] how many variable were read?
-
-transformations (AS?):
-  - [ ] Variable transformation layer - need to diff the GOV_ACCUM  
-   
+  
 testing: 
   - [ ] see <https://github.com/epogrebnyak/mini-kep/issues?q=is%3Aissue+is%3Aopen+label%3Atesting>
   - [ ] test coverage annotate 
@@ -111,11 +116,7 @@ testing:
    
 [Simplify procedure to update new month #29](https://github.com/epogrebnyak/mini-kep/issues/29):
   - [ ] may also review **filled_dates** mechanism in files.py 
- 
-follow-up tasks from spec.py:
-   - [ ] ```# TODO: use sample in required```
-   - [ ] ```# TODO: short names for variables in FRED style, short=```
- 
+
 [naming modules](https://github.com/epogrebnyak/mini-kep/issues/35)
    - [ ] rename kep to csv2df
    - [ ] csv2df.reader, parser, emitter
@@ -123,6 +124,10 @@ follow-up tasks from spec.py:
    
 NOT TODO
 ========
+
+follow-up tasks from spec.py:
+   - [ ] use sample in required
+   - [ ] short names for variables in FRED style, ```short=```
 
 - sphinx-doc usage:
   - include intro.md in index.rst
