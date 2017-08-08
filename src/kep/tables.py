@@ -107,7 +107,7 @@ class Table:
         self.headers = headers
         self.lines = odict((row.name, self.UNKNOWN) for row in headers)
         self.datarows = datarows
-        self.coln = max(row.len() for row in self.datarows)
+        self.coln = max(len(row) for row in self.datarows)
         self.splitter_func = None
 
     def set_label(self, varnames_dict, units_dict):
