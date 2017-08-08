@@ -42,7 +42,8 @@ spec1 = Specification(default=main)
 dfa, dfq, dfm = csvfile_to_dataframes(csvfile1, spec1)
 assert isinstance(dfa, pd.DataFrame)
 assert isinstance(dfq, pd.DataFrame)
-assert isinstance(dfm, pd.DataFrame) # dfm is empty
+assert isinstance(dfm, pd.DataFrame) 
+assert dfm.empty is True
 
 # 2. content validation procedure
 from kep.validator import Validator, serialise

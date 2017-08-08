@@ -10,9 +10,11 @@ from io import StringIO
 
 import kep.validator as vldr
 
+
 def to_dataframe(text):
-    return pd.read_csv(StringIO(text), sep="\t")    
-    
+    return pd.read_csv(StringIO(text), sep="\t")
+
+
 dfa_text = """	year	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GDP_bln_rub	GDP_yoy	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_yoy
 1999-12-31	1999	143.2	135.0	139.2	134.0	136.5	75.6	4823.0	106.4	1258.0	666.9	653.8	1213.6	615.5	660.8	-51.4	7.0	39.5		670.4	105.3	866.1	93.6	931.3	94.7	1797.4	94.2	3372.0	13.0	1523.0	78.0
 2000-12-31	2000	125.0	117.1	118.5	133.7	120.2	105.0	7306.0	110.0	1960.1	1029.2	1032.1	2097.7	1132.1	1065.8	102.9	33.8	44.9		1165.2	117.4	1093.2	107.5	1259.1	110.5	2352.3	109.0	3542.0	10.5	2223.0	120.9
@@ -39,7 +41,7 @@ dfq_text = """	year	qtr	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICE
 1999-09-30	1999	3	106.0	104.3	107.2	107.2	105.6	18.9	1373.0	111.4	795.8	434.2	400.6	759.3	387.3	411.0	-46.9	10.4	9.5			185.6		105.0	222.6	103.1	89.2	242.0	107.0	91.3	464.6	105.1	90.3	833.0	12.3	1642.0	102.4	76.4
 1999-12-31	1999	4	107.1	102.8	104.9	104.7	103.9	24.3	1447.0	112.0	1258.0	666.9	653.8	1213.6	615.5	660.8	-51.4	7.0	10.8			256.9		117.4	252.4	110.3	98.0	284.9	110.8	107.8	537.3	110.6	103.1	887.0	12.5	1927.0	112.9	104.7"""
 
-dfm_text =""" 	year	month	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_rog	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_rog	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_rog	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_rog	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_rog	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_rog	WAGE_REAL_yoy
+dfm_text = """ 	year	month	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_rog	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_rog	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_rog	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_rog	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_rog	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_rog	WAGE_REAL_yoy
 1999-01-31	1999	1	109.7	110.4	106.2	104.1	108.4	4.5	45.6	27.4	22.7	49.0	27.8	25.7	0.4	3.0	2.7			28.5	42.5	92.2	60.3	82.5	90.3	61.5	81.0	79.0	121.8	81.7	84.0	277.7	14.3	1167.0	72.5	58.6
 1999-02-28	1999	2	104.2	104.4	104.0	103.2	104.1	4.9	103.1	61.0	49.2	99.3	54.7	51.7	-6.3	2.5	3.0			31.8	108.4	93.8	60.7	96.5	93.7	62.2	97.4	85.4	122.9	96.9	89.2	252.1	14.6	1199.0	99.1	59.0
 1999-03-31	1999	3	103.4	102.7	103.2	101.9	102.8	5.8	189.0	108.3	91.5	171.9	89.1	93.6	-19.2	2.1	3.5			36.5	111.2	95.1	65.8	105.5	94.1	68.5	106.6	89.1	134.3	106.0	91.4	291.4	14.0	1385.0	111.7	62.8
@@ -57,32 +59,48 @@ dfa = to_dataframe(dfa_text)
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
 
-
 def yield_checkpoints():
-    for c in vldr.ANNUAL+vldr.QTR+vldr.MONTHLY:
+    for c in vldr.ANNUAL + vldr.QTR + vldr.MONTHLY:
         for pt in vldr.serialise(c):
             yield(pt)
-            
+
 assert vldr.CHECKPOINTS == list(yield_checkpoints())
-            
 
 checkpoint = ('a', 'GDP_bln_rub', 1999, 4823.0)
-assert next(vldr.serialise(checkpoint)) == {'freq': 'a', 'label': 'GDP_bln_rub',
-                                       'period': False, 'value': 4823.0,
-                                       'year': 1999}
+assert next(
+    vldr.serialise(checkpoint)) == {
+        'freq': 'a',
+        'label': 'GDP_bln_rub',
+        'period': False,
+        'value': 4823.0,
+    'year': 1999}
 
-checkpoint2 = ('q', 'CPI_rog',  1999, {1: 116.0, 2: 107.3, 3: 105.6, 4: 103.9})
+checkpoint2 = ('q', 'CPI_rog', 1999, {1: 116.0, 2: 107.3, 3: 105.6, 4: 103.9})
 gen2 = vldr.serialise(checkpoint2)
-assert next(gen2) == {'freq': 'q', 'label': 'CPI_rog', 'year': 1999, 'period': 1, 'value': 116.0}
-assert next(gen2) == {'freq': 'q', 'label': 'CPI_rog', 'year': 1999, 'period': 2, 'value': 107.3}
+assert next(gen2) == {
+    'freq': 'q',
+    'label': 'CPI_rog',
+    'year': 1999,
+    'period': 1,
+    'value': 116.0}
+assert next(gen2) == {
+    'freq': 'q',
+    'label': 'CPI_rog',
+    'year': 1999,
+    'period': 2,
+    'value': 107.3}
 
 checker = vldr.Validator(dfa, dfq, dfm)
 
-pt = {'freq': 'a', 'label': 'GDP_bln_rub',  'period': False,  'value': 4823.0,  'year': 1999}
+pt = {
+    'freq': 'a',
+    'label': 'GDP_bln_rub',
+    'period': False,
+    'value': 4823.0,
+    'year': 1999}
 z = checker.get_value(pt)
 assert z == 4823
 assert checker.is_included(pt)
 
-for p in vldr.CHECKPOINTS:    
+for p in vldr.CHECKPOINTS:
     assert checker.is_included(p)
-        

@@ -15,7 +15,7 @@ We parse CSV file by segment, because some table headers repeat themselves in
 CSV file. Extracting a piece out of CSV file gives a good isolated input for
 parsing.
 
-Previously **SPEC** was initialised from yaml file, but this led to many errors, 
+Previously **SPEC** was initialised from yaml file, but this led to many errors,
 so the parsing instructions are now created internally in *spec.py*.
 
 **SPEC** is used by:
@@ -214,7 +214,7 @@ class Scope():
 
     def get_bounds(self, rows):
         """Get start and end line markers, which can be found in *rows*
-        
+
         Returns:
             start, end - tuple of start and end strings found in *rows*
 
@@ -236,7 +236,7 @@ class Scope():
     @staticmethod
     def _is_found(line, rows):
         """
-        Return: 
+        Return:
            True, if *line* found at start of some entry in *rows*
            False otherwise
         """
@@ -247,7 +247,7 @@ class Scope():
 
     def _error_message(self, rows):
         """Prepare error message with diagnostics.
-        
+
         Returns:
             string with message text
         """

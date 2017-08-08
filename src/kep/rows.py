@@ -15,7 +15,7 @@ def to_csv(rows, path):
         filewriter = csv.writer(csvfile, **CSV_FORMAT)
         for row in rows:
             filewriter.writerow(row)
-    return path # Why return path?
+    return path  # Why return path?
 
 
 def open_csv(path):
@@ -76,7 +76,8 @@ class Row:
         text = text.replace('"', '')
         return r.startswith(text)
 
-    # FIXME: identical to startswith? -- No it's not \b matches at a word boundary i.e. start of any word
+    # RFE: identical to startswith? -- No it's not \b matches at a word
+    # boundary i.e. start of any word
     def matches(self, pat):
         rx = r"\b{}".format(pat)
         return bool(re.search(rx, self.name))
@@ -120,6 +121,8 @@ YEAR_CATCHER = re.compile("(\d{4}).*")
 
 # is this method intended to use outside of Row class?
 # maybe it should be staticmethod?
+
+
 def get_year(string: str, rx=YEAR_CATCHER):
     """Extracts year from string *string*.
        Returns False if year is not valid or not in plausible range."""
@@ -132,6 +135,8 @@ def get_year(string: str, rx=YEAR_CATCHER):
 
 # is this method intended to use outside of Row class?
 # maybe it should be staticmethod?
+
+
 def is_year(string: str) -> bool:
     return get_year(string) is not False
 
@@ -204,5 +209,5 @@ if __name__ == "__main__":
     c = rows.remaining_rows()
     assert c[0] == Row(["wed", "1", "2"])
     assert c[1] == Row(["zed"])
-    
+
     assert eval(repr(Row(["wed", "1", "2"]))) == Row(["wed", "1", "2"])

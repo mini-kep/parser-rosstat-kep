@@ -40,6 +40,13 @@ Also in [/src] folder:
   [/src]: https://github.com/epogrebnyak/mini-kep/tree/master/src
   [README.md]: https://github.com/epogrebnyak/mini-kep/blob/master/VALUES.md
 
+Glossary
+========
+    
+**resulting dataframes** - pandas dataframes with parsing result, usually denoted as ```dfa, dfq, dfm```, 
+                           Hold timeseries at annual, quarterly and monthly frequencies respectively.   
+  
+  
 Active tasks 
 ============
 
