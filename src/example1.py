@@ -9,7 +9,11 @@ from kep.vintage import Emitter
 
 
 def csvfile_to_dataframes(csvfile, spec):
-    """
+    """Extract dataframes from *csvfile* using *spec* parsing instructions. 
+    
+    This fucntion is also contained in vintage.py, duplicated here for 
+    reference.
+    
     Arg:
       csvfile (file connection or StringIO) - CSV file for parsing
       spec (spec.Specification) - pasing instructions
