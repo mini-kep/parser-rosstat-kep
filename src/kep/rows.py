@@ -15,8 +15,9 @@ def to_csv(rows, path):
         filewriter = csv.writer(csvfile, **CSV_FORMAT)
         for row in rows:
             filewriter.writerow(row)
-    return path  # Why return path?
-
+    return path  # Why return path? - EP: just further use, actually 
+                 #                        to_csv not used in the program, it is here for symmetry
+                 
 
 def open_csv(path):
     return path.open(encoding=ENC)
@@ -119,9 +120,12 @@ class Row:
 
 YEAR_CATCHER = re.compile("(\d{4}).*")
 
-# is this method intended to use outside of Row class?
+# ID: is this method intended to use outside of Row class?
 # maybe it should be staticmethod?
 
+# EP: generally you are right, by convention I keep these functions standalone, 
+#     just feel better about it in testing. they have a history of migrating 
+#     from module to module 
 
 def get_year(string: str, rx=YEAR_CATCHER):
     """Extracts year from string *string*.
@@ -132,9 +136,6 @@ def get_year(string: str, rx=YEAR_CATCHER):
         if year >= 1991 and year <= 2050:
             return year
     return False
-
-# is this method intended to use outside of Row class?
-# maybe it should be staticmethod?
 
 
 def is_year(string: str) -> bool:
