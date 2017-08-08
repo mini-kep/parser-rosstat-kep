@@ -205,5 +205,4 @@ if __name__ == "__main__":
     assert c[0] == Row(["wed", "1", "2"])
     assert c[1] == Row(["zed"])
     
-    assert len(Row(["wed", "1", "2"])) == 2
     assert eval(repr(Row(["wed", "1", "2"]))) == Row(["wed", "1", "2"])
