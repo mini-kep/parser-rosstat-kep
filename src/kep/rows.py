@@ -32,7 +32,7 @@ def read_csv(path):
 def yield_csv_rows(csvfile, fmt=CSV_FORMAT):
     """Yield CSV rows from *csvfile*.
 
-    Arg:
+    Args:
         csvfile - file connection or StringIO
 
     Yields:
@@ -45,7 +45,7 @@ def yield_csv_rows(csvfile, fmt=CSV_FORMAT):
 def to_rows(csvfile):
     """Filter and yield Row() instances from *csvfile*.
 
-    Arg:
+    Args:
         csvfile - file connection or StringIO
 
     Yields:
@@ -64,14 +64,26 @@ class Row:
         self.name = row[0]
         self.data = row[1:]
 
-    def __len__(self):
-        # Special method designated to len() function
-        return len(self.data)
-
     def is_datarow(self):
+        """Check if this Row object is row of data.
+        
+        If self.name is a year then this is datarow.
+        True is returned in such case. False otherwise.
+          
+        Returns:
+            True if object is datarow, False otherwise.
+        """
         return is_year(self.name)
 
     def startswith(self, text):
+        """Check if self.name starts with given string.
+        
+        Args:
+            text: A string that is searched for in self.name
+          
+        Returns:
+            True if self.name starts with string text. False otherwise.
+        """
         # clean out apostrophe (")
         r = self.name.replace('"', '')
         text = text.replace('"', '')
@@ -84,15 +96,35 @@ class Row:
         return bool(re.search(rx, self.name))
 
     def get_year(self):
+        """Returns self.name as a year int.
+        
+        Parses self.name to get year as an integer.
+        If self.head cannot be parsed as a year, False is returned
+          
+        Returns:
+            Year as an integer, or False, if year cannot be parsed.
+        """
         return get_year(self.name)
 
     def get_varname(self, varnames_mapper_dict):
+        """Returns variable name of this datarow.
+        
+        Args:
+            varnames_mapper_dict: Dictionary of valid variable names
+          
+        Returns:
+            Matched varname from self.name.
+            False if no match was found.
+            
+        Raises:
+            ValueError: If match found for more than one legal varname 
+        """
         varnames = []
         for k in varnames_mapper_dict.keys():
             if self.matches(k):
                 varnames.append(varnames_mapper_dict[k])
         if len(varnames) > 1:
-            msg = "Many entries found in <{}>: {}".format(self.name, varnames)
+            msg = "Many entries found in <{0}>: {1}".format(self.name, varnames)
             raise ValueError(msg)
         elif len(varnames) == 1:
             return varnames[0]
@@ -100,11 +132,22 @@ class Row:
             return False
 
     def get_unit(self, units_mapper_dict):
+        """Returns units of this datarow.
+
+        Args:
+            units_mapper_dict: Dictionary of valid units
+          
+        Returns:
+            Matched unit. False if no match was found.
+        """
         for k in units_mapper_dict.keys():
             if k in self.name:
                 return units_mapper_dict[k]
         return False
 
+    def __len__(self):
+        return len(self.data)
+    
     def __eq__(self, x):
         return bool(self.name == x.name and self.data == x.data)
 
@@ -120,12 +163,6 @@ class Row:
 
 YEAR_CATCHER = re.compile("(\d{4}).*")
 
-# ID: is this method intended to use outside of Row class?
-# maybe it should be staticmethod?
-
-# EP: generally you are right, by convention I keep these functions standalone, 
-#     just feel better about it in testing. they have a history of migrating 
-#     from module to module 
 
 def get_year(string: str, rx=YEAR_CATCHER):
     """Extracts year from string *string*.
@@ -212,3 +249,5 @@ if __name__ == "__main__":
     assert c[1] == Row(["zed"])
 
     assert eval(repr(Row(["wed", "1", "2"]))) == Row(["wed", "1", "2"])
+
+    
