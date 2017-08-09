@@ -57,75 +57,100 @@ In order of appearance:
 **Stable URL** - 
      a web address, from where an end user can read a canonical dataset: 
 	 
-    -  <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfa.csv>.
-	-  <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfq.csv>.
-	-  <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfm.csv>.
- 
+- <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfa.csv>
+- <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfq.csv>
+- <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfm.csv>
+	 
   
 Active tasks 
 ============
 
-### Review rows.py, tables.py, vintage.py
+These tasks are marked with ['in development' label][in_dev]
+
+[in_dev]: https://github.com/epogrebnyak/mini-kep/labels/in%20development
+
+
+
+### review src/kep (doctrints, eye review, refactoring code and tests)
 
 Issue: <https://github.com/epogrebnyak/mini-kep/issues/52>
 
-Who: ID
+Guidelines: <https://github.com/epogrebnyak/mini-kep/blob/master/issues/todo_refactoring.md>
 
 Refactoring, documentation, testing for:
 - [x] kep.files 
 - [x] kep.spec 
-- [ ] kep.rows
+- [ ] kep.rows (in progres)
 - [x] kep.splitter
 - [ ] kep.tables
 - [ ] kep.vintage
+- [ ] kep.validator, also as [Issue #50](https://github.com/epogrebnyak/mini-kep/issues/50)
 
-### [Edit example1.py](https://github.com/epogrebnyak/mini-kep/issues/53)
+### parsing result validation 
 
-Todo:
-- [ ] comment current version 
-- [ ] larger example with several tables + maybe segment
-- [ ] use this example in end-to-end testing 
+Issue: <https://github.com/epogrebnyak/mini-kep/issues/50>
 
-Reference: 
-- [CSV mock proposal](https://github.com/epogrebnyak/mini-kep/issues/9)
+Expected result: 
+  - [ ] new file src/test/test_validator.py
 
-### [Validation procedure for parsing result with checkpoints](https://github.com/epogrebnyak/mini-kep/issues/50)
+### download an unpack rar files from Rosstat
 
+Issue: <https://github.com/epogrebnyak/mini-kep/issues/30>
 
-### transformations:
-  - [ ] Variable transformation layer - need to diff the GOV_ACCUM see <issues/todo_df_check.py>
+Work file: <https://github.com/epogrebnyak/mini-kep/blob/master/issues/todo_download.py>
 
+Expected result: 
+  - [x] Download rar file from Rosstat
+  - [x] Unrar MS Word files
+  - [ ] wrap unrar for linux usage
+  - [ ] save Word files to designated folder
+  - [ ] rely on new date helper to check what can be downloaded
 
-### Download files
+### resulting df consistency check and transformations
 
-- [ ] [Download files](https://github.com/epogrebnyak/mini-kep/issues/30)
-- [ ] Unpack zip/rar files 
+Issue: <https://github.com/epogrebnyak/mini-kep/issues/61>
 
-### s3 sync
+Work file: <https://github.com/epogrebnyak/mini-kep/blob/master/issues/todo_df_check.py>
 
-Rules:
-
-- [ ] [#51: Sync with aws s3](https://github.com/epogrebnyak/mini-kep/issues/51)
-  at [task_boto_download.py](https://github.com/epogrebnyak/mini-kep/blob/dev/todo_task_boto_s3_sync.py):
-  - [ ] local to S3 
-  - [ ] S3 to local 
-  - [ ] html docs to bucket 
-  - [ ] manually save deeper history of s3 files to bucket
+Expected result:
+  - [ ] anomalies in ```dfa, dfq, dfm``` revealed
+  - [ ] GOV_*_ACCUM differentiated
 
   
+    
+ 
 Prepare tasks
 =============
 
-> See [this tag](https://github.com/epogrebnyak/mini-kep/issues?q=is%3Aissue+is%3Aopen+label%3A%22edit+task+specification%22) for tasks requiring more specification. 
+Tasks below require more specification. 
 
 
-Global config file with dates
+[simplify procedure to update new month #29](https://github.com/epogrebnyak/mini-kep/issues/29)
 
-Add more parsing definitions:
+helper module with  dates:
+  - [ ] review **filled_dates** mechanism in files.py 
+
+helper module with local file paths:  
+  - [ ] maybe also web destination 
+  
+html docs to bucket:
+  - [ ] document why unhappy with readthedocs
+  - [ ] try restore encoding at readthedocs (maybe python3 issue , will not work)  
+  - [ ] uploader to bucket
+  
+s3 sync:
+  - workfile <https://github.com/epogrebnyak/mini-kep/blob/master/issues/todo_boto_s3_sync.py>
+  - issue: <https://github.com/epogrebnyak/mini-kep/issues/51>
+  - [ ] local to S3 
+  - [ ] S3 to local 
+  - [ ] manually save deeper history of s3 files to bucket
+
+add more parsing definitions:
   - [ ] see [#33 Add more variable definitions ](https://github.com/epogrebnyak/mini-kep/issues/33) 	
   
-frontpage (AS?):
-   - [ ] issue [#18](https://github.com/epogrebnyak/mini-kep/issues/18) + see also <https://github.com/epogrebnyak/mini-kep/tree/master/src/frontend>.
+frontpage:
+   - issue <https://github.com/epogrebnyak/mini-kep/issues/18> 
+   - workfile <https://github.com/epogrebnyak/mini-kep/tree/master/src/frontend>.
    - [ ] show imported variables or varnames
    - [ ] how many variable were read?
   
@@ -133,25 +158,25 @@ testing:
   - [ ] see <https://github.com/epogrebnyak/mini-kep/issues?q=is%3Aissue+is%3Aopen+label%3Atesting>
   - [ ] test coverage annotate 
   - [ ] check values from sample rows in spec  
-  - [ ] uncomment end-to-end tests
+  - [ ] uncomment end-to-end test
   - [ ] review previous testing guidelines    
+  - [ ] [CSV mock proposal](https://github.com/epogrebnyak/mini-kep/issues/9)
    
-[Simplify procedure to update new month #29](https://github.com/epogrebnyak/mini-kep/issues/29):
-  - [ ] may also review **filled_dates** mechanism in files.py 
 
-[naming modules](https://github.com/epogrebnyak/mini-kep/issues/35)
+  
+NOT TODO / LATER
+=================
+
+[renaming modules](https://github.com/epogrebnyak/mini-kep/issues/35)
    - [ ] rename kep to csv2df
    - [ ] csv2df.reader, parser, emitter
-   
-   
-NOT TODO
-========
 
 follow-up tasks from spec.py:
    - [ ] use sample in required
    - [ ] short names for variables in FRED style, ```short=```
 
 - sphinx-doc usage:
+  - why modules rst?
   - include intro.md in index.rst
   - warnings in compile
   - hanging kep.rst
@@ -162,7 +187,7 @@ follow-up tasks from spec.py:
   
 DONE
 ====
-
+- [x] example.py
 - [x] delete from repo: static html
 - [x] try ```inv pep8 -f.``` works
 - [x] spec.py review
