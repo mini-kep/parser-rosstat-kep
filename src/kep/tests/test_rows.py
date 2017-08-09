@@ -23,22 +23,23 @@ class Test_is_year():
 
 class Test_Row:
     def setup_method(self):
-        self.row1 = Row(['Объем ВВП', '', '', '', ''])
+        self.row1 = Row(["Объем ВВП", "", "", "", ""])
         self.row2 = Row(["1991 1)", "4823", "901", "1102", "1373", "1447"])
-        self.row3 = Row(['abcd', '1', '2'])
+        self.row3 = Row(["abcd", "1", "2"])
+        self.row4 = Row(["many words in head", "", "", ""])
 
 
 class Test_Row_Properies_and_Some_Methods(Test_Row):
 
     def test_name_property(self):
-        assert self.row1.name == 'Объем ВВП'
+        assert self.row1.name == "Объем ВВП"
         assert self.row2.name == "1991 1)"
-        assert self.row3.name == 'abcd'
+        assert self.row3.name == "abcd"
 
     def test_data_property(self):
-        assert self.row1.data == ['', '', '', '']
+        assert self.row1.data == ["", "", "", ""]
         assert self.row2.data == ["4823", "901", "1102", "1373", "1447"]
-        assert self.row3.data == ['1', '2']
+        assert self.row3.data == ["1", "2"]
 
     def test_len_method(self):
         assert len(self.row1) == 4
@@ -53,16 +54,16 @@ class Test_Row_Properies_and_Some_Methods(Test_Row):
     def test_eq(self):
         class MockRow:
             name = "abcd"
-            data = ['1', '2']
+            data = ["1", "2"]
         r = MockRow
-        assert Row(['abcd', '1', '2']).__eq__(r)
+        assert Row(["abcd", "1", "2"]).__eq__(r)
 
     def test_repr_method(self):
-        # TODO: add testing with eval()
         assert repr(self.row1) == "Row(['Объем ВВП', '', '', '', ''])"
         assert repr(
             self.row2) == "Row(['1991 1)', '4823', '901', '1102', '1373', '1447'])"
-        assert repr(self.row3)        
+        assert repr(self.row3)
+        assert eval(repr(self.row1)) == self.row1
         
     def test_str_method(self):
         assert str(self.row1) == "<Объем ВВП>"
@@ -76,6 +77,8 @@ class Test_Row_Match_Methods(Test_Row):
         assert self.row1.startswith("Объем ВВП") is True
         assert self.row2.startswith("Объем ВВП") is False
         assert Row(["1.1 Объем ВВП"]).startswith("Объем ВВП") is False
+        # this would be True for Row.matches()
+        assert self.row1.startswith("ВВП") is False
 
     def test_startswith_ignores_apostrophe(self):
         assert self.row1.startswith('Объем \"ВВП\"') is True
@@ -83,25 +86,32 @@ class Test_Row_Match_Methods(Test_Row):
     def test_matches_returns_bool(self):
         assert self.row1.matches("Объем ВВП") is True
         assert self.row2.matches("Объем ВВП") is False
+        # this would be False for Row.startswith()
+        assert self.row1.matches("ВВП") is True
+        # also works for multiple words
+        assert self.row4.matches("words in") is True
+        assert self.row4.matches("in head") is True
+        # as long as they are in order
+        assert self.row4.matches("words head") is False
 
     def test_get_varname(self):
         # finds one entry
-        assert Row(["1. abcd"]).get_varname({'1. ab': "ZZZ"}) == 'ZZZ'
+        assert Row(["1. abcd"]).get_varname({"1. ab": "ZZZ"}) == "ZZZ"
         # will not find anything, becase 'bc' is in the middle of string
-        assert Row(["1. abcd"]).get_varname({'bc': "ZZZ"}) is False
+        assert Row(["1. abcd"]).get_varname({"bc": "ZZZ"}) is False
         # finds too many entries, raises error - must be strictly defined
         with pytest.raises(ValueError):
-            varname_mapper_dict = {'1. a': "ZZZ", '1. ab': "YYY"}
+            varname_mapper_dict = {"1. a": "ZZZ", "1. ab": "YYY"}
             assert Row(["1. abcd"]).get_varname(varname_mapper_dict)
 
     def test_get_unit(self):
-        unit_mapper = {'%': 'pct'}
-        assert Row(["Rate, %"]).get_unit(unit_mapper) == 'pct'
+        unit_mapper = {"%": "pct"}
+        assert Row(["Rate, %"]).get_unit(unit_mapper) == "pct"
 
     def test_get_unit_uses_first_entry_in_unit_mapper_dict(self):
         unit_mapper = odict([('% change', "rog"), ('%', "pct")])
-        assert Row(["1. abcd, % change"]).get_unit(unit_mapper) == 'rog'
-        assert Row(["1. abcd, % change"]).get_unit(unit_mapper) != 'pct'
+        assert Row(["1. abcd, % change"]).get_unit(unit_mapper) == "rog"
+        assert Row(["1. abcd, % change"]).get_unit(unit_mapper) != "pct"
 
 
 def mock_rows():
@@ -122,7 +132,7 @@ class Test_Rowstack:
 
     def test_pop(self, rowstack):
         a = rowstack.pop("bat", "dot")
-        assert a == [Row(['bat aa...ah', '1', '2']),
+        assert a == [Row(["bat aa...ah", "1", "2"]),
                      Row(["can extra text", "1", "2"])]
 
     def test_pop_segment_and_remaining_rows_behaviour(self, rowstack):
