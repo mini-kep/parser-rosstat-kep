@@ -40,22 +40,38 @@ Also in [/src](https://github.com/epogrebnyak/mini-kep/tree/master/src) folder:
   
 Glossary
 ========
-    
-**Parsing specification** - set of instructions about what information to extract from CSV file.      
-    
-**Resulting dataframes** - pandas dataframes with parsing result, usually denoted as ```dfa, dfq, dfm```. 
-                           Hold time series at annual, quarterly and monthly frequency respectively.   
+In order of appearance:
 
-**Stable URL** - a web address, from where an end user can read a canonical dataset. Stable URL is 
-<https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>.
+**Rosstat KEP publication** - 
+     monthly publication of macroeconomic time times sereis by Rosstat,  Russian statatics agency. 
+	 Released as MS Word files of a web site.      
+  
+**Parsing specification** - 
+     set of instructions used to extract data from CSV file. These instructions like table headers 
+     to variable names.
+
+**Resulting dataframes** - 
+     pandas dataframes with parsing result, usually denoted as ```dfa, dfq, dfm```. 
+     Hold time series at annual, quarterly and monthly frequency respectively.   
+
+**Stable URL** - 
+     a web address, from where an end user can read a canonical dataset: 
+	 
+    -  <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfa.csv>.
+	-  <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfq.csv>.
+	-  <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfm.csv>.
  
   
 Active tasks 
 ============
 
-### [Review rows.py, tables.py, vintage.py](https://github.com/epogrebnyak/mini-kep/issues/52)
+### Review rows.py, tables.py, vintage.py
 
-Refactoring, documentation testing for:
+Issue: <https://github.com/epogrebnyak/mini-kep/issues/52>
+
+Who: ID
+
+Refactoring, documentation, testing for:
 - [x] kep.files 
 - [x] kep.spec 
 - [ ] kep.rows

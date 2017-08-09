@@ -131,6 +131,12 @@ class Test_Rowstack:
         c = rowstack.remaining_rows()
         assert c[0] == Row(["wed more text", "1", "2"])
         assert c[1] == Row(["zed some text"])
+        
+    def test_yield_segment_with_defintion(self):
+        # LATER: todo later or if Inmars can do this        
+        # will need a mock for specification or a specification instance/fixture (can copy from example1.py)
+        # need - 1 segment, 1 default definition for *rowstack* fixture
+        pass
 
 
 if __name__ == "__main__":
