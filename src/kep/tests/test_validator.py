@@ -59,10 +59,12 @@ dfa = to_dataframe(dfa_text)
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
 
+
 def yield_checkpoints():
     for c in vldr.ANNUAL + vldr.QTR + vldr.MONTHLY:
         for pt in vldr.serialise(c):
             yield(pt)
+
 
 assert vldr.CHECKPOINTS == list(yield_checkpoints())
 

@@ -1,4 +1,4 @@
-"""Parse CSV file rows into Table() instanses using parsing specification 
+"""Parse CSV file rows into Table() instanses using parsing specification
    from spec.py.
 
 Main call:
@@ -21,9 +21,9 @@ warnings.simplefilter('ignore', UserWarning)
 
 def fix_multitable_units(tables):
     """For tables without *varname* copy *varname* from previous table.
-    
+
        Applies to tables without unknown rows.
-       
+
     """
     for prev_table, table in zip(tables, tables[1:]):
         if table.varname is None and not table.has_unknown_lines():
@@ -156,7 +156,7 @@ class Table:
 
     def __repr__(self):
         return "Table(headers={},\ndatarows={})".format(repr(self.headers),
-                                                       repr(self.datarows))
+                                                        repr(self.datarows))
 
 
 if __name__ == "__main__":

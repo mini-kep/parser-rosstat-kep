@@ -8,26 +8,9 @@ CSV_FORMAT = dict(delimiter="\t", lineterminator="\n")
 
 # csv file access
 
-def to_csv(iter, path):
-    """Accept iterable *iter* and write in to *csv_path*
-    
-    NOTE: Not used in package, reserved for future use.
-    
-    """
-    with path.open("w", encoding=ENC) as csvfile:
-        filewriter = csv.writer(csvfile, **CSV_FORMAT)
-        for row in iter:
-            filewriter.writerow(row)
 
-            
-def open_csv(path):     
+def open_csv(path):
     return path.open(encoding=ENC)
-    
-    
-# def read_csv(path):
-    # with path.open(encoding=ENC) as csvfile:
-        # for row in to_rows(csvfile):
-            # yield row
 
 
 def yield_csv_rows(csvfile, fmt=CSV_FORMAT):
@@ -43,6 +26,14 @@ def yield_csv_rows(csvfile, fmt=CSV_FORMAT):
         yield row
 
 
+def filter_csv_rows(gen):
+    """Kill empty rows and rows with comments from *gen*.
+    """
+    filled = filter(lambda row: row and row[0], gen)
+    no_comments = filter(lambda row: not row[0].startswith("___"), filled)
+    return no_comments
+
+
 def to_rows(csvfile):
     """Filter and yield Row() instances from *csvfile*.
 
@@ -53,9 +44,8 @@ def to_rows(csvfile):
         Row() instances
     """
     csv_rows = yield_csv_rows(csvfile)
-    filled = filter(lambda row: row and row[0], csv_rows)
-    no_comments = filter(lambda row: not row[0].startswith("___"), filled)
-    return map(Row, no_comments)
+    csv_rows = filter_csv_rows(csv_rows)
+    return map(Row, csv_rows)
 
 
 class Row:
@@ -71,7 +61,7 @@ class Row:
 
     def is_datarow(self):
         """Helper function for table demarkation.
-        
+
         Returns:
             True if first element in row is year.
             False otherwise.
@@ -80,7 +70,7 @@ class Row:
 
     def startswith(self, text):
         """Helper function for header parsing.
-        
+
         Returns:
             True if *self.name* starts with *text*.
             False otherwise.
@@ -92,7 +82,7 @@ class Row:
 
     def matches(self, pat):
         """Helper function for header parsing.
-        
+
         Returns:
             True if *self.name* contains *text*.
             False otherwise.
@@ -101,10 +91,10 @@ class Row:
         return bool(re.search(rx, self.name))
 
     def get_year(self):
-        """Extract year as integer from *self.name* 
-        
+        """Extract year as integer from *self.name*
+
         If *self.name* cannot be parsed as a year, False is returned
-          
+
         Returns:
             year as an integer, or False.
         """
@@ -112,17 +102,17 @@ class Row:
 
     def get_varname(self, varnames_mapper_dict):
         """Returns variable name string (varname) found in this row.
-        
+
         Args:
             varnames_mapper_dict: dictionary of valid variable names.
                                   For example: {'Gross domestic product':'GDP'}
-                                  
+
         Returns:
-            Matched varname from *self.name* as string, for example: 
-            'GDP', 'CPI', 'INDPRO'.              
-            
-            If no match was found returns False. 
-            
+            Matched varname from *self.name* as string, for example:
+            'GDP', 'CPI', 'INDPRO'.
+
+            If no match was found returns False.
+
         Raises:
             ValueError: if found for more than one varname .
         """
@@ -131,7 +121,8 @@ class Row:
             if self.matches(k):
                 varnames.append(varnames_mapper_dict[k])
         if len(varnames) > 1:
-            msg = "Multiple entries found in <{0}>: {1}".format(self.name, varnames)
+            msg = "Multiple entries found in <{0}>: {1}".format(
+                self.name, varnames)
             raise ValueError(msg)
         elif len(varnames) == 1:
             return varnames[0]
@@ -142,12 +133,12 @@ class Row:
         """Returns units measurement for this row.
 
         Args:
-            units_mapper_dict: dictionary of valid units of measurement, 
-                               For example {'% change from previous period': 'rog',
-                                            'billion ruble': 'bln_rub'}
-          
+            units_mapper_dict: dictionary of valid units of measurement,
+                               ex. {'% change from previous period': 'rog',
+                                    'billion ruble': 'bln_rub'}
+
         Returns:
-            Matched unit of measurement as string. 
+            Matched unit of measurement as string.
             False if no match was found.
         """
         for k in units_mapper_dict.keys():
@@ -157,7 +148,7 @@ class Row:
 
     def __len__(self):
         return len(self.data)
-    
+
     def __eq__(self, x):
         return bool(self.name == x.name and self.data == x.data)
 
@@ -176,7 +167,7 @@ YEAR_CATCHER = re.compile("(\d{4}).*")
 
 def get_year(string: str, rx=YEAR_CATCHER):
     """Extracts year from *string* using *rx* regex.
-    
+
        Returns:
            Year as integer
            False if year is not valid or not in plausible range."""
@@ -191,23 +182,26 @@ def get_year(string: str, rx=YEAR_CATCHER):
 def is_year(string: str) -> bool:
     return get_year(string) is not False
 
-# TODO (ID): need docstring draft for .pop() and .yield_segment_with_defintion()
+# TODO (ID): need docstring draft for .pop() and
+# .yield_segment_with_defintion()
+
+
 class RowStack:
-    """Holder for CSV rows. 
-    
-       Allows extracting segments of CSV file and remaining part of CSV file 
+    """Holder for CSV rows.
+
+       Allows extracting segments of CSV file and remaining part of CSV file
        after all necessary segments are extracted.
 
        Operates on list of Row() instances."""
 
     def __init__(self, rows):
-        
+
         # EP: must distinguish between gen and list as *rows* argument
-        #     if rows already a list list(rows) wil produce [[1,2]], 
+        #     if rows already a list list(rows) wil produce [[1,2]],
         #     [r for r in rows] is safer in this situation
-        
+
         # consume *rows*, if it is a generator or list
-        self.rows = [r for r in rows] #list(rows)
+        self.rows = [r for r in rows]  # list(rows)
 
     def remaining_rows(self):
         return self.rows
@@ -234,8 +228,8 @@ class RowStack:
                 i += 1
         return segment
 
-    def yield_segment_with_defintion(self, spec):    
-        """Yield CSV segments and corresponding parsing definitons based on 
+    def yield_segment_with_defintion(self, spec):
+        """Yield CSV segments and corresponding parsing definitons based on
            *spec* parsing specification.
         """
         for pdef in spec.get_segment_parsing_definitions():
@@ -244,6 +238,6 @@ class RowStack:
             yield csv_segment, pdef
         yield self.remaining_rows(), spec.get_main_parsing_definition()
 
-        
+
 if __name__ == "__main__":
     pass

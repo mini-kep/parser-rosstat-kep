@@ -2,13 +2,13 @@
 """Use hardcoded constants for year 1999 to validate dfa, dfq, dfm dataframes.
    These dataframes are the result of parsign procedure.
 
-   Hardcoded constants are recorded in ANNUAL, QTR and MONTHLY variables, 
+   Hardcoded constants are recorded in ANNUAL, QTR and MONTHLY variables,
    converted to dictionaries using *serialise()*. CHECKPOINTS holds all
    sample datapoints as dictionaries.
-   
-   Validator(dfa, dfq, dfm).run() tests dataframes against CHECKPOINTS. 
 
-   
+   Validator(dfa, dfq, dfm).run() tests dataframes against CHECKPOINTS.
+
+
 """
 
 

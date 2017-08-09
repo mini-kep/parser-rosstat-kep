@@ -78,21 +78,14 @@ def github(ctx):
 
 
 @task
-def issues(ctx): 
-    pass
-    # NOT TODO NOW: open a new issueon github
-    # https://github.com/epogrebnyak/mini-kep/issues/new
-    # https://gist.github.com/JeffPaine/3145490    
-
-
-@task
 def test(ctx):
     ctx.run("py.test --cov=kep")
 
 
 @task
 def cov(ctx):
-    ctx.run("coverage report --omit=*tests*")
+    ctx.run("py.test --cov=kep")
+    ctx.run("coverage report --omit=*tests*,*__init__*")
 
 
 @task
@@ -105,7 +98,7 @@ def ls(ctx):
 
 
 ns = Collection()
-for t in [clean, pep8, ls, cov, test, doc, rst, github]:
+for t in [clean, pep8, ls, cov, test, doc, rst, github, lint]:
     ns.add_task(t)
 
 

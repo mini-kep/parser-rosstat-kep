@@ -161,14 +161,14 @@ class Emitter:
         if df.empty:
             return pd.Dataframe()
         self._assert_has_no_duplicate_rows(df)
-        #make time index
+        # make time index
         funcs = dict(a=lambda x: get_date_year_end(x['year']),
                      q=lambda x: get_date_quarter_end(x['year'], x['qtr']),
                      m=lambda x: get_date_month_end(x['year'], x['month']))
         df["time_index"] = df.apply(funcs[freq], axis=1)
-        #reshape
+        # reshape
         df = df.pivot(columns='label', values='value', index='time_index')
-        #add yeay and period
+        # add yeay and period
         df.insert(0, "year", df.index.year)
         if freq == "q":
             df.insert(1, "qtr", df.index.quarter)
