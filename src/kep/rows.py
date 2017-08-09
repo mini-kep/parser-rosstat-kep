@@ -90,12 +90,13 @@ class Row:
         text = text.replace('"', '')
         return r.startswith(text)
 
-    # RFE: identical to startswith? 
-    # No it's not \b matches at a word
-    # boundary i.e. start of any word
-    # TODO (ID): make tests illustrating this 
     def matches(self, pat):
-        # TODO (ID): need docstring draft 
+        """Helper function for header parsing.
+        
+        Returns:
+            True if *self.name* contains *text*.
+            False otherwise.
+        """
         rx = r"\b{}".format(pat)
         return bool(re.search(rx, self.name))
 
@@ -245,8 +246,4 @@ class RowStack:
 
         
 if __name__ == "__main__":
-    # TODO (ID): put this into tests
-    x = Row(["wed", "1", "2"])
-    assert eval(repr(x)) == x
-
-    
+    pass
