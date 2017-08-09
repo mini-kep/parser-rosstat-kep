@@ -90,7 +90,6 @@ class Test_Row_Match_Methods(Test_Row):
         assert self.row1.matches("ВВП") is True
         # also works for multiple words
         assert self.row4.matches("words in") is True
-        assert self.row4.matches("in head") is True
         # as long as they are in order
         assert self.row4.matches("words head") is False
 
