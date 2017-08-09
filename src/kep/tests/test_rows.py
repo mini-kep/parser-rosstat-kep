@@ -26,7 +26,6 @@ class Test_Row:
         self.row1 = Row(["Объем ВВП", "", "", "", ""])
         self.row2 = Row(["1991 1)", "4823", "901", "1102", "1373", "1447"])
         self.row3 = Row(["abcd", "1", "2"])
-        self.row4 = Row(["many words in head", "", "", ""])
 
 
 class Test_Row_Properies_and_Some_Methods(Test_Row):
@@ -76,9 +75,8 @@ class Test_Row_Match_Methods(Test_Row):
     def test_startswith_returns_bool(self):
         assert self.row1.startswith("Объем ВВП") is True
         assert self.row2.startswith("Объем ВВП") is False
-        assert Row(["1.1 Объем ВВП"]).startswith("Объем ВВП") is False
-        # this would be True for Row.matches()
         assert self.row1.startswith("ВВП") is False
+        assert Row(["1.1 Объем ВВП"]).startswith("Объем ВВП") is False
 
     def test_startswith_ignores_apostrophe(self):
         assert self.row1.startswith('Объем \"ВВП\"') is True
@@ -86,13 +84,19 @@ class Test_Row_Match_Methods(Test_Row):
     def test_matches_returns_bool(self):
         assert self.row1.matches("Объем ВВП") is True
         assert self.row2.matches("Объем ВВП") is False
-        # this would be False for Row.startswith()
         assert self.row1.matches("ВВП") is True
-        # also works for multiple words
-        assert self.row4.matches("words in") is True
+        
+    def test_mathches_vs_starts_with(self):
+        row = Row(["many words in my head", "", "", ""])
+        # Any matching word is ok for Row.matches()
+        # Row.startswith() only tests beginning of *Row.head*
+        assert row.matches("words") is True
+        assert row.startswith("words") is False
+        # matches also can check multiple words
+        assert row.matches("words in") is True
         # as long as they are in order
-        assert self.row4.matches("words head") is False
-
+        assert row.matches("words head") is False
+        
     def test_get_varname(self):
         # finds one entry
         assert Row(["1. abcd"]).get_varname({"1. ab": "ZZZ"}) == "ZZZ"
