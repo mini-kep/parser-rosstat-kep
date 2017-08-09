@@ -3,7 +3,7 @@ from collections import OrderedDict as odict
 
 from kep.rows import get_year, is_year, Row, RowStack
 
-# TODO: test csv readers
+# LATER: test csv readers
 
 
 class Test_get_year():
@@ -22,7 +22,6 @@ class Test_is_year():
 
 
 class Test_Row:
-
     def setup_method(self):
         self.row1 = Row(['Объем ВВП', '', '', '', ''])
         self.row2 = Row(["1991 1)", "4823", "901", "1102", "1373", "1447"])
@@ -59,15 +58,16 @@ class Test_Row_Properies_and_Some_Methods(Test_Row):
         assert Row(['abcd', '1', '2']).__eq__(r)
 
     def test_repr_method(self):
+        # TODO: add testing with eval()
         assert repr(self.row1) == "Row(['Объем ВВП', '', '', '', ''])"
         assert repr(
             self.row2) == "Row(['1991 1)', '4823', '901', '1102', '1373', '1447'])"
-        assert repr(self.row3)
-
+        assert repr(self.row3)        
+        
     def test_str_method(self):
         assert str(self.row1) == "<Объем ВВП>"
         assert str(self.row2) == "<1991 1) | 4823 901 1102 1373 1447>"
-        assert str(self.row3)
+        assert str(self.row3) # checking it is callable
 
 
 class Test_Row_Match_Methods(Test_Row):
@@ -99,9 +99,9 @@ class Test_Row_Match_Methods(Test_Row):
         assert Row(["Rate, %"]).get_unit(unit_mapper) == 'pct'
 
     def test_get_unit_uses_first_entry_in_unit_mapper_dict(self):
-        unit_mapper = odict([('%', "pct"), ('% change', "pct_chg")])
-        assert Row(["1. abcd, % change"]).get_unit(unit_mapper) == 'pct'
-        assert Row(["1. abcd, % change"]).get_unit(unit_mapper) != 'pct_chg'
+        unit_mapper = odict([('% change', "rog"), ('%', "pct")])
+        assert Row(["1. abcd, % change"]).get_unit(unit_mapper) == 'rog'
+        assert Row(["1. abcd, % change"]).get_unit(unit_mapper) != 'pct'
 
 
 def mock_rows():

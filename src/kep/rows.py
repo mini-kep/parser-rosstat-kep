@@ -1,4 +1,4 @@
-"""Read CSV file and represent it as a stream/list of Rows() instances."""
+"""Read CSV file and represent it as Row() instances."""
 
 import csv
 import re
@@ -8,25 +8,26 @@ CSV_FORMAT = dict(delimiter="\t", lineterminator="\n")
 
 # csv file access
 
-
-def to_csv(rows, path):
-    """Accept iterable of rows *rows* and write in to *csv_path*"""
+def to_csv(iter, path):
+    """Accept iterable *iter* and write in to *csv_path*
+    
+    NOTE: Not used in package, reserved for future use.
+    
+    """
     with path.open("w", encoding=ENC) as csvfile:
         filewriter = csv.writer(csvfile, **CSV_FORMAT)
-        for row in rows:
+        for row in iter:
             filewriter.writerow(row)
-    return path  # Why return path? - EP: just further use, actually 
-                 #                        to_csv not used in the program, it is here for symmetry
-                 
 
-def open_csv(path):
+            
+def open_csv(path):     
     return path.open(encoding=ENC)
-
-
-def read_csv(path):
-    with path.open(encoding=ENC) as csvfile:
-        for row in to_rows(csvfile):
-            yield row
+    
+    
+# def read_csv(path):
+    # with path.open(encoding=ENC) as csvfile:
+        # for row in to_rows(csvfile):
+            # yield row
 
 
 def yield_csv_rows(csvfile, fmt=CSV_FORMAT):
@@ -61,70 +62,75 @@ class Row:
     """CSV row representation."""
 
     def __init__(self, row):
+        """
+        Args:
+            row - list of strings
+        """
         self.name = row[0]
         self.data = row[1:]
 
     def is_datarow(self):
-        """Check if this Row object is row of data.
+        """Helper function for table demarkation.
         
-        If self.name is a year then this is datarow.
-        True is returned in such case. False otherwise.
-          
         Returns:
-            True if object is datarow, False otherwise.
+            True if first element in row is year.
+            False otherwise.
         """
         return is_year(self.name)
 
     def startswith(self, text):
-        """Check if self.name starts with given string.
+        """Helper function for header parsing.
         
-        Args:
-            text: A string that is searched for in self.name
-          
         Returns:
-            True if self.name starts with string text. False otherwise.
+            True if *self.name* starts with *text*.
+            False otherwise.
         """
         # clean out apostrophe (")
         r = self.name.replace('"', '')
         text = text.replace('"', '')
         return r.startswith(text)
 
-    # RFE: identical to startswith? -- No it's not \b matches at a word
+    # RFE: identical to startswith? 
+    # No it's not \b matches at a word
     # boundary i.e. start of any word
+    # TODO (ID): make tests illustrating this 
     def matches(self, pat):
+        # TODO (ID): need docstring draft 
         rx = r"\b{}".format(pat)
         return bool(re.search(rx, self.name))
 
     def get_year(self):
-        """Returns self.name as a year int.
+        """Extract year as integer from *self.name* 
         
-        Parses self.name to get year as an integer.
-        If self.head cannot be parsed as a year, False is returned
+        If *self.name* cannot be parsed as a year, False is returned
           
         Returns:
-            Year as an integer, or False, if year cannot be parsed.
+            year as an integer, or False.
         """
         return get_year(self.name)
 
     def get_varname(self, varnames_mapper_dict):
-        """Returns variable name of this datarow.
+        """Returns variable name string (varname) found in this row.
         
         Args:
-            varnames_mapper_dict: Dictionary of valid variable names
-          
+            varnames_mapper_dict: dictionary of valid variable names.
+                                  For example: {'Gross domestic product':'GDP'}
+                                  
         Returns:
-            Matched varname from self.name.
-            False if no match was found.
+            Matched varname from *self.name* as string, for example: 
+            'GDP', 'CPI', 'INDPRO'.              
+            
+            If no match was found returns False. 
             
         Raises:
-            ValueError: If match found for more than one legal varname 
+            ValueError: if found for more than one varname .
         """
         varnames = []
         for k in varnames_mapper_dict.keys():
             if self.matches(k):
                 varnames.append(varnames_mapper_dict[k])
         if len(varnames) > 1:
-            msg = "Many entries found in <{0}>: {1}".format(self.name, varnames)
+            msg = "Multiple entries found in <{0}>: {1}".format(self.name, varnames)
             raise ValueError(msg)
         elif len(varnames) == 1:
             return varnames[0]
@@ -132,13 +138,16 @@ class Row:
             return False
 
     def get_unit(self, units_mapper_dict):
-        """Returns units of this datarow.
+        """Returns units measurement for this row.
 
         Args:
-            units_mapper_dict: Dictionary of valid units
+            units_mapper_dict: dictionary of valid units of measurement, 
+                               For example {'% change from previous period': 'rog',
+                                            'billion ruble': 'bln_rub'}
           
         Returns:
-            Matched unit. False if no match was found.
+            Matched unit of measurement as string. 
+            False if no match was found.
         """
         for k in units_mapper_dict.keys():
             if k in self.name:
@@ -165,8 +174,11 @@ YEAR_CATCHER = re.compile("(\d{4}).*")
 
 
 def get_year(string: str, rx=YEAR_CATCHER):
-    """Extracts year from string *string*.
-       Returns False if year is not valid or not in plausible range."""
+    """Extracts year from *string* using *rx* regex.
+    
+       Returns:
+           Year as integer
+           False if year is not valid or not in plausible range."""
     match = re.match(rx, string)
     if match:
         year = int(match.group(1))
@@ -178,16 +190,23 @@ def get_year(string: str, rx=YEAR_CATCHER):
 def is_year(string: str) -> bool:
     return get_year(string) is not False
 
-
+# TODO (ID): need docstring draft for .pop() and .yield_segment_with_defintion()
 class RowStack:
-    """Holder for CSV rows. Allows extracting segments of CSV file and
-       remaining part of CSV file, after all segments are extracted.
+    """Holder for CSV rows. 
+    
+       Allows extracting segments of CSV file and remaining part of CSV file 
+       after all necessary segments are extracted.
 
        Operates on list of Row() instances."""
 
     def __init__(self, rows):
-        # consume *rows*, likely it is a generator
-        self.rows = list(rows)
+        
+        # EP: must distinguish between gen and list as *rows* argument
+        #     if rows already a list list(rows) wil produce [[1,2]], 
+        #     [r for r in rows] is safer in this situation
+        
+        # consume *rows*, if it is a generator or list
+        self.rows = [r for r in rows] #list(rows)
 
     def remaining_rows(self):
         return self.rows
@@ -214,40 +233,20 @@ class RowStack:
                 i += 1
         return segment
 
-    def yield_segment_with_defintion(self, spec):
-        """Yield csv segments and with corresponding parsing definitons"""
+    def yield_segment_with_defintion(self, spec):    
+        """Yield CSV segments and corresponding parsing definitons based on 
+           *spec* parsing specification.
+        """
         for pdef in spec.get_segment_parsing_definitions():
             start, end = pdef.get_bounds(self.rows)
             csv_segment = self.pop(start, end)
             yield csv_segment, pdef
         yield self.remaining_rows(), spec.get_main_parsing_definition()
 
-
+        
 if __name__ == "__main__":
-    assert Row(["1. abcd"]).get_varname({"1. ab": "ZZZ"}) == "ZZZ"
-    assert Row(["1. abcd"]).get_varname({"bc": "ZZZ"}) is False
-    import pytest
-    with pytest.raises(ValueError):
-        assert Row(["1. abcd"]).get_varname({"1. ab": "ZZZ", "1. abcd": "YYY"})
-    assert Row(["1. abcd, %"]).get_unit({"%": "pct"}) == "pct"
-
-    def mock_read_csv():
-        yield Row(["apt", "1", "2"])
-        yield Row(["bat aa...ah", "1", "2"])
-        yield Row(["can", "1", "2"])
-        yield Row(["dot oo...eh", "1", "2"])
-        yield Row(["wed", "1", "2"])
-        yield Row(["zed"])
-
-    rows = RowStack(mock_read_csv())
-    a = rows.pop("bat", "dot")
-    assert len(a) == 2
-    b = rows.pop("apt", "wed")
-    assert len(b) == 2
-    c = rows.remaining_rows()
-    assert c[0] == Row(["wed", "1", "2"])
-    assert c[1] == Row(["zed"])
-
-    assert eval(repr(Row(["wed", "1", "2"]))) == Row(["wed", "1", "2"])
+    # TODO (ID): put this into tests
+    x = Row(["wed", "1", "2"])
+    assert eval(repr(x)) == x
 
     
