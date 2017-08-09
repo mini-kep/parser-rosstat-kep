@@ -159,7 +159,7 @@ class Emitter:
     def get_dataframe(self, freq):
         df = pd.DataFrame(self._collect(freq))
         if df.empty:
-            return pd.Dataframe()
+            return pd.DataFrame()
         self._assert_has_no_duplicate_rows(df)
         # make time index
         funcs = dict(a=lambda x: get_date_year_end(x['year']),

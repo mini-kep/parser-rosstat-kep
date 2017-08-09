@@ -1,5 +1,4 @@
-"""Parse CSV file rows into Table() instanses using parsing specification
-   from spec.py.
+"""Parse CSV file rows into Table() instances using parsing specification.
 
 Main call:
    tables = get_tables(rows, SPEC)

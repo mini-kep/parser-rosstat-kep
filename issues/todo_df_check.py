@@ -57,9 +57,12 @@ dfm = to_dataframe(dfm_text)
     absolute values by month/qtr accumulate to qtr/year (with tolerance)
     rog rates accumulate to yoy (with tolerance)
     other rules for consistency checks
+"""
+# assert f.dfa['GDP_bln_rub'].sum() == f.dfq['GDP_bln_rub'].sum()
+    
+    
 
-
-# TODO: transform GOV_ACCUM_variables to non-accumulated values (by substacting)."""
+# TODO: transform GOV_ACCUM_variables to non-accumulated values (by substacting).
 
 gov_vars =[x for x in dfa.columns if x.startswith('GOV') and "ACCUM" in x]
 
