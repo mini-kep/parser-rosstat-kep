@@ -10,15 +10,16 @@ macroeconomic time series and saves them as [CSV files at stable URL][backend].
   [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
   [backend]: https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest
 
-It is inspired by [FRED](https://fred.stlouisfed.org/) and [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science). 
+[mini-kep] is inspired by [FRED](https://fred.stlouisfed.org/) and [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science). 
 
 Project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com)
 
 # Example
 
-[mini-kep] translates text like this found in MS Word files:
+[mini-kep] translates text like this (from MS Word files):
 
-```Объем ВВП, млрд.рублей / Gross domestic product, bln rubles					
+```
+Объем ВВП, млрд.рублей / Gross domestic product, bln rubles					
 1999	4823	901	1102	1373	1447
 2000	7306	1527	1697	2038	2044
 ```
@@ -45,9 +46,18 @@ Out[3]:
 2000-12-31  2000    4       2044.0
 ```
 
-which you can load from stable URLs:
+which you can donload to your code as simply as:
 
-```pandas 
+```python
+import pandas as pd
+
+url_m = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfm.csv"
+dfm = pd.read_csv(url_m)
+```
+
+or, with a bit of formatting:
+
+```python
 import pandas as pd
 
 def get_dataframe(freq):
@@ -60,13 +70,14 @@ def get_dataframe(freq):
 
 dfa = get_dataframe('a')
 dfq = get_dataframe('q')
-dfm = get_dataframe('m')```
+dfm = get_dataframe('m')
+```
 
 See more [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py)
 and [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/access_data/)
 
 Workflow
-=========
+========
 
 ```
 (1) Rosstat ->  mini-kep:                        
