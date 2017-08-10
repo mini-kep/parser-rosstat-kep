@@ -3,7 +3,9 @@ import pandas as pd
 from io import StringIO
 
 def to_dataframe(text):
-    return pd.read_csv(StringIO(text), sep="\t")
+    return pd.read_csv(StringIO(text), sep="\t", 
+                       converters={0: pd.to_datetime},
+                       index_col=0)
 
 
 dfa_text = """	year	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GDP_bln_rub	GDP_yoy	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_yoy
@@ -63,6 +65,7 @@ dfm_text = """	year	month	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVI
 2000-12-31	2000	12	101.1	102.0	101.2	101.6	101.6	10.1	1960.1	1029.2	1032.1	2097.7	1132.1	1065.8	102.9	33.8	4.9			195.5	154.3	113.4	121.3	117.4	109.3	137.3	114.0	109.5	258.6	115.6	109.4	311.0	9.9	3025.0	118.8	113.4"""
 
 dfa = to_dataframe(dfa_text)
+assert dfa.index[0] == pd.Timestamp("1999-12-31")
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
 
@@ -73,9 +76,22 @@ dfm = to_dataframe(dfm_text)
 #  - rog rates accumulate to yoy (with some delta for rounding)
 #  - formulate other checks 
 
-# (not run):
-# assert dfa['GDP_bln_rub'].sum() == dfq['GDP_bln_rub'].sum()
-    
+   
+#
+sample_varnames = ['INVESTMENT_bln_rub', 'INVESTMENT_rog', 'INVESTMENT_yoy']
+simplified_varnames = ['val', 'rog', 'yoy']
+dfa = dfa[['INVESTMENT_bln_rub', 'INVESTMENT_yoy']]
+dfa.columns = ['val', 'yoy']
+
+dfq = dfq[sample_varnames]
+dfm = dfm[sample_varnames]
+dfq.columns = simplified_varnames
+dfm.columns = simplified_varnames
+
+# EP: can now work with dfa, dfq, dfm 
+
+# ...
+
 
 
 # -----------------------------------------------------------------------------
@@ -84,9 +100,13 @@ dfm = to_dataframe(dfm_text)
 
 # *gov_vars* variables accumulate from the start of the year
 # need to take a difference and produce new variables with monthly and quarterly values
+_dfa = to_dataframe(dfa_text)
+_dfq = to_dataframe(dfq_text)
+_dfm = to_dataframe(dfm_text)
+
 varnames = [vn for vn in dfa.columns 
             if vn.startswith('GOV') and "ACCUM" in vn]
-df = dfm[varnames]
+df = _dfm[varnames]
 
 for varname in df.columns:
     ts = df.loc[:,varname]
