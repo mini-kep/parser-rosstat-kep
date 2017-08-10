@@ -66,7 +66,7 @@ dfa = to_dataframe(dfa_text)
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
 
-# TODO 1 <https://github.com/epogrebnyak/mini-kep/issues/61>
+# TODO 1 @MM <https://github.com/epogrebnyak/mini-kep/issues/61>
 
 # Check on resulting dataframes dfa, dfq, dfm based on following rules:
 #  - absolute values by month/qtr accumulate to qtr/year (with some delta for rounding)
@@ -76,28 +76,30 @@ dfm = to_dataframe(dfm_text)
 # (not run):
 # assert dfa['GDP_bln_rub'].sum() == dfq['GDP_bln_rub'].sum()
     
+
+
+# -----------------------------------------------------------------------------
     
 # Issue: <https://github.com/epogrebnyak/mini-kep/issues/66>
 
 # *gov_vars* variables accumulate from the start of the year
 # need to take a difference and produce new variables with monthly and quarterly values
 varnames = [vn for vn in dfa.columns 
-                     if vn.startswith('GOV') and "ACCUM" in vn]
-varname_mapper = {vn:vn.replace("_ACCUM", "") for vn in varnames}
+            if vn.startswith('GOV') and "ACCUM" in vn]
 df = dfm[varnames]
 
 for varname in df.columns:
     ts = df.loc[:,varname]
     new_ts = ts.diff()    
     
-    # FIXME: must generalise to insert at every start of year
+    # FIXME: must generalise to insert orginal value at every start of year
     new_ts[0] = ts[0]
     new_ts[12] = ts[12]   
-    # -------------------------------------------------------
+    # ---------------------------------------------------------------------
     
     # write back to df and rename
     df.loc[:,varname] = new_ts    
     df.rename(columns={varname: varname.replace("_ACCUM", "")}, inplace=True)
     
 #FIXME: for qtr
-#FIXME: rename years
+#FIXME: rename dfa
