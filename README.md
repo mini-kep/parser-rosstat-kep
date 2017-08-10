@@ -46,7 +46,7 @@ Out[3]:
 2000-12-31  2000    4       2044.0
 ```
 
-which you can donload to your code as simply as:
+which you can use in your code as simply as:
 
 ```python
 import pandas as pd
@@ -55,7 +55,7 @@ url_m = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/proc
 dfm = pd.read_csv(url_m)
 ```
 
-or, with a bit of formatting:
+or, with a bit of formatting as:
 
 ```python
 import pandas as pd
@@ -73,29 +73,28 @@ dfq = get_dataframe('q')
 dfm = get_dataframe('m')
 ```
 
-See more [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py)
-and [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/access_data/)
+See more parsing examples [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py)
+and final data access methods [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/access_data/)
 
 Workflow
 ========
 
-```
-(1) Rosstat ->  mini-kep:                        
-                   (2) download and unrar
-			       (3) parse and publish at stable URL  -> (4) clean CSV files 
-			                                                        |
-											               (5) used by your program in R/pandas
-```
+|    Rosstat                 |      mini-kep                          |     Stable URL
+|----------------------------|----------------------------------------|--------------------------------
+|   Publishes Word files...  |                                        |
+|                            |  we download, parse, check and publish |                               
+|                            |                                        |  ... you read clean CSV files  			
+
 1. Rosstat publishes KEP publication every month as rar'ed Word files
-2. *TODO: download and unpack rar files from website, or S3 bucket (prior to 2017)*
-3. parse Word files and save output as three CSV files (annual, quarterly and monthly) 
+2. we download and unpack rar files from website, or S3 bucket (prior to 2017) *(not implemented, TODO)*
+3. we parse and check Word files and save output as three CSV files (annual, quarterly and monthly) 
 4. machine-readable CSV files are available at <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>
-5. import macroeconomic indicators to your R/pandas code from these files  
+5. you can import macroeconomic indicators to your R/pandas code from these files  
 
 Parser pipeline
 ===============
--   **word2csv**: convert MS Word files to single interim CSV file (see [example])
--   **csv2df**: parse interim CSV file to obtain [processed CSV files][processed CSV files at stable URL] with annual, quarterly and monthly data.
+-   **word2csv**: convert MS Word files to single interim CSV file
+-   **csv2df**: parse interim CSV file to obtain processed CSV files with annual, quarterly and monthly data.
 
 Also in [/src](https://github.com/epogrebnyak/mini-kep/tree/master/src) folder:
 
