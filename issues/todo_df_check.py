@@ -50,20 +50,24 @@ dfa = to_dataframe(dfa_text)
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
 
-# TODO #61 https://github.com/epogrebnyak/mini-kep/issues/61
+# TODO 1 <https://github.com/epogrebnyak/mini-kep/issues/61>
+# refere to #61 when committing
 
-"""In src/exmple2.py will make an entry point for checks on resulting dataframes, based on following rules:
+"""Must check on resulting dataframes, based on following rules:
 
-    absolute values by month/qtr accumulate to qtr/year (with tolerance)
-    rog rates accumulate to yoy (with tolerance)
-    other rules for consistency checks
+    absolute values by month/qtr accumulate to qtr/year (with some delta for rounding)
+    rog rates accumulate to yoy (with some delta for rounding)
+    
 """
-# assert f.dfa['GDP_bln_rub'].sum() == f.dfq['GDP_bln_rub'].sum()
+# Example (not run):
+# assert dfa['GDP_bln_rub'].sum() == dfq['GDP_bln_rub'].sum()
     
     
-
-# TODO: transform GOV_ACCUM_variables to non-accumulated values (by substacting).
+# TODO 2 <https://github.com/epogrebnyak/mini-kep/issues/66>
+# also refer to #66 when committing
 
 gov_vars =[x for x in dfa.columns if x.startswith('GOV') and "ACCUM" in x]
+# these variables accumulate from the start of the year, need to take a different and produce new variables 
+# with monthly and quarterly values
 
 
