@@ -49,8 +49,6 @@ Out[3]:
 which you can use in your code as simply as:
 
 ```python
-import pandas as pd
-
 url_m = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfm.csv"
 dfm = pd.read_csv(url_m)
 ```
@@ -87,7 +85,7 @@ Workflow
 
 1. Rosstat publishes KEP publication every month as rar'ed Word files
 2. we download and unpack rar files from website, or S3 bucket (prior to 2017) *(not implemented, TODO)*
-3. we parse and check Word files and save output as three CSV files (annual, quarterly and monthly) 
+3. we parse Word files, and check data and save output as three CSV files (annual, quarterly and monthly) 
 4. machine-readable CSV files are available at <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>
 5. you can import macroeconomic indicators to your R/pandas code from these files  
 
