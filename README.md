@@ -1,30 +1,88 @@
 [![Build Status](https://travis-ci.org/epogrebnyak/mini-kep.svg?branch=master)](https://travis-ci.org/epogrebnyak/mini-kep) 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8a467743314641b4a22b66b327834367)](https://www.codacy.com/app/epogrebnyak/mini-kep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=epogrebnyak/mini-kep&amp;utm_campaign=Badge_Grade)
 
-# mini-kep
+# Concept
 
 [mini-kep] parses MS Word files from [Rosstat KEP publication][Rosstat], creates pandas dataframes with 
-macroeconomic time series and saves them as [CSV files at stable URL][backend]. Inspired by [FRED](https://fred.stlouisfed.org/) and 
-[cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science). 
+macroeconomic time series and saves them as [CSV files at stable URL][backend].
 
-Check documentation [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com)
-and examples [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example1.py)
+  [mini-kep]: https://github.com/epogrebnyak/mini-kep
+  [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
+  [backend]: https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest
+
+It is inspired by [FRED](https://fred.stlouisfed.org/) and [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science). 
+
+Project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com)
+
+# Example
+
+[mini-kep] translates text like this found in MS Word files:
+
+```Объем ВВП, млрд.рублей / Gross domestic product, bln rubles					
+1999	4823	901	1102	1373	1447
+2000	7306	1527	1697	2038	2044
+```
+
+into pandas dataframes:
 
 ```
-(1) Rosstat -> (2) mini-kep -> (3) clean CSV files -> (4) your code with R/pandas
-```
-1. Rosstat publishes KEP publication every month as zipped Word files
-2. mini-kep parses Word files and saves output as three CSV files (annual, quarterly and monthly)
-3. CSV files are available at <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>, 
-   or <https://goo.gl/Cr5mSZ> 
-4. you can import Russian macroeconomic indicators to your R/pandas code from these files  
+dfa
+Out[2]: 
+            year  GDP_bln_rub
+1999-12-31  1999       4823.0
+2000-12-31  2000       7306.0
 
+dfq
+Out[3]: 
+            year  qtr  GDP_bln_rub
+1999-03-31  1999    1        901.0
+1999-06-30  1999    2       1102.0
+1999-09-30  1999    3       1373.0
+1999-12-31  1999    4       1447.0
+2000-03-31  2000    1       1527.0
+2000-06-30  2000    2       1697.0
+2000-09-30  2000    3       2038.0
+2000-12-31  2000    4       2044.0
+```
+
+which you can load from stable URLs:
+
+```pandas 
+import pandas as pd
+
+def get_dataframe(freq):
+    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
+    filename = "df{}.csv".format(freq)
+    url = url_base.format(filename)
+    return pd.read_csv(url, 
+                       converters={'time_index': pd.to_datetime},
+                       index_col='time_index')
+
+dfa = get_dataframe('a')
+dfq = get_dataframe('q')
+dfm = get_dataframe('m')```
+
+See more [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py)
+and [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/access_data/)
+
+Workflow
+=========
+
+```
+(1) Rosstat ->  mini-kep:                        
+                   (2) download and unrar
+			       (3) parse and publish at stable URL  -> (4) clean CSV files 
+			                                                        |
+											               (5) used by your program in R/pandas
+```
+1. Rosstat publishes KEP publication every month as rar'ed Word files
+2. *TODO: download and unpack rar files from website, or S3 bucket (prior to 2017)*
+3. parse Word files and save output as three CSV files (annual, quarterly and monthly) 
+4. machine-readable CSV files are available at <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>
+5. import macroeconomic indicators to your R/pandas code from these files  
 
 Parser pipeline
 ===============
--   **manually** (*FIXME*):
-    -   download zip/rar file for a specified month [from Rosstat website]
-    -   unpack MS Word files to a local folder
 -   **word2csv**: convert MS Word files to single interim CSV file (see [example])
 -   **csv2df**: parse interim CSV file to obtain [processed CSV files][processed CSV files at stable URL] with annual, quarterly and monthly data.
 
@@ -33,29 +91,23 @@ Also in [/src](https://github.com/epogrebnyak/mini-kep/tree/master/src) folder:
 -   **access\_data**: sample code to download data from stable URL and save a local copy
 -   **frontpage**: add tables and graphs to [README.md](https://github.com/epogrebnyak/mini-kep/blob/master/VALUES.md)
 
-  [mini-kep]: https://github.com/epogrebnyak/mini-kep
-  [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
-  [backend]: https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest
-  [example]: https://github.com/epogrebnyak/mini-kep/blob/master/data/interim/2017/05/tab.csv
-  
 Glossary
 ========
 In order of appearance:
 
 **Rosstat KEP publication** - 
-     monthly publication of macroeconomic time times sereis by Rosstat,  Russian statatics agency. 
-	 Released as MS Word files of a web site.      
+     monthly publication of macroeconomic time times series by Rosstat. 
+	 Released as several MS Word files on a web site.      
   
 **Parsing specification** - 
-     set of instructions used to extract data from CSV file. These instructions like table headers 
-     to variable names.
+     set of instructions used to extract data from CSV file. These instructions 
+	 link table headers to variable names and units of measuremant.
 
 **Resulting dataframes** - 
      pandas dataframes with parsing result, usually denoted as ```dfa, dfq, dfm```. 
-     Hold time series at annual, quarterly and monthly frequency respectively.   
+     They hold time series at annual, quarterly and monthly frequency respectively.   
 
-**Stable URL** - 
-     a web address, from where an end user can read a canonical dataset: 
+**Stable URL** - end user can read a canonical dataset from these stable URLs: 
 	 
 - <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfa.csv>
 - <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfq.csv>
@@ -70,7 +122,6 @@ These tasks are marked with ['in development' label][in_dev]
 [in_dev]: https://github.com/epogrebnyak/mini-kep/labels/in%20development
 
 
-
 ### review src/kep (doctrints, eye review, refactoring code and tests)
 
 Issue: <https://github.com/epogrebnyak/mini-kep/issues/52>
@@ -80,7 +131,7 @@ Guidelines: <https://github.com/epogrebnyak/mini-kep/blob/master/issues/todo_ref
 Refactoring, documentation, testing for:
 - [x] kep.files 
 - [x] kep.spec 
-- [ ] kep.rows (in progres)
+- [ ] kep.rows (in progress)
 - [x] kep.splitter
 - [ ] kep.tables
 - [ ] kep.vintage
@@ -100,23 +151,22 @@ Issue: <https://github.com/epogrebnyak/mini-kep/issues/30>
 Work file: <https://github.com/epogrebnyak/mini-kep/blob/master/issues/todo_download.py>
 
 Expected result: 
-  - [x] Download rar file from Rosstat
-  - [x] Unrar MS Word files
+  - [x] download rar file from Rosstat
+  - [x] unrar MS Word files
   - [ ] wrap unrar for linux usage
   - [ ] save Word files to designated folder
   - [ ] rely on new date helper to check what can be downloaded
 
 ### resulting df consistency check and transformations
 
-Issue: <https://github.com/epogrebnyak/mini-kep/issues/61>
+Issue: <https://github.com/epogrebnyak/mini-kep/issues/61>, 
+       <https://github.com/epogrebnyak/mini-kep/issues/63>
 
 Work file: <https://github.com/epogrebnyak/mini-kep/blob/master/issues/todo_df_check.py>
 
 Expected result:
   - [ ] anomalies in ```dfa, dfq, dfm``` revealed
-  - [ ] GOV_*_ACCUM differentiated
-
-  
+  - [ ] GOV_*_ACCUM differentiated  
     
  
 Prepare tasks
@@ -162,7 +212,6 @@ testing:
   - [ ] review previous testing guidelines    
   - [ ] [CSV mock proposal](https://github.com/epogrebnyak/mini-kep/issues/9)
    
-
   
 NOT TODO / LATER
 =================
