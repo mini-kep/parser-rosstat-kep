@@ -12,7 +12,7 @@ macroeconomic time series and saves them as [CSV files at stable URL][backend].
 
 [mini-kep] is inspired by [FRED](https://fred.stlouisfed.org/) and [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science). 
 
-Project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com)
+Project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com).
 
 # Example
 
@@ -72,7 +72,7 @@ dfm = get_dataframe('m')
 ```
 
 See more parsing examples [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py)
-and final data access methods [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/access_data/)
+and final data access methods [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/access_data/).
 
 Workflow
 ========
@@ -109,7 +109,7 @@ In order of appearance:
   
 **Parsing specification** - 
      set of instructions used to extract data from CSV file. These instructions 
-	 link table headers to variable names and units of measuremant.
+	 link table headers to variable names and units of measurement.
 
 **Resulting dataframes** - 
      pandas dataframes with parsing result, usually denoted as ```dfa, dfq, dfm```. 
