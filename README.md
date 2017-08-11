@@ -1,5 +1,7 @@
 [![Build Status](https://travis-ci.org/epogrebnyak/mini-kep.svg?branch=master)](https://travis-ci.org/epogrebnyak/mini-kep) 
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8a467743314641b4a22b66b327834367)](https://www.codacy.com/app/epogrebnyak/mini-kep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=epogrebnyak/mini-kep&amp;utm_campaign=Badge_Grade)
+[![Documentation Status](https://readthedocs.org/projects/mini-kep-parcer-for-rosstat-kep-publication/badge/?version=latest)](http://mini-kep-parcer-for-rosstat-kep-publication.readthedocs.io/en/latest/?badge=latest)
+           
 
 # Concept
 
@@ -12,14 +14,18 @@ macroeconomic time series and saves them as [CSV files at stable URL][backend]. 
 
 # Latest data
 
-*TODO: add here + generate Excel files in 
+*TODO: add here *
+
+*TODO: generate Excel files*
 
 
 # End user code
 
-You can use macroeconomic indicators in your code as simply as:
+You can use macroeconomic indicators in your code as:
 
 ```python
+import pandas as pd
+
 # monthly data 
 url_m = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfm.csv"
 dfm = pd.read_csv(url_m)
@@ -36,7 +42,6 @@ dfa = pd.read_csv(url_a)
 or, with a nicer date index formatting as:
 
 ```python
-import pandas as pd
 
 def get_dataframe(freq):
     url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
@@ -51,14 +56,9 @@ dfq = get_dataframe('q')
 dfm = get_dataframe('m')
 ```
 
-Check access methods for final data [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/access_data/).
+Check other access methods for final data [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/access_data/).
 
 # Development 
-
-Project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com). 
-See also [project glossary](https://github.com/epogrebnyak/mini-kep/blob/master/doc/glossary.rst).
-
-# Example
 
 **mini-kep** translates text like this (from MS Word files):
 
@@ -92,6 +92,10 @@ Out[3]:
 
 See more parsing examples [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py).
 
+Project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com). 
+
+See also [project glossary](https://github.com/epogrebnyak/mini-kep/blob/master/doc/glossary.rst).
+
 Workflow
 ========
 
@@ -107,8 +111,9 @@ Workflow
 4. machine-readable CSV files are available at <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>
 5. you can import macroeconomic indicators to your R/pandas code from these files  
 
-Parser pipeline
-===============
+Subpackages
+===========
+
 -   **word2csv**: convert MS Word files to single interim CSV file
 -   **csv2df**: parse interim CSV file to obtain processed CSV files with annual, quarterly and monthly data.
 
