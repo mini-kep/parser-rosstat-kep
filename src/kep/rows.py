@@ -251,7 +251,7 @@ class RowStack:
 
     def yield_segment_with_defintion(self, spec):
         """Yield CSV segments and corresponding parsing definitons.
-        
+
         Yield CSV segments as Row() instances and corresponding
         parsing definitons based on *spec* parsing specification.
 
