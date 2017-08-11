@@ -76,11 +76,15 @@ dfm = to_dataframe(dfm_text)
 
 def select_varnames(df):
     return [vn for vn in df.columns if vn.startswith('GOV') and "ACCUM" in vn]
-    
 
-def rename(df):
-    dict_new_names = {vn:vn.replace("_ACCUM", "") for vn in df.columns}
-    df.rename(columns=dict_new_names, inplace=True)
+assert select_varnames(dfm) == select_varnames(dfq)
+assert select_varnames(dfm) == select_varnames(dfa)
+
+COLNAME_MAPPER = {vn:vn.replace("_ACCUM", "") for vn in dfa.columns}
+COLNAME_MAPPER_REVERSE = {v:k for k,v in COLNAME_MAPPER.items()}
+
+def rename(df):    
+    df.rename(columns=COLNAME_MAPPER, inplace=True)
     
 # TODO (EP): change names of variables to GOV_ACCUM_something    
 
@@ -97,7 +101,8 @@ def deaccumulate(df, first_month):
     original_start_year_values = df[df.index.month == first_month].copy()
     # take a difference
     df = df.diff()
-    # write back start or year
+    # write back start of year values 
+    # (January in monthly data, March in qtr data)
     ix = original_start_year_values.index
     # ERROR: this fails
     #df.loc[ix,] = original_start_year_values.loc[ix, ]
@@ -108,25 +113,27 @@ def deaccumulate(df, first_month):
             df.loc[i,varname] = original_start_year_values.loc[i,varname]
     return df        
         
-assert select_varnames(dfm) == select_varnames(dfq)
-assert select_varnames(dfm) == select_varnames(dfa)
-
 varnames = select_varnames(dfm)
-diff_dfm = deaccumulate_qtr(dfm[varnames])
+
+gov_dfm = dfm[varnames]
+diff_dfm = deaccumulate_month(gov_dfm)
 rename(diff_dfm)
 
-diff_dfq = deaccumulate_qtr(dfq[varnames])
+gov_dfq = dfq[varnames]
+diff_dfq = deaccumulate_qtr(gov_dfq)
 rename(diff_dfq)
 
-varnames_a = select_varnames(dfa)
 diff_dfa = dfa[varnames]
 rename(diff_dfa)
 
 print (diff_dfm, diff_dfq, diff_dfa)
 
 # TODO-1: check - accumulate diff_dfm and diff_dfq and compare to 
-#               dfm[varnames] and dfq[varnames]
+#                 gov_dfm and gov_dfq
 
-# TODO-2: replace old variables with new variables at dfa, dfq, dfm
+# TODO-2: suggest more checks 
 
-# TODO-3: supress warning or change code: A value is trying to be set on a copy of a slice from a DataFrame
+# TODO-3: replace old variables with new variables at dfa, dfq, dfm
+
+# TODO-4: supress warning or change code: A value is trying to be set on 
+#         a copy of a slice from a DataFrame
