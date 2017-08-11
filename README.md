@@ -6,7 +6,7 @@
 # Concept
 
 [mini-kep] parses MS Word files from [Rosstat KEP publication][Rosstat], creates pandas dataframes with 
-macroeconomic time series and saves them as [CSV files at stable URL][backend]. Inspired by [FRED](https://fred.stlouisfed.org/) and [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science). 
+macroeconomic time series and saves them as [CSV files at stable URL][backend]. 
 
   [mini-kep]: https://github.com/epogrebnyak/mini-kep
   [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
@@ -60,6 +60,13 @@ Check other access methods for final data [here](https://github.com/epogrebnyak/
 
 # Development 
 
+- [mini-kep] inspired by [FRED](https://fred.stlouisfed.org/) and [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science)
+- [data-rosstat-kep] is ancestor to 
+- project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com). 
+- [project glossary](https://github.com/epogrebnyak/mini-kep/blob/master/doc/glossary.rst).
+
+## Example
+
 **mini-kep** translates text like this (from MS Word files):
 
 ```
@@ -71,14 +78,12 @@ Check other access methods for final data [here](https://github.com/epogrebnyak/
 into pandas dataframes:
 
 ```
-dfa
-Out[2]: 
             year  GDP_bln_rub
 1999-12-31  1999       4823.0
 2000-12-31  2000       7306.0
+```
 
-dfq
-Out[3]: 
+```
             year  qtr  GDP_bln_rub
 1999-03-31  1999    1        901.0
 1999-06-30  1999    2       1102.0
@@ -90,14 +95,11 @@ Out[3]:
 2000-12-31  2000    4       2044.0
 ```
 
-See more parsing examples [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py).
+More parsing examples [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py).
 
-Project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com). 
 
-See also [project glossary](https://github.com/epogrebnyak/mini-kep/blob/master/doc/glossary.rst).
+## Workflow
 
-Workflow
-========
 
 |    Rosstat                 |      mini-kep                          |     Stable URL
 |----------------------------|----------------------------------------|--------------------------------
@@ -111,8 +113,7 @@ Workflow
 4. machine-readable CSV files are available at <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>
 5. you can import macroeconomic indicators to your R/pandas code from these files  
 
-Subpackages
-===========
+## Packages
 
 -   **word2csv**: convert MS Word files to single interim CSV file
 -   **csv2df**: parse interim CSV file to obtain processed CSV files with annual, quarterly and monthly data.
