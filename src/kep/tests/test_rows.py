@@ -192,11 +192,13 @@ class Test_Rowstack:
         # ID: Test verifies that [r for r in rows] is equivalent to list(rows)
         # regardless if rows is generator or an iterable (e.g. a list)
         # This allows to make robust experiments to RowStack.__init__() method.
-        a_generator = mock_rows()
+        def gen():
+            yield Row(["dot oo...eh", "1", "2"])
+            yield Row(["wed more text", "1", "2"])
+            yield Row(["zed some text"])
+        
+        a_generator = gen()
         a_list = [
-            Row(["apt extra text", "1", "2"]),
-            Row(["bat aa...ah", "1", "2"]),
-            Row(["can extra text", "1", "2"]),
             Row(["dot oo...eh", "1", "2"]),
             Row(["wed more text", "1", "2"]),
             Row(["zed some text"]),
@@ -205,7 +207,7 @@ class Test_Rowstack:
         from_generator = RowStack(a_generator)
         from_list = RowStack(a_list)
         
-        assert from_generator.rows == from_list.rows is True
+        assert from_generator.rows == from_list.rows
 
     def test_pop(self, rowstack):
         a = rowstack.pop("bat", "dot")
