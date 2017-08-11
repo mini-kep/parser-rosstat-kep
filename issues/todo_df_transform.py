@@ -73,7 +73,6 @@ dfm = to_dataframe(dfm_text)
 # *gov_vars* variables accumulate from the start of the year
 # need to take a difference and produce new variables with monthly and quarterly values
 
-
 def select_varnames(df):
     return [vn for vn in df.columns if vn.startswith('GOV') and "ACCUM" in vn]
 
@@ -104,10 +103,8 @@ def deaccumulate(df, first_month):
     # write back start of year values 
     # (January in monthly data, March in qtr data)
     ix = original_start_year_values.index
-    # ERROR: this fails
-    #df.loc[ix,] = original_start_year_values.loc[ix, ]
-    # using this instead:
-    # FIXME: can do this without loop?    
+    # FIXME: can we do this without loop? this fails:
+    # df.loc[ix,] = original_start_year_values.loc[ix, ]
     for i in ix:
         for varname in df.columns:
             df.loc[i,varname] = original_start_year_values.loc[i,varname]
@@ -128,12 +125,11 @@ rename(diff_dfa)
 
 print (diff_dfm, diff_dfq, diff_dfa)
 
-# TODO-1: check - accumulate diff_dfm and diff_dfq and compare to 
-#                 gov_dfm and gov_dfq
+# TODO-1: check - accumulate diff_dfm and diff_dfq and compare to  gov_dfm and gov_dfq
 
 # TODO-2: suggest more checks 
 
 # TODO-3: replace old variables with new variables at dfa, dfq, dfm
 
-# TODO-4: supress warning or change code: A value is trying to be set on 
-#         a copy of a slice from a DataFrame
+# TODO-4: supress warning or change code: 
+#         A value is trying to be set on a copy of a slice from a DataFrame
