@@ -21,13 +21,16 @@ You can use macroeconomic indicators in your code as simply as:
 
 ```python
 # monthly data 
-dfm = pd.read_csv("https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfm.csv")
+url_m = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfm.csv"
+dfm = pd.read_csv(url_m)
 
 # quarterly data 
-dfq = pd.read_csv("https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfq.csv")
+url_q = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfq.csv"
+dfq = pd.read_csv(url_q)
 
 # annual data
-dfa = pd.read_csv("https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfa.csv")
+url_a = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfa.csv"
+dfa = pd.read_csv(url_a)
 ```
 
 or, with a nicer date index formatting as:
@@ -52,8 +55,8 @@ Check access methods for final data [here](https://github.com/epogrebnyak/mini-k
 
 # Development 
 
-Project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com). See also [project glossary]
-(https://github.com/epogrebnyak/mini-kep/blob/master/doc/glossary.rst).
+Project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com). 
+See also [project glossary](https://github.com/epogrebnyak/mini-kep/blob/master/doc/glossary.rst).
 
 # Example
 
