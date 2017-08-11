@@ -73,9 +73,6 @@ dfm = to_dataframe(dfm_text)
 # *gov_vars* variables accumulate from the start of the year
 # need to take a difference and produce new variables with monthly and quarterly values
 
-varnames = [vn for vn in dfa.columns if vn.startswith('GOV') and "ACCUM" in vn]
-#df = dfm[varnames]
-
 
 def select_varnames(df):
     return [vn for vn in df.columns if vn.startswith('GOV') and "ACCUM" in vn]
@@ -127,9 +124,9 @@ rename(diff_dfa)
 
 print (diff_dfm, diff_dfq, diff_dfa)
 
-# TODO: check - accumulate diff_dfm and diff_dfq and compare to 
+# TODO-1: check - accumulate diff_dfm and diff_dfq and compare to 
 #               dfm[varnames] and dfq[varnames]
 
-# TODO: replace old variables with new variables at dfa, dfq, dfm
+# TODO-2: replace old variables with new variables at dfa, dfq, dfm
 
-# TODO: supress or change code: A value is trying to be set on a copy of a slice from a DataFrame
+# TODO-3: supress warning or change code: A value is trying to be set on a copy of a slice from a DataFrame
