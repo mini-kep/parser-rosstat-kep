@@ -192,24 +192,14 @@ class RowStack:
        Operates on list of Row() instances."""
 
     def __init__(self, rows):
-        # EP: must distinguish between gen and list as *rows* argument
-        #     if rows already a list list(rows) wil produce [[1,2]],
-        #     [r for r in rows] is safer in this situation
-        # ID: list([1,2]) -> [1,2]
-        #     see Test_Rowstack.test_init() in test_rows.py
-        # consume *rows*, if it is a generator or list
-        # self.rows = [r for r in rows]
+        """
+        Args:
+            rows: a list or a generator containing Row() instances.
+        """
         self.rows = list(rows)
 
     def remaining_rows(self):
         """Returns a list of Row() instances that remain in this RowStack"""
-        # ID: Maybe this method should also "pop"?
-        # if .pop() method removes returned Row() instances form stack
-        # maybe it would be more conistant to remove returned ones here as well.
-        # So this method could not be called multiple times.
-        # ---
-        # return self.rows
-        # --- something like this:
         remaining = self.rows
         self.rows = []
         return remaining
