@@ -200,7 +200,7 @@ class RowStack:
         #     if rows already a list list(rows) wil produce [[1,2]],
         #     [r for r in rows] is safer in this situation
         # ID: see Test_Rowstack.test_init()
-        
+        #
         # consume *rows*, if it is a generator or list
         #self.rows = [r for r in rows]  
         self.rows = list(rows)
