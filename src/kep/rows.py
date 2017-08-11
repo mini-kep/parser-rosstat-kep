@@ -182,9 +182,6 @@ def get_year(string: str, rx=YEAR_CATCHER):
 def is_year(string: str) -> bool:
     return get_year(string) is not False
 
-# TODO (ID): need docstring draft for .pop() and
-# .yield_segment_with_defintion()
-
 
 class RowStack:
     """Holder for CSV rows.
@@ -198,19 +195,42 @@ class RowStack:
         # EP: must distinguish between gen and list as *rows* argument
         #     if rows already a list list(rows) wil produce [[1,2]],
         #     [r for r in rows] is safer in this situation
-        # ID: see Test_Rowstack.test_init()
-        #
+        # ID: list([1,2]) -> [1,2]
+        #     see Test_Rowstack.test_init() in test_rows.py
         # consume *rows*, if it is a generator or list
         # self.rows = [r for r in rows]
         self.rows = list(rows)
 
     def remaining_rows(self):
-        return self.rows
+        """Returns a list of Row() instances that remain in this RowStack"""
+        # ID: Maybe this method should also "pop"?
+        # if .pop() method removes returned Row() instances form stack
+        # maybe it would be more conistant to remove returned ones here as well.
+        # So this method could not be called multiple times.
+        # ---
+        # return self.rows
+        # --- something like this:
+        remaining = self.rows
+        self.rows = []
+        return remaining
 
     def pop(self, start, end):
-        """Pops elements of self.rows between [start, end).
-           Recognises element occurrences by index *i*.
-           Modifies *self.rows*.
+        """Pops elements of *self.rows* between [start, end).
+
+        Pops elements from *self.rows* that are between
+        start bound (inclusive) and end bound (non-inclusive).
+        Recognises element occurrences by index *i*.
+        Modifies *self.rows*.
+
+        Args:
+            start: str defining start bound. e.g.:
+                "1.6. Инвестиции в основной капитал",
+            end: str defining end bound. e.g:
+                "1.6.1. Инвестиции в основной капитал организаций"
+
+        Returns:
+            A list of Row() instances between [start, end).
+            that are taken out of RowStack.
         """
         we_are_in_segment = False
         segment = []
@@ -230,8 +250,17 @@ class RowStack:
         return segment
 
     def yield_segment_with_defintion(self, spec):
-        """Yield CSV segments and corresponding parsing definitons based on
-           *spec* parsing specification.
+        """Yield CSV segments and corresponding parsing definitons.
+        
+        Yield CSV segments as Row() instances and corresponding
+        parsing definitons based on *spec* parsing specification.
+
+        Args:
+            spec: parsing specification as spec.Specification() instance
+
+        Yields:
+            Yield CSV segments (list of Row() instances)
+            and parsing definiton pairs as tuples
         """
         for pdef in spec.get_segment_parsing_definitions():
             start, end = pdef.get_bounds(self.rows)
