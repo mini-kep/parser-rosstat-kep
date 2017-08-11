@@ -7,8 +7,7 @@ def to_dataframe(text):
                        converters={0: pd.to_datetime},
                        index_col=0)
 
-
-dfa_text = """	year	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GDP_bln_rub	GDP_yoy	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_yoy
+dfa_text = u"""	year	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GDP_bln_rub	GDP_yoy	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_yoy
 1999-12-31	1999	143.2	135.0	139.2	134.0	136.5	75.6	4823.0	106.4	1258.0	666.9	653.8	1213.6	615.5	660.8	-51.4	7.0	39.5		670.4	105.3	866.1	93.6	931.3	94.7	1797.4	94.2	3372.0	13.0	1523.0	78.0
 2000-12-31	2000	125.0	117.1	118.5	133.7	120.2	105.0	7306.0	110.0	1960.1	1029.2	1032.1	2097.7	1132.1	1065.8	102.9	33.8	44.9		1165.2	117.4	1093.2	107.5	1259.1	110.5	2352.3	109.0	3542.0	10.5	2223.0	120.9
 2001-12-31	2001	112.6	117.8	112.7	136.9	118.6	101.9	8944.0	105.1	2419.4	1321.9	1330.2	2683.7	1594.0	1322.4	272.1	-7.8	53.8		1504.7	111.7	1416.8	107.6	1653.2	113.9	3070.0	111.0	3651.0	9.0	3240.0	119.9
@@ -28,7 +27,7 @@ dfa_text = """	year	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_ro
 2015-12-31	2015	110.7	114.5	113.7	110.2	112.9	341.5	83233.0	97.2	29741.5	15620.3	9479.8	26922.0	13659.2	9308.2	-1961.0	-171.6	193.0	99.2	13897.2	89.9	13412.3	91.0	14114.5	89.1	27526.8	90.0	4978.0	5.6	34030.0	91.0
 2016-12-31	2016	106.4	104.3	106.5	104.9	105.4	281.7	86044.0	99.8	31323.7	16416.4	9936.4	28181.5	13460.0	9923.8	-2956.4	-12.6	191.7	101.3	14639.8	99.1	13751.8	95.0	14565.5	95.8	28317.3	95.4	5070.0	5.5	36709.0	100.8"""
 
-dfq_text = """	year	qtr	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GDP_bln_rub	GDP_yoy	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_rog	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_rog	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_rog	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_rog	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_rog	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_rog	WAGE_REAL_yoy
+dfq_text =u"""	year	qtr	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GDP_bln_rub	GDP_yoy	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_rog	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_rog	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_rog	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_rog	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_rog	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_rog	WAGE_REAL_yoy
 1999-03-31	1999	1	118.2	118.4	114.0	109.5	116.0	15.3	901.0	98.1	189.0	108.3	91.5	171.9	89.1	93.6	-19.2	2.1	9.1			96.8		93.8	186.8	85.0	92.7	192.2	90.7	84.3	379.0	88.0	88.1	821.0	14.3	1248.0	80.9	60.7
 1999-06-30	1999	2	106.8	106.4	108.6	109.0	107.3	17.1	1102.0	103.1	486.8	272.1	240.0	448.6	226.6	247.3	-45.5	7.3	10.1			131.1		99.2	204.3	101.4	91.6	212.2	100.2	88.5	416.5	100.8	90.0	831.0	13.0	1511.0	111.5	65.1
 1999-09-30	1999	3	106.0	104.3	107.2	107.2	105.6	18.9	1373.0	111.4	795.8	434.2	400.6	759.3	387.3	411.0	-46.9	10.4	9.5			185.6		105.0	222.6	103.1	89.2	242.0	107.0	91.3	464.6	105.1	90.3	833.0	12.3	1642.0	102.4	76.4
@@ -38,7 +37,7 @@ dfq_text = """	year	qtr	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICE
 2000-09-30	2000	3	103.3	102.6	104.3	109.8	104.1	26.6	2038.0	110.5	1204.8	632.2	642.3	1395.9	783.2	682.4	151.0	40.1	11.1			330.2		119.7	276.0	103.9	107.3	322.4	107.4	111.3	598.4	105.8	109.4	868.0	9.9	2336.0	103.4	124.7
 2000-12-31	2000	4	102.3	106.1	104.6	105.7	105.4	29.1	2044.0	108.2	1960.1	1029.2	1032.1	2097.7	1132.1	1065.8	102.9	33.8	13.4			433.2		116.1	322.1	111.8	108.8	371.3	109.4	110.0	693.4	110.5	109.4	921.0	9.8	2652.0	108.1	117.8"""
 
-dfm_text = """	year	month	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_rog	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_rog	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_rog	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_rog	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_rog	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_rog	WAGE_REAL_yoy
+dfm_text = u"""	year	month	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_rog	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_rog	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_rog	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_rog	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_rog	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_rog	WAGE_REAL_yoy
 1999-01-31	1999	1	109.7	110.4	106.2	104.1	108.4	4.5	45.6	27.4	22.7	49.0	27.8	25.7	0.4	3.0	2.7			28.5	42.5	92.2	60.3	82.5	90.3	61.5	81.0	79.0	121.8	81.7	84.0	277.7	14.3	1167.0	72.5	58.6
 1999-02-28	1999	2	104.2	104.4	104.0	103.2	104.1	4.9	103.1	61.0	49.2	99.3	54.7	51.7	-6.3	2.5	3.0			31.8	108.4	93.8	60.7	96.5	93.7	62.2	97.4	85.4	122.9	96.9	89.2	252.1	14.6	1199.0	99.1	59.0
 1999-03-31	1999	3	103.4	102.7	103.2	101.9	102.8	5.8	189.0	108.3	91.5	171.9	89.1	93.6	-19.2	2.1	3.5			36.5	111.2	95.1	65.8	105.5	94.1	68.5	106.6	89.1	134.3	106.0	91.4	291.4	14.0	1385.0	111.7	62.8
@@ -73,25 +72,64 @@ dfm = to_dataframe(dfm_text)
 
 # *gov_vars* variables accumulate from the start of the year
 # need to take a difference and produce new variables with monthly and quarterly values
-dfa = to_dataframe(dfa_text)
-dfq = to_dataframe(dfq_text)
-dfm = to_dataframe(dfm_text)
 
 varnames = [vn for vn in dfa.columns if vn.startswith('GOV') and "ACCUM" in vn]
-df = dfm[varnames]
+#df = dfm[varnames]
 
-for varname in df.columns:
-    ts = df.loc[:,varname]
-    new_ts = ts.diff()    
+
+def select_varnames(df):
+    return [vn for vn in df.columns if vn.startswith('GOV') and "ACCUM" in vn]
     
-    # FIXME: must generalise to insert orginal value at every start of year
-    new_ts[0] = ts[0]
-    new_ts[12] = ts[12]   
-    # ---------------------------------------------------------------------
+
+def rename(df):
+    dict_new_names = {vn:vn.replace("_ACCUM", "") for vn in df.columns}
+    df.rename(columns=dict_new_names, inplace=True)
     
-    # write back to df and rename
-    df.loc[:,varname] = new_ts    
-    df.rename(columns={varname: varname.replace("_ACCUM", "")}, inplace=True)
-    
-#FIXME: same for qtr
-#FIXME: rename dfa
+# TODO (EP): change names of variables to GOV_ACCUM_something    
+
+def deaccumulate_qtr(df):
+    return deaccumulate(df, first_month=3)
+
+def deaccumulate_month(df):
+    return deaccumulate(df, first_month=1)
+
+def deaccumulate(df, first_month):
+    # first_month is 1 for dfm, 3 for dfq
+    assert first_month in [1, 3]
+    # save start of year values 
+    original_start_year_values = df[df.index.month == first_month].copy()
+    # take a difference
+    df = df.diff()
+    # write back start or year
+    ix = original_start_year_values.index
+    # ERROR: this fails
+    #df.loc[ix,] = original_start_year_values.loc[ix, ]
+    # using this instead:
+    # FIXME: can do this without loop?    
+    for i in ix:
+        for varname in df.columns:
+            df.loc[i,varname] = original_start_year_values.loc[i,varname]
+    return df        
+        
+assert select_varnames(dfm) == select_varnames(dfq)
+assert select_varnames(dfm) == select_varnames(dfa)
+
+varnames = select_varnames(dfm)
+diff_dfm = deaccumulate_qtr(dfm[varnames])
+rename(diff_dfm)
+
+diff_dfq = deaccumulate_qtr(dfq[varnames])
+rename(diff_dfq)
+
+varnames_a = select_varnames(dfa)
+diff_dfa = dfa[varnames]
+rename(diff_dfa)
+
+print (diff_dfm, diff_dfq, diff_dfa)
+
+# TODO: check - accumulate diff_dfm and diff_dfq and compare to 
+#               dfm[varnames] and dfq[varnames]
+
+# TODO: replace old variables with new variables at dfa, dfq, dfm
+
+# TODO: supress or change code: A value is trying to be set on a copy of a slice from a DataFrame
