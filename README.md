@@ -4,19 +4,60 @@
 # Concept
 
 [mini-kep] parses MS Word files from [Rosstat KEP publication][Rosstat], creates pandas dataframes with 
-macroeconomic time series and saves them as [CSV files at stable URL][backend].
+macroeconomic time series and saves them as [CSV files at stable URL][backend]. Inspired by [FRED](https://fred.stlouisfed.org/) and [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science). 
 
   [mini-kep]: https://github.com/epogrebnyak/mini-kep
   [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
   [backend]: https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest
 
-[mini-kep] is inspired by [FRED](https://fred.stlouisfed.org/) and [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science). 
+# Latest data
 
-Project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com).
+*TODO: add here + generate Excel files in 
+
+
+# End user code
+
+You can use macroeconomic indicators in your code as simply as:
+
+```python
+# monthly data 
+dfm = pd.read_csv("https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfm.csv")
+
+# quarterly data 
+dfq = pd.read_csv("https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfq.csv")
+
+# annual data
+dfa = pd.read_csv("https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfa.csv")
+```
+
+or, with a nicer date index formatting as:
+
+```python
+import pandas as pd
+
+def get_dataframe(freq):
+    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
+    filename = "df{}.csv".format(freq)
+    url = url_base.format(filename)
+    return pd.read_csv(url, 
+                       converters={'time_index': pd.to_datetime},
+                       index_col='time_index')
+
+dfa = get_dataframe('a')
+dfq = get_dataframe('q')
+dfm = get_dataframe('m')
+```
+
+Check access methods for final data [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/access_data/).
+
+# Development 
+
+Project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com). See also [project glossary]
+(https://github.com/epogrebnyak/mini-kep/blob/master/doc/glossary.rst).
 
 # Example
 
-[mini-kep] translates text like this (from MS Word files):
+**mini-kep** translates text like this (from MS Word files):
 
 ```
 Объем ВВП, млрд.рублей / Gross domestic product, bln rubles					
@@ -46,33 +87,7 @@ Out[3]:
 2000-12-31  2000    4       2044.0
 ```
 
-which you can use in your code as simply as:
-
-```python
-url_m = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfm.csv"
-dfm = pd.read_csv(url_m)
-```
-
-or, with a bit of formatting as:
-
-```python
-import pandas as pd
-
-def get_dataframe(freq):
-    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
-    filename = "df{}.csv".format(freq)
-    url = url_base.format(filename)
-    return pd.read_csv(url, 
-                       converters={'time_index': pd.to_datetime},
-                       index_col='time_index')
-
-dfa = get_dataframe('a')
-dfq = get_dataframe('q')
-dfm = get_dataframe('m')
-```
-
-See more parsing examples [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py)
-and final data access methods [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/access_data/).
+See more parsing examples [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py).
 
 Workflow
 ========
@@ -99,28 +114,6 @@ Also in [/src](https://github.com/epogrebnyak/mini-kep/tree/master/src) folder:
 -   **access\_data**: sample code to download data from stable URL and save a local copy
 -   **frontpage**: add tables and graphs to [README.md](https://github.com/epogrebnyak/mini-kep/blob/master/VALUES.md)
 
-Glossary
-========
-In order of appearance:
-
-**Rosstat KEP publication** - 
-     monthly publication of macroeconomic time times series by Rosstat. 
-	 Released as several MS Word files on a web site.      
-  
-**Parsing specification** - 
-     set of instructions used to extract data from CSV file. These instructions 
-	 link table headers to variable names and units of measurement.
-
-**Resulting dataframes** - 
-     pandas dataframes with parsing result, usually denoted as ```dfa, dfq, dfm```. 
-     They hold time series at annual, quarterly and monthly frequency respectively.   
-
-**Stable URL** - end user can read a canonical dataset from these stable URLs: 
-	 
-- <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfa.csv>
-- <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfq.csv>
-- <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest/dfm.csv>
-	 
   
 Active tasks 
 ============
