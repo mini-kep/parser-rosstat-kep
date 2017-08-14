@@ -188,22 +188,15 @@ def rowstack():
 
 class Test_Rowstack:
     
-    def test_init(self):
-        # ID: Test verifies that [r for r in rows] is equivalent to list(rows)
-        # regardless if rows is generator or an iterable (e.g. a list)
-        # This allows to make robust experiments to RowStack.__init__() method.
+    def test_init_from_generator_or_list(self):
         def gen():
             yield Row(["dot oo...eh", "1", "2"])
             yield Row(["wed more text", "1", "2"])
-            yield Row(["zed some text"])
-        
-        a_generator = gen()
-        a_list = [
-            Row(["dot oo...eh", "1", "2"]),
-            Row(["wed more text", "1", "2"]),
-            Row(["zed some text"]),
-        ]
 
+        a_generator = gen()
+        a_list = [Row(["dot oo...eh", "1", "2"]),
+                  Row(["wed more text", "1", "2"])]
+        
         from_generator = RowStack(a_generator)
         from_list = RowStack(a_list)
         
@@ -218,8 +211,10 @@ class Test_Rowstack:
         b = rowstack.pop("apt", "wed")
         assert len(b) == 4
         c = rowstack.remaining_rows()
-        assert c[0] == Row(["wed more text", "1", "2"])
-        assert c[1] == Row(["zed some text"])
+        assert c == [Row(["wed more text", "1", "2"]),
+                     Row(["zed some text"])]
+        d = rowstack.remaining_rows()
+        assert d == []
 
     @pytest.mark.xfail
     def test_yield_segment_with_defintion(self):
