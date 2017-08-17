@@ -31,24 +31,6 @@ Latest data is in [kep.xlsx](https://github.com/epogrebnyak/mini-kep/issues/70)
 You can use macroeconomic indicators in your python code as:
 
 ```python
-import pandas as pd
-
-# monthly data in *dfm* dataframe
-url_m = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfm.csv"
-dfm = pd.read_csv(url_m)
-
-# quarterly data in *dfq* dataframe
-url_q = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfq.csv"
-dfq = pd.read_csv(url_q)
-
-# annual data in *dfa* dataframe
-url_a = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfa.csv"
-dfa = pd.read_csv(url_a)
-```
-
-or, with a nicer date index formatting as:
-
-```python
 
 def get_dataframe(freq):
     url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
