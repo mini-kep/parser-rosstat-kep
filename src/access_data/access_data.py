@@ -1,5 +1,24 @@
 # -*- coding: utf-8 -*-
-"""Common code to read pandas dataframes from stable URL or local CSV files."""
+"""Suggested code to read pandas dataframes from stable URL.
+
+Includes:
+- caching to local file
+
+This is most simple call:
+
+    # monthly data in *dfm* dataframe
+    url_m = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfm.csv"
+    dfm = pd.read_csv(url_m)
+
+    # quarterly data in *dfq* dataframe
+    url_q = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfq.csv"
+    dfq = pd.read_csv(url_q)
+
+    # annual data in *dfa* dataframe
+    url_a = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfa.csv"
+    dfa = pd.read_csv(url_a)
+
+"""
 
 import pandas as pd
 
@@ -37,64 +56,3 @@ def get_dfs_from_web():
     dfq = read_csv(get_url('q'))
     dfm = read_csv(get_url('m'))
     return dfa, dfq, dfm
-
-# TODO: save to local cache, update cache
-
-
-# json's
-from pathlib import Path
-
-# if in package, can import this from src.kep.cfg.py
-FOLDER_LATEST_CSV = Path(__file__).parents[2] / "data" / "processed" / "latest"
-FOLDER_LATEST_JSON = Path(__file__).parents[2] / "data" / "processed" / "json"
-
-
-def json_path(freq, folder=FOLDER_LATEST_JSON):
-    # FIXME: something nice than .__str__()
-    return (folder / "df{}.json".format(freq)).__str__()
-
-
-def csv_path(freq, folder=FOLDER_LATEST_CSV):
-    return folder / "df{}.csv".format(freq)
-
-
-def read_csv_safe_long_name(source):
-    """Works safely on long directory names"""
-    assert isinstance(source, Path)
-    with source.open() as buf:
-        return read_csv(buf)
-
-
-def get_dfs():
-    """Get three dataframes from local csv files"""
-    dfa = read_csv_safe_long_name(csv_path('a'))
-    dfq = read_csv_safe_long_name(csv_path('q'))
-    dfm = read_csv_safe_long_name(csv_path('m'))
-    return dfa, dfq, dfm
-
-
-# IDEA: import local copy of "df*.csv" and update from web if necessary
-#       see oil and CBR repositories for that
-
-
-def save_json(folder_path):
-    param = dict(orient="records")
-    dfa, dfq, dfm = get_dfs()
-    dfa.to_json(json_path('a'), **param)
-    dfq.to_json(json_path('q'), **param)
-    dfm.to_json(json_path('m'), **param)
-    print("Saved dataframes as json to", folder_path)
-
-
-if __name__ == "__main__":
-    # FIXME: must quarantee 'latest' is updated
-    dfa1, dfq1, dfm1 = get_dfs_from_web()
-    dfa, dfq, dfm = get_dfs()
-
-    # FIXME get_dfs_from_web() may be slow, otherwise could be a good test to
-    # compare dfa1 to dfa, etc
-    assert dfa1.equals(dfa)
-    assert dfq1.equals(dfq)
-    assert dfm1.equals(dfm)
-
-    save_json(FOLDER_LATEST_JSON)
