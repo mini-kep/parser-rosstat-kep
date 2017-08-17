@@ -23,7 +23,7 @@ macroeconomic time series and saves them as [CSV files at stable URL][backend].
 
 ### Excel file
 
-Latest data is in [kep.xlsx](https://github.com/epogrebnyak/mini-kep/issues/70).
+Latest data is in [kep.xlsx](https://github.com/epogrebnyak/mini-kep/issues/70)
 
 
 ### Work with CSV 
@@ -69,19 +69,10 @@ Check other access methods [here](https://github.com/epogrebnyak/mini-kep/blob/d
 
 - [mini-kep] inspired by [FRED](https://fred.stlouisfed.org/) and [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science)
 - *data-rosstat-kep* is ancestor to *mini-kep*
-- project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com). FIXME: readthedocs not updated.
-- [project glossary](https://github.com/epogrebnyak/mini-kep/blob/master/doc/glossary.rst).
+- project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com) *FIXME: readthedocs not updated.*
+- [project glossary](https://github.com/epogrebnyak/mini-kep/blob/master/doc/glossary.rst)
 
 ### Workflow
-
-
-|    Rosstat             |      mini-kep                 |     Stable URL
-|------------------------|-------------------------------|-------------------
-|   Releases Word files  |                               |
-|                        |  Download and unpack          |       
-|                        |  Convert MS Word files        |   
-|                        |  Parse, validate and publish  |       
-|                        |                               |  Read clean CSV files  			
 
 - **Rosstat** issues KEP publication every month as rar'ed Word files
 - **mini-kep**: 
