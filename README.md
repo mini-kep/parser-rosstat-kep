@@ -14,27 +14,34 @@ macroeconomic time series and saves them as [CSV files at stable URL][backend].
 
 # Latest data
 
-*TODO: add here *
+*TODO: add graphs here <https://github.com/epogrebnyak/mini-kep/issues/12>*
 
-*TODO: generate Excel files*
+*TODO: generate Excel files <https://github.com/epogrebnyak/mini-kep/issues/70>*
 
 
-# End user code
+# How to download Russian macroeconomic indicators from here?
 
-You can use macroeconomic indicators in your code as:
+### Excel file
+
+Latest data is in in [kep.xlsx](...) file.
+
+
+### Work with CSV 
+
+You can use macroeconomic indicators in your python code as:
 
 ```python
 import pandas as pd
 
-# monthly data 
+# monthly data in *dfm* dataframe
 url_m = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfm.csv"
 dfm = pd.read_csv(url_m)
 
-# quarterly data 
+# quarterly data in *dfq* dataframe
 url_q = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfq.csv"
 dfq = pd.read_csv(url_q)
 
-# annual data
+# annual data in *dfa* dataframe
 url_a = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfa.csv"
 dfa = pd.read_csv(url_a)
 ```
@@ -56,18 +63,52 @@ dfq = get_dataframe('q')
 dfm = get_dataframe('m')
 ```
 
-Check other access methods for final data [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/access_data/).
+Check other access methods [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/access_data/).
 
 # Development 
 
 - [mini-kep] inspired by [FRED](https://fred.stlouisfed.org/) and [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science)
-- [data-rosstat-kep] is ancestor to 
+- [data-rosstat-kep] is ancestor to [mini-kep]
 - project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com). 
 - [project glossary](https://github.com/epogrebnyak/mini-kep/blob/master/doc/glossary.rst).
 
-## Example
+### Workflow
 
-**mini-kep** translates text like this (from MS Word files):
+
+|    Rosstat             |      mini-kep                 |     Stable URL
+|------------------------|-------------------------------|-------------------
+|   Releases Word files  |                               |
+|                        |  Download and unpack          |       
+|                        |  Convert MS Word files        |   
+|                        |  Parse, validate and publish  |       
+|                        |                               |  Read clean CSV files  			
+
+- **Rosstat** issues KEP publication every month as rar'ed Word files
+- **mini-kep**: 
+   - downloads and unpacks rar files from website, or S3 bucket (prior to 2017) *(not implemented, TODO)*
+   - dumps MS Word files to interim CSV files
+   - parses interim CSV files and verifies data
+   - saves output as three CSV files (annual, quarterly and monthly)
+- **End user**:
+   - imports machine-readable CSV files from [stable URL](https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest) using pandas or R
+
+### Mini-kep subpackages
+
+-   **word2csv**: convert MS Word files to single interim CSV file
+-   **csv2df**: parse interim CSV file to obtain processed CSV files with annual, quarterly and monthly data.
+
+Also in [/src](https://github.com/epogrebnyak/mini-kep/tree/master/src) folder:
+
+-   **access\_data**: sample code to download data from stable URL and save a local copy
+-   **frontpage**: add tables and graphs to [README.md](https://github.com/epogrebnyak/mini-kep/blob/master/VALUES.md)
+
+
+### Parcer work example
+
+**csv2df** parcer is at core of **mini-kep**. Its work is illustarted by examples 
+[here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py).
+
+**csv2df** translates text like this:
 
 ```
 Объем ВВП, млрд.рублей / Gross domestic product, bln rubles					
@@ -75,7 +116,7 @@ Check other access methods for final data [here](https://github.com/epogrebnyak/
 2000	7306	1527	1697	2038	2044
 ```
 
-into pandas dataframes:
+to pandas dataframes:
 
 ```
             year  GDP_bln_rub
@@ -94,34 +135,6 @@ into pandas dataframes:
 2000-09-30  2000    3       2038.0
 2000-12-31  2000    4       2044.0
 ```
-
-More parsing examples [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py).
-
-
-## Workflow
-
-
-|    Rosstat                 |      mini-kep                          |     Stable URL
-|----------------------------|----------------------------------------|--------------------------------
-|   Publishes Word files...  |                                        |
-|                            |  we download, parse, check and publish |                               
-|                            |                                        |  ... you read clean CSV files  			
-
-1. Rosstat publishes KEP publication every month as rar'ed Word files
-2. we download and unpack rar files from website, or S3 bucket (prior to 2017) *(not implemented, TODO)*
-3. we parse Word files, and check data and save output as three CSV files (annual, quarterly and monthly) 
-4. machine-readable CSV files are available at <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>
-5. you can import macroeconomic indicators to your R/pandas code from these files  
-
-## Packages
-
--   **word2csv**: convert MS Word files to single interim CSV file
--   **csv2df**: parse interim CSV file to obtain processed CSV files with annual, quarterly and monthly data.
-
-Also in [/src](https://github.com/epogrebnyak/mini-kep/tree/master/src) folder:
-
--   **access\_data**: sample code to download data from stable URL and save a local copy
--   **frontpage**: add tables and graphs to [README.md](https://github.com/epogrebnyak/mini-kep/blob/master/VALUES.md)
 
   
 Active tasks 
