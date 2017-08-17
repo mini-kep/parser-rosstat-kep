@@ -19,11 +19,11 @@ macroeconomic time series and saves them as [CSV files at stable URL][backend].
 *TODO: generate Excel files <https://github.com/epogrebnyak/mini-kep/issues/70>*
 
 
-# How to download Russian macroeconomic indicators from here?
+# How I download macroeconomic indicators from here?
 
 ### Excel file
 
-Latest data is in in [kep.xlsx](...) file.
+Latest data is in [kep.xlsx](https://github.com/epogrebnyak/mini-kep/issues/70).
 
 
 ### Work with CSV 
@@ -68,8 +68,8 @@ Check other access methods [here](https://github.com/epogrebnyak/mini-kep/blob/d
 # Development 
 
 - [mini-kep] inspired by [FRED](https://fred.stlouisfed.org/) and [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science)
-- [data-rosstat-kep] is ancestor to [mini-kep]
-- project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com). 
+- *data-rosstat-kep* is ancestor to *mini-kep*
+- project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com). FIXME: readthedocs not updated.
 - [project glossary](https://github.com/epogrebnyak/mini-kep/blob/master/doc/glossary.rst).
 
 ### Workflow
@@ -90,7 +90,7 @@ Check other access methods [here](https://github.com/epogrebnyak/mini-kep/blob/d
    - parses interim CSV files and verifies data
    - saves output as three CSV files (annual, quarterly and monthly)
 - **End user**:
-   - imports machine-readable CSV files from [stable URL](https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest) using pandas or R
+   - imports machine-readable CSV files from [stable URL](https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest) using pandas or R.
 
 ### Mini-kep subpackages
 
@@ -105,8 +105,7 @@ Also in [/src](https://github.com/epogrebnyak/mini-kep/tree/master/src) folder:
 
 ### Parcer work example
 
-**csv2df** parcer is at core of **mini-kep**. Its work is illustarted by examples 
-[here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py).
+**csv2df** parcer is at core of **mini-kep**. Its work is illustarted by [example here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example.py).
 
 **csv2df** translates text like this:
 
