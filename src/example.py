@@ -63,3 +63,10 @@ _dfa, _dfq, _dfm = vint.dfs()
 
 # LATER: parse several tables with a larger parsing definitoin (from test folder)
 # LATER: use this example in testing +  bring good examples from testing to here 
+
+# FIXME: test code for  pandas dataframe
+#from io import StringIO
+#_source = StringIO("""time_index,EXPORT_GOODS_TOTAL_bln_usd,GDP_bln_rub\n1999-12-31,75.6,4823.0""")
+#df = read_csv(source=_source)
+#assert df.EXPORT_GOODS_TOTAL_bln_usd['1999-12-31'] == 75.6
+#assert df.GDP_bln_rub['1999-12-31'] == 4823.0
