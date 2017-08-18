@@ -14,7 +14,7 @@ macroeconomic time series and saves them as [CSV files at stable URL][backend].
 
 # Source
 
-Rosstat KEP publication is [here][Rosstat]
+Rosstat KEP publication is [here][Rosstat].
 
 # Latest data
 
