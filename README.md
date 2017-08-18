@@ -12,6 +12,10 @@ macroeconomic time series and saves them as [CSV files at stable URL][backend].
   [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
   [backend]: https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest
 
+# Source
+
+Rosstat KEP publication is [here][Rosstat]
+
 # Latest data
 
 *TODO: add graphs here <https://github.com/epogrebnyak/mini-kep/issues/12>*
