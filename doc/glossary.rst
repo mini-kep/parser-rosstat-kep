@@ -5,7 +5,9 @@ Glossary
 
 Rosstat KEP publication
    Monthly publication of macroeconomic time series by Rosstat.
-   Released as several MS Word files on a web site.
+   Released as several MS Word files at Rosstat web site at this link:
+   http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
+   
 
 Parsing specification
    Set of instructions used to extract data from CSV file. These instructions link 
