@@ -4,7 +4,7 @@ import io
 
 # from runner.py
 from kep.spec import Definition, Specification
-from kep2.reader import Reader
+from kep2.reader import Reader, open_csv
 from kep2.parcer import get_tables
 from kep2.emitter import Emitter
 from kep2.validator import Validator
@@ -16,17 +16,17 @@ def get_dataframes(csvfile, spec):
       csvfile (file connection or StringIO) - CSV file for parsing
       spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
     """
-    rdr = Reader(csvfile, spec)
-    parsing_inputs = rdr.items()
-    tables = get_tables(parsing_inputs)
+    inputs = Reader(csvfile, spec).items()
+    tables = get_tables(inputs)
     emitter = Emitter(tables)
     dfa = emitter.get_dataframe(freq='a')
     dfq = emitter.get_dataframe(freq='q')
     dfm = emitter.get_dataframe(freq='m')
     return dfa, dfq, dfm
- 
+
     
 # Example 1. StringIO *csvfile1* is parsed with *spec1* instruction 
+
 csvfile1 = io.StringIO("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles					
 1999	4823	901	1102	1373	1447
 2000	7306	1527	1697	2038	2044""")
@@ -53,12 +53,27 @@ for c in check_points:
     assert checker.is_included(c) 
 
 
-# Example 3. Read actual data by month/year
-from kep2.runner import Vintage
+# Example 4 Read actual data by month and year
 year, month = 2017, 5
+
+# 4.1
+from kep2.helpers import PathHelper
+from kep2.specification import SPEC
+csv_path = PathHelper.locate_csv(year, month)
+with open_csv(csv_path) as csvfile:
+    dfa1, dfq1, dfm1 = get_dataframes(csvfile, SPEC)
+
+# 4.2 
+from kep2.runner import Vintage
 vint = Vintage(year, month)
+dfa2, dfq2, dfm2 = vint.dfs()
+
+assert dfa1.equals(dfa2)
+assert dfq1.equals(dfq2)
+assert dfm1.equals(dfm2)
+
+# Example 5. Validation example
 vint.validate()
-_dfa, _dfq, _dfm = vint.dfs()
 
 # LATER: parse several tables with a larger parsing definitoin (from test folder)
 # LATER: use this example in testing +  bring good examples from testing to here 

@@ -1,3 +1,4 @@
+# TODO: edit module docstring
 """File and folder locations for interim and processed CSV files.
 
 Functions based on :class:`kep.files.Folder` class methods:
@@ -26,7 +27,6 @@ For reference - data directory structure::
           \\...
       \\processed
           \\latest
-          \\latest_json (may be depreciated)
           \\2017
           \\2016
           \\...
@@ -35,14 +35,13 @@ For reference - data directory structure::
 from pathlib import Path
 import shutil
 
-__all__ = ['locate_csv', 'get_processed_folder',
-           'filled_dates', 'get_latest_date']
+__all__ = ['PathHelper', 'DateHelper']
 
 # csv file parameters
 ENC = 'utf8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
-# we are in src/kep
+# find ourselves - this file is in src/kep2
 levels_up = 2
 data_folder = Path(__file__).parents[levels_up] / 'data'
 
@@ -74,49 +73,59 @@ DATES = [(2009, 4), (2009, 5), (2009, 6),
 
          (2017, 1), (2017, 2), (2017, 3), (2017, 4), (2017, 5)]
 
-# end user functions
+# end user interface
+
+class PathHelper:
+    def locate_csv(year: int=None, month: int=None):
+        """Return interim CSV file based on *year* and *month*. Defaults to 
+           latest year and month.
+    
+           Returns:
+                pathlib.Path() instance
+        """
+        folder = Folder(year, month).get_interim_folder()
+        csv_path = folder / "tab.csv"
+        if csv_path.exists() and csv_path.stat().st_size > 0:
+            return csv_path
+        else:
+            raise FileNotFoundError(
+                "File not found or has zero length: {}".format(csv_path))
+
+    def get_processed_folder(year, month):
+        """Return processed CSV file folder based on *year* and *month*.
+    
+        The processed CSV file folder is used by Frames class
+        to write output files (dfa.csv, dfq.csv, dfm.csv).
+    
+        Returns:
+            pathlib.Path() instance
+    
+        """
+        return Folder(year, month).get_processed_folder()
 
 
-def filled_dates():
-    return DATES
-
-
-def get_latest_date():
-    """Return year and month for latest available interim data folder.
-
-    Returns:
-        (year, month) tuple of two integers
-
-    """
-    return Folder.get_latest_date()
-
-
-def locate_csv(year: int=None, month: int=None):
-    """Return interim CSV file based on *year* and *month*.
-
-    Returns:
-        pathlib.Path() instance
-    """
-    folder = Folder(year, month).get_interim_folder()
-    csv_path = folder / "tab.csv"
-    if csv_path.exists() and csv_path.stat().st_size > 0:
-        return csv_path
-    else:
-        raise FileNotFoundError(
-            "Not found or has zero length: {}".format(csv_path))
-
-
-def get_processed_folder(year, month):
-    """Return processed CSV file folder based on *year* and *month*.
-
-    The processed CSV file folder is used by Frames class
-    to write output files (dfa.csv, dfq.csv, dfm.csv).
-
-    Returns:
-        pathlib.Path() instance
-
-    """
-    return Folder(year, month).get_processed_folder()
+class DateHelper:
+    
+    def get_supported_dates():
+        return Folder.supported_dates        
+    
+    def get_latest_date():
+        """Return year and month for latest available interim data folder.
+    
+        Returns:
+            (year, month) tuple of two integers
+    
+        """
+        return Folder.get_latest_date()    
+        
+    def filter_date(year, month):
+        """Set (year, month) to latest date, even if year or month omitted.
+                    
+        Returns:
+            (year, month) tuple of two integers  
+        """
+        latest_year, latest_month = DateHelper.get_latest_date()
+        return year or latest_year, month or latest_month
 
 
 # folder locations
@@ -129,7 +138,6 @@ class Folder:
     @classmethod
     def get_latest_date(cls):
         root = cls.interim
-
         def max_subfolder(folder):
             _lst = [f.name for f in folder.iterdir() if f.is_dir()]
             return int(max(_lst))
@@ -197,8 +205,8 @@ def copy_latest():
        Returns:
            list of files copied
     """
-    year, month = get_latest_date()
-    src_folder = get_processed_folder(year, month)
+    year, month = DateHelper.get_latest_date()
+    src_folder = PathHelper.get_processed_folder(year, month)
     copied = []
     for src in [f for f in src_folder.iterdir() if f.is_file()]:
         dst = Folder.latest / src.name

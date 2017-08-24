@@ -14,8 +14,7 @@
 
 """
 
-import kep2.helpers as helpers
-
+from kep2.helpers import DateHelper, PathHelper
 from kep2.specification import SPEC
 from kep2.reader import Reader, open_csv
 from kep2.parcer import get_tables
@@ -30,9 +29,8 @@ def get_dataframes(csvfile, spec=SPEC):
       csvfile (file connection or StringIO) - CSV file for parsing
       spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
     """
-    rdr = Reader(csvfile, spec)
-    parsing_inputs = rdr.items()
-    tables = get_tables(parsing_inputs)
+    inputs = Reader(csvfile, spec).items()
+    tables = get_tables(inputs)
     emitter = Emitter(tables)
     dfa = emitter.get_dataframe(freq='a')
     dfq = emitter.get_dataframe(freq='q')
@@ -43,15 +41,10 @@ def get_dataframes(csvfile, spec=SPEC):
 class Vintage:
     """Represents dataset release for a given year and month."""
 
-    @staticmethod
-    def filter_date(year, month):
-        """Set (year, month) to latest date if year or month omitted."""
-        latest_year, latest_month = helpers.get_latest_date()
-        return year or latest_year, month or latest_month
-
     def __init__(self, year=False, month=False):
-        self.year, self.month = self.filter_date(year, month)
-        csv_path = helpers.locate_csv(self.year, self.month)
+        _year, _month = DateHelper.filter_date(year, month)
+        self.year, self.month = _year, _month 
+        csv_path = PathHelper.locate_csv(_year, _month)
         with open_csv(csv_path) as csvfile:
             self.dfa, self.dfq, self.dfm = get_dataframes(csvfile)
 
@@ -60,7 +53,7 @@ class Vintage:
         return self.dfa, self.dfq, self.dfm
 
     def save(self):
-        folder_path = helpers.get_processed_folder(self.year, self.month)
+        folder_path = PathHelper.get_processed_folder(self.year, self.month)
         self.dfa.to_csv(folder_path / 'dfa.csv')
         self.dfq.to_csv(folder_path / 'dfq.csv')
         self.dfm.to_csv(folder_path / 'dfm.csv')
@@ -78,11 +71,8 @@ class Vintage:
 class Collection:
     """Methods to manipulate entire set of data releases."""
 
-    @staticmethod
-    def save_all():
-        for (year, month) in helpers.filled_dates():
-            Vintage(year, month).save()
-
+    all_dates = DateHelper.get_supported_dates()
+    
     @staticmethod
     def save_latest():
         vintage = Vintage(year=None, month=None)
@@ -95,12 +85,17 @@ class Collection:
         vintage.validate()
 
     @staticmethod
+    def save_all():
+        for (year, month) in Collection.all_dates:
+            Vintage(year, month).save()
+
+    @staticmethod
     def approve_all():
         """Checks all dates, runs for about 1-2 min of a fast computer.
            May fail if dataset not complete, eg word2csv written only part
            of CSV file.
         """
-        for year, month in helpers.filled_dates():
+        for year, month in Collection.all_dates:
             print("Checking", year, month)
             vintage = Vintage(year, month)
             vintage.validate()

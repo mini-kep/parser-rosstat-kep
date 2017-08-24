@@ -65,6 +65,17 @@ class Spec_Sample:
         main.append(**indpro_def)
         return Specification(main)
 
+labels = {0:'GDP_bln_rub',
+          1:'GDP_rog',
+          2:'INDPRO_yoy'}
+
+parsed_varnames = {0:'GDP',
+            1:'GDP',
+            2:'INDPRO'}
+
+parsed_units = {0:'bln_rub',
+                1:'rog',
+                2:'yoy'}
 
 headers = {0: [Row(['Объем ВВП', '', '', '', '']),
                Row(['млрд.рублей', '', '', '', ''])],
@@ -92,9 +103,16 @@ class Sample(Spec_Sample):
 
     def table(i):
         return Table(headers[i], data_items[i])
+    
+    def table_parsed(i):
+        t = Table(headers[i], data_items[i])
+        t.varname = parsed_varnames[i]
+        t.unit = parsed_units[i]        
+        t.set_splitter(funcname=None)
+        return t
 
     def label(i):
-        return ['GDP_bln_rub', 'GDP_rog', 'INDPRO_yoy'][i]
+        return labels[i]
 
 
 @pytest.fixture
