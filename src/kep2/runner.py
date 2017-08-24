@@ -14,8 +14,6 @@
 
 """
 
-import warnings
-
 import kep2.helpers as helpers
 
 from kep2.specification import SPEC
@@ -23,10 +21,6 @@ from kep2.reader import Reader, open_csv
 from kep2.parcer import get_tables
 from kep2.emitter import Emitter
 from kep2.validator import Validator
-
-
-# use'always' or 'ignore'
-warnings.simplefilter('ignore', UserWarning)
 
 
 def get_dataframes(csvfile, spec=SPEC):
