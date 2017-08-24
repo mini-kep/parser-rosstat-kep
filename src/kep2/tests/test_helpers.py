@@ -47,6 +47,7 @@ class Test_Folder():
         with pytest.raises(ValueError):
             files.Folder(2030, 1)
             
+# skipping
             
 @pytest.mark.skip(reason="not testing maintenance scripts yet")        
 def test_md(folder):

@@ -1,23 +1,36 @@
-# TODO: rename module 'rows'
+import pytest
+import kep2.label as label
 
-# FIXME: test for label handling
-#    def make_label(vn, unit, sep="_"):
-#    return vn + sep + unit
-#
-#
-# def split_label(label):
-#    return extract_varname(label), extract_unit(label)
-#
-#
-# def extract_varname(label):
-#    words = label.split('_')
-#    return '_'.join(itertools.takewhile(lambda word: word.isupper(), words))
-#
-#
-# def extract_unit(label):
-#    words = label.split('_')
-#    return '_'.join(itertools.dropwhile(lambda word: word.isupper(), words))
+#TODO: add variable name with underscore, like GOV_EXPENSE
 
-# FIXME: csv to rows testing
+def test_make_label():
+    assert label.make_label('GDP', 'bln_rub') == 'GDP_bln_rub'
+    assert label.make_label('GDP', 'rog') == 'GDP_rog'
+    assert label.make_label('PROD_E', 'TWh') == 'PROD_E_TWh'    
+ 
 
-# FIXME: Scope not tested
+def test_split_label():
+    assert label.split_label('GDP_bln_rub') == ('GDP', 'bln_rub')
+    assert label.split_label('GDP_rog') == ('GDP', 'rog')
+    assert label.split_label('PROD_E_TWh') == ('PROD_E', 'TWh')
+    #note the () for tuple above
+    with pytest.raises(AssertionError):
+        assert label.split_label('GDP_bln_rub') == 'GDP', 'bln_rub'
+    
+
+
+def test_extract_varname():
+    assert label.extract_varname('GDP_bln_rub') == 'GDP'
+    assert label.extract_varname('GDP_rog') == 'GDP'
+    assert label.extract_varname('PROD_E_TWh') == 'PROD_E'
+ 
+
+def test_extract_unit():
+    assert label.extract_unit('GDP_bln_rub') == 'bln_rub'
+    assert label.extract_unit('GDP_rog') == 'rog'
+    assert label.extract_unit('PROD_E_TWh') == 'TWh'  
+    
+
+if __name__ == "__main__":
+    pytest.main([__file__])
+        
