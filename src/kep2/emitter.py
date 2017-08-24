@@ -1,19 +1,10 @@
 """Emitting values from list of tables."""
 
 import re
-import warnings
-
-from datetime import date
-import calendar
-
 import pandas as pd
 
 
 __all__ = ['Emitter']
-
-
-# use'always' or 'ignore'
-warnings.simplefilter('ignore', UserWarning)
 
 
 COMMENT_CATCHER = re.compile("\D*(\d+[.,]?\d*)\s*(?=\d\))")
@@ -62,13 +53,20 @@ class DatapointMaker:
         self.period = period
         return self.as_dict()
 
-    def get_date(self):
+    def get_date(self):        
+        # annual
         if self.freq=='a':
             return pd.Timestamp(self.year) + pd.offsets.YearEnd()
-        elif self.freq=='q':
-            return get_date_quarter_end(self.year, self.period)
+        # qtr or month
+        year = int(self.year)        
+        if self.freq=='q':
+            month = int(self.period) * 3
+            base = pd.Timestamp(year, month, 1)
+            return base + pd.offsets.QuarterEnd()
         elif self.freq=='m':
-            return get_date_month_end(self.year, self.period)
+            month = int(self.period)
+            base = pd.Timestamp(year, month, 1)
+            return base + pd.offsets.MonthEnd()
             
     def as_dict(self):
         basedict = dict(year=int(self.year),
@@ -82,49 +80,6 @@ class DatapointMaker:
             basedict.update(dict(month=self.period))
         return basedict 
 
-class DictMaker:
-    def __init__(self, year, label):
-        self.basedict = {'year': year, 'label': label}
-
-    def a_dict(self, val):
-        return {**self.basedict, 'freq': 'a', 'value': to_float(val)}
-
-    def q_dict(self, val, q):
-        return {**self.basedict, 'freq': 'q', 'value': to_float(val), 'qtr': q}
-
-    def m_dict(self, val, m):
-        return {
-            **self.basedict,
-            'freq': 'm',
-            'value': to_float(val),
-            'month': m}
-
-    def __str__(self):
-        return self.basedict.__str__()
-
-
-# dataframe dates handling
-
-def _month_end_day(year, month):
-    return calendar.monthrange(year, month)[1]
-
-
-def get_date_month_end(year, month):
-    day = _month_end_day(year, month)
-    return pd.Timestamp(date(year, month, day))
-
-
-def get_date_quarter_end(year, qtr):
-    # quarter number should be based at 1
-    assert qtr <= 4 and qtr >= 1
-    month = qtr * 3
-    return get_date_month_end(year, month)
-
-
-def get_date_year_end(year):
-    return pd.Timestamp(date(year, 12, 31))
-
-
 class Emitter:
     """Emitter extractsand emits annual, quarterly and monthly values
        from a list Table() instances.
@@ -135,8 +90,6 @@ class Emitter:
        Raises:
            ValueError if any table in list is not defined.
 
-       Method:
-           get_dataframe(freq)
     """
     
     @staticmethod
@@ -174,21 +127,20 @@ class Emitter:
             raise ValueError(freq)
 
     @staticmethod
-    def assert_has_no_duplicate_rows(df):
+    def _assert_has_no_duplicate_rows(df):
         if df.empty:
             dups = df
         else:
             dups = df[df.duplicated(keep=False)]
         if not dups.empty:           #
             raise ValueError("Duplicate rows found {}".format(dups))
-
     
     
     def get_dataframe(self, freq):
         df = pd.DataFrame(self._collect(freq))
         if df.empty:
             return pd.DataFrame()
-        self.assert_has_no_duplicate_rows(df)
+        self._assert_has_no_duplicate_rows(df)
         # reshape
         df = df.pivot(columns='label', values='value', index='time_index')
         # add year and period
@@ -201,80 +153,3 @@ class Emitter:
         df.columns.name = None
         df.index.name = None
         return df
-
-# ------------------------
-
-from kep2.parcer import Table
-
-labels = {0:'GDP_bln_rub',
-          1:'GDP_rog',
-          2:'INDPRO_yoy'}
-
-parsed_varnames = {0:'GDP',
-            1:'GDP',
-            2:'INDPRO'}
-
-parsed_units = {0:'bln_rub',
-                1:'rog',
-                2:'yoy'}
-
-headers = {0: [Row(['Объем ВВП', '', '', '', '']),
-               Row(['млрд.рублей', '', '', '', ''])],
-           1: [Row(['Индекс ВВП, в % к прошлому периоду/ GDP index, percent'])],
-           2: [Row(['Индекс промышленного производства']),
-               Row(['в % к соответствующему периоду предыдущего года'])]
-           }
-
-data_items = {0: [Row(["1991", "4823", "901", "1102", "1373", "1447"])],
-              1: [Row(['1991', '106,4', '98,1', '103,1', '111,4', '112,0'])],
-              2: [Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])]
-              }
-
-
-class Sample:
-    """Fixtures for testing"""
-    def rows(i):
-        return headers[i] + data_items[i]
-
-    def headers(i):
-        return headers[i]
-
-    def data_items(i):
-        return data_items[i]
-
-    def table(i):
-        return Table(headers[i], data_items[i])
-    
-    def table_parsed(i):
-        t = Table(headers[i], data_items[i])
-        t.varname = parsed_varnames[i]
-        t.unit = parsed_units[i]        
-        t.set_splitter(funcname=None)
-        return t
-
-    def label(i):
-        return labels[i]
-
-#-------------------------
-
-tables = [Sample.table_parsed(0), Sample.table_parsed(1)]
-e = Emitter(tables)
-df = e.get_dataframe('q')
-
-assert df.to_dict(orient='index') == {
- pd.Timestamp('1991-03-31'): {'GDP_bln_rub': 901.0,
-  'GDP_rog': 98.1,
-  'qtr': 1,
-  'year': 1991},
- pd.Timestamp('1991-06-30'): {'GDP_bln_rub': 1102.0,
-  'GDP_rog': 103.1,
-  'qtr': 2,
-  'year': 1991},
- pd.Timestamp('1991-09-30'): {'GDP_bln_rub': 1373.0,
-  'GDP_rog': 111.4,
-  'qtr': 3,
-  'year': 1991},
- pd.Timestamp('1991-12-31'): {'GDP_bln_rub': 1447.0,
-  'GDP_rog': 112.0,
-  'qtr': 4,
-  'year': 1991}}
