@@ -20,8 +20,8 @@ class Reader(object):
 
        Pasring specification contains segment boundaries and
        parsing defintions by segment.
-    """
-
+       
+    """    
     def __init__(self, csvfile, spec):
         """
         Args:
@@ -311,11 +311,14 @@ class RowStack:
 
 
 if __name__ == "__main__":
-    from kep2 import file_location_handler
+    from kep2 import helpers
     from kep2 import specification
 
-    csv_path = file_location_handler.locate_csv()
-    reader = Reader(path=csv_path, spec=specification.SPEC)
+    #print all rows from csvpath 
+    csv_path = helpers.locate_csv()
+    csvfile = open_csv(csv_path)
+    reader = Reader(csvfile, spec=specification.SPEC)
     for csv_segment, pdef in reader.items():
         for row in csv_segment:
-            print(row)
+            print(row)            
+    csvfile.close()        

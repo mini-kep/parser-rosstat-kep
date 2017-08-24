@@ -157,16 +157,19 @@ class Table:
 
 if __name__ == "__main__":
     import itertools
-    from kep2 import file_location_handler
+    from kep2 import helpers
     from kep2 import reader
 
     assert list(itertools.chain.from_iterable([[1, 2], [3, 4]])) == \
         [1, 2, 3, 4]
 
-    csv_path = file_location_handler.locate_csv()
-    parsing_inputs = list(reader.Reader(path=csv_path, spec=SPEC).items())
+    csv_path = helpers.locate_csv()
+    csvfile = reader.open_csv(csv_path)
+    parsing_inputs = reader.Reader(csvfile, spec=SPEC).items()
     tables = get_tables(parsing_inputs)
 
     for t in tables:
         print()
         print(t)
+        
+    csvfile.close()    

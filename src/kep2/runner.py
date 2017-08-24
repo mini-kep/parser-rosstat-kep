@@ -16,7 +16,7 @@
 
 import warnings
 
-import kep2.helper as helper
+import kep2.helpers as helpers
 
 from kep2.specification import SPEC
 from kep2.reader import Reader, open_csv
@@ -52,12 +52,12 @@ class Vintage:
     @staticmethod
     def filter_date(year, month):
         """Set (year, month) to latest date if year or month omitted."""
-        latest_year, latest_month = helper.get_latest_date()
+        latest_year, latest_month = helpers.get_latest_date()
         return year or latest_year, month or latest_month
 
     def __init__(self, year=False, month=False):
         self.year, self.month = self.filter_date(year, month)
-        csv_path = helper.locate_csv(self.year, self.month)
+        csv_path = helpers.locate_csv(self.year, self.month)
         with open_csv(csv_path) as csvfile:
             self.dfa, self.dfq, self.dfm = get_dataframes(csvfile)
 
@@ -66,7 +66,7 @@ class Vintage:
         return self.dfa, self.dfq, self.dfm
 
     def save(self):
-        folder_path = helper.get_processed_folder(self.year, self.month)
+        folder_path = helpers.get_processed_folder(self.year, self.month)
         self.dfa.to_csv(folder_path / 'dfa.csv')
         self.dfq.to_csv(folder_path / 'dfq.csv')
         self.dfm.to_csv(folder_path / 'dfm.csv')
@@ -86,7 +86,7 @@ class Collection:
 
     @staticmethod
     def save_all():
-        for (year, month) in helper.filled_dates():
+        for (year, month) in helpers.filled_dates():
             Vintage(year, month).save()
 
     @staticmethod
@@ -106,7 +106,7 @@ class Collection:
            May fail if dataset not complete, eg word2csv written only part
            of CSV file.
         """
-        for year, month in helper.filled_dates():
+        for year, month in helpers.filled_dates():
             print("Checking", year, month)
             vintage = Vintage(year, month)
             vintage.validate()
