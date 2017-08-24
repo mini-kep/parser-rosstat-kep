@@ -1,9 +1,7 @@
-from datetime import date
 import pandas as pd
 import pytest
 
-import kep2.parcer as parcer
-import kep2.emitter as emitter
+import kep.emitter as emitter
 
 
 # stateless functions
@@ -47,8 +45,8 @@ def test_DatapointMaker():
         
 # ------------------------
 
-from kep2.reader import Row
-from kep2.parcer import Table
+from kep.reader import Row
+from kep.parcer import Table
 
 labels = {0:'GDP_bln_rub',
           1:'GDP_rog',
@@ -106,9 +104,9 @@ def test_emitter():
     
     tables = [Sample.table_parsed(0), Sample.table_parsed(1)]
     e = emitter.Emitter(tables)
-    df = e.get_dataframe('q')
+    dfq = e.get_dataframe('q')
     
-    assert df.to_dict(orient='index') == {
+    assert dfq.to_dict(orient='index') == {
      pd.Timestamp('1991-03-31'): {'GDP_bln_rub': 901.0,
       'GDP_rog': 98.1,
       'qtr': 1,
@@ -125,9 +123,20 @@ def test_emitter():
       'GDP_rog': 112.0,
       'qtr': 4,
       'year': 1991}}
+     
+     
+    assert e.get_dataframe('a').to_dict(orient='index') == \
+        {pd.Timestamp('1991-12-31'): {'GDP_bln_rub': 4823.0,
+                                      'GDP_rog': 106.4,
+                                       'year': 1991.0}}
             
         
 if __name__ == "__main__":
     pytest.main([__file__])
+    
+    
+    tables = [Sample.table_parsed(0), Sample.table_parsed(1)]
+    e = emitter.Emitter(tables)
+    dfa = e.get_dataframe('a')
 
 

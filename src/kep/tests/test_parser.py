@@ -2,10 +2,11 @@ import itertools
 import pytest
 
 # fixtures
-from kep.rows import Row
+from kep.reader import Row
 # testing
-from kep.tables import Table, split_to_tables, extract_tables
-from kep.spec import ParsingInstruction, Definition, Specification
+from kep.parcer import Table, split_to_tables, extract_tables
+from kep.specification import (ParsingInstruction, Definition, 
+                               Specification)
 
 # TODO: rename module 'rows'
 
@@ -201,7 +202,7 @@ class Test_Table_after_parsing:
     def test_set_splitter(self):
         table = Sample.table(0)
         table.set_splitter(None)
-        from kep.splitter import split_row_by_year_and_qtr
+        from kep.util_row_splitter import split_row_by_year_and_qtr
         assert table.splitter_func == split_row_by_year_and_qtr
 
     def test_has_unknown_lines(self):

@@ -3,14 +3,10 @@ import pytest
 
 import io
 
-# FIXME: to use later
-#from tempfile import NamedTemporaryFile
-#from pathlib import Path
-
-from kep.spec import Definition, Specification
-from kep.rows import to_rows
-from kep.tables import get_tables
-from kep.vintage import Emitter
+from kep.specification import Definition, Specification
+from kep.reader import Reader
+from kep.parcer import get_tables
+from kep.runner import Emitter
 
 
 # input data
@@ -26,14 +22,15 @@ spec = Specification(default=main)
 
 
 # parsing result
-rows = to_rows(csvfile)
-tables = get_tables(rows, spec)
+inputs = Reader(csvfile, spec).items()
+tables = get_tables(inputs)
 emitter = Emitter(tables)
 dfa = emitter.get_dataframe(freq="a")
 dfq = emitter.get_dataframe(freq="q")
 dfm = emitter.get_dataframe(freq="m")
 
 
+#@pytest.mark.skip('fails apparenty, similar to example.py')
 def test_resulting_dataframes():
     assert dfa.GDP_bln_rub['1999-12-31'] == 4823.0
 
