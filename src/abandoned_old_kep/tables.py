@@ -1,5 +1,4 @@
-"""Parse [(csv_segment, pdef)... ] inputs into Table() instances using
-   parsing specification.
+"""Parse CSV file rows into Table() instances using parsing specification.
 
 Main call:
    tables = get_tables(rows, SPEC)
@@ -11,40 +10,34 @@ from collections import OrderedDict as odict
 import warnings
 
 from kep import splitter
+from kep.rows import RowStack
 from kep.spec import SPEC
 from kep.label import make_label
-
 
 # use'always' or 'ignore'
 warnings.simplefilter('ignore', UserWarning)
 
-__all__ = ['get_tables']
 
+def fix_multitable_units(tables):
+    """For tables without *varname* copy *varname* from previous table.
 
-def get_tables(parsing_inputs):
-    for csv_segment, pdef in parsing_inputs:
-        for table in extract_tables(csv_segment, pdef):
-            yield table
+       Applies to tables without unknown rows.
+
+    """
+    for prev_table, table in zip(tables, tables[1:]):
+        if table.varname is None and not table.has_unknown_lines():
+            table.varname = prev_table.varname
 
 
 def extract_tables(csv_segment, pdef):
-    """Extract tables from *csv_segment* list Rows instances using
-       *pdef* parsing defintion.
+    """Extract tables from *csv_segment* using *pdef* defintion.
     """
     # yield tables from csv_segment
     tables = split_to_tables(csv_segment)
-    # parse tables to obtain labels - set label and splitter
+    # parse tables to obtain labels
     tables = [t.set_label(pdef.varnames_dict, pdef.units_dict) for t in tables]
     tables = [t.set_splitter(pdef.funcname) for t in tables]
-    # assign trailing units
-
-    def fix_multitable_units(tables):
-        """For tables without *varname*-  copy *varname* from previous table.
-           Applies to tables where all rows are known rows.
-        """
-        for prev_table, table in zip(tables, tables[1:]):
-            if table.varname is None and not table.has_unknown_lines():
-                table.varname = prev_table.varname
+    # another run to assign trailing units to some tables
     fix_multitable_units(tables)
     # were all required tables read?
     _labels_in_tables = [t.label for t in tables]
@@ -53,9 +46,19 @@ def extract_tables(csv_segment, pdef):
         raise ValueError("Missed labels: {}".format(_labels_missed))
     return [t for t in tables if t.label in pdef.required]
 
+
+def yield_tables(_rows, spec):
+    rowstack = RowStack(_rows)
+    for csv_segment, pdef in rowstack.yield_segment_with_defintion(spec):
+        for t in extract_tables(csv_segment, pdef):
+            yield t
+
+
+def get_tables(_rows, spec):
+    return list(yield_tables(_rows, spec))
+
+
 # classes for split_to_tables()
-
-
 @unique
 class RowType(Enum):
     UNKNOWN = 0
@@ -156,20 +159,11 @@ class Table:
 
 
 if __name__ == "__main__":
-    import itertools
-    from kep2 import helpers
-    from kep2 import reader
-
-    assert list(itertools.chain.from_iterable([[1, 2], [3, 4]])) == \
-        [1, 2, 3, 4]
-
-    csv_path = helpers.locate_csv()
-    csvfile = reader.open_csv(csv_path)
-    parsing_inputs = reader.Reader(csvfile, spec=SPEC).items()
-    tables = get_tables(parsing_inputs)
-
+    from kep import files
+    from kep import rows
+    csv_path = files.locate_csv()
+    _rows = rows.read_csv(csv_path)
+    tables = get_tables(_rows, SPEC)
     for t in tables:
         print()
         print(t)
-        
-    csvfile.close()    

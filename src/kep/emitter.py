@@ -1,4 +1,4 @@
-"""Emitting values from list of tables."""
+"""Emitting datapoints from tables."""
 
 import re
 import pandas as pd
@@ -10,7 +10,12 @@ __all__ = ['Emitter']
 COMMENT_CATCHER = re.compile("\D*(\d+[.,]?\d*)\s*(?=\d\))")
 
 
-def to_float(text, i=0):
+def to_float(text: str, i=0):
+    """Convert *text* to float() type.
+    
+    Returns:
+        Float value, or False if not sucessful.
+    """
     i += 1
     if i > 5:
         raise ValueError("Max recursion depth exceeded on '{}'".format(text))
@@ -33,6 +38,7 @@ def to_float(text, i=0):
         return False
 
 class DatapointMaker:
+    """Factory to make dictionaries representing a datapoint."""
     
     def __init__(self, year, label):
         self.year = year
@@ -56,13 +62,14 @@ class DatapointMaker:
     def get_date(self):        
         # annual
         if self.freq=='a':
-            return pd.Timestamp(self.year) + pd.offsets.YearEnd()
-        # qtr or month
+            return pd.Timestamp(str(self.year)) + pd.offsets.YearEnd()
+        # qtr 
         year = int(self.year)        
         if self.freq=='q':
             month = int(self.period) * 3
             base = pd.Timestamp(year, month, 1)
             return base + pd.offsets.QuarterEnd()
+        #  month
         elif self.freq=='m':
             month = int(self.period)
             base = pd.Timestamp(year, month, 1)
