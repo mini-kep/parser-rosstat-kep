@@ -30,35 +30,36 @@ class Test_Function_to_float_on_values:
             emitter.to_float("1.2,,,,,")
 
 
-def test_DatapointMaker():        
+def test_DatapointMaker():
     d = emitter.DatapointMaker('2000', 'abc')
-    
+
     z = d.make('a', '100 1)2)')
     assert z['time_index'] == pd.Timestamp('2000-12-31')
     assert z["value"] == 100
-    
+
     w = d.make('q', '25', 1)
     assert w['time_index'] == pd.Timestamp('2000-03-31')
-    
+
     k = d.make('m', '6.55', 12)
     assert k['time_index'] == pd.Timestamp('2000-12-31')
-        
+
 # ------------------------
+
 
 from kep.reader import Row
 from kep.parcer import Table
 
-labels = {0:'GDP_bln_rub',
-          1:'GDP_rog',
-          2:'INDPRO_yoy'}
+labels = {0: 'GDP_bln_rub',
+          1: 'GDP_rog',
+          2: 'INDPRO_yoy'}
 
-parsed_varnames = {0:'GDP',
-            1:'GDP',
-            2:'INDPRO'}
+parsed_varnames = {0: 'GDP',
+                   1: 'GDP',
+                   2: 'INDPRO'}
 
-parsed_units = {0:'bln_rub',
-                1:'rog',
-                2:'yoy'}
+parsed_units = {0: 'bln_rub',
+                1: 'rog',
+                2: 'yoy'}
 
 headers = {0: [Row(['Объем ВВП', '', '', '', '']),
                Row(['млрд.рублей', '', '', '', ''])],
@@ -86,11 +87,11 @@ class Sample:
 
     def table(i):
         return Table(headers[i], data_items[i])
-    
+
     def table_parsed(i):
         t = Table(headers[i], data_items[i])
         t.varname = parsed_varnames[i]
-        t.unit = parsed_units[i]        
+        t.unit = parsed_units[i]
         t.set_splitter(funcname=None)
         return t
 
@@ -99,44 +100,40 @@ class Sample:
 
 #-------------------------
 
+
 def test_emitter():
 
-    
     tables = [Sample.table_parsed(0), Sample.table_parsed(1)]
     e = emitter.Emitter(tables)
     dfq = e.get_dataframe('q')
-    
+
     assert dfq.to_dict(orient='index') == {
-     pd.Timestamp('1991-03-31'): {'GDP_bln_rub': 901.0,
-      'GDP_rog': 98.1,
-      'qtr': 1,
-      'year': 1991},
-     pd.Timestamp('1991-06-30'): {'GDP_bln_rub': 1102.0,
-      'GDP_rog': 103.1,
-      'qtr': 2,
-      'year': 1991},
-     pd.Timestamp('1991-09-30'): {'GDP_bln_rub': 1373.0,
-      'GDP_rog': 111.4,
-      'qtr': 3,
-      'year': 1991},
-     pd.Timestamp('1991-12-31'): {'GDP_bln_rub': 1447.0,
-      'GDP_rog': 112.0,
-      'qtr': 4,
-      'year': 1991}}
-     
-     
+        pd.Timestamp('1991-03-31'): {'GDP_bln_rub': 901.0,
+                                     'GDP_rog': 98.1,
+                                     'qtr': 1,
+                                     'year': 1991},
+        pd.Timestamp('1991-06-30'): {'GDP_bln_rub': 1102.0,
+                                     'GDP_rog': 103.1,
+                                     'qtr': 2,
+                                     'year': 1991},
+        pd.Timestamp('1991-09-30'): {'GDP_bln_rub': 1373.0,
+                                     'GDP_rog': 111.4,
+                                     'qtr': 3,
+                                     'year': 1991},
+        pd.Timestamp('1991-12-31'): {'GDP_bln_rub': 1447.0,
+                                     'GDP_rog': 112.0,
+                                     'qtr': 4,
+                                     'year': 1991}}
+
     assert e.get_dataframe('a').to_dict(orient='index') == \
         {pd.Timestamp('1991-12-31'): {'GDP_bln_rub': 4823.0,
                                       'GDP_rog': 106.4,
-                                       'year': 1991.0}}
-            
-        
+                                      'year': 1991.0}}
+
+
 if __name__ == "__main__":
     pytest.main([__file__])
-    
-    
+
     tables = [Sample.table_parsed(0), Sample.table_parsed(1)]
     e = emitter.Emitter(tables)
     dfa = e.get_dataframe('a')
-
-

@@ -3,11 +3,11 @@ import pytest
 from kep.helpers import PathHelper, DateHelper, Folder
 
 
-year, month = DateHelper.get_latest_date() 
+year, month = DateHelper.get_latest_date()
 
 
 class Test_PathHelper:
-    
+
     def test_locate_csv_on_year_month_path_esists(self):
         assert PathHelper.locate_csv(2017, 5).exists() is True
 
@@ -23,16 +23,17 @@ class Test_PathHelper:
 
 
 class Test_DateHelper:
-    
+
     def test_filled_dates_runs_on_Nones(self):
-        assert DateHelper.filter_date(None, None) == DateHelper.get_latest_date() 
-        
-    def test_filled_dates_runs_on_year_month(self):    
+        assert DateHelper.filter_date(
+            None, None) == DateHelper.get_latest_date()
+
+    def test_filled_dates_runs_on_year_month(self):
         assert DateHelper.filter_date(2017, 5) == (2017, 5)
-    
+
     def test_get_supported_dates_starts_in_2009_4(self):
-        assert DateHelper.get_supported_dates()[0] == (2009, 4) 
-            
+        assert DateHelper.get_supported_dates()[0] == (2009, 4)
+
     def test_get_latest_date(self):
         year, month = DateHelper.get_latest_date()
         assert year >= 2017
@@ -40,7 +41,7 @@ class Test_DateHelper:
         assert month <= 12
 
 
-# more testing, 'private' part  
+# more testing, 'private' part
 
 class Test_Folder():
     def test_repr(self):
@@ -53,20 +54,24 @@ class Test_Folder():
     def test_out_of_range_year_raises_error(self):
         with pytest.raises(ValueError):
             Folder(2030, 1)
-            
+
 # skipping
-            
-@pytest.mark.skip(reason="not testing maintenance scripts yet")        
+
+
+@pytest.mark.skip(reason="not testing maintenance scripts yet")
 def test_md(folder):
-    assert False    
+    assert False
+
 
 @pytest.mark.skip(reason="not testing maintenance scripts yet")
 def test_init_dirs():
     assert False
-    
+
+
 @pytest.mark.skip(reason="not testing maintenance scripts yet")
 def test_copy_latest():
     assert False
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

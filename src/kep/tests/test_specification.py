@@ -6,7 +6,7 @@ import kep.specification as spec
 from kep.specification import as_list, ParsingInstruction
 from kep.specification import Definition, Scope
 
-#TODO
+# TODO
 from kep.specification import Specification
 
 

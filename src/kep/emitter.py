@@ -12,7 +12,7 @@ COMMENT_CATCHER = re.compile("\D*(\d+[.,]?\d*)\s*(?=\d\))")
 
 def to_float(text: str, i=0):
     """Convert *text* to float() type.
-    
+
     Returns:
         Float value, or False if not sucessful.
     """
@@ -37,21 +37,22 @@ def to_float(text: str, i=0):
             return to_float(text[:-1], i)
         return False
 
+
 class DatapointMaker:
     """Factory to make dictionaries representing a datapoint."""
-    
+
     def __init__(self, year, label):
         self.year = year
         self.label = label
         self.freq = False
         self.value = False
-        self.period = False 
-    
+        self.period = False
+
     def set_value(self, x):
-        if x: 
+        if x:
             self.value = to_float(x)
         else:
-            self.value = None            
+            self.value = None
 
     def make(self, freq: str, x: float, period=False):
         self.freq = freq
@@ -59,22 +60,22 @@ class DatapointMaker:
         self.period = period
         return self.as_dict()
 
-    def get_date(self):        
+    def get_date(self):
         # annual
-        if self.freq=='a':
+        if self.freq == 'a':
             return pd.Timestamp(str(self.year)) + pd.offsets.YearEnd()
-        # qtr 
-        year = int(self.year)        
-        if self.freq=='q':
+        # qtr
+        year = int(self.year)
+        if self.freq == 'q':
             month = int(self.period) * 3
             base = pd.Timestamp(year, month, 1)
             return base + pd.offsets.QuarterEnd()
         #  month
-        elif self.freq=='m':
+        elif self.freq == 'm':
             month = int(self.period)
             base = pd.Timestamp(year, month, 1)
             return base + pd.offsets.MonthEnd()
-            
+
     def as_dict(self):
         basedict = dict(year=int(self.year),
                         label=self.label,
@@ -85,7 +86,8 @@ class DatapointMaker:
             basedict.update(dict(qtr=self.period))
         elif self.freq == 'm':
             basedict.update(dict(month=self.period))
-        return basedict 
+        return basedict
+
 
 class Emitter:
     """Emitter extractsand emits annual, quarterly and monthly values
@@ -98,7 +100,7 @@ class Emitter:
            ValueError if any table in list is not defined.
 
     """
-    
+
     @staticmethod
     def _assert_defined(table):
         if not table.is_defined():
@@ -109,7 +111,7 @@ class Emitter:
         self.q = []
         self.m = []
         for t in tables:
-            self._assert_defined(t)    
+            self._assert_defined(t)
             self._import(t)
 
     def _import(self, table):
@@ -141,8 +143,7 @@ class Emitter:
             dups = df[df.duplicated(keep=False)]
         if not dups.empty:           #
             raise ValueError("Duplicate rows found {}".format(dups))
-    
-    
+
     def get_dataframe(self, freq):
         df = pd.DataFrame(self._collect(freq))
         if df.empty:

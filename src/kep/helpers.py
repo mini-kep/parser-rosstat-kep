@@ -75,11 +75,12 @@ DATES = [(2009, 4), (2009, 5), (2009, 6),
 
 # end user interface
 
+
 class PathHelper:
     def locate_csv(year: int=None, month: int=None):
-        """Return interim CSV file based on *year* and *month*. Defaults to 
+        """Return interim CSV file based on *year* and *month*. Defaults to
            latest year and month.
-    
+
            Returns:
                 pathlib.Path() instance
         """
@@ -93,36 +94,36 @@ class PathHelper:
 
     def get_processed_folder(year, month):
         """Return processed CSV file folder based on *year* and *month*.
-    
+
         The processed CSV file folder is used by Frames class
         to write output files (dfa.csv, dfq.csv, dfm.csv).
-    
+
         Returns:
             pathlib.Path() instance
-    
+
         """
         return Folder(year, month).get_processed_folder()
 
 
 class DateHelper:
-    
+
     def get_supported_dates():
-        return Folder.supported_dates        
-    
+        return Folder.supported_dates
+
     def get_latest_date():
         """Return year and month for latest available interim data folder.
-    
+
         Returns:
             (year, month) tuple of two integers
-    
+
         """
-        return Folder.get_latest_date()    
-        
+        return Folder.get_latest_date()
+
     def filter_date(year, month):
         """Set (year, month) to latest date, even if year or month omitted.
-                    
+
         Returns:
-            (year, month) tuple of two integers  
+            (year, month) tuple of two integers
         """
         latest_year, latest_month = DateHelper.get_latest_date()
         return year or latest_year, month or latest_month
@@ -138,6 +139,7 @@ class Folder:
     @classmethod
     def get_latest_date(cls):
         root = cls.interim
+
         def max_subfolder(folder):
             _lst = [f.name for f in folder.iterdir() if f.is_dir()]
             return int(max(_lst))

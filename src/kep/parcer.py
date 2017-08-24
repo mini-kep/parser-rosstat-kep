@@ -172,5 +172,5 @@ if __name__ == "__main__":
     for t in tables:
         print()
         print(t)
-        
-    csvfile.close()    
+
+    csvfile.close()

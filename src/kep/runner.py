@@ -43,7 +43,7 @@ class Vintage:
 
     def __init__(self, year=False, month=False):
         _year, _month = DateHelper.filter_date(year, month)
-        self.year, self.month = _year, _month 
+        self.year, self.month = _year, _month
         csv_path = PathHelper.locate_csv(_year, _month)
         with open_csv(csv_path) as csvfile:
             self.dfa, self.dfq, self.dfm = get_dataframes(csvfile)
@@ -72,7 +72,7 @@ class Collection:
     """Methods to manipulate entire set of data releases."""
 
     all_dates = DateHelper.get_supported_dates()
-    
+
     @staticmethod
     def save_latest():
         vintage = Vintage(year=None, month=None)
