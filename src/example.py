@@ -3,11 +3,11 @@ import pandas as pd
 import io
 
 # from runner.py
-from kep.specification import Definition, Specification
-from kep.reader import Reader, open_csv
-from kep.parcer import get_tables
-from kep.emitter import Emitter
-from kep.validator import Validator
+from csv2df.specification import Definition, Specification
+from csv2df.reader import Reader, open_csv
+from csv2df.parcer import get_tables
+from csv2df.emitter import Emitter
+from csv2df.validator import Validator
 
 def get_dataframes(csvfile, spec):
     """Extract dataframes from *csvfile* using *spec* parsing instructions.
@@ -16,8 +16,12 @@ def get_dataframes(csvfile, spec):
       csvfile (file connection or StringIO) - CSV file for parsing
       spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
     """
-    inputs = Reader(csvfile, spec).items()
-    tables = get_tables(inputs)
+
+    # reader will create parsing jobs, each job has a csv file segment and its parsing definition
+    parse_jobs = Reader(csvfile, spec).items()
+    # construct Table class instances and identify variable names and units in each table
+    tables = get_tables(parse_jobs)
+    # get data from tables
     emitter = Emitter(tables)
     dfa = emitter.get_dataframe(freq='a')
     dfq = emitter.get_dataframe(freq='q')
@@ -57,14 +61,14 @@ for c in check_points:
 year, month = 2017, 5
 
 # 4.1
-from kep.helpers import PathHelper
-from kep.specification import SPEC
+from csv2df.helpers import PathHelper
+from csv2df.specification import SPEC
 csv_path = PathHelper.locate_csv(year, month)
 with open_csv(csv_path) as csvfile:
     dfa1, dfq1, dfm1 = get_dataframes(csvfile, SPEC)
 
 # 4.2 
-from kep.runner import Vintage
+from csv2df.runner import Vintage
 vint = Vintage(year, month)
 dfa2, dfq2, dfm2 = vint.dfs()
 
