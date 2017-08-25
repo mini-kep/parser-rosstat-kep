@@ -4,8 +4,8 @@ import io
 
 from csv2df.specification import Definition, Specification
 from csv2df.reader import Reader
-from csv2df.parcer import get_tables
-from csv2df.runner import Emitter, get_dataframes
+from csv2df.parcer import extract_tables
+from csv2df.runner import Emitter
 
 
 # input data
@@ -21,9 +21,16 @@ spec = Specification(default=main)
 
 
 # parsing result
-inputs = Reader(csvfile, spec).items()
-tables = get_tables(inputs)
-emitter = Emitter(tables)
+parsed_tables = []
+for csv_segment, pdef in Reader(csvfile, spec).items():
+    tables = extract_tables(csv_segment, pdef)
+    parsed_tables.extend(tables)
+
+# get dataframes from parsed tables
+emitter = Emitter(parsed_tables)
+dfa = emitter.get_dataframe(freq='a')
+dfq = emitter.get_dataframe(freq='q')
+dfm = emitter.get_dataframe(freq='m')
 dfa = emitter.get_dataframe(freq="a")
 dfq = emitter.get_dataframe(freq="q")
 dfm = emitter.get_dataframe(freq="m")
