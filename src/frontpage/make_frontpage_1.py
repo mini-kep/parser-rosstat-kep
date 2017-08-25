@@ -12,7 +12,7 @@ def get_root():
 
 
 src_root = Path(__file__).parents[1]
-sys.path.extend(str(src_root / "kep"))
+sys.path.extend(str(src_root / "csv2df"))
 sys.path.extend(str(src_root / "access_data"))
 
 files_dir = Path(__file__).parent
@@ -90,7 +90,7 @@ latest_values_file.write_text(md2)
 class Sparkline():
     LOCAL_FOLDER = get_root() / "output" / "png"
     GITHUB_FOLDER = \
-        "https://github.com/epogrebnyak/mini-kep/raw/master/output/png/{}"
+        "https://github.com/epogrebnyak/mini-csv2df/raw/master/output/png/{}"
 
     def __init__(self, ts):
         self.ts = ts

@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-import kep.emitter as emitter
+import csv2df.emitter as emitter
 
 
 # stateless functions
@@ -46,8 +46,8 @@ def test_DatapointMaker():
 # ------------------------
 
 
-from kep.reader import Row
-from kep.parcer import Table
+from csv2df.reader import Row
+from csv2df.parcer import Table
 
 labels = {0: 'GDP_bln_rub',
           1: 'GDP_rog',

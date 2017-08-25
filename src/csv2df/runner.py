@@ -14,12 +14,12 @@
 
 """
 
-from kep.helpers import DateHelper, PathHelper
-from kep.specification import SPEC
-from kep.reader import Reader, open_csv
-from kep.parcer import get_tables
-from kep.emitter import Emitter
-from kep.validator import Validator
+from csv2df.helpers import DateHelper, PathHelper
+from csv2df.specification import SPEC
+from csv2df.reader import Reader, open_csv
+from csv2df.parcer import get_tables
+from csv2df.emitter import Emitter
+from csv2df.validator import Validator
 
 
 def get_dataframes(csvfile, spec=SPEC):

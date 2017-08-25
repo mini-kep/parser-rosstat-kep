@@ -2,8 +2,8 @@ import pytest
 from collections import OrderedDict as odict
 import io
 
-from kep.reader import yield_csv_rows, to_rows, filter_csv_rows
-from kep.reader import get_year, is_year, Row, RowStack
+from csv2df.reader import yield_csv_rows, to_rows, filter_csv_rows
+from csv2df.reader import get_year, is_year, Row, RowStack
 
 # FIXME: can I test open_csv?
 # FIXME: is it ok to xfail missing tests?

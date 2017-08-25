@@ -14,7 +14,7 @@ import botocore
 #
 
 
-BUCKET_NAME = 'mini-kep-docs' # replace with your bucket name
+BUCKET_NAME = 'mini-csv2df-docs' # replace with your bucket name
 KEY = 'index.html' # replace with your object key
 
 s3 = boto3.resource('s3')
@@ -41,7 +41,7 @@ class RawData:
         # NOT NOW: may check if date is valid 
         
         #S3 bucket:
-        #'mini-kep-raw-data'
+        #'mini-csv2df-raw-data'
         
         
     def download_from_s3(self):
@@ -57,10 +57,10 @@ class RawData:
 
 def upload_html_docsto_s3():
     pass
-    # TODO 3: *doc_upload* upload docs to from s3 mini-kep-docs
+    # TODO 3: *doc_upload* upload docs to from s3 mini-csv2df-docs
     # upload all files from doc\_build\html\ 
     # to aws https://mini-kep-docs.s3.amazonaws.com/
-    # mini-kep-docs + is region neded?
+    # mini-csv2df-docs + is region neded?
         
 
 # for reference:     

@@ -99,7 +99,7 @@ if __name__ == "__main__":
     assert set(available_dates) == set(get_available_dates(WORD_ROOT))
 
     INTERIM_ROOT = Path(
-        'C:/Users/PogrebnyakEV/Desktop/mini-kep-master/data/interim')
+        'C:/Users/PogrebnyakEV/Desktop/mini-csv2df-master/data/interim')
     init_dirs(INTERIM_ROOT)
 
     for d in reversed(available_dates):

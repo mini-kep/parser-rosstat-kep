@@ -10,9 +10,9 @@ from enum import Enum, unique
 from collections import OrderedDict as odict
 import warnings
 
-import kep.util_row_splitter as splitter
-from kep.specification import SPEC
-from kep.label import make_label
+import csv2df.util_row_splitter as splitter
+from csv2df.specification import SPEC
+from csv2df.label import make_label
 
 
 # use'always' or 'ignore'

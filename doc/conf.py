@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# kep documentation build configuration file, created by
+# csv2df documentation build configuration file, created by
 # sphinx-quickstart on Sun Jul 23 02:39:55 2017.
 #
 # This file is execfile()d with the current directory set to its
@@ -130,7 +130,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'kep.tex', 'kep Documentation',
+    (master_doc, 'csv2df.tex', 'csv2df Documentation',
      'Author', 'manual'),
 ]
 
@@ -140,7 +140,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'kep', 'kep Documentation',
+    (master_doc, 'csv2df', 'csv2df Documentation',
      [author], 1)
 ]
 
@@ -151,8 +151,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'kep', 'kep Documentation',
-     author, 'kep', 'One line description of project.',
+    (master_doc, 'csv2df', 'csv2df Documentation',
+     author, 'csv2df', 'One line description of project.',
      'Miscellaneous'),
 ]
 

@@ -19,7 +19,7 @@ def get_root():
 
 
 src_root = Path(__file__).parents[1]
-sys.path.extend([str(src_root / "kep"), str(src_root / "access_data")])
+sys.path.extend([str(src_root / "csv2df"), str(src_root / "access_data")])
 
 
 import cfg

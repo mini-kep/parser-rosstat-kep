@@ -2,11 +2,13 @@ import itertools
 import pytest
 
 # fixtures
-from kep.reader import Row
+from csv2df.reader import Row
 # testing
-from kep.parcer import Table, split_to_tables, extract_tables
-from kep.specification import (ParsingInstruction, Definition,
+from csv2df.parcer import Table, split_to_tables, extract_tables
+from csv2df.specification import (ParsingInstruction, Definition,
                                Specification)
+
+from csv2df.util_row_splitter import split_row_by_year_and_qtr
 
 # TODO: rename module 'rows'
 
@@ -203,7 +205,6 @@ class Test_Table_after_parsing:
     def test_set_splitter(self):
         table = Sample.table(0)
         table.set_splitter(None)
-        from kep.util_row_splitter import split_row_by_year_and_qtr
         assert table.splitter_func == split_row_by_year_and_qtr
 
     def test_has_unknown_lines(self):

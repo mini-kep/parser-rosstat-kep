@@ -4,7 +4,7 @@
 # json's
 from pathlib import Path
 
-# if in package, can import this from src.kep.cfg.py
+# if in package, can import this from src.csv2df.cfg.py
 FOLDER_LATEST_CSV = Path(__file__).parents[2] / "data" / "processed" / "latest"
 FOLDER_LATEST_JSON = Path(__file__).parents[2] / "data" / "processed" / "json"
 

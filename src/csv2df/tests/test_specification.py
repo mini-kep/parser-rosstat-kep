@@ -2,12 +2,13 @@
 import pytest
 from collections import OrderedDict as odict
 
-import kep.specification as spec
-from kep.specification import as_list, ParsingInstruction
-from kep.specification import Definition, Scope
+import csv2df.specification as spec
 
-# TODO
-from kep.specification import Specification
+from csv2df.specification import as_list, ParsingInstruction
+from csv2df.specification import Definition, Scope
+
+from csv2df.specification import Specification
+
 
 
 def test_UNITS():
@@ -159,12 +160,12 @@ class Test_Scope:
 
 class Test_Specification:
     def test_public_getter_methods_are_callable(self):
-        from kep.specification import SPEC
+        from csv2df.specification import SPEC
         assert SPEC.get_main_parsing_definition()
         assert SPEC.get_segment_parsing_definitions()
 
     def test_get_varnames(self):
-        from kep.specification import SPEC
+        from csv2df.specification import SPEC
         assert SPEC.get_varnames()
 
 

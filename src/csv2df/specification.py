@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-""":mod:`kep.spec` module contains data structures used as parsing instructions.
+""":mod:`csv2df.spec` module contains data structures used as parsing instructions.
 
-Global variable  **SPEC** (:class:`kep.spec.Specification`) allows access to
+Global variable  **SPEC** (:class:`csv2df.spec.Specification`) allows access to
 parsing definitions:
 
-  - :func:`kep.spec.Specification.get_main_parsing_definition` retrieves
+  - :func:`csv2df.spec.Specification.get_main_parsing_definition` retrieves
     main (default) parsing definition, where most indicators are defined;
 
-  - :func:`kep.spec.Specification.get_segment_parsing_definitions` provides
+  - :func:`csv2df.spec.Specification.get_segment_parsing_definitions` provides
     a list of parsing defintions by csv segment.
 
 We parse CSV file by segment, because some table headers repeat themselves in
@@ -20,13 +20,14 @@ so the parsing instructions are now created internally in *spec.py*.
 
 **SPEC** is used by:
 
-  - :class:`kep.rows.RowStack`
-  - :func:`kep.tables.extract_tables`
+  - :class:`csv2df.rows.RowStack`
+  - :func:`csv2df.tables.extract_tables`
 
 """
 
 from collections import OrderedDict as odict
-from kep.label import make_label
+from csv2df.label import make_label
+from csv2df.util_row_splitter import FUNC_MAPPER
 
 # mapper dictionary to convert text in table headers to unit of measurement
 UNITS = odict([  # 1. MONEY
@@ -307,7 +308,6 @@ class Definition(object):
         Raises:
             ValueError: if *funcname* is not valid.
         """
-        from kep.util_row_splitter import FUNC_MAPPER
         if isinstance(funcname, str) and funcname in FUNC_MAPPER.keys():
             self.reader = funcname
         else:

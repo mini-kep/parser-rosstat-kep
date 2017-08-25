@@ -25,7 +25,7 @@ def find_all(glob):
 
 
 @task
-def pep8(ctx, folder="kep"):
+def pep8(ctx, folder="csv2df"):
     path = PROJECT_DIR / "src" / folder
     files = filter(lambda x: x.suffix == ".py", walk_files(path))
     for f in files:
@@ -43,7 +43,7 @@ def clean(ctx):
 
 
 @task
-def lint(ctx, folder="src/kep"):
+def lint(ctx, folder="src/csv2df"):
     """Check style with flake8
 
        See more flake8 usage at:
@@ -58,7 +58,7 @@ def lint(ctx, folder="src/kep"):
 def rst(ctx):
     # TODO:
     # build new modules sphinx
-    # sphinx-apidoc -feM -o. ../src/kep
+    # sphinx-apidoc -feM -o. ../src/csv2df
     pass
 
 
@@ -69,22 +69,22 @@ def doc(ctx):
     # TODO: 
     # upload all files from doc\_build\html\ 
     # to aws https://mini-kep-docs.s3.amazonaws.com/
-    # mini-kep-docs + is region neded?
+    # mini-csv2df-docs + is region neded?
 
 
 @task
 def github(ctx):
-    ctx.run("start https://github.com/epogrebnyak/mini-kep")
+    ctx.run("start https://github.com/epogrebnyak/mini-csv2df")
 
 
 @task
 def test(ctx):
-    ctx.run("py.test") #--cov=kep
+    ctx.run("py.test") #--cov=csv2df
 
 
 @task
 def cov(ctx):
-    ctx.run("py.test --cov=kep")
+    ctx.run("py.test --cov=csv2df")
     ctx.run("coverage report --omit=*tests*,*__init__*")
 
 

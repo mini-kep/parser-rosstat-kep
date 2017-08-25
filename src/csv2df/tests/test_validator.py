@@ -8,7 +8,7 @@ Created on Tue Aug  8 11:01:45 2017
 import pandas as pd
 from io import StringIO
 
-import kep.validator as vldr
+import csv2df.validator as vldr
 
 
 def to_dataframe(text):

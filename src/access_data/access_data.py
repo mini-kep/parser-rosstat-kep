@@ -7,15 +7,15 @@ Includes:
 This is most simple call:
 
     # monthly data in *dfm* dataframe
-    url_m = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfm.csv"
+    url_m = "https://raw.githubusercontent.com/epogrebnyak/mini-csv2df/master/data/processed/latest/dfm.csv"
     dfm = pd.read_csv(url_m)
 
     # quarterly data in *dfq* dataframe
-    url_q = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfq.csv"
+    url_q = "https://raw.githubusercontent.com/epogrebnyak/mini-csv2df/master/data/processed/latest/dfq.csv"
     dfq = pd.read_csv(url_q)
 
     # annual data in *dfa* dataframe
-    url_a = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/dfa.csv"
+    url_a = "https://raw.githubusercontent.com/epogrebnyak/mini-csv2df/master/data/processed/latest/dfa.csv"
     dfa = pd.read_csv(url_a)
 
 """
@@ -24,7 +24,7 @@ import pandas as pd
 
 
 def get_dataframe(freq):
-    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
+    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-csv2df/master/data/processed/latest/{}"
     filename = "df{}.csv".format(freq)
     url = url_base.format(filename)
     return pd.read_csv(url, 
@@ -45,7 +45,7 @@ def read_csv(source):
 
 def get_url(freq):
     """Make URL for CSV files by frequency."""
-    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
+    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-csv2df/master/data/processed/latest/{}"
     filename = "df{}.csv".format(freq)
     return url_base.format(filename)
 
