@@ -4,10 +4,10 @@ python:
 # command to install dependencies 
 install:
   - pip install -r requirements.txt
-  - pip install coveralls
+#  - pip install coveralls
 # command to run tests
 script: 
-  - pytest src/kep --doctest-modules
-after_success:
-  - codecov
-  - coveralls
+  - pytest src/csv2df --doctest-modules
+#after_success:
+#  - codecov
+#  - coveralls
