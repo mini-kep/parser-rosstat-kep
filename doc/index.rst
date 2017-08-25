@@ -4,36 +4,22 @@
    contain the root `toctree` directive.
 
    
-mini-kep
---------
+
+mini-kep documentation
+======================
 
 .. toctree::
-   :maxdepth: 2
-   
-   intro
-   glossary
+   :maxdepth: 4
 
-   
-csv2df modules
---------------
+   csv2df
 
-   
-TODO: rename **kep** to **csv2df**
-
-.. toctree::
-   :maxdepth: 2
-   
-   kep.files
-   kep.spec
-   kep.rows   
-   kep.splitter
-   kep.tables
-   kep.vintage
 
    
 .. include:: intro.rst
 
 .. include:: glossary.rst
+
+
 
 Indices and tables
 ==================

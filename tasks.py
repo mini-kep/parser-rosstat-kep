@@ -56,10 +56,28 @@ def lint(ctx, folder="src/csv2df"):
 
 @task
 def rst(ctx):
-    # TODO:
-    # build new modules sphinx
-    # sphinx-apidoc -feM -o. ../src/csv2df
-    pass
+    # build new rst files with sphinx
+    # FIXME: must check / appearance issues:
+
+    # 1. documentation page shows intro.rst and glossary.rst for the project
+    #     and links to src/ packages/folders:
+    #          download
+    #          word2csv (will rename, it is now called word)
+    #          csv2df
+    #          access_data
+    #          frontage
+    #    The link is a module name, possibly followed by a short comment.
+
+    #    Question: can this comment be ofr example __init__ docstring? Or just
+    #    enter harcoded test or omit, showing this is not a priority.
+
+    # 2. in csv2df page I want a listing of modules with their docstrings, no
+    #    docs for module contents. In listing I would prefer to control order of
+    #    modules listed, eg. make 'helpers' first and 'emitter', 'validator' last.
+
+    # 3. when clicking on module name I get its documentation
+
+    ctx.run("sphinx-apidoc -efM -o doc src\csv2df *test_*")
 
 
 @task
