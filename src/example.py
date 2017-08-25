@@ -17,10 +17,14 @@ def get_dataframes(csvfile, spec):
       spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
     """
 
-    # reader will create parsing jobs, each job has a csv file segment and its parsing definition
+    # reader will create parsing jobs, each job is a tuple of csv file segment and its parsing definition
+    #  - csv file segment is a list of reader.Row instances
+    #  - parsing definition is specification.Definition instance
     parse_jobs = Reader(csvfile, spec).items()
+
     # construct Table class instances and identify variable names and units in each table
     tables = get_tables(parse_jobs)
+
     # get data from tables
     emitter = Emitter(tables)
     dfa = emitter.get_dataframe(freq='a')
@@ -60,14 +64,14 @@ for c in check_points:
 # Example 4 Read actual data by month and year
 year, month = 2017, 5
 
-# 4.1
+# 4.1 Access to csv file using path helper
 from csv2df.helpers import PathHelper
 from csv2df.specification import SPEC
 csv_path = PathHelper.locate_csv(year, month)
 with open_csv(csv_path) as csvfile:
     dfa1, dfq1, dfm1 = get_dataframes(csvfile, SPEC)
 
-# 4.2 
+# 4.2 Access to csv file using vintage class
 from csv2df.runner import Vintage
 vint = Vintage(year, month)
 dfa2, dfq2, dfm2 = vint.dfs()
