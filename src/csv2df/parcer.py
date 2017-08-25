@@ -8,37 +8,21 @@ Main call:
 
 from enum import Enum, unique
 from collections import OrderedDict as odict
-import warnings
 
 import csv2df.util_row_splitter as splitter
 from csv2df.specification import SPEC
 from csv2df.label import make_label
 
 
-# use'always' or 'ignore'
-warnings.simplefilter('ignore', UserWarning)
+__all__ = ['extract_tables']
 
 
-__all__ = ['get_tables']
 
-
-def get_tables(parsing_inputs):
-    for csv_segment, pdef in parsing_inputs:
-        for table in extract_tables(csv_segment, pdef):
-            yield table
-
-
-def extract_tables(csv_segment, pdef):
-    """Extract tables from *csv_segment* list Rows instances using
-       *pdef* parsing defintion.
-    """
-    # yield tables from csv_segment
-    tables = split_to_tables(csv_segment)
+def parse_tables(tables, pdef): 
     # parse tables to obtain labels - set label and splitter
     tables = [t.set_label(pdef.varnames_dict, pdef.units_dict) for t in tables]
     tables = [t.set_splitter(pdef.funcname) for t in tables]
     # assign trailing units
-
     def fix_multitable_units(tables):
         """For tables without *varname*-  copy *varname* from previous table.
            Applies to tables where all rows are known rows.
@@ -47,6 +31,16 @@ def extract_tables(csv_segment, pdef):
             if table.varname is None and not table.has_unknown_lines():
                 table.varname = prev_table.varname
     fix_multitable_units(tables)
+    return tables
+
+
+def extract_tables(csv_segment, pdef):
+    """Extract tables from *csv_segment* list Rows instances using
+       *pdef* parsing defintion.
+    """
+    # yield tables from csv_segment
+    tables = split_to_tables(csv_segment)
+    tables = parse_tables(tables, pdef)
     # were all required tables read?
     _labels_in_tables = [t.label for t in tables]
     _labels_missed = [x for x in pdef.required if x not in _labels_in_tables]
