@@ -62,23 +62,16 @@ Check other access methods [here](https://github.com/epogrebnyak/mini-kep/blob/d
 
 - **Rosstat** issues KEP publication every month as rar'ed Word files
 - **mini-kep**: 
-   - downloads and unpacks rar files from website, or S3 bucket (prior to 2017) *(not implemented, TODO)*
-   - dumps MS Word files to interim CSV files
-   - parses interim CSV files and verifies data
-   - saves output as three CSV files (annual, quarterly and monthly)
+   - *\[manually yet\]* downloads and unpacks rar files from website, or S3 bucket (prior to 2017) *(not implemented, TODO)*
+   - **word2csv**: convert MS Word files to single interim CSV file
+   - **csv2df**: parse interim CSV files saves processed CSV files with annual, quarterly and monthly data.
 - **End user**:
    - imports machine-readable CSV files from [stable URL](https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest) using pandas or R.
 
-### Mini-kep subpackages
-
--   **word2csv**: convert MS Word files to single interim CSV file
--   **csv2df**: parse interim CSV file to obtain processed CSV files with annual, quarterly and monthly data.
-
 Also in [/src](https://github.com/epogrebnyak/mini-kep/tree/master/src) folder:
 
--   **access\_data**: sample code to download data from stable URL and save a local copy
--   **frontpage**: add tables and graphs to [README.md](https://github.com/epogrebnyak/mini-kep/blob/master/VALUES.md)
-
+- **access\_data**: sample code to download data from stable URL and save a local copy
+- **frontpage**: add tables and graphs to [README.md](https://github.com/epogrebnyak/mini-kep/blob/master/VALUES.md)
 
 ### Parcer work example
 
