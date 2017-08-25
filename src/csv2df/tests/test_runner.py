@@ -28,6 +28,7 @@ dfa = emitter.get_dataframe(freq="a")
 dfq = emitter.get_dataframe(freq="q")
 dfm = emitter.get_dataframe(freq="m")
 
+
 @pytest.mark.skip("'ValueError: Missed labels: ['GDP_bln_rub']")
 def test_get_dataframes():
     dfa_, dfq_, dfm_ = get_dataframes(csvfile, spec)
@@ -52,6 +53,7 @@ def test_resulting_dataframes():
 2000-12-31  2000    4       2044.0"""
 
     assert dfm.empty is True
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

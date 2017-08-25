@@ -6,7 +6,7 @@ from csv2df.reader import Row
 # testing
 from csv2df.parcer import Table, split_to_tables, extract_tables
 from csv2df.specification import (ParsingInstruction, Definition,
-                               Specification)
+                                  Specification)
 
 from csv2df.util_row_splitter import split_row_by_year_and_qtr
 

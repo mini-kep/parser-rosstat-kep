@@ -10,7 +10,6 @@ from csv2df.specification import Definition, Scope
 from csv2df.specification import Specification
 
 
-
 def test_UNITS():
     assert isinstance(spec.UNITS, dict)
 
