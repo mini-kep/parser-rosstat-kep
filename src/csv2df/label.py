@@ -1,6 +1,6 @@
 """Variable labels.
 
-Used to handle names like GDP_rog, GOV_EXPENSE_bln_rub.
+Used to handle strings like GDP_rog, GOV_EXPENSE_bln_rub and its parts.
 
 """
 

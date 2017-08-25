@@ -81,6 +81,8 @@ def github(ctx):
 def test(ctx):
     ctx.run("py.test") #--cov=csv2df
 
+# TODO:
+# coverage annotate -d csv2df\tests\annotate -i csv2df/runner.py
 
 @task
 def cov(ctx):
@@ -106,6 +108,8 @@ for t in [clean, pep8, ls, cov, test, doc, rst, github, lint]:
 if platform == 'win32':
     # This is path to cmd.exe
     ns.configure({'run': {'shell': environ['COMSPEC']}})
+
+
 
 
 ##########################################################################
