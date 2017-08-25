@@ -79,7 +79,7 @@ def github(ctx):
 
 @task
 def test(ctx):
-    ctx.run("py.test --cov=kep")
+    ctx.run("py.test") #--cov=kep
 
 
 @task
