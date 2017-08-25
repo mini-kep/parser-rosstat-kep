@@ -31,10 +31,9 @@ def get_dataframes(csvfile, spec=SPEC):
     """
     parsed_tables = []    
     
-    # Reader.items() will yeild a tuple of csv file segment 
-    # and its parsing definition
+    # Reader.items() will yeild a tuple of: 
     #    csv_segment - list of reader.Row instances
-    #    pdef - parsing definition is specification.Definition instance    
+    #    pdef - parsing definition as specification.Definition() 
     for csv_segment, pdef in Reader(csvfile, spec).items():
         # construct list of Table()'s from csv_segment        
         # and identify variable names and units in each table 
