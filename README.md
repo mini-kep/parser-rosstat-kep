@@ -25,14 +25,8 @@ Rosstat KEP publication is [here][Rosstat].
 
 # How I download macroeconomic indicators from here?
 
-### Excel file
-
-Latest data is in [kep.xlsx](https://github.com/epogrebnyak/mini-kep/issues/70)
-
-
-### Work with CSV 
-
-You can use macroeconomic indicators in your python code as:
+You can use macroeconomic indicators in your python code as shown below or 
+get latest data as Excel file [kep.xlsx](https://github.com/epogrebnyak/mini-kep/issues/70)
 
 ```python
 
@@ -49,7 +43,8 @@ dfq = get_dataframe('q')
 dfm = get_dataframe('m')
 ```
 
-Check other access methods [here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/access_data/).
+More access methods (including saving a local copy) are shown in 
+[example_access_data.py](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example_access_data.py).
 
 # Development 
 
