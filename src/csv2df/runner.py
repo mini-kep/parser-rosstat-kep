@@ -1,17 +1,26 @@
-"""Get dataframes for given data nad month.
+"""Get pandas dataframes for a given data and month. 
+
+*get_dataframes(csvfile, spec=SPEC)* is a lower-level function to get 
+dataframes from *csvfile* connection under *spec* parsing instruction.  
 
 *Vintage* class addresses dataset by year and month:
 
-   Vintage(year, month).validate()
-   Vintage(year, month).save()
+    Vintage(year, month).save()
+    Vintage(year, month).validate()
+
+These calls should give similar results:
+    
+    csv_path = PathHelper.locate_csv(year, month)
+    csvfile = open_csv(csv_path)
+    
+    Vintage(year, month).dfs()
 
 *Collection* manipulates all datasets, released at various dates:
 
-    - save_all()
-    - save_latest()
-    - approve_latest()
-    - approve_all()
-
+    Collection.save_all()
+    Collection.save_latest()
+    Collection.approve_latest()
+    Collection.approve_all()
 """
 
 from csv2df.helpers import DateHelper, PathHelper
@@ -22,13 +31,18 @@ from csv2df.emitter import Emitter
 from csv2df.validator import Validator
 
 
+__all__ = ['get_dataframes', 'Vintage', 'Collection']
+
 
 def get_dataframes(csvfile, spec=SPEC):
     """Extract dataframes from *csvfile* using *spec* parsing instructions.
 
-    Arg:
-      csvfile (file connection or StringIO) - CSV file for parsing
-      spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
+    Args:
+       csvfile (file connection or StringIO) - CSV file for parsing
+       spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
+    
+    Returns:  
+       Three pandas dataframes at annual, qtr and monthly frequencies.  
     """
     tables = [t for csv_segment, pdef in Reader(csvfile, spec).items() 
                 for t in extract_tables(csv_segment, pdef)]

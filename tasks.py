@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
 from sys import platform
 from os import environ
-from invoke import Collection, task
 from pathlib import Path
+import inspect
+
+from invoke import Collection, task
 
 
 PROJECT_DIR = Path(__file__).parent
@@ -23,17 +25,29 @@ def find_all(glob):
         if glob in f.name:
             yield f
 
+            
+def yield_python_files(folder):
+    for file in filter(lambda x: x.suffix == ".py", walk_files(folder)):
+        yield file           
 
+            
 @task
 def pep8(ctx, folder="csv2df"):
     path = PROJECT_DIR / "src" / folder
-    files = filter(lambda x: x.suffix == ".py", walk_files(path))
-    for f in files:
+    for f in yield_python_files(path):
         print("Formatting", f)
         # FIXME: may use 'import autopep8' without console
         ctx.run("autopep8 --aggressive --aggressive --in-place {}".format(f))
 
-
+# 
+def docstrings(ctx):
+    print(inspect.cleandoc(__doc__))
+    path = PROJECT_DIR / "src" / folder
+    for f in yield_python_files(path):
+        # FIXME: list modules as in https://stackoverflow.com/questions/487971/is-there-a-standard-way-to-list-names-of-python-modules-in-a-package
+        # print(inspect.cleandoc(__doc__))        
+        pass
+        
 @task
 def clean(ctx):
     """Delete all compiled Python files"""
@@ -58,28 +72,10 @@ def lint(ctx, folder="src/csv2df"):
 def rst(ctx):
     # build new rst files with sphinx
     # FIXME: must check / appearance issues:
-
-    # 1. documentation page shows intro.rst and glossary.rst for the project
-    #     and links to src/ packages/folders:
-    #          download
-    #          word2csv (will rename, it is now called word)
-    #          csv2df
-    #          access_data
-    #          frontage
-    #    The link is a module name, possibly followed by a short comment.
-
-    #    Question: can this comment be ofr example __init__ docstring? Or just
-    #    enter harcoded test or omit, showing this is not a priority.
-
-    # 2. in csv2df page I want a listing of modules with their docstrings, no
-    #    docs for module contents. In listing I would prefer to control order of
-    #    modules listed, eg. make 'helpers' first and 'emitter', 'validator' last.
-
-    # 3. when clicking on module name I get its documentation
-
+    
     ctx.run("sphinx-apidoc -efM -o doc src\csv2df *test_*")
-
-
+    
+    
 @task
 def doc(ctx):
     ctx.run("doc\make.bat html")

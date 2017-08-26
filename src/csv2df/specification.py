@@ -26,7 +26,8 @@ so the parsing instructions are now created internally in *spec.py*.
 """
 
 from collections import OrderedDict as odict
-from csv2df.label import make_label
+
+from csv2df.util_label import make_label
 from csv2df.util_row_splitter import FUNC_MAPPER
 
 # mapper dictionary to convert text in table headers to unit of measurement

@@ -33,10 +33,9 @@ dfm = emitter.get_dataframe(freq='m')
 
 
 def test_get_dataframes():
-    #must copy
-    csvfile1 = io.StringIO("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
-1999	4823	901	1102	1373	1447
-2000	7306	1527	1697	2038	2044""")
+    # csvfile1 was consumed once, buffer position if not at zero
+    if csvfile1.tell() != 0:
+        csvfile1.seek(0)
     dfa_, dfq_, dfm_ = get_dataframes(csvfile1, spec1)
     assert dfa_.equals(dfa)
     assert dfq_.equals(dfq)

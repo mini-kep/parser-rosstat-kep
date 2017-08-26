@@ -5,13 +5,11 @@ import io
 from csv2df.reader import yield_csv_rows, to_rows, filter_csv_rows
 from csv2df.reader import get_year, is_year, Row, RowStack
 
-# FIXME: can I test open_csv?
 # FIXME: is it ok to xfail missing tests?
 
-
-@pytest.mark.xfail
-def test_open_csv():
-    # EP: don't know how to test this
+# FIXME: can I test open_csv? with a mock file?
+@pytest.mark.skip("don't know how to test this")
+def test_open_csv():    
     assert 0
 
 
@@ -222,7 +220,7 @@ class Test_Rowstack:
         assert c[0] == Row(["wed more text", "1", "2"])
         assert c[1] == Row(["zed some text"])
 
-    @pytest.mark.xfail
+    @pytest.mark.skip("see comment below")
     def test_yield_segment_with_defintion(self):
         # will need a mock for specification or a specification instance/fixture (can copy from example1.py)
         # need - 1 segment, 1 default definition for *rowstack* fixture
