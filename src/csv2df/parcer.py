@@ -10,13 +10,20 @@ from enum import Enum, unique
 from collections import OrderedDict as odict
 
 import csv2df.util_row_splitter as splitter
-from csv2df.specification import SPEC
 from csv2df.label import make_label
 
 
 __all__ = ['extract_tables']
 
-
+def extract_tables(csv_segment, pdef):
+    """Extract tables from *csv_segment* list Rows instances using
+       *pdef* parsing defintion.
+    """
+    # yield tables from csv_segment
+    tables = split_to_tables(csv_segment)
+    tables = parse_tables(tables, pdef)
+    verify_tables(tables, pdef)
+    return [t for t in tables if t.label in pdef.required]
 
 def parse_tables(tables, pdef): 
     # parse tables to obtain labels - set label and splitter
@@ -33,20 +40,12 @@ def parse_tables(tables, pdef):
     fix_multitable_units(tables)
     return tables
 
-
-def extract_tables(csv_segment, pdef):
-    """Extract tables from *csv_segment* list Rows instances using
-       *pdef* parsing defintion.
-    """
-    # yield tables from csv_segment
-    tables = split_to_tables(csv_segment)
-    tables = parse_tables(tables, pdef)
-    # were all required tables read?
+def verify_tables(tables, pdef):
     _labels_in_tables = [t.label for t in tables]
     _labels_missed = [x for x in pdef.required if x not in _labels_in_tables]
     if _labels_missed:
+        import pdb; pdb.set_trace()
         raise ValueError("Missed labels: {}".format(_labels_missed))
-    return [t for t in tables if t.label in pdef.required]
 
 # classes for split_to_tables()
 
@@ -152,16 +151,19 @@ class Table:
 
 if __name__ == "__main__":
     import itertools
-    from kep2 import helpers
-    from kep2 import reader
+    from csv2df.helpers import PathHelper
+    import csv2df.reader as reader
+    import csv2df.specification as spec
 
     assert list(itertools.chain.from_iterable([[1, 2], [3, 4]])) == \
         [1, 2, 3, 4]
 
-    csv_path = helpers.locate_csv()
+    csv_path = PathHelper.locate_csv()
     csvfile = reader.open_csv(csv_path)
-    parsing_inputs = reader.Reader(csvfile, spec=SPEC).items()
-    tables = get_tables(parsing_inputs)
+    parsed_tables = []    
+    for csv_segment, pdef in reader.Reader(csvfile, spec.SPEC).items():
+        tables = extract_tables(csv_segment, pdef)
+        parsed_tables.extend(tables)
 
     for t in tables:
         print()

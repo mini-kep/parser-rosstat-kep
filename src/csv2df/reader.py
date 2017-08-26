@@ -314,13 +314,13 @@ class RowStack:
 
 
 if __name__ == "__main__":
-    from kep2 import helpers
-    from kep2 import specification
+    from csv2df.helpers import PathHelper
+    import csv2df.specification as spec
 
     # print all rows from csvpath
-    csv_path = helpers.locate_csv()
+    csv_path = PathHelper.locate_csv()
     csvfile = open_csv(csv_path)
-    reader = Reader(csvfile, spec=specification.SPEC)
+    reader = Reader(csvfile, spec=spec.SPEC)
     for csv_segment, pdef in reader.items():
         for row in csv_segment:
             print(row)

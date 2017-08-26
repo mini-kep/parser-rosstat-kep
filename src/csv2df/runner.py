@@ -22,6 +22,7 @@ from csv2df.emitter import Emitter
 from csv2df.validator import Validator
 
 
+
 def get_dataframes(csvfile, spec=SPEC):
     """Extract dataframes from *csvfile* using *spec* parsing instructions.
 
@@ -29,20 +30,9 @@ def get_dataframes(csvfile, spec=SPEC):
       csvfile (file connection or StringIO) - CSV file for parsing
       spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
     """
-    parsed_tables = []    
-    
-    # Reader.items() will yeild a tuple of: 
-    #    csv_segment - list of reader.Row instances
-    #    pdef - parsing definition as specification.Definition() 
-    for csv_segment, pdef in Reader(csvfile, spec).items():
-        # construct list of Table()'s from csv_segment        
-        # and identify variable names and units in each table 
-        tables = extract_tables(csv_segment, pdef)
-        # accumulate results
-        parsed_tables.extend(tables)
-
-    # get dataframes from parsed tables
-    emitter = Emitter(parsed_tables)
+    tables = [t for csv_segment, pdef in Reader(csvfile, spec).items() 
+                for t in extract_tables(csv_segment, pdef)]
+    emitter = Emitter(tables)
     dfa = emitter.get_dataframe(freq='a')
     dfq = emitter.get_dataframe(freq='q')
     dfm = emitter.get_dataframe(freq='m')

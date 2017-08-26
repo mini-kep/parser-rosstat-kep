@@ -5,11 +5,11 @@ import io
 from csv2df.specification import Definition, Specification
 from csv2df.reader import Reader
 from csv2df.parcer import extract_tables
-from csv2df.runner import Emitter
+from csv2df.runner import Emitter, get_dataframes
 
 
 # input data
-csvfile = io.StringIO("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
+csvfile1 = io.StringIO("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447
 2000	7306	1527	1697	2038	2044""")
 # input instruction
@@ -17,34 +17,32 @@ main = Definition(units={"млрд.рублей": "bln_rub"})
 main.append(varname="GDP",
             text="Объем ВВП",
             required_units=["bln_rub"])
-spec = Specification(default=main)
+spec1 = Specification(default=main)
 
 
 # parsing result
 parsed_tables = []
-for csv_segment, pdef in Reader(csvfile, spec).items():
+for csv_segment, pdef in Reader(csvfile1, spec1).items():
     tables = extract_tables(csv_segment, pdef)
     parsed_tables.extend(tables)
-
-# get dataframes from parsed tables
 emitter = Emitter(parsed_tables)
 dfa = emitter.get_dataframe(freq='a')
 dfq = emitter.get_dataframe(freq='q')
 dfm = emitter.get_dataframe(freq='m')
-dfa = emitter.get_dataframe(freq="a")
-dfq = emitter.get_dataframe(freq="q")
-dfm = emitter.get_dataframe(freq="m")
 
 
-@pytest.mark.skip("'ValueError: Missed labels: ['GDP_bln_rub']")
+
 def test_get_dataframes():
-    dfa_, dfq_, dfm_ = get_dataframes(csvfile, spec)
+    #must copy
+    csvfile1 = io.StringIO("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
+1999	4823	901	1102	1373	1447
+2000	7306	1527	1697	2038	2044""")
+    dfa_, dfq_, dfm_ = get_dataframes(csvfile1, spec1)
     assert dfa_.equals(dfa)
     assert dfq_.equals(dfq)
     assert dfm_.equals(dfm)
 
 
-@pytest.mark.skip("ValueError: Missed labels: ['GDP_bln_rub']")
 def test_resulting_dataframes():
     assert dfa.GDP_bln_rub['1999-12-31'] == 4823.0
 
