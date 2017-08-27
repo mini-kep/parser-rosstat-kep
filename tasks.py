@@ -123,33 +123,38 @@ def add(ctx, year, month):
     _add(year, month)    
     
 def _add(year, month):    
-    year, month = int(year), int(month)
     src = str(Path(__file__).parent / 'src')
     sys.path.insert(0, src)
-    #download, unpack
     from locations.folder import FolderBase
+        
+    #download, unpack
     from download.download import RemoteFile
+    year, month = int(year), int(month)
     rf = RemoteFile(year, month)
-    rf.download()
-    rf.unrar()
-    interim_csv = FolderBase(year, month).get_interim_csv()
+    assert rf.download()
+    assert rf.unrar()
+    
     #make interim csv
+    interim_csv = FolderBase(year, month).get_interim_csv()
     if not os.path.exists(interim_csv):
         from word2csv.word import make_interim_csv
-        make_interim_csv(year, month)
-        FolderBase(year, month).copy_tab_csv()        
+        assert make_interim_csv(year, month)
+        assert FolderBase(year, month).copy_tab_csv()        
+    
     #parse, validate, save
     from csv2df.runner import Vintage
     vint = Vintage(year, month)
-    vint.validate()
-    vint.save()
+    assert vint.validate()
+    assert vint.save()
+    
     #copy to latest
-    from locations.folder import copy_latest
-    copy_latest()
+    if FolderBase.get_latest_date() == (year, month):
+        from locations.folder import copy_latest
+        copy_latest()
+    
+    # see for context manager https://stackoverflow.com/questions/17211078/how-to-temporarily-modify-sys-path-in-python
     sys.path.remove(src)
-    # see for context manager: 
-    # https://stackoverflow.com/questions/17211078/how-to-temporarily-modify-sys-path-in-python
-
+    
 
 ns = Collection()
 for t in [clean, pep8, ls, cov, test, doc, rst, github, lint, add]:
@@ -163,7 +168,7 @@ if platform == 'win32':
 
 
 if __name__ == '__main__':
-    _add(2017, 5)
+    _add(2017, 6)
 
 ##########################################################################
 # GLOBALS                                                                       #

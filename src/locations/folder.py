@@ -47,19 +47,24 @@ class FolderBase:
         root = cls.interim
 
         def max_subfolder(folder):
-            subfolders = [f.name for f in folder.iterdir() if f.is_dir()]
-            return int(max(subfolders))
+            
+            subfolders = [f.name for f in folder.iterdir() if f.is_dir()]           
+            return max(map(int, subfolders))
         year = max_subfolder(root)
         
-        _subfolder = root / str(year)
-        month = max_subfolder(_subfolder)
+        subfolder = root / str(year)
+        month = max_subfolder(subfolder)
         return year, month    
         
 
+    def make_dirs(self):
+        for folder in [self.get_raw_folder(),
+                       self.get_interim_folder(),
+                       self.get_processed_folder()]:
+            md(folder)
+
     def _local_folder(self, parent_folder):
         folder = parent_folder / str(self.year) / str(self.month).zfill(2) 
-        if not folder.exists():
-            md(folder) 
         return folder
         
     def get_raw_folder(self):
@@ -70,19 +75,20 @@ class FolderBase:
     
     def get_interim_csv(self): 
         return self.get_interim_folder() / CSV_FILENAME 
+
+    def get_processed_folder(self):
+        return self._local_folder(self.processed)
             
     def copy_tab_csv(self):
         src = self.get_raw_folder() / CSV_FILENAME 
         dst = self.get_interim_folder() / CSV_FILENAME 
         from shutil import copyfile
-        copyfile(src, dst)                             
+        copyfile(src, dst)
+        return True                              
 
     @staticmethod         
     def is_valid_filepath(path):
         return bool(path.exists() and path.stat().st_size > 0)
-
-    def get_processed_folder(self):
-        return self._local_folder(self.processed)
 
     def __repr__(self):
         return "FolderBase({}, {})".format(self.year, self.month)
@@ -105,5 +111,6 @@ def copy_latest():
         dst = dst_folder / src.name
         shutil.copyfile(src, dst)
         copied.append(dst)
+    print("Latest date is", year, month) 
     print("Updated folder", FolderBase.latest)
     return copied

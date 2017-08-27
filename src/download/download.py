@@ -67,17 +67,18 @@ class RemoteFile():
             download(self.url, self.local_path)
         if os.path.exists(self.local_path):
            print('Downloaded', self.local_path)
-           return 0
+           return True
         else:
-           return 1
+           print('Already downloaded', self.local_path)
+           return False
        
     def unrar(self):        
         res = unrar(self.local_path, self.folder)
         if res == 0:
             print('UnRARed', self.local_path)
-            return res
+            return True
         else:
-            return 1
+            return False
 
     def clean(self):        
         for file in os.listdir(self.folder):

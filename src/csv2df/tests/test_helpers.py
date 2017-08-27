@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
-from csv2df.helpers import PathHelper, DateHelper, Folder
-
+from csv2df.helpers import PathHelper, DateHelper
 
 year, month = DateHelper.get_latest_date()
 
@@ -41,37 +40,10 @@ class Test_DateHelper:
         assert month <= 12
 
 
-# more testing, 'private' part
-
-class Test_Folder():
-    def test_repr(self):
-        assert repr(Folder(2015, 5))
-
-    def test_get_folder_methods(self):
-        assert Folder(2015, 5).get_processed_folder().exists()
-        assert Folder(2015, 5).get_interim_folder().exists()
-
-    def test_out_of_range_year_raises_error(self):
-        with pytest.raises(ValueError):
-            Folder(2030, 1)
-
-# skipping
-
-
-@pytest.mark.skip(reason="not testing maintenance scripts yet")
-def test_md(folder):
-    assert False
-
 
 @pytest.mark.skip(reason="not testing maintenance scripts yet")
 def test_init_dirs():
     assert False
-
-
-@pytest.mark.skip(reason="not testing maintenance scripts yet")
-def test_copy_latest():
-    assert False
-
 
 if __name__ == "__main__":
     pytest.main([__file__])

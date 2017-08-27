@@ -32,7 +32,7 @@ For reference - data directory structure::
           \\...
 """
 
-import shutil
+
 from locations.folder import FolderBase, md
 
 __all__ = ['PathHelper', 'DateHelper']
@@ -87,6 +87,7 @@ class PathHelper:
            Returns:
                 pathlib.Path() instance
         """
+        year, month = DateHelper.filter_date(year, month)
         folder = Folder(year, month).get_interim_folder()
         csv_path = folder / "tab.csv"
         if csv_path.exists() and csv_path.stat().st_size > 0:

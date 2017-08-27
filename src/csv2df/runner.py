@@ -73,11 +73,13 @@ class Vintage:
         self.dfq.to_csv(folder_path / 'dfq.csv')
         self.dfm.to_csv(folder_path / 'dfm.csv')
         print("Saved dataframes to", folder_path)
+        return True
 
     def validate(self):
         checker = Validator(self.dfa, self.dfq, self.dfm)
         checker.run()
         print("Test values parsed OK for", self)
+        return True
 
     def __repr__(self):
         return "Vintage({}, {})".format(self.year, self.month)

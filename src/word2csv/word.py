@@ -199,6 +199,7 @@ def make_interim_csv(year, month):
     from locations.folder import FolderBase
     folder = FolderBase(year, month).get_raw_folder()    
     folder_to_csv(folder)
+    return True
 
 if __name__ == "__main__":
     #from run_word import get_word_folder
