@@ -21,9 +21,6 @@ Workflow
 - **Rosstat** issues KEP publication every month as RAR-archived Word files.
 - **mini-kep** does the following:
         -  **download**: download and unpack rar files from Rosstat website
-	
-	     - *TODO: download from S3 bucket prior to 2016-12* 
-	
 	-  **word2csv**: convert MS Word files to single interim CSV file
 	-  **csv2df**: parse interim CSV file and save processed CSV files with
 	   annual, quarterly and monthly data
