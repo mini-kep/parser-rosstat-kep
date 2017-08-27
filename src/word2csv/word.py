@@ -12,7 +12,8 @@ import csv
 import os
 
 
-CSV_FILENAME = 'tab.csv'
+from locations.folder import CSV_FILENAME
+#  CSV_FILENAME = 'tab.csv'
 ENCODING = 'utf8'
 
 
@@ -187,18 +188,25 @@ def make_file_list(folder):
 
 def folder_to_csv(folder):
     """Make single csv based on 5 .doc files in *folder*. """
-    print("\nFolder:\n    ", folder)
+    print()
+    print("Folder:\n    ", folder)
     file_list = make_file_list(folder)
     csv_filename = get_csv_filename(folder)
     dump_doc_files_to_csv(file_list, csv_filename)
     print("Finished creating raw CSV file:", csv_filename)
-
+    
+def make_interim_csv(year, month):    
+    from locations.folder import FolderBase
+    folder = FolderBase(year, month).get_raw_folder()    
+    folder_to_csv(folder)
 
 if __name__ == "__main__":
     #from run_word import get_word_folder
-    from pathlib import Path
+    #from pathlib import Path
     #WORD_ROOT = Path("D:/digital/kep_data2")
     #word_folder = get_word_folder(2012, 11, WORD_ROOT)
-
-    word_folder = Path("D:/digital/kep_data/2015_01")
-    folder_to_csv(word_folder)
+    
+    #word_folder = Path("D:/digital/kep_data/2015_01")
+    #folder_to_csv(word_folder)
+    
+    pass

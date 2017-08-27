@@ -32,8 +32,8 @@ For reference - data directory structure::
           \\...
 """
 
-from pathlib import Path
 import shutil
+from locations.folder import FolderBase, md
 
 __all__ = ['PathHelper', 'DateHelper']
 
@@ -41,9 +41,6 @@ __all__ = ['PathHelper', 'DateHelper']
 ENC = 'utf8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
-# find ourselves - this file is in src/kep2
-levels_up = 2
-data_folder = Path(__file__).parents[levels_up] / 'data'
 
 # FIXME: hardcoded constant will not update to new months
 DATES = [(2009, 4), (2009, 5), (2009, 6),
@@ -71,9 +68,15 @@ DATES = [(2009, 4), (2009, 5), (2009, 6),
          (2016, 1), (2016, 2), (2016, 3), (2016, 4), (2016, 5), (2016, 6),
          (2016, 7), (2016, 8), (2016, 9), (2016, 10), (2016, 11), (2016, 12),
 
-         (2017, 1), (2017, 2), (2017, 3), (2017, 4), (2017, 5)]
+         (2017, 1), (2017, 2), (2017, 3), (2017, 4), (2017, 5), (2017, 6)]
 
-# end user interface
+
+# folder locations
+
+class Folder(FolderBase):
+    def __repr__(self):
+        return "Folder({}, {})".format(self.year, self.month)
+
 
 
 class PathHelper:
@@ -108,7 +111,7 @@ class PathHelper:
 class DateHelper:
 
     def get_supported_dates():
-        return Folder.supported_dates
+        return DATES
 
     def get_latest_date():
         """Return year and month for latest available interim data folder.
@@ -129,63 +132,7 @@ class DateHelper:
         return year or latest_year, month or latest_month
 
 
-# folder locations
-class Folder:
-    interim = data_folder / 'interim'
-    processed = data_folder / 'processed'
-    latest = processed / 'latest'
-    supported_dates = DATES
-
-    @classmethod
-    def get_latest_date(cls):
-        root = cls.interim
-
-        def max_subfolder(folder):
-            _lst = [f.name for f in folder.iterdir() if f.is_dir()]
-            return int(max(_lst))
-        year = max_subfolder(root)
-        _subfolder = root / str(year)
-        month = max_subfolder(_subfolder)
-        return year, month
-
-    @classmethod
-    def filter_date(cls, year, month):
-        # mask with latest date
-        if not year or not month:
-            year, month = cls.get_latest_date()
-        # check if date is available
-        if (year, month) in cls.supported_dates:
-            return year, month
-        else:
-            msg = "Year and month not found: {} {}".format(year, month)
-            raise ValueError(msg)
-
-    def __init__(self, year=None, month=None):
-        self.year, self.month = Folder.filter_date(year, month)
-
-    def _local_folder(self, root):
-        return root / str(self.year) / str(self.month).zfill(2)
-
-    def get_interim_folder(self):
-        return self._local_folder(root=self.interim)
-
-    def get_processed_folder(self):
-        return self._local_folder(root=self.processed)
-
-    def __repr__(self):
-        return "Folder({}, {})".format(self.year, self.month)
-
-
 # create local data dirs for DATES
-
-def md(folder):
-    """Create *folder* if not exists.
-       Also create parent folder if needed. """
-    if not folder.exists():
-        parent = folder.parent
-        if not parent.exists():
-            parent.mkdir()
-        folder.mkdir()
 
 
 def init_dirs(supported_dates=None):
@@ -198,26 +145,6 @@ def init_dirs(supported_dates=None):
         md(f.get_processed_folder())
 
 
-# housekeeping  - copy contents to 'processed/latest' folder
-
-def copy_latest():
-    """Copy all files from folder like *processed/2017/04* to
-       *processed/latest* folder.
-
-       Returns:
-           list of files copied
-    """
-    year, month = DateHelper.get_latest_date()
-    src_folder = PathHelper.get_processed_folder(year, month)
-    copied = []
-    for src in [f for f in src_folder.iterdir() if f.is_file()]:
-        dst = Folder.latest / src.name
-        shutil.copyfile(src, dst)
-        copied.append(dst)
-    print("Updated folder", Folder.latest)
-    return copied
-
-
 if __name__ == "__main__":
     init_dirs()
-    copy_latest()
+

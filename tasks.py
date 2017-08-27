@@ -1,8 +1,13 @@
 # -*- coding: utf-8 -*-
+import sys
+import os
+import inspect
+
 from sys import platform
 from os import environ
 from pathlib import Path
-import inspect
+
+
 
 from invoke import Collection, task
 
@@ -40,14 +45,14 @@ def pep8(ctx, folder="csv2df"):
         ctx.run("autopep8 --aggressive --aggressive --in-place {}".format(f))
 
 # 
-def docstrings(ctx):
-    print(inspect.cleandoc(__doc__))
-    path = PROJECT_DIR / "src" / folder
-    for f in yield_python_files(path):
+#def docstrings(ctx):
+#    print(inspect.cleandoc(__doc__))
+#    path = PROJECT_DIR / "src" / folder
+#    for f in yield_python_files(path):
         # FIXME: list modules as in https://stackoverflow.com/questions/487971/is-there-a-standard-way-to-list-names-of-python-modules-in-a-package
         # print(inspect.cleandoc(__doc__))        
-        pass
-        
+#        pass
+       
 @task
 def clean(ctx):
     """Delete all compiled Python files"""
@@ -113,8 +118,41 @@ def ls(ctx):
     print(result.stdout.splitlines())
 
 
+@task
+def add(ctx, year, month):
+    _add(year, month)    
+    
+def _add(year, month):    
+    year, month = int(year), int(month)
+    src = str(Path(__file__).parent / 'src')
+    sys.path.insert(0, src)
+    #download, unpack
+    from locations.folder import FolderBase
+    from download.download import RemoteFile
+    rf = RemoteFile(year, month)
+    rf.download()
+    rf.unrar()
+    interim_csv = FolderBase(year, month).get_interim_csv()
+    #make interim csv
+    if not os.path.exists(interim_csv):
+        from word2csv.word import make_interim_csv
+        make_interim_csv(year, month)
+        FolderBase(year, month).copy_tab_csv()        
+    #parse, validate, save
+    from csv2df.runner import Vintage
+    vint = Vintage(year, month)
+    vint.validate()
+    vint.save()
+    #copy to latest
+    from locations.folder import copy_latest
+    copy_latest()
+    sys.path.remove(src)
+    # see for context manager: 
+    # https://stackoverflow.com/questions/17211078/how-to-temporarily-modify-sys-path-in-python
+
+
 ns = Collection()
-for t in [clean, pep8, ls, cov, test, doc, rst, github, lint]:
+for t in [clean, pep8, ls, cov, test, doc, rst, github, lint, add]:
     ns.add_task(t)
 
 
@@ -124,7 +162,8 @@ if platform == 'win32':
     ns.configure({'run': {'shell': environ['COMSPEC']}})
 
 
-
+if __name__ == '__main__':
+    _add(2017, 5)
 
 ##########################################################################
 # GLOBALS                                                                       #
