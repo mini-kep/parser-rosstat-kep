@@ -9,15 +9,15 @@ from csv2df.reader import get_year, is_year, Row, RowStack
 
 # FIXME: can I test open_csv? with a mock file?
 @pytest.mark.skip("don't know how to test this")
-def test_open_csv():    
+def test_open_csv():
     assert 0
 
 
 # TODO: implement tests
 @pytest.mark.skip("Only a sceleton.")
-def test_reader():    
-    assert 0   
- 
+def test_reader():
+    assert 0
+
 
 junk_string = "________\n\n\t\t\t"
 content_string = "Объем ВВП\n1999\t4823\n2000\t7306"
