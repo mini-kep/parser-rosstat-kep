@@ -13,6 +13,12 @@ def test_open_csv():
     assert 0
 
 
+# TODO: implement tests
+@pytest.mark.skip("Only a sceleton.")
+def test_reader():    
+    assert 0   
+ 
+
 junk_string = "________\n\n\t\t\t"
 content_string = "Объем ВВП\n1999\t4823\n2000\t7306"
 full_string = "\n".join([junk_string, content_string])
