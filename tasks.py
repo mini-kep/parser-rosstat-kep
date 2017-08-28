@@ -4,7 +4,7 @@ import os
 import inspect
 
 from sys import platform
-from os import environ, chdir
+from os import environ
 from pathlib import Path
 
 
@@ -72,57 +72,19 @@ def lint(ctx, folder="src/csv2df"):
     # --max-line-length=100
     ctx.run('flake8 {} --exclude test* --ignore E501'.format(folder))
 
-@task
-def rstmenu(ctx):
-    """get docs of each module mentioned in csv2df package __all__
-    and  generate menu: link with docs below in "modules_menu.rst"
-    """
-
-    # some hacks to prepare import package/modules
-    import sys, os
-    srcdir= str( PROJECT_DIR / "src" )
-    pkgdir = str( PROJECT_DIR / "src" / "csv2df" )
-    sys.path.append( srcdir )
-    sys.path.append( pkgdir )
-
-    import csv2df as pkg
-    # print( pkg.__name__, pkg.__doc__ )
-
-    # generate menu..
-    menu =  []
-
-    for modname in pkg.__all__:
-        # module = getattr(pkg,  modname)  # doesn't work like this
-        module = __import__( modname)
-        def indent_block(txt, spaces=4):
-            joiner = '\n' + ' ' * spaces
-            return ' ' * spaces + joiner.join(txt.split("\n"))
-        docs = indent_block(module.__doc__)
-        menu.append( f""":doc:`{pkg.__name__}.{modname}`. \n{docs}\n""" )
-        print( "\n===", modname, "\n\n", menu[-1] )  # make it verbose
-
-
-    with open( PROJECT_DIR / "doc" / "modules_menu.rst", 'w') as f:
-        f.writelines( menu )
-
 
 @task
 def rst(ctx):
     # build new rst files with sphinx
     # FIXME: must check / appearance issues:
     
-    ctx.run("sphinx-apidoc -efM -o doc src/csv2df src/csv2df/tests")
+    ctx.run("sphinx-apidoc -efM -o doc src\csv2df *test_*")
     
     
 @task
 def doc(ctx):
-    if platform=="linux":
-        chdir('doc')
-        ctx.run('make html')
-
-    else:
-        ctx.run("doc\make.bat html")
-        ctx.run("start doc\_build\html\index.html")
+    ctx.run("doc\make.bat html")
+    ctx.run("start doc\_build\html\index.html")
     # TODO: 
     # upload all files from doc\_build\html\ 
     # to aws https://mini-kep-docs.s3.amazonaws.com/
@@ -195,7 +157,7 @@ def _add(year, month):
     
 
 ns = Collection()
-for t in [clean, pep8, ls, cov, test, doc, rst, github, lint, add, rstmenu]:
+for t in [clean, pep8, ls, cov, test, doc, rst, github, lint, add]:
     ns.add_task(t)
 
 
