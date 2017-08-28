@@ -9,13 +9,13 @@ mini-kep documentation
 ======================
 
 .. toctree::
-   :maxdepth: 4
-
+    :maxdepth: 1
    
-csv2df modules
---------------
+    download
+    word2csv
+    csv2df
+    frontpage
 
-.. include:: modules_menu.rst
 
    
 .. include:: intro.rst

@@ -1,7 +1,10 @@
-csv2df
-======
+frontpage
+=========
 
 .. toctree::
    :maxdepth: 4
 
-   csv2df
+   make_frontpage_1
+   make_frontpage_2
+   sparkline
+   to_markdown
