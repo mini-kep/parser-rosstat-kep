@@ -4,7 +4,7 @@ import pytest
 # fixtures
 from csv2df.reader import Row
 # testing
-from csv2df.parcer import Table, split_to_tables, extract_tables
+from csv2df.parser import Table, split_to_tables, extract_tables
 from csv2df.specification import (ParsingInstruction, Definition,
                                   Specification)
 
