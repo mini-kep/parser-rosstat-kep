@@ -1,7 +1,7 @@
-csv2df
-======
+frontpage
+=========
 
 .. toctree::
    :maxdepth: 4
 
-   csv2df
+   frontpage

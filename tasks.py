@@ -108,10 +108,28 @@ def rstmenu(ctx):
 def rst(ctx):
     # build new rst files with sphinx
     # FIXME: must check / appearance issues:
-    
-    ctx.run("sphinx-apidoc -efM -o doc src/csv2df src/csv2df/tests")
-    
-    
+
+    # ctx.run("sphinx-apidoc -efM -o doc src/csv2df src/csv2df/tests")
+
+    packages = ['download',
+                'word2csv',
+                'csv2df src/csv2df/tests', # second param lists excluded dir
+                'frontpage src/frontpage/markdown']
+
+    for pkg in packages:
+        ctx.run("sphinx-apidoc -efM -o doc src/"+pkg)
+
+    # inject modules_menu
+    def inject_modules_menu():
+        txt = open(PROJECT_DIR / "doc" / "csv2df.rst").read()
+        separator = """\nSubmodules\n----------\n\n"""
+        first_part = txt.split(separator)[0]
+
+        with open(PROJECT_DIR / "doc" / "csv2df.rst", 'w') as f:
+            f.writelines( first_part + separator + ".. include:: modules_menu.rst")
+
+    inject_modules_menu()
+
 @task
 def doc(ctx):
     if platform=="linux":
