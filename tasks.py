@@ -80,27 +80,27 @@ def rstmenu(ctx):
 
     # some hacks to prepare import package/modules
     import sys, os
-    srcdir= str( PROJECT_DIR / "src" )
-    pkgdir = str( PROJECT_DIR / "src" / "csv2df" )
+    srcdir = str( PROJECT_DIR / "src" )
     sys.path.append( srcdir )
-    sys.path.append( pkgdir )
+    # pkgdir = str( PROJECT_DIR / "src" / "csv2df" )
+    # sys.path.append( pkgdir )
 
     import csv2df as pkg
     # print( pkg.__name__, pkg.__doc__ )
 
     # generate menu..
     menu =  []
-
+    print ("\n  modules menu for csv2df :")
     for modname in pkg.__all__:
-        # module = getattr(pkg,  modname)  # doesn't work like this
-        module = __import__( modname)
-        def indent_block(txt, spaces=4):
-            joiner = '\n' + ' ' * spaces
-            return ' ' * spaces + joiner.join(txt.split("\n"))
-        docs = indent_block(module.__doc__)
-        menu.append( f""":doc:`{pkg.__name__}.{modname}`. \n{docs}\n""" )
-        print( "\n===", modname, "\n\n", menu[-1] )  # make it verbose
-
+        # def indent_block(txt, spaces=4):
+        #     joiner = '\n' + ' ' * spaces
+        #     return ' ' * spaces + joiner.join(txt.split("\n"))
+        ## module = getattr(pkg,  modname)  # doesn't work like this
+        # module = __import__(modname)
+        # docs = indent_block(module.__doc__)
+        docs = f"    .. automodule:: csv2df.{modname}"
+        menu.append( f""":doc:`{pkg.__name__}.{modname}` \n{docs}\n""" )
+        print( modname )  # show progress
 
     with open( PROJECT_DIR / "doc" / "modules_menu.rst", 'w') as f:
         f.writelines( menu )
@@ -131,6 +131,8 @@ def rst(ctx):
             f.writelines( first_part + separator + ".. include:: modules_menu.rst")
 
     inject_modules_menu()
+
+    rstmenu(ctx)
 
 @task
 def doc(ctx):
