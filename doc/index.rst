@@ -8,7 +8,8 @@
 mini-kep documentation
 ======================
 
-.. toctree::
+..  comment
+    toctree::
     :maxdepth: 1
    
     download
@@ -16,6 +17,7 @@ mini-kep documentation
     csv2df
     frontpage
 
+.. include:: rich_menu_.rst
 
    
 .. include:: intro.rst

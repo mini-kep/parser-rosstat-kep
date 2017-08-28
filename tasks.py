@@ -73,35 +73,27 @@ def lint(ctx, folder="src/csv2df"):
     ctx.run('flake8 {} --exclude test* --ignore E501'.format(folder))
 
 @task
-def rstmenu(ctx):
-    """get docs of each module mentioned in csv2df package __all__
-    and  generate menu: link with docs below in "modules_menu.rst"
+def rst_rich_menu(ctx, root='csv2df', all=None):
+    """get docs of each module  in root package (__all__ or defined in params)
+    and  generate TOC menu: link with docs below in "rich_menu_{root}.rst"
     """
 
-    # some hacks to prepare import package/modules
     srcdir = str( PROJECT_DIR / "src" )
     sys.path.append( srcdir )
-    # pkgdir = str( PROJECT_DIR / "src" / "csv2df" )
-    # sys.path.append( pkgdir )
 
-    import csv2df as pkg
-    # print( pkg.__name__, pkg.__doc__ )
+    if not all:
+        pkg = __import__( root )
+        all = pkg.__all__
 
     # generate menu..
     menu =  []
-
-    for modname in pkg.__all__:
-        # def indent_block(txt, spaces=4):
-        #     joiner = '\n' + ' ' * spaces
-        #     return ' ' * spaces + joiner.join(txt.split("\n"))
-        ## module = getattr(pkg,  modname)  # doesn't work like this
-        # module = __import__(modname)
-        # docs = indent_block(module.__doc__)
-        docs = f"    .. automodule:: csv2df.{modname}"
-        menu.append( f""":doc:`{pkg.__name__}.{modname}` \n{docs}\n""" )
+    for modname in all:
+        fullname = f"{root}.{modname}" if root else modname
+        docs = f"    .. automodule:: {fullname}"
+        menu.append( f""":doc:`{fullname}` \n{docs}\n""" )
         print( modname )  # show progress
 
-    with open( PROJECT_DIR / "doc" / "modules_menu.rst", 'w') as f:
+    with open( PROJECT_DIR / "doc" / f"rich_menu_{root}.rst", 'w') as f:
         f.writelines( menu )
 
 
@@ -121,16 +113,19 @@ def rst(ctx):
         ctx.run("sphinx-apidoc -efM -o doc src/"+pkg)
 
     # inject modules_menu
-    def inject_modules_menu():
-        txt = open(PROJECT_DIR / "doc" / "csv2df.rst").read()
+    def inject_modules_menu(linkfrom="csv2df", linkto="csv2df"):
+        txt = open(PROJECT_DIR / "doc" / f"{linkfrom}.rst").read()
         separator = """\nSubmodules\n----------\n\n"""
         first_part = txt.split(separator)[0]
 
-        with open(PROJECT_DIR / "doc" / "csv2df.rst", 'w') as f:
-            f.writelines( first_part + separator + ".. include:: modules_menu.rst")
+        with open(PROJECT_DIR / "doc" / f"{linkfrom}.rst", 'w') as f:
+            f.writelines( first_part + separator + f".. include:: rich_menu_{linkto}.rst")
 
     inject_modules_menu()
-    # rstmenu(ctx) # regenerate modules_menu.rst
+
+    # may comment this if csv2df module names don't change..
+    rst_rich_menu(ctx, "csv2df") # regenerate rich_menu_csv2df.rst
+    rst_rich_menu(ctx, "", all=['download', 'word2csv', 'csv2df', 'frontpage'] ) # regenerate rich_menu_.rst
 
 @task
 def doc(ctx):
@@ -213,7 +208,7 @@ def _add(year, month):
     
 
 ns = Collection()
-for t in [clean, pep8, ls, cov, test, doc, rst, github, lint, add, rstmenu]:
+for t in [clean, pep8, ls, cov, test, doc, rst, github, lint, add, rst_rich_menu]:
     ns.add_task(t)
 
 

@@ -9,4 +9,4 @@ csv2df package
 Submodules
 ----------
 
-.. include:: modules_menu.rst
+.. include:: rich_menu_csv2df.rst
