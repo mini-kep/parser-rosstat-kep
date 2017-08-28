@@ -130,6 +130,7 @@ def rst(ctx):
             f.writelines( first_part + separator + ".. include:: modules_menu.rst")
 
     inject_modules_menu()
+    # rstmenu(ctx) # regenerate modules_menu.rst
 
 @task
 def doc(ctx):
