@@ -176,3 +176,5 @@ epub_copyright = copyright
 
 # A list of files that should not be packed into the epub file.
 epub_exclude_files = ['search.html']
+
+# autodoc_mock_imports = ["pandas", "numpy", "matplotlib", "numpy.ma", "matplotlib.pyplot"] # "cfg", "access_data"
