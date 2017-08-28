@@ -4,7 +4,7 @@ import io
 
 from csv2df.specification import Definition, Specification
 from csv2df.reader import Reader
-from csv2df.parcer import extract_tables
+from csv2df.parser import extract_tables
 from csv2df.runner import Emitter, get_dataframes
 
 
