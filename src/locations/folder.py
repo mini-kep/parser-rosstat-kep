@@ -1,3 +1,8 @@
+"""Helper class FolderBase to navigate through */data* directory structure.
+
+   Also includes copy_latest() housekeeping function.
+"""
+
 from pathlib import Path
 import shutil
 

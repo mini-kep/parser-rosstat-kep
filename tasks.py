@@ -79,7 +79,6 @@ def rstmenu(ctx):
     """
 
     # some hacks to prepare import package/modules
-    import sys, os
     srcdir= str( PROJECT_DIR / "src" )
     pkgdir = str( PROJECT_DIR / "src" / "csv2df" )
     sys.path.append( srcdir )
@@ -93,7 +92,7 @@ def rstmenu(ctx):
 
     for modname in pkg.__all__:
         # module = getattr(pkg,  modname)  # doesn't work like this
-        module = __import__( modname)
+        module = __import__(modname)
         def indent_block(txt, spaces=4):
             joiner = '\n' + ' ' * spaces
             return ' ' * spaces + joiner.join(txt.split("\n"))
@@ -101,9 +100,8 @@ def rstmenu(ctx):
         menu.append( f""":doc:`{pkg.__name__}.{modname}`. \n{docs}\n""" )
         print( "\n===", modname, "\n\n", menu[-1] )  # make it verbose
 
-
-    with open( PROJECT_DIR / "doc" / "modules_menu.rst", 'w') as f:
-        f.writelines( menu )
+    with open(PROJECT_DIR / "doc" / "modules_menu.rst", 'w') as f:
+        f.writelines(menu)
 
 
 @task
