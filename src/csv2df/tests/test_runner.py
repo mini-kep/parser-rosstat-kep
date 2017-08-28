@@ -43,13 +43,13 @@ def test_get_dataframes():
 
 # TODO: implement tests
 @pytest.mark.skip("Only a sceleton.")
-def test_vintage():    
+def test_vintage():
     assert 0
 
 
 # TODO: implement tests
 @pytest.mark.skip("Only a sceleton.")
-def test_collection():    
+def test_collection():
     assert 0
 
 
