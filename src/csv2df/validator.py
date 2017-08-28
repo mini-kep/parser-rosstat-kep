@@ -7,18 +7,21 @@
    sample datapoints as dictionaries.
 
    Validator(dfa, dfq, dfm).run() tests dataframes against CHECKPOINTS.
-
-
 """
+
+
+__all__ = [] #TODO
 
 
 ANNUAL = [('a', 'GDP_bln_rub', 1999, 4823.0),
           ('a', 'GDP_yoy', 1999, 106.4)
           ]
 
+
 QTR = [('q', 'GDP_bln_rub', 1999, {4: 1447}),
        ('q', 'CPI_rog', 1999, {1: 116.0, 2: 107.3, 3: 105.6, 4: 103.9})
        ]
+
 
 MONTHLY = [('m', 'CPI_rog', 1999, {1: 108.4, 6: 101.9, 12: 101.3}),
            ('m', 'EXPORT_GOODS_bln_usd', 1999, {12: 9.7}),
