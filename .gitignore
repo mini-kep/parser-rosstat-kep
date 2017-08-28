@@ -1,5 +1,8 @@
+*.html
 *.doc
 *.rar
+doc/
+doc2/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

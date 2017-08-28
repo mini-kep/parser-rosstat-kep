@@ -79,7 +79,6 @@ def rstmenu(ctx):
     """
 
     # some hacks to prepare import package/modules
-    import sys, os
     srcdir = str( PROJECT_DIR / "src" )
     sys.path.append( srcdir )
     # pkgdir = str( PROJECT_DIR / "src" / "csv2df" )
@@ -90,7 +89,7 @@ def rstmenu(ctx):
 
     # generate menu..
     menu =  []
-    print ("\n  modules menu for csv2df :")
+
     for modname in pkg.__all__:
         # def indent_block(txt, spaces=4):
         #     joiner = '\n' + ' ' * spaces
@@ -131,8 +130,6 @@ def rst(ctx):
             f.writelines( first_part + separator + ".. include:: modules_menu.rst")
 
     inject_modules_menu()
-
-    rstmenu(ctx)
 
 @task
 def doc(ctx):
