@@ -31,7 +31,6 @@ dfq = emitter.get_dataframe(freq='q')
 dfm = emitter.get_dataframe(freq='m')
 
 
-
 def test_get_dataframes():
     # csvfile1 was consumed once, buffer position if not at zero
     if csvfile1.tell() != 0:
@@ -45,13 +44,13 @@ def test_get_dataframes():
 # TODO: implement tests
 @pytest.mark.skip("Only a sceleton.")
 def test_vintage():    
-assert 0
+    assert 0
 
 
 # TODO: implement tests
 @pytest.mark.skip("Only a sceleton.")
 def test_collection():    
-assert 0
+    assert 0
 
 
 def test_resulting_dataframes():
