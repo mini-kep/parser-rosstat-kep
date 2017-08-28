@@ -11,11 +11,8 @@ mini-kep documentation
 .. toctree::
    :maxdepth: 4
 
-   
-csv2df modules
---------------
+   csv2df
 
-.. include:: modules_menu.rst
 
    
 .. include:: intro.rst
