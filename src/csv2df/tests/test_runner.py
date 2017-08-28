@@ -42,6 +42,18 @@ def test_get_dataframes():
     assert dfm_.equals(dfm)
 
 
+# TODO: implement tests
+@pytest.mark.skip("Only a sceleton.")
+def test_vintage():    
+assert 0
+
+
+# TODO: implement tests
+@pytest.mark.skip("Only a sceleton.")
+def test_collection():    
+assert 0
+
+
 def test_resulting_dataframes():
     assert dfa.GDP_bln_rub['1999-12-31'] == 4823.0
 
