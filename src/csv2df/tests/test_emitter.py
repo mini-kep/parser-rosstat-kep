@@ -47,7 +47,7 @@ def test_DatapointMaker():
 
 
 from csv2df.reader import Row
-from csv2df.parcer import Table
+from csv2df.parser import Table
 
 labels = {0: 'GDP_bln_rub',
           1: 'GDP_rog',
