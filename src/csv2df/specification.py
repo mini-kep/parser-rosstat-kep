@@ -31,7 +31,7 @@ from csv2df.util_label import make_label
 from csv2df.util_row_splitter import FUNC_MAPPER
 
 
-__all__ = [] #TODO
+__all__ = [] #TODO: (ID) Which classes/functions need to be added to __all__?
 
 
 # mapper dictionary to convert text in table headers to unit of measurement
