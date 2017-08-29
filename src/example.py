@@ -16,7 +16,7 @@ Workflow as follows (doc/pseudo.rst)
 |    for further processing                    |                          |
 +----------------------------------------------+--------------------------+
 | 5. Create Table instances from rows          |                          |
-|                                              | parcer.extract_tables()  |
+|                                              | parser.extract_tables()  |
 +----------------------------------------------+                          |
 | 6. Extract variable name and unit of         |                          |
 |    measurement from each table               |                          |
@@ -43,7 +43,7 @@ import io
 
 from csv2df.specification import Definition, Specification
 from csv2df.reader import Reader, open_csv
-from csv2df.parcer import extract_tables
+from csv2df.parser import extract_tables
 from csv2df.emitter import Emitter
 from csv2df.validator import Validator
 
