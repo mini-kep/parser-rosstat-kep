@@ -43,8 +43,6 @@ class Reader(object):
         return rowstack.yield_segment_with_defintion(self.spec)
 
 
-
-
 # csv file access
 
 def open_csv(path):

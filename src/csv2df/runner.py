@@ -1,7 +1,7 @@
-"""Get pandas dataframes for a given data and month. 
+"""Get pandas dataframes for a given data and month.
 
-*get_dataframes(csvfile, spec=SPEC)* is a lower-level function to get 
-dataframes from *csvfile* connection under *spec* parsing instruction.  
+*get_dataframes(csvfile, spec=SPEC)* is a lower-level function to get
+dataframes from *csvfile* connection under *spec* parsing instruction.
 
 *Vintage* class addresses dataset by year and month:
 
@@ -9,10 +9,10 @@ dataframes from *csvfile* connection under *spec* parsing instruction.
     Vintage(year, month).validate()
 
 These calls should give similar results:
-    
+
     csv_path = PathHelper.locate_csv(year, month)
     csvfile = open_csv(csv_path)
-    
+
     Vintage(year, month).dfs()
 
 *Collection* manipulates all datasets, released at various dates:
@@ -40,12 +40,12 @@ def get_dataframes(csvfile, spec=SPEC):
     Args:
        csvfile (file connection or StringIO) - CSV file for parsing
        spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
-    
-    Returns:  
-       Three pandas dataframes at annual, qtr and monthly frequencies.  
+
+    Returns:
+       Three pandas dataframes at annual, qtr and monthly frequencies.
     """
-    tables = [t for csv_segment, pdef in Reader(csvfile, spec).items() 
-                for t in extract_tables(csv_segment, pdef)]
+    tables = [t for csv_segment, pdef in Reader(csvfile, spec).items()
+              for t in extract_tables(csv_segment, pdef)]
     emitter = Emitter(tables)
     dfa = emitter.get_dataframe(freq='a')
     dfq = emitter.get_dataframe(freq='q')
