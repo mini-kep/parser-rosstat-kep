@@ -129,18 +129,18 @@ def rst(ctx):
 
 @task
 def doc(ctx):
+    source_dir = os.path.join('doc', 'rst') 
+    html_dir = os.path.join('doc', 'html') 
+    index_html = os.path.join(html_dir, 'index.html')
+    # call without parameters
+    # for paarmeters may add: 
+    #     -aE - to overwrite files 
+    build_command = f'sphinx-build -b html {source_dir} {html_dir}' 
     if platform=="linux":
-        chdir('doc')
-        ctx.run('make html')
-
+        ctx.run(build_command)
     else:
-        ctx.run("doc\make.bat html")
-        ctx.run("start doc\_build\html\index.html")
-    # TODO: 
-    # upload all files from doc\_build\html\ 
-    # to aws https://mini-kep-docs.s3.amazonaws.com/
-    # mini-csv2df-docs + is region neded?
-
+        ctx.run(build_command)
+        ctx.run('start {}'.format(index_html))
 
 @task
 def github(ctx):
