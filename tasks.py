@@ -73,31 +73,6 @@ def lint(ctx, folder="src/csv2df"):
     ctx.run('flake8 {} --exclude test* --ignore E501'.format(folder))
 
 
-@task
-def rst_rich_menu(ctx, root='csv2df', all=None):
-    """get docs of each module  in root package (__all__ or defined in params)
-    and  generate TOC menu: link with docs below in "rich_menu_{root}.rst"
-    """
-
-    srcdir = str( PROJECT_DIR / "src" )
-    sys.path.append( srcdir )
-
-    if not all:
-        pkg = __import__( root )
-        all = pkg.__all__
-
-    # generate menu..
-    menu =  []
-    for modname in all:
-        fullname = f"{root}.{modname}" if root else modname
-        docs = f"    .. automodule:: {fullname}"
-        menu.append( f""":doc:`{fullname}` \n{docs}\n""" )
-        print( modname )  # show progress
-
-    with open( PROJECT_DIR / "doc" / f"rich_menu_{root}.rst", 'w') as f:
-        f.writelines( menu )
-
-
 def apidoc(pkg, exclude=''):
     """Call sphinx-apidoc to document *pkg* package without files 
        in *exclude* pattern. """
