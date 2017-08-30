@@ -120,9 +120,9 @@ class Collection:
 
 if __name__ == "__main__":
     # Collection calls
-    Collection.approve_latest()
+    # Collection.approve_latest()
     # Collection.approve_all()
-    # Collection.save_latest()
+    Collection.save_latest()
     # Collection.save_all()
 
     # sample Vintage call
@@ -130,3 +130,8 @@ if __name__ == "__main__":
     vint = Vintage(year, month)
     vint.validate()
     dfa, dfq, dfm = vint.dfs()
+    
+    import pandas as pd
+    from io import StringIO
+    s = dfa.to_csv()
+    dx = pd.read_csv(StringIO(s))

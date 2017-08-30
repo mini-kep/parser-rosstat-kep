@@ -159,5 +159,4 @@ class Emitter:
             df.insert(1, "month", df.index.month)
         # delete some df internals for better view
         df.columns.name = None
-        df.index.name = None
         return df
