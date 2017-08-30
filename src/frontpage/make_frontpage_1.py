@@ -20,9 +20,9 @@ sections_file = files_dir / "_sections.md"
 latest_values_file = files_dir / "_latest.md"
 monthy_images = files_dir / "_images_paths.md"
 
-import cfg
+# import cfg
 from to_markdown import to_markdown
-import access_data
+import example_access_data as access_data
 
 # TABLE 1 - Sections with required varnames
 # FIXME: cfg.yield_variable_descriptions_with_subheaders
@@ -32,25 +32,25 @@ def bold(s):
     return"**{}**".format(s)
 
 
-def yield_variable_descriptions_with_subheaders(sections=cfg.SECTIONS,
-                                                desc=cfg.DESC):
+# def yield_variable_descriptions_with_subheaders(sections=cfg.SECTIONS,
+#                                                 desc=cfg.DESC):
 
-    for section_name, labels in sections.items():
-        yield([bold(section_name), ""])
-        for label in labels:
-            yield([desc[label], label])
+#     for section_name, labels in sections.items():
+#         yield([bold(section_name), ""])
+#         for label in labels:
+#             yield([desc[label], label])
 
 
-md1 = to_markdown(body=yield_variable_descriptions_with_subheaders(),
-                  header=["Показатель", "Код"])
-sections_file.write_text(md1)
+# md1 = to_markdown(body=yield_variable_descriptions_with_subheaders(),
+#                   header=["Показатель", "Код"])
+# sections_file.write_text(md1)
 # print(md1)
 
 # TABLE 2 - latest values for all monthly variables
 # https://github.com/epogrebnyak/data-rosstat-kep/blob/47229a4e668dbaee31dfb6419f510abe13d0d9a3/frontpage.py#L120-L153
 # or local old/frontpage.py#L120-L153
 
-dfa, dfq, dfm = access_data.get_dfs()
+dfa, dfq, dfm = access_data.get_dfs_from_web()
 
 # generate with latest values from monthly dataframe
 
@@ -87,54 +87,54 @@ latest_values_file.write_text(md2)
 
 # всё ниже относится к TABLE 3 таску
 
-class Sparkline():
-    LOCAL_FOLDER = get_root() / "output" / "png"
-    GITHUB_FOLDER = \
-        "https://github.com/epogrebnyak/mini-csv2df/raw/master/output/png/{}"
+# class Sparkline():
+#     LOCAL_FOLDER = get_root() / "output" / "png"
+#     GITHUB_FOLDER = \
+#         "https://github.com/epogrebnyak/mini-csv2df/raw/master/output/png/{}"
 
-    def __init__(self, ts):
-        self.ts = ts
+#     def __init__(self, ts):
+#         self.ts = ts
 
-    def path(self):
-        return str(self.LOCAL_FOLDER / self.filename())
+#     def path(self):
+#         return str(self.LOCAL_FOLDER / self.filename())
 
-    def filename(self):
-        return "{}_spark.png".format(self.ts.name)
+#     def filename(self):
+#         return "{}_spark.png".format(self.ts.name)
 
-    def plot(self):
-        """Draw sparkline graph. Return Axes()."""
-        fig = plt.figure(figsize=(2, 0.5))
-        ax = fig.add_subplot(111)
-        ax.plot(self.ts, 'r-')
-        for _, v in ax.spines.items():
-            v.set_visible(False)
-        ax.set_xticks([])
-        ax.set_yticks([])
-        return ax
+#     def plot(self):
+#         """Draw sparkline graph. Return Axes()."""
+#         fig = plt.figure(figsize=(2, 0.5))
+#         ax = fig.add_subplot(111)
+#         ax.plot(self.ts, 'r-')
+#         for _, v in ax.spines.items():
+#             v.set_visible(False)
+#         ax.set_xticks([])
+#         ax.set_yticks([])
+#         return ax
 
-    def save(self):
-        spark(self.ts)
-        plt.subplots_adjust(bottom=0.15)
-        plt.savefig(self.path())
-        plt.close()
+#     def save(self):
+#         spark(self.ts)
+#         plt.subplots_adjust(bottom=0.15)
+#         plt.savefig(self.path())
+#         plt.close()
 
-    def markdown(self):
-        path = self.GITHUB_FOLDER.format(self.filename())
-        return '![]{}'.format(path)
-
-
-def make_sparks(df, save=False):
-    df = df.drop(['year', 'month'], 1)
-    for vn in df.columns:
-        ts = df[vn]
-        Sparkline(ts).save()
+#     def markdown(self):
+#         path = self.GITHUB_FOLDER.format(self.filename())
+#         return '![]{}'.format(path)
 
 
-# TODO: make quarterly spark pngs
+# def make_sparks(df, save=False):
+#     df = df.drop(['year', 'month'], 1)
+#     for vn in df.columns:
+#         ts = df[vn]
+#         Sparkline(ts).save()
 
-if __name__ == "__main__":
-    make_sparks(dfm)
-    # print(md1)
-    # print(md2)
-    # print(md3)
-    pass
+
+# # TODO: make quarterly spark pngs
+
+# if __name__ == "__main__":
+#     make_sparks(dfm)
+#     # print(md1)
+#     # print(md2)
+#     # print(md3)
+#     pass

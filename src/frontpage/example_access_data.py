@@ -24,35 +24,31 @@ import pandas as pd
 
 
 def get_dataframe(freq):
-    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-csv2df/master/data/processed/latest/{}"
-    filename = "df{}.csv".format(freq)
-    url = url_base.format(filename)
-    return pd.read_csv(url, 
-                       converters={'time_index': pd.to_datetime},
-                       index_col='time_index')
+    url = get_url(freq)
+    df = pd.read_csv(url) 
+                       # converters={'time_index': pd.to_datetime},
+                       # index_col='time_index')
+    return df
 
-
-dfa = get_dataframe('a')
-dfq = get_dataframe('q')
-dfm = get_dataframe('m')
 
 def read_csv(source):
     """Canonical wrapper for pd.read_csv"""
-    return pd.read_csv(source, 
-                       converters={'time_index': pd.to_datetime},
-                       index_col='time_index')
+    df = pd.read_csv(source)
+                       # converters={'time_index': pd.to_datetime},
+                       # index_col='time_index')
+    return df
 
 
 def get_url(freq):
     """Make URL for CSV files by frequency."""
-    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-csv2df/master/data/processed/latest/{}"
+    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
     filename = "df{}.csv".format(freq)
     return url_base.format(filename)
 
 
 def get_dfs_from_web():
     """Get three dataframes from local csv files"""
-    dfa = read_csv(get_url('a'))
-    dfq = read_csv(get_url('q'))
-    dfm = read_csv(get_url('m'))
+    dfa = get_dataframe('a')
+    dfq = get_dataframe('q')
+    dfm = get_dataframe('m')
     return dfa, dfq, dfm
