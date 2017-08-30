@@ -33,12 +33,4 @@ frontpage\.sparkline module
     :undoc-members:
     :show-inheritance:
 
-frontpage\.to\_markdown module
-------------------------------
-
-.. automodule:: frontpage.to_markdown
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
 

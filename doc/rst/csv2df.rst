@@ -6,13 +6,6 @@ csv2df package
     :undoc-members:
     :show-inheritance:
 
-Subpackages
------------
-
-.. toctree::
-
-    csv2df.tests
-
 Submodules
 ----------
 

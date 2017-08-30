@@ -116,15 +116,13 @@ def rst(ctx):
             ('locations', ''),
             ('download', ''),
             ('word2csv', ''),
-            ('csv2df', '*tests/*'),
-            ('frontpage', '*markdown/*')
+            ('csv2df', '*tests*')
+            #,('frontpage', '*markdown*')
     ]
 
     for args in args_list:        
         command = apidoc(*args)
         ctx.run(command)
-
-
 
 
 @task
@@ -136,10 +134,9 @@ def doc(ctx):
     # for paarmeters may add: 
     #     -aE - to overwrite files 
     build_command = f'sphinx-build -b html {source_dir} {html_dir}' 
-    if platform=="linux":
-        ctx.run(build_command)
-    else:
-        ctx.run(build_command)
+    
+    ctx.run(build_command)    
+    if platform=="win32":        
         ctx.run('start {}'.format(index_html))
 
 @task

@@ -12,5 +12,5 @@ and saves them as [CSV files at stable URL][backend].
    - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
    - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
 
-helped by:       
-   - **frontpage**: generate png graphs and markdown tables
+[comment]: <> (helped by:)       
+[comment]: <> (   - **frontpage**: generate png graphs and markdown tables for github)

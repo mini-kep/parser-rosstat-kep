@@ -15,9 +15,11 @@ Documentation by package
     word2csv
     csv2df
 
+..    frontpage
 
-Doctring review
-===============
+
+Docstring review
+================
 
 locations
 ---------
@@ -40,6 +42,7 @@ csv2df
 ------
 
 .. automodule:: csv2df
+
 
 csv2df.helpers
 ~~~~~~~~~~~~~~
@@ -92,6 +95,3 @@ csv2df.util_row_splitter
     
 
 .. include:: glossary.rst
-
-
-
