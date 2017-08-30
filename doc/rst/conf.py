@@ -35,7 +35,8 @@ sys.path.insert(0, abs_path)
 extensions = ['sphinx.ext.autodoc',
               'sphinx.ext.napoleon',
               'sphinx.ext.todo',
-              'sphinx.ext.viewcode']
+              'sphinx.ext.viewcode',
+              'm2r']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -44,7 +45,14 @@ templates_path = ['_templates']
 # You can specify multiple suffix as a list of string:
 #
 # source_suffix = ['.rst', '.md']
-source_suffix = '.rst'
+#from recommonmark.parser import CommonMarkParser
+#
+#source_parsers = {
+#    '.md': CommonMarkParser,
+#}
+
+source_suffix = ['.rst', '.md']
+
 
 # The master toctree document.
 master_doc = 'index'

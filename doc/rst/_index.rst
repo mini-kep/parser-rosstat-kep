@@ -16,7 +16,10 @@ mini-kep documentation
     csv2df
     frontpage
 
-.. include:: _intro.rst
+.. mdinclude:: concept.md
+
+.. include:: readme.rst
+
 
 locations
 ---------

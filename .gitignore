@@ -1,8 +1,7 @@
 *.html
 *.doc
 *.rar
-doc/_static
-doc/_build
+doc/html/
 doc2/
 
 # Byte-compiled / optimized / DLL files
