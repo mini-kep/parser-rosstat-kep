@@ -39,7 +39,7 @@ def read_csv(source):
 
 def get_url(freq):
     """Make URL for CSV files by frequency."""
-    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-csv2df/master/data/processed/latest/{}"
+    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
     filename = "df{}.csv".format(freq)
     return url_base.format(filename)
 
