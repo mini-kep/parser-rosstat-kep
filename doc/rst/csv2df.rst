@@ -25,10 +25,10 @@ csv2df\.helpers module
     :undoc-members:
     :show-inheritance:
 
-csv2df\.parcer module
+csv2df\.parser module
 ---------------------
 
-.. automodule:: csv2df.parcer
+.. automodule:: csv2df.parser
     :members:
     :undoc-members:
     :show-inheritance:

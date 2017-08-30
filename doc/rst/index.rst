@@ -62,10 +62,10 @@ csv2df.reader
 .. automodule:: csv2df.reader
 
 
-csv2df.parcer
+csv2df.parser
 ~~~~~~~~~~~~~
 
-.. automodule:: csv2df.parcer
+.. automodule:: csv2df.parser
 
 
 csv2df.runner
