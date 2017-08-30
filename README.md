@@ -70,9 +70,8 @@ Basically this command downloads a rar file from Rosstat, unpacks MS Word files,
 to an interim CSV file, parses interim CSV file to dataframes by frequency and saves dataframes as processed CSV files.
 
 I also manually update *csv2df.helpers.DATES* until there is a [better date handler](https://github.com/epogrebnyak/mini-kep/issues/82).    
- Working on adding [some graphs for newer data](https://github.com/epogrebnyak/mini-kep/issues/78).
  
- See [DEV.md](https://github.com/epogrebnyak/mini-kep/blob/master/DEV.md) for development notes/roadmap. 
+See [DEV.md](https://github.com/epogrebnyak/mini-kep/blob/master/DEV.md) for development notes/roadmap. 
 
 
 
