@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
-import pandas as pd
+import pytest
 from io import StringIO
-import sys
+
+from issues import todo_df_check
+import pandas as pd
 
 
 def to_dataframe(text):
@@ -71,139 +73,33 @@ dfa = to_dataframe(dfa_text)
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
 
-# TODO <https://github.com/epogrebnyak/mini-kep/issues/61>
-
-# Check on resulting dataframes dfa, dfq, dfm based on following rules:
-#  1. absolute values by month/qtr accumulate to qtr/year (with some delta for rounding)
-#  2. rog rates accumulate to yoy (with some delta for rounding)
-#  3. formulate other checks 
 
 
-# checking 1
+class Test_Check_Time_Period:
+
+    def test_month_to_year(self):
+        columns_to_test = ['IMPORT_GOODS_bln_usd', 'INDPRO_rog', 'INDPRO_yoy', 'INVESTMENT_rog',
+                           'RETAIL_SALES_FOOD_bln_rub', 'RETAIL_SALES_NONFOOD_bln_rub', 'RETAIL_SALES_bln_rub']
+
+        for column in columns_to_test:
+            assert (todo_df_check.check_month_to_year(dfm, dfq, dfa, 0.15, column) == True)
+
+    def test_month_to_qtr(self):
+        columns_to_test = ['IMPORT_GOODS_bln_usd', 'INDPRO_rog', 'INDPRO_yoy', 'INVESTMENT_rog', 'RETAIL_SALES_FOOD_bln_rub', 'RETAIL_SALES_NONFOOD_bln_rub', 'RETAIL_SALES_bln_rub']
+
+        for column in columns_to_test:
+            assert (todo_df_check.check_month_to_qtr(dfm, dfq, dfa, 0.15, column) == True)
 
 
-BAD_RESULT = pd.DataFrame({'A': [1]})
+    def test_qtr_to_year(self):
+        columns_to_test = ['IMPORT_GOODS_bln_usd', 'INDPRO_rog', 'INDPRO_yoy', 'INVESTMENT_rog',
+                           'RETAIL_SALES_FOOD_bln_rub', 'RETAIL_SALES_NONFOOD_bln_rub', 'RETAIL_SALES_bln_rub']
+
+        for column in columns_to_test:
+            assert (todo_df_check.check_qtr_to_year(dfm, dfq, dfa, 0.15, column) == True)
 
 
-def check_month_to_year(month_frame, quarter_frame, year_frame, acceptable_error,
-                        variable_to_check='EXPORT_GOODS_bln_usd'):
-    """
-        Check consistency sum of particular column in month_frame and year_frame
-
-        Args:
-             month: month data frame
-             quarter_frame: quarter data frame.
-             year_frame: year data frame
-             acceptable_error: acceptable_error of consistency
-             variable_to_check: column_name which we will check
-
-        Returns:
-            True, if we have not found unconsistent entry else: False
-     """
-
-    try:
-        monthly = month_frame[variable_to_check]
-        annual = year_frame[variable_to_check]
-
-        month_to_year = monthly.resample('A').sum()
-        month_to_year.index += pd.offsets.YearEnd()
-
-        error_month_to_year = (month_to_year - annual).abs()
-
-        error_month_to_year.dropna(inplace=True)
-
-        return error_month_to_year.where(error_month_to_year >= acceptable_error).dropna().empty
-
-    #        assert (error_month_to_year < acceptable_error).all()
-
-    except KeyError:
-        pass
-
-    return False
-
-
-def check_month_to_qtr(month_frame, quarter_frame, year_frame, acceptable_error,
-                       variable_to_check='EXPORT_GOODS_bln_usd'):
-    """
-        Check consistency sum of particular column in month_frame and year_frame
-
-        Args:
-             month: month data frame
-             quarter_frame: quarter data frame.
-             year_frame: year data frame
-             acceptable_error: acceptable_error of consistency
-             variable_to_check: column_name which we will check
-
-        Returns:
-            True, if we have not found unconsistent entry else: False
-     """
-
-    try:
-        monthly = month_frame[variable_to_check]
-        qtr = quarter_frame[variable_to_check]
-
-        month_to_qtr = monthly.resample('QS').sum()
-        month_to_qtr.index += pd.offsets.QuarterEnd()
-        error_month_to_qtr = (month_to_qtr - qtr).abs()
-        error_month_to_qtr.dropna(inplace=True)
-
-        return error_month_to_qtr.where(error_month_to_qtr >= acceptable_error).dropna().empty
-
-    #        assert (error_month_to_qtr < acceptable_error).all()
-
-    except KeyError:
-        pass
-
-    return False
-
-
-def check_qtr_to_year(month_frame, quarter_frame, year_frame, acceptable_error,
-                      variable_to_check='EXPORT_GOODS_bln_usd'):
-    """
-        Check consistency sum of particular column in month_frame and year_frame
-
-        Args:
-             month: month data frame
-             quarter_frame: quarter data frame.
-             year_frame: year data frame
-             acceptable_error: acceptable_error of consistency
-             variable_to_check: column_name which we will check
-
-        Returns:
-            True, if we have not found unconsistent entry else: False
-    """
-
-    try:
-        qtr = quarter_frame[variable_to_check]
-        annual = year_frame[variable_to_check]
-
-        qtr_to_year = qtr.resample('A').sum()
-        qtr_to_year.index += pd.offsets.YearEnd()
-        error_qtr_to_year = (qtr_to_year - annual).abs()
-        error_qtr_to_year.dropna(inplace=True)
-
-        return error_qtr_to_year.where(error_qtr_to_year >= acceptable_error).dropna().empty
-
-    except KeyError:
-        pass
-
-    return False
 
 
 if __name__ == "__main__":
-
-
-    columns_passed = [column for column in dfm.columns
-                      if check_month_to_year(dfm, dfq, dfa, 0.15, column)]
-
-    print("Column passed for month->year ", columns_passed)
-
-    columns_passed = [column for column in dfm.columns
-                      if check_month_to_qtr(dfm, dfq, dfa, 0.1, column)]
-
-    print("Column passed for month->qtr ", columns_passed)
-
-    columns_passed = [column for column in dfm.columns
-                      if check_qtr_to_year(dfm, dfq, dfa, 0.15, column)]
-
-    print("Column passed for qtr->year ", columns_passed)
+    pytest.main([__file__])
