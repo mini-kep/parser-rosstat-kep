@@ -1,7 +1,10 @@
 import pytest
-from csv2df.helpers import PathHelper
 from pathlib import Path
 import pandas as pd
+from io import StringIO
+
+from csv2df.helpers import PathHelper
+
 
 # regression tests - after bug fixes on occasional errors
 
@@ -15,7 +18,10 @@ def test_time_index_is_included_in_access():
        return str(folder / "df{}.csv".format(freq))
    
     for freq in 'aqm':
-        df = pd.read_csv(make_path('a'))
+        # a workaround for Windows problem https://github.com/pandas-dev/pandas/issues/15086
+        content = Path(make_path(freq)).read_text() 
+        filelike = StringIO(content)        
+        df = pd.read_csv(filelike)
         assert df.columns[0] == 'time_index'
 
 def test_csv_has_no_null_byte():
