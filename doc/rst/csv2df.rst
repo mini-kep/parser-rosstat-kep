@@ -6,7 +6,3 @@ csv2df package
     :undoc-members:
     :show-inheritance:
 
-Submodules
-----------
-
-.. include:: rich_menu_csv2df.rst
