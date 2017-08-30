@@ -35,12 +35,9 @@ and little glossary [here](https://github.com/epogrebnyak/mini-kep/blob/master/d
 
 # How can I download macroeconomic indicators from here?
 
-You can use macroeconomic indicators in your python code as shown below or 
-get latest data as Excel file [kep.xlsx](https://github.com/epogrebnyak/mini-kep/issues/70)
-
 ```python
 
-def get_dataframe(freq):
+def get_dataframe_from_web(freq):
     url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
     filename = "df{}.csv".format(freq)
     url = url_base.format(filename)
@@ -48,14 +45,18 @@ def get_dataframe(freq):
                        converters={'time_index': pd.to_datetime},
                        index_col='time_index')
 
-dfa = get_dataframe('a')
-dfq = get_dataframe('q')
-dfm = get_dataframe('m')
+dfa = get_dataframe_from_web('a')
+dfq = get_dataframe_from_web('q')
+dfm = get_dataframe_from_web('m')
 ```
 
 Check more access methods [in example here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example_access_data.py).
 
+# Can I have this data as Excel file?
 
+ Here it is: [kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true), 
+ but the real benefit is when you work with it in pandas, R or econometric package.
+ 
 # How do you update this repo?
 
 Around [this schedule](http://www.gks.ru/gis/images/graf-oper2017.htm) on a Windows machine I run:   
