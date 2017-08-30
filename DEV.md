@@ -2,14 +2,6 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8a467743314641b4a22b66b327834367)](https://www.codacy.com/app/epogrebnyak/mini-kep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=epogrebnyak/mini-kep&amp;utm_campaign=Badge_Grade)
 [![Documentation Status](https://readthedocs.org/projects/mini-kep-parcer-for-rosstat-kep-publication/badge/?version=latest)](http://mini-kep-parcer-for-rosstat-kep-publication.readthedocs.io/en/latest/?badge=latest)
            
-Development 
-===========
-
-- [mini-kep] inspired by [FRED](https://fred.stlouisfed.org/) and [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science)
-- *data-rosstat-kep* is ancestor to *mini-kep*
-- project documentation is [here](http://mini-kep-docs.s3-website-eu-west-1.amazonaws.com)
-- project glossary is [here](http://mini-kep-parcer-for-rosstat-kep-publication.readthedocs.io/en/latest/)
-
   
 Active tasks 
 ============
