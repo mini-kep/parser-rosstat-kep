@@ -1,24 +1,23 @@
-.. kep documentation master file, created by
-   sphinx-quickstart on Sun Jul 23 02:39:55 2017.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
-
-
 mini-kep documentation
 ======================
 
+.. mdinclude:: concept.md
+
+
+Documentation by module 
+=======================
+
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
    
     locations  
     download
     word2csv
     csv2df
-    frontpage
-    glossary
 
-.. mdinclude:: concept.md
 
+Doctring review
+===============
 
 locations
 ---------
@@ -40,7 +39,7 @@ word2csv
 csv2df
 ------
 
-.. include:: _pseudocode.rst
+.. automodule:: csv2df
 
 csv2df.helpers
 ~~~~~~~~~~~~~~
@@ -88,6 +87,11 @@ csv2df.util_row_splitter
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. automodule:: csv2df.util_row_splitter
+
+
+    
+
+.. include:: glossary.rst
 
 
 

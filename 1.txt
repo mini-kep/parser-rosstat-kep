@@ -1,0 +1,20 @@
+Running Sphinx v1.6.3
+loading translations [en]... done
+loading pickled environment... done
+building [mo]: targets for 0 po files that are out of date
+building [html]: targets for 0 source files that are out of date
+updating environment: 0 added, 1 changed, 0 removed
+reading sources... [100%] csv2df                                               
+looking for now-outdated files... none found
+pickling environment... done
+checking consistency... done
+preparing documents... done
+writing output... [ 50%] csv2df                                                writing output... [100%] index                                                 
+generating indices... genindex py-modindex
+highlighting module code... [  6%] csv2df.emitter                              highlighting module code... [ 13%] csv2df.helpers                              highlighting module code... [ 20%] csv2df.parcer                               highlighting module code... [ 26%] csv2df.reader                               highlighting module code... [ 33%] csv2df.runner                               highlighting module code... [ 40%] csv2df.specification                        highlighting module code... [ 46%] csv2df.util_label                           highlighting module code... [ 53%] csv2df.util_row_splitter                    highlighting module code... [ 60%] csv2df.validator                            highlighting module code... [ 66%] download.download                           highlighting module code... [ 73%] frontpage.to_markdown                       highlighting module code... [ 80%] locations.folder                            highlighting module code... [ 86%] pathlib                                     highlighting module code... [ 93%] locations.test_folder                       highlighting module code... [100%] word2csv.word                               
+writing additional pages... search
+copying static files... done
+copying extra files... done
+dumping search index in English (code: en) ... done
+dumping object inventory... done
+build succeeded, 11 warnings.

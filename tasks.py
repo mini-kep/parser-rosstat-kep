@@ -97,35 +97,35 @@ def rst_rich_menu(ctx, root='csv2df', all=None):
         f.writelines( menu )
 
 
+def apidoc(pkg, exclude=''):
+    """Call sphinx-apidoc to document *pkg* package without files 
+       in *exclude* pattern. """
+    rst_source_dir = os.path.join('doc', 'rst')  
+    pkg_dir = os.path.join('src', pkg) 
+    flags = '--module-first --no-toc --force'   
+    return f'sphinx-apidoc {flags} -o {rst_source_dir} {pkg_dir} {exclude}'
+
+
 @task
 def rst(ctx):
-    # build new rst files with sphinx
-    # FIXME: must check / appearance issues:
+    """Build new rst files with sphinx"""
+    
+    #FIXME: must exclude tests everywhere
+    
+    args_list = [
+            ('locations', ''),
+            ('download', ''),
+            ('word2csv', ''),
+            ('csv2df', '*tests/*'),
+            ('frontpage', '*markdown/*')
+    ]
 
-    # ctx.run("sphinx-apidoc -efM -o doc src/csv2df src/csv2df/tests")
+    for args in args_list:        
+        command = apidoc(*args)
+        ctx.run(command)
 
-    packages = ['download',
-                'word2csv',
-                'csv2df src/csv2df/tests', # second param lists excluded dir
-                'frontpage src/frontpage/markdown']
 
-    for pkg in packages:
-        ctx.run("sphinx-apidoc -efM -o doc src/"+pkg)
 
-    # inject modules_menu
-    def inject_modules_menu(linkfrom="csv2df", linkto="csv2df"):
-        txt = open(PROJECT_DIR / "doc" / f"{linkfrom}.rst").read()
-        separator = """\nSubmodules\n----------\n\n"""
-        first_part = txt.split(separator)[0]
-
-        with open(PROJECT_DIR / "doc" / f"{linkfrom}.rst", 'w') as f:
-            f.writelines( first_part + separator + f".. include:: rich_menu_{linkto}.rst")
-
-    inject_modules_menu()
-
-    # may comment this if csv2df module names don't change..
-    rst_rich_menu(ctx, "csv2df") # regenerate rich_menu_csv2df.rst
-    rst_rich_menu(ctx, "", all=['download', 'word2csv', 'csv2df', 'frontpage'] ) # regenerate rich_menu_.rst
 
 @task
 def doc(ctx):
@@ -144,7 +144,7 @@ def doc(ctx):
 
 @task
 def github(ctx):
-    ctx.run("start https://github.com/epogrebnyak/mini-csv2df")
+    ctx.run("start https://github.com/epogrebnyak/mini-kep")
 
 
 @task
@@ -219,7 +219,9 @@ if platform == 'win32':
 
 
 if __name__ == '__main__':
-    _add(2017, 6)
+    #_add(2017, 6)
+    print(apidoc('download'))
+    
 
 ##########################################################################
 # GLOBALS                                                                       #

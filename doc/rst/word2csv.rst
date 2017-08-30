@@ -1,7 +1,7 @@
-download package
+word2csv package
 ================
 
-.. automodule:: download
+.. automodule:: word2csv
     :members:
     :undoc-members:
     :show-inheritance:
@@ -9,10 +9,10 @@ download package
 Submodules
 ----------
 
-download\.download module
--------------------------
+word2csv\.word module
+---------------------
 
-.. automodule:: download.download
+.. automodule:: word2csv.word
     :members:
     :undoc-members:
     :show-inheritance:

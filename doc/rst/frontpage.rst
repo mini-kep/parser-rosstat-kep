@@ -9,10 +9,36 @@ frontpage package
 Submodules
 ----------
 
-.. toctree::
+frontpage\.make\_frontpage\_1 module
+------------------------------------
 
-   frontpage.make_frontpage_1
-   frontpage.make_frontpage_2
-   frontpage.sparkline
-   frontpage.to_markdown
+.. automodule:: frontpage.make_frontpage_1
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+frontpage\.make\_frontpage\_2 module
+------------------------------------
+
+.. automodule:: frontpage.make_frontpage_2
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+frontpage\.sparkline module
+---------------------------
+
+.. automodule:: frontpage.sparkline
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+frontpage\.to\_markdown module
+------------------------------
+
+.. automodule:: frontpage.to_markdown
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 

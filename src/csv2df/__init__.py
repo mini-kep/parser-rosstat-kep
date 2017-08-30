@@ -9,7 +9,7 @@ An input may be a CSV like this:
       1999  4823    901     1102    1373    1447 
       2000  7306    1527    1697    2038    2044  
   
-Such input will result in thwo dataframes, with annual and quarterly frequency:
+Such input will result in two dataframes, with annual and quarterly frequency:
 
 :: 
 
