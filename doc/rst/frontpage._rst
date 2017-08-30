@@ -1,0 +1,36 @@
+frontpage package
+=================
+
+.. automodule:: frontpage
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+Submodules
+----------
+
+frontpage\.make\_frontpage\_1 module
+------------------------------------
+
+.. automodule:: frontpage.make_frontpage_1
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+frontpage\.make\_frontpage\_2 module
+------------------------------------
+
+.. automodule:: frontpage.make_frontpage_2
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+frontpage\.sparkline module
+---------------------------
+
+.. automodule:: frontpage.sparkline
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+

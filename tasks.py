@@ -74,34 +74,76 @@ def lint(ctx, folder="src/csv2df"):
 
 
 @task
+def rst_rich_menu(ctx, root='csv2df', all=None):
+    """get docs of each module  in root package (__all__ or defined in params)
+    and  generate TOC menu: link with docs below in "rich_menu_{root}.rst"
+    """
+
+    srcdir = str( PROJECT_DIR / "src" )
+    sys.path.append( srcdir )
+
+    if not all:
+        pkg = __import__( root )
+        all = pkg.__all__
+
+    # generate menu..
+    menu =  []
+    for modname in all:
+        fullname = f"{root}.{modname}" if root else modname
+        docs = f"    .. automodule:: {fullname}"
+        menu.append( f""":doc:`{fullname}` \n{docs}\n""" )
+        print( modname )  # show progress
+
+    with open( PROJECT_DIR / "doc" / f"rich_menu_{root}.rst", 'w') as f:
+        f.writelines( menu )
+
+
+def apidoc(pkg, exclude=''):
+    """Call sphinx-apidoc to document *pkg* package without files 
+       in *exclude* pattern. """
+    rst_source_dir = os.path.join('doc', 'rst')  
+    pkg_dir = os.path.join('src', pkg) 
+    flags = '--module-first --no-toc --force'   
+    return f'sphinx-apidoc {flags} -o {rst_source_dir} {pkg_dir} {exclude}'
+
+
+@task
 def rst(ctx):
-    # build new rst files with sphinx
-    # FIXME: must check / appearance issues:
-    
-    ctx.run("sphinx-apidoc -efM -o doc src\csv2df *test_*")
-    
-    
+    """Build new rst files with sphinx"""
+    args_list = [
+            ('locations', ''),
+            ('download', ''),
+            ('word2csv', ''),
+            ('csv2df', '*tests*')
+            #,('frontpage', '*markdown*')
+    ]
+
+    for args in args_list:        
+        command = apidoc(*args)
+        ctx.run(command)
+
 @task
 def doc(ctx):
-    ctx.run("doc\make.bat html")
-    ctx.run("start doc\_build\html\index.html")
-    # TODO: 
-    # upload all files from doc\_build\html\ 
-    # to aws https://mini-kep-docs.s3.amazonaws.com/
-    # mini-csv2df-docs + is region neded?
-
+    source_dir = os.path.join('doc', 'rst') 
+    html_dir = os.path.join('doc', 'html') 
+    index_html = os.path.join(html_dir, 'index.html')
+    # call without parameters
+    # for paarmeters may add: 
+    #     -aE - to overwrite files 
+    build_command = f'sphinx-build -b html {source_dir} {html_dir}' 
+    ctx.run(build_command)    
+    if platform=="win32":        
+        ctx.run('start {}'.format(index_html))
 
 @task
 def github(ctx):
-    ctx.run("start https://github.com/epogrebnyak/mini-csv2df")
+    ctx.run("start https://github.com/epogrebnyak/mini-kep")
 
 
 @task
 def test(ctx):
     ctx.run("py.test") #--cov=csv2df
 
-# TODO:
-# coverage annotate -d csv2df\tests\annotate -i csv2df/runner.py
 
 @task
 def cov(ctx):
@@ -168,7 +210,9 @@ if platform == 'win32':
 
 
 if __name__ == '__main__':
-    _add(2017, 6)
+    #_add(2017, 6)
+    print(apidoc('download'))
+    
 
 ##########################################################################
 # GLOBALS                                                                       #
