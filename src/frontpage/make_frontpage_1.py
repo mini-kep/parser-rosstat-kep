@@ -22,7 +22,7 @@ monthy_images = files_dir / "_images_paths.md"
 
 # import cfg
 from to_markdown import to_markdown
-import access_data
+import example_access_data as access_data
 
 # TABLE 1 - Sections with required varnames
 # FIXME: cfg.yield_variable_descriptions_with_subheaders
@@ -41,16 +41,16 @@ def bold(s):
 #             yield([desc[label], label])
 
 
-md1 = to_markdown(body=yield_variable_descriptions_with_subheaders(),
-                  header=["Показатель", "Код"])
-sections_file.write_text(md1)
+# md1 = to_markdown(body=yield_variable_descriptions_with_subheaders(),
+#                   header=["Показатель", "Код"])
+# sections_file.write_text(md1)
 # print(md1)
 
 # TABLE 2 - latest values for all monthly variables
 # https://github.com/epogrebnyak/data-rosstat-kep/blob/47229a4e668dbaee31dfb6419f510abe13d0d9a3/frontpage.py#L120-L153
 # or local old/frontpage.py#L120-L153
 
-dfa, dfq, dfm = access_data.get_dfs()
+dfa, dfq, dfm = access_data.get_dfs_from_web()
 
 # generate with latest values from monthly dataframe
 
