@@ -1,14 +1,11 @@
 import pytest
-import tempfile
 
 import io
-import os
-import pandas as pd
 
 from csv2df.specification import Definition, Specification
 from csv2df.reader import Reader
 from csv2df.parser import extract_tables
-from csv2df.runner import Emitter, get_dataframes, to_xls
+from csv2df.runner import Emitter, get_dataframes
 
 # input data
 csvfile1 = io.StringIO("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
@@ -42,12 +39,6 @@ def test_get_dataframes():
     assert dfq_.equals(dfq)
     assert dfm_.equals(dfm)
     
-def test_write_xls_writes_some_xlsx_file():    
-    fn = os.path.join(tempfile.gettempdir(), '123.xlsx')
-    df = pd.DataFrame()
-    to_xls(fn, df, df, df)    
-    os.remove(fn)    
-
 
 # TODO: implement tests
 @pytest.mark.skip("Only a sceleton.")

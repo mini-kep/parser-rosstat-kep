@@ -7,6 +7,7 @@ from pathlib import Path
 import shutil
 
 CSV_FILENAME = 'tab.csv'
+XL_FILENAME = 'kep.xlsx'
 
 def find_repo_root():
     """Returns root folder for repository.
@@ -19,11 +20,11 @@ def find_repo_root():
     levels_up = 2 
     return Path(__file__).parents[levels_up] 
     
-def md(folder, i = 0):
+def md(folder, i=0):
     """Create *folder* if not exists.
        Also create parent folder if not exists."""
     if i > 3:
-        ValueError("Cannot create path, it is too deep: {}".format(folder))
+        ValueError("Cannot create path, iteration too deep: {}".format(folder))
     if not folder.exists():
         parent = folder.parent
         if not parent.exists():
@@ -36,6 +37,13 @@ def get_unrar_binary():
     unrar_filename = "UnRAR.exe"
     return str(root / 'bin' / unrar_filename)
 
+def get_xl_filepath():
+    root = find_repo_root()
+    return str(root / 'output' / XL_FILENAME) 
+
+def get_latest_csv(freq):
+    return str(FolderBase.latest / "df{}.csv".format(freq))
+    
 
 class FolderBase:
     root = find_repo_root()
