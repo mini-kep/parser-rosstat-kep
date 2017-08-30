@@ -22,6 +22,7 @@ These calls should give similar results:
     Collection.approve_latest()
     Collection.approve_all()
 """
+import pandas as pd
 
 from csv2df.helpers import DateHelper, PathHelper
 from csv2df.specification import SPEC
@@ -53,6 +54,16 @@ def get_dataframes(csvfile, spec=SPEC):
     return dfa, dfq, dfm
 
 
+def to_xls(filepath, dfa, dfq, dfm):
+    """Save dataframes *dfa, dfq, dfm* in .xlsx *filepath*."""
+    with pd.ExcelWriter(filepath) as writer:
+        dfa.to_excel(writer, sheet_name='year')
+        dfq.to_excel(writer, sheet_name='quarter')
+        dfm.to_excel(writer, sheet_name='month')
+        #TODO: add variable names
+        #self.df_vars().to_excel(writer, sheet_name='variables') 
+
+
 class Vintage:
     """Represents dataset release for a given year and month."""
 
@@ -73,8 +84,8 @@ class Vintage:
         self.dfq.to_csv(folder_path / 'dfq.csv')
         self.dfm.to_csv(folder_path / 'dfm.csv')
         print("Saved dataframes to", folder_path)
-        return True
-
+        return True  
+                   
     def validate(self):
         checker = Validator(self.dfa, self.dfq, self.dfm)
         checker.run()
