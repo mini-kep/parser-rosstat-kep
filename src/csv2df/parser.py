@@ -15,6 +15,7 @@ from csv2df.util_label import make_label
 
 __all__ = ['extract_tables']
 
+
 def extract_tables(csv_segment, pdef):
     """Extract tables from *csv_segment* list Rows instances using
        *pdef* parsing defintion.
@@ -25,11 +26,13 @@ def extract_tables(csv_segment, pdef):
     verify_tables(tables, pdef)
     return [t for t in tables if t.label in pdef.required]
 
-def parse_tables(tables, pdef): 
+
+def parse_tables(tables, pdef):
     # parse tables to obtain labels - set label and splitter
     tables = [t.set_label(pdef.varnames_dict, pdef.units_dict) for t in tables]
     tables = [t.set_splitter(pdef.funcname) for t in tables]
     # assign trailing units
+
     def fix_multitable_units(tables):
         """For tables without *varname*-  copy *varname* from previous table.
            Applies to tables where all rows are known rows.
@@ -40,11 +43,13 @@ def parse_tables(tables, pdef):
     fix_multitable_units(tables)
     return tables
 
+
 def verify_tables(tables, pdef):
     _labels_in_tables = [t.label for t in tables]
     _labels_missed = [x for x in pdef.required if x not in _labels_in_tables]
     if _labels_missed:
-        import pdb; pdb.set_trace()
+        import pdb
+        pdb.set_trace()
         raise ValueError("Missed labels: {}".format(_labels_missed))
 
 # classes for split_to_tables()
@@ -160,7 +165,7 @@ if __name__ == "__main__":
 
     csv_path = PathHelper.locate_csv()
     csvfile = reader.open_csv(csv_path)
-    parsed_tables = []    
+    parsed_tables = []
     for csv_segment, pdef in reader.Reader(csvfile, spec.SPEC).items():
         tables = extract_tables(csv_segment, pdef)
         parsed_tables.extend(tables)

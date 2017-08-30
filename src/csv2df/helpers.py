@@ -78,7 +78,6 @@ class Folder(FolderBase):
         return "Folder({}, {})".format(self.year, self.month)
 
 
-
 class PathHelper:
     def locate_csv(year: int=None, month: int=None):
         """Return interim CSV file based on *year* and *month*. Defaults to
@@ -148,4 +147,3 @@ def init_dirs(supported_dates=None):
 
 if __name__ == "__main__":
     init_dirs()
-

@@ -3,6 +3,7 @@ import csv2df.util_label as label
 
 # TODO: add variable name with underscore, like GOV_EXPENSE
 
+
 def test_make_label():
     assert label.make_label('GDP', 'bln_rub') == 'GDP_bln_rub'
     assert label.make_label('GDP', 'rog') == 'GDP_rog'

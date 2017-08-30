@@ -1,6 +1,9 @@
-"""
+"""Key examples to csv2df parser.
+
+Workflow as follows (doc/pseudo.rst)
+
 +----------------------------------------------+--------------------------+
-| Step                                         | Actor                    |
+| Step                                         | Call                     |
 +==============================================+==========================+
 | 1. Open csv file as connection               | reader.open_csv()        |
 +----------------------------------------------+--------------------------+
@@ -12,8 +15,8 @@
 | 4. Supply segment and a parsing definition   |                          |
 |    for further processing                    |                          |
 +----------------------------------------------+--------------------------+
-| 5. Group rows to tables                      |                          |
-|                                              | parcer.extract_tables()  |
+| 5. Create Table instances from rows          |                          |
+|                                              | parser.extract_tables()  |
 +----------------------------------------------+                          |
 | 6. Extract variable name and unit of         |                          |
 |    measurement from each table               |                          |
@@ -21,24 +24,26 @@
 | 7. Filter defined tables and check all       |                          |
 |    required variables were read              |                          |
 +----------------------------------------------+--------------------------+
-| 8. Submit tables to an emitter instance      |                          |
+| 8. Submit tables to Emitter instance         |                          |
 +----------------------------------------------+                          |
 | 9. Import datapoints from table datarows     | emitter.Emitter()        |
 |    by frequency                              |                          |
 +----------------------------------------------+                          |
-| 10. Create dataframes by frequency           |                          |
+| 10. Create dataframes from datapoints        |                          |
+|     by frequency                             |                          |
 +----------------------------------------------+--------------------------+
-| 11. Validate data in dataframes              | validator.Validator      |
+| 11. Validate data in dataframes              | validator.Validator()    |
 +----------------------------------------------+--------------------------+
-| 12. Save dataframes in csv files             | Vintage().save()         |
+| 12. Save dataframes as csv files             | Vintage().save()         |
 +----------------------------------------------+--------------------------+
 """
+
 import pandas as pd
 import io
 
 from csv2df.specification import Definition, Specification
 from csv2df.reader import Reader, open_csv
-from csv2df.parcer import extract_tables
+from csv2df.parser import extract_tables
 from csv2df.emitter import Emitter
 from csv2df.validator import Validator
 
@@ -50,13 +55,14 @@ def get_dataframes(csvfile, spec):
       csvfile (file connection or StringIO) - CSV file for parsing
       spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
     """
-    parsed_tables = []    
+    
     # Reader.items() yeild a tuple of csv file segment and its parsing definition
     #    csv_segment - list of reader.Row instances
     #    pdef - parsing definition is specification.Definition instance    
+    # We construct list of Table()'s from csv_segment and identify 
+    # variable names and units in each table 
+    parsed_tables = []    
     for csv_segment, pdef in Reader(csvfile, spec).items():
-        # construct list of Table()'s from csv_segment        
-        # and identify variable names and units in each table 
         tables = extract_tables(csv_segment, pdef)
         # accumulate results
         parsed_tables.extend(tables)
@@ -71,10 +77,12 @@ def get_dataframes(csvfile, spec):
     
 # Example 1. StringIO *csvfile1* is parsed with *spec1* instruction 
 
+#data
 csvfile1 = io.StringIO("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles					
 1999	4823	901	1102	1373	1447
 2000	7306	1527	1697	2038	2044""")
-# input instruction
+
+# parsing instruction
 main = Definition(units={'млрд.рублей':'bln_rub'})
 main.append(varname='GDP',
             text='Объем ВВП',
@@ -97,18 +105,17 @@ checker = Validator(dfa, dfq, dfm)
 for c in check_points:
     assert checker.is_included(c) 
 
-
-# Example 4 Read actual data by month and year
+# Example 3 Read actual data by month and year
 year, month = 2017, 5
 
-# 4.1 Access to csv file using path helper
+# 3.1 Access to csv file using path helper
 from csv2df.helpers import PathHelper
 from csv2df.specification import SPEC
 csv_path = PathHelper.locate_csv(year, month)
 with open_csv(csv_path) as csvfile:
     dfa1, dfq1, dfm1 = get_dataframes(csvfile, SPEC)
 
-# 4.2 Access to csv file using vintage class
+# 3.2 Access to csv file using Vintage class (identical to 3.1)
 from csv2df.runner import Vintage
 vint = Vintage(year, month)
 dfa2, dfq2, dfm2 = vint.dfs()
@@ -117,7 +124,7 @@ assert dfa1.equals(dfa2)
 assert dfq1.equals(dfq2)
 assert dfm1.equals(dfm2)
 
-# Example 5. Validation example
-vint.validate()
+# validation
+assert vint.validate()
 
 # LATER: parse several tables with a larger parsing definition (from test folder)

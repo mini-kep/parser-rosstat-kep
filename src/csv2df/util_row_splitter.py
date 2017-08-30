@@ -1,6 +1,9 @@
 """Splitter functions extract annual, quarterly and monthly values from data row."""
 
 
+__all__ = []  # TODO: (ID) Which classes/functions need to be added to __all__?
+
+
 def split_row_by_periods(row):
     """Values format:
        A Q Q Q Q M*12

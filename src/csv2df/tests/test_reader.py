@@ -8,8 +8,16 @@ from csv2df.reader import get_year, is_year, Row, RowStack
 # FIXME: is it ok to xfail missing tests?
 
 # FIXME: can I test open_csv? with a mock file?
+
+
 @pytest.mark.skip("don't know how to test this")
-def test_open_csv():    
+def test_open_csv():
+    assert 0
+
+
+# TODO: implement tests
+@pytest.mark.skip("Only a sceleton.")
+def test_reader():
     assert 0
 
 

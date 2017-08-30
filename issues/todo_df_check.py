@@ -65,28 +65,37 @@ dfm_text = """	year	month	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVI
 2000-12-31	2000	12	101.1	102.0	101.2	101.6	101.6	10.1	1960.1	1029.2	1032.1	2097.7	1132.1	1065.8	102.9	33.8	4.9			195.5	154.3	113.4	121.3	117.4	109.3	137.3	114.0	109.5	258.6	115.6	109.4	311.0	9.9	3025.0	118.8	113.4"""
 
 dfa = to_dataframe(dfa_text)
-assert dfa.index[0] == pd.Timestamp("1999-12-31")
+# assert dfa.index[0] == pd.Timestamp("1999-12-31")
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
 
-# TODO @MM <https://github.com/epogrebnyak/mini-kep/issues/61>
+# TODO <https://github.com/epogrebnyak/mini-kep/issues/61>
 
 # Check on resulting dataframes dfa, dfq, dfm based on following rules:
-#  - absolute values by month/qtr accumulate to qtr/year (with some delta for rounding)
-#  - rog rates accumulate to yoy (with some delta for rounding)
-#  - formulate other checks 
+#  1. absolute values by month/qtr accumulate to qtr/year (with some delta for rounding)
+#  2. rog rates accumulate to yoy (with some delta for rounding)
+#  3. formulate other checks 
 
-   
-sample_varnames = ['INVESTMENT_bln_rub', 'INVESTMENT_rog', 'INVESTMENT_yoy']
-simplified_varnames = ['val', 'rog', 'yoy']
-dfa = dfa[['INVESTMENT_bln_rub', 'INVESTMENT_yoy']]
-dfa.columns = ['val', 'yoy']
 
-dfq = dfq[sample_varnames]
-dfm = dfm[sample_varnames]
-dfq.columns = simplified_varnames
-dfm.columns = simplified_varnames
+#checking 1
+annual = dfa['EXPORT_GOODS_bln_usd']   
+qtr = dfq['EXPORT_GOODS_bln_usd']    
+monthly = dfm['EXPORT_GOODS_bln_usd']    
+month_to_qtr = monthly.resample('QS').sum()
+month_to_qtr.index += pd.offsets.QuarterEnd()
+error = (month_to_qtr - qtr).abs() 
+assert (error < 0.15).all()
 
-# EP: can now work with dfa, dfq, dfm 
-
-# ...
+#sample_varnames = ['INVESTMENT_bln_rub', 'INVESTMENT_rog', 'INVESTMENT_yoy']
+#simplified_varnames = ['val', 'rog', 'yoy']
+#dfa = dfa[['INVESTMENT_bln_rub', 'INVESTMENT_yoy']]
+#dfa.columns = ['val', 'yoy']
+#
+#dfq = dfq[sample_varnames]
+#dfm = dfm[sample_varnames]
+#dfq.columns = simplified_varnames
+#dfm.columns = simplified_varnames
+#
+## EP: can now work with dfa, dfq, dfm 
+#
+## ...

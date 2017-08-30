@@ -4,7 +4,7 @@ import os
 import inspect
 
 from sys import platform
-from os import environ, chdir
+from os import environ
 from pathlib import Path
 
 
@@ -72,6 +72,7 @@ def lint(ctx, folder="src/csv2df"):
     # --max-line-length=100
     ctx.run('flake8 {} --exclude test* --ignore E501'.format(folder))
 
+
 @task
 def rst_rich_menu(ctx, root='csv2df', all=None):
     """get docs of each module  in root package (__all__ or defined in params)
@@ -109,9 +110,6 @@ def apidoc(pkg, exclude=''):
 @task
 def rst(ctx):
     """Build new rst files with sphinx"""
-    
-    #FIXME: must exclude tests everywhere
-    
     args_list = [
             ('locations', ''),
             ('download', ''),
@@ -124,7 +122,6 @@ def rst(ctx):
         command = apidoc(*args)
         ctx.run(command)
 
-
 @task
 def doc(ctx):
     source_dir = os.path.join('doc', 'rst') 
@@ -134,7 +131,6 @@ def doc(ctx):
     # for paarmeters may add: 
     #     -aE - to overwrite files 
     build_command = f'sphinx-build -b html {source_dir} {html_dir}' 
-    
     ctx.run(build_command)    
     if platform=="win32":        
         ctx.run('start {}'.format(index_html))
@@ -148,8 +144,6 @@ def github(ctx):
 def test(ctx):
     ctx.run("py.test") #--cov=csv2df
 
-# TODO:
-# coverage annotate -d csv2df\tests\annotate -i csv2df/runner.py
 
 @task
 def cov(ctx):
@@ -205,7 +199,7 @@ def _add(year, month):
     
 
 ns = Collection()
-for t in [clean, pep8, ls, cov, test, doc, rst, github, lint, add, rst_rich_menu]:
+for t in [clean, pep8, ls, cov, test, doc, rst, github, lint, add]:
     ns.add_task(t)
 
 

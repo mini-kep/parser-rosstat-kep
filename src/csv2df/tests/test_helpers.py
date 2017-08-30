@@ -40,10 +40,10 @@ class Test_DateHelper:
         assert month <= 12
 
 
-
 @pytest.mark.skip(reason="not testing maintenance scripts yet")
 def test_init_dirs():
     assert False
+
 
 if __name__ == "__main__":
     pytest.main([__file__])
