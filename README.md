@@ -12,18 +12,25 @@ macroeconomic time series and saves them as [CSV files at stable URL][backend].
   [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
   [backend]: https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest
 
-[mini-kep] code has following packages:
+[mini-kep] follows [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
+directory structure. The code in *src* folder consists of following packages:
    - **locations**: navigate through repo directory structure 
    - **download**: download and unpack rar files from Rosstat website
    - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
    - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
+   - **frontpage**: draw graphs and provide simple interface to latest data. 
+   
+[mini-kep] is inspired by [FRED](https://fred.stlouisfed.org/) and replaces a predecessor repo,
+[data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of
+macroeconomic data well. 
 
+Project documentation is [here](http://mini-kep-parcer-for-rosstat-kep-publication.readthedocs.io/en/latest/?badge=latest)
+and little glossary [here](https://github.com/epogrebnyak/mini-kep/blob/master/doc/rst/glossary.rst).
+   
 
 # Latest data
 
-*TODO: add graphs here <https://github.com/epogrebnyak/mini-kep/issues/12>*
-
-*TODO: generate Excel files <https://github.com/epogrebnyak/mini-kep/issues/70>*
+*TODO: add spline graphs here <https://github.com/epogrebnyak/mini-kep/issues/12>*
 
 
 # How can I download macroeconomic indicators from here?
@@ -46,5 +53,26 @@ dfq = get_dataframe('q')
 dfm = get_dataframe('m')
 ```
 
-More access methods (including saving a local copy) are shown in 
-[example_access_data.py](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example_access_data.py).
+Check more access methods [in example here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example_access_data.py).
+
+
+# How do you update this repo?
+
+Around [this schedule](http://www.gks.ru/gis/images/graf-oper2017.htm) on a Windows machine I run:   
+
+```
+invoke add <year> <month>
+```
+
+and commit to this repo.
+
+Basically this command downloads a rar file from Rosstat, unpacks MS Word files, dumps all tables 
+to an interim CSV file, parses interim CSV file to dataframes by frequency and saves dataframes as processed CSV files.
+
+I also manually update *csv2df.helpers.DATES* until there is a [better date handler](https://github.com/epogrebnyak/mini-kep/issues/82).    
+ Working on adding [some graphs for newer data](https://github.com/epogrebnyak/mini-kep/issues/78).
+ 
+ See [DEV.md](https://github.com/epogrebnyak/mini-kep/blob/master/DEV.md) for development notes/roadmap. 
+
+
+
