@@ -57,7 +57,8 @@ def test_resulting_dataframes():
     assert dfa.GDP_bln_rub['1999-12-31'] == 4823.0
 
     assert dfq.to_string() == \
-        """            year  qtr  GDP_bln_rub
+"""            year  qtr  GDP_bln_rub
+time_index                        
 1999-03-31  1999    1        901.0
 1999-06-30  1999    2       1102.0
 1999-09-30  1999    3       1373.0

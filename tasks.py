@@ -117,7 +117,7 @@ def github(ctx):
 
 @task
 def test(ctx):
-    ctx.run("py.test") #--cov=csv2df
+    ctx.run("py.test src") #--cov=csv2df
 
 
 @task
