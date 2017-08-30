@@ -55,7 +55,7 @@ Check more access methods [in example here](https://github.com/epogrebnyak/mini-
 # Can I have this data as Excel file?
 
  Here it is: [kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true), 
- but the real benefit is when you work with it in pandas, R or econometric package.
+ but the real benefit is when you work with it in pandas, R or some econometric package.
  
 # How do you update this repo?
 
@@ -67,8 +67,14 @@ invoke add <year> <month>
 
 and commit to this repo.
 
-Basically this command downloads a rar file from Rosstat, unpacks MS Word files, dumps all tables 
-to an interim CSV file, parses interim CSV file to dataframes by frequency and saves dataframes as processed CSV files.
+Basically this command:
+- downloads a rar file from Rosstat, 
+- unpacks MS Word files, 
+- dumps all tables to an interim CSV file, 
+- parses interim CSV file to dataframes by frequency 
+- validates parsing result
+- transforms some variables
+- saves dataframes as processed CSV files.
 
 I also manually update *csv2df.helpers.DATES* until there is a [better date handler](https://github.com/epogrebnyak/mini-kep/issues/82).    
  

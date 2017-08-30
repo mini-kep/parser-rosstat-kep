@@ -144,7 +144,7 @@ def _add(year, month):
     sys.path.insert(0, src)
     from locations.folder import FolderBase
         
-    #download, unpack
+    #download and  unpack
     from download.download import RemoteFile
     year, month = int(year), int(month)
     rf = RemoteFile(year, month)
@@ -164,12 +164,15 @@ def _add(year, month):
     assert vint.validate()
     assert vint.save()
     
-    #copy to latest
+    #copy to latest and make Excel file
     if FolderBase.get_latest_date() == (year, month):
         from locations.folder import copy_latest
         copy_latest()
+        from results.latest import save_xls
+        save_xls()
+        
     
-    # see for context manager https://stackoverflow.com/questions/17211078/how-to-temporarily-modify-sys-path-in-python
+    # see for context manager - https://stackoverflow.com/questions/17211078/how-to-temporarily-modify-sys-path-in-python
     sys.path.remove(src)
     
 
@@ -185,7 +188,7 @@ if platform == 'win32':
 
 
 if __name__ == '__main__':
-    #_add(2017, 6)
+    _add(2017, 6)
     print(apidoc('download'))
     
 
