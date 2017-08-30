@@ -4,8 +4,8 @@ mini-kep documentation
 .. mdinclude:: concept.md
 
 
-Documentation by module 
-=======================
+Documentation by package 
+========================
 
 .. toctree::
     :maxdepth: 1
