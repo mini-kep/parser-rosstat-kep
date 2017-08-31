@@ -57,7 +57,7 @@ def test_resulting_dataframes():
 
     assert dfq.to_string() == \
         """            year  qtr  GDP_bln_rub
-time_index
+time_index                        
 1999-03-31  1999    1        901.0
 1999-06-30  1999    2       1102.0
 1999-09-30  1999    3       1373.0
