@@ -56,7 +56,7 @@ Check more access methods [in example here](https://github.com/epogrebnyak/mini-
 
  Here it is: [kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true)
  
- But the real research is when you load a CSV file to pandas (as shown above), R or some econometric package.
+ But using CSV files in pandas (as shown above), R or some econometric package is highly preferred over Excel.
  
 # How do you update this repo?
 
