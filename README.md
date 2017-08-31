@@ -14,7 +14,6 @@ macroeconomic time series and saves them as [CSV files at stable URL][backend].
 
 [mini-kep] follows [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
 directory structure. The code in *src* folder consists of following packages:
-   - **locations**: navigate through repo directory structure 
    - **download**: download and unpack rar files from Rosstat website
    - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
    - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
@@ -50,7 +49,9 @@ dfq = get_dataframe_from_web('q')
 dfm = get_dataframe_from_web('m')
 ```
 
-Check more access methods [in example here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example_access_data.py).
+Check more access methods at
+[getter.py](https://github.com/epogrebnyak/mini-kep/blob/dev/src/getter.py).
+
 
 # Can I get this data in Excel?
 
@@ -75,10 +76,10 @@ Basically this command:
 - parses interim CSV file to dataframes by frequency 
 - validates parsing result
 - transforms some variables
-- saves dataframes as processed CSV files.
+- saves dataframes as processed CSV files
+- saves an Excel file for latest date.
 
-I also manually update *csv2df.helpers.DATES* until there is a [better date handler](https://github.com/epogrebnyak/mini-kep/issues/82).    
- 
+
 See [DEV.md](https://github.com/epogrebnyak/mini-kep/blob/master/DEV.md) for development notes/roadmap. 
 
 

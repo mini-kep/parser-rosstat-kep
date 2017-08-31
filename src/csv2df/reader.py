@@ -312,11 +312,12 @@ class RowStack:
 
 
 if __name__ == "__main__":
-    from csv2df.helpers import PathHelper
+    from config import PathHelper, DateHelper
     import csv2df.specification as spec
 
     # print all rows from csvpath
-    csv_path = PathHelper.locate_csv()
+    year, month = DateHelper.get_latest_date()
+    csv_path = PathHelper.locate_csv(year, month)
     csvfile = open_csv(csv_path)
     reader = Reader(csvfile, spec=spec.SPEC)
     for csv_segment, pdef in reader.items():

@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 from io import StringIO
 
-from csv2df.helpers import PathHelper
+from config import PathHelper
 
 
 # regression tests - after bug fixes on occasional errors

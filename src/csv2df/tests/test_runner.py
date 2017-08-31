@@ -55,6 +55,8 @@ def test_collection():
 def test_resulting_dataframes():
     assert dfa.GDP_bln_rub['1999-12-31'] == 4823.0
 
+def test_resulting_dataframes_with_time_index():
+    # FIXME: this gets spoiled after runing pep8
     assert dfq.to_string() == \
         """            year  qtr  GDP_bln_rub
 time_index                        
@@ -67,6 +69,7 @@ time_index
 2000-09-30  2000    3       2038.0
 2000-12-31  2000    4       2044.0"""
 
+def test_resulting_dataframes_no_dfm():
     assert dfm.empty is True
 
 

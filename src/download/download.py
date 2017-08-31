@@ -8,9 +8,9 @@ import subprocess
 import requests
 import datetime
 
-from locations.folder import FolderBase
-from locations.folder import get_unrar_binary
-UNPACK_RAR_EXE = get_unrar_binary()
+from config import PathHelper
+
+UNPACK_RAR_EXE = PathHelper.get_unrar_binary()
 
 
 def download(url, path):
@@ -41,13 +41,13 @@ class RemoteFile():
         self.year, self.month = year, month
         self._check_date()
         self.url = self._make_url()
-        folder = FolderBase(year, month).get_raw_folder()
+        folder = PathHelper.get_raw_folder(year, month)
         self.folder = str(folder)
         self.local_path = str(folder / 'ind.rar')
 
     def _check_date(self):
         def as_date(year, month):
-            return datetime.date(year, month, 1)        
+            return datetime.date(year, month, 1)
         if as_date(self.year, self.month) < as_date(2016, 12):
             raise ValueError('No web files before 2016-12')
 
@@ -84,23 +84,15 @@ class RemoteFile():
             path = os.path.join(self.folder, file)
             if not path.endswith(".rar"):
                 os.remove(path)
-                
-    #FIXME: wrong responsibility
-    def make_interim_csv(self):
-        from word2csv.word import folder_to_csv
-        folder_to_csv(self.folder)
 
 
 if __name__ == "__main__":
     u = RemoteFile(2016, 12)._make_url()
     assert u.startswith("http://www.gks.ru/free_doc/")
-    RemoteFile(2016, 12).download()
-    RemoteFile(2016, 12).unrar()
 
     rf = RemoteFile(2017, 6)
     rf.download()
     rf.unrar()
-    # rf.make_interim_csv()
 
 # May use messages:
 

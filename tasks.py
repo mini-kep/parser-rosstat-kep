@@ -113,11 +113,6 @@ def doc(ctx):
 
 
 @task
-def github(ctx):
-    ctx.run("start https://github.com/epogrebnyak/mini-kep")
-
-
-@task
 def test(ctx):
     ctx.run("py.test src")  # --cov=csv2df
 
@@ -142,45 +137,65 @@ def add(ctx, year, month):
     _add(year, month)
 
 
+class PathContext():
+    def __init__(self, path=str(Path(__file__).parent / 'src')):
+        self.path = path
+
+    def __enter__(self):
+        sys.path.insert(0, self.path)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        sys.path.remove(self.path)
+
+
 def _add(year, month):
-    src = str(Path(__file__).parent / 'src')
-    sys.path.insert(0, src)
-    from locations.folder import FolderBase
-
-    #download and  unpack
-    from download.download import RemoteFile
     year, month = int(year), int(month)
-    rf = RemoteFile(year, month)
-    assert rf.download()
-    assert rf.unrar()
 
-    # make interim csv
-    interim_csv = FolderBase(year, month).get_interim_csv()
-    if not os.path.exists(interim_csv):
-        from word2csv.word import make_interim_csv
-        assert make_interim_csv(year, month)
-        assert FolderBase(year, month).copy_tab_csv()
+    with PathContext():
 
-    #parse, validate, save
-    from csv2df.runner import Vintage
-    vint = Vintage(year, month)
-    assert vint.validate()
-    assert vint.save()
+        from config import DataFolder
 
-    # copy to latest and make Excel file
-    if FolderBase.get_latest_date() == (year, month):
-        from locations.folder import copy_latest
+        #download and  unpack
+        from download.download import RemoteFile
+        remote = RemoteFile(year, month)
+        assert remote.download()
+        assert remote.unrar()
+
+        # make interim csv from Word files
+        interim_csv = DataFolder(year, month).get_interim_csv()
+        if not os.path.exists(interim_csv):
+            from word2csv.word import make_interim_csv
+            assert make_interim_csv(year, month)
+            assert DataFolder(year, month).copy_tab_csv()
+
+        #parse, validate, save
+        from csv2df.runner import Vintage
+        vint = Vintage(year, month)
+        assert vint.validate()
+        assert vint.save()
+
+
+@task
+def latest(ctx):
+    _latest()
+
+
+def _latest():
+    """Copy to latest CSVs and make Excel file."""
+    with PathContext():
+        # TODO: check the date seems to be latest
+        from finaliser import copy_latest
         copy_latest()
-        from results.latest import save_xls
+        from finaliser import save_xls
         save_xls()
-
-    # see for context manager -
-    # https://stackoverflow.com/questions/17211078/how-to-temporarily-modify-sys-path-in-python
-    sys.path.remove(src)
 
 
 ns = Collection()
-for t in [clean, pep8, ls, cov, test, doc, rst, github, lint, add]:
+for t in [ls, clean,
+          pep8, lint,
+          test, cov,
+          doc, rst,
+          add, latest]:
     ns.add_task(t)
 
 

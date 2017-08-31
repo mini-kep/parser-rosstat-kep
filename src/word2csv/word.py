@@ -11,17 +11,14 @@
 import csv
 import os
 
-
-from locations.folder import CSV_FILENAME
-#  CSV_FILENAME = 'tab.csv'
 ENCODING = 'utf8'
-
 
 # -------------------------------------------------------------------------------
 #
 #     Application management
 #
 # -------------------------------------------------------------------------------
+
 
 def win32_word_dispatch():
     # Lazy import of win32com - do not load Windows/MS Office libraries when
@@ -169,10 +166,12 @@ def yield_rows_from_many_files(file_list):
             print("File:", p)
             for row in yield_continious_rows(p):
                 yield row
+        else:
+            print("File does not exist:", p)
 
 
 def get_csv_filename(folder):
-    return os.path.join(folder, CSV_FILENAME)
+    return os.path.join(folder, 'tab.csv')
 
 
 def dump_doc_files_to_csv(file_list, csv_path):
@@ -186,20 +185,22 @@ def make_file_list(folder):
     return [os.path.abspath(os.path.join(folder, fn)) for fn in files]
 
 
-def folder_to_csv(folder):
+def folder_to_csv(folder, csv_filename=False):
     """Make single csv based on 5 .doc files in *folder*. """
+    if not csv_filename:
+        csv_filename = get_csv_filename(folder)
     print()
     print("Folder:\n    ", folder)
     file_list = make_file_list(folder)
-    csv_filename = get_csv_filename(folder)
     dump_doc_files_to_csv(file_list, csv_filename)
     print("Finished creating raw CSV file:", csv_filename)
 
 
 def make_interim_csv(year, month):
-    from locations.folder import FolderBase
-    folder = FolderBase(year, month).get_raw_folder()
-    folder_to_csv(folder)
+    from config import DataFolder
+    folder = DataFolder(year, month).get_raw_folder()
+    interim_csv = DataFolder(year, month).get_interim_csv()
+    folder_to_csv(folder, interim_csv)
     return True
 
 

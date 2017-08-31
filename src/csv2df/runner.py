@@ -24,7 +24,7 @@ These calls should give similar results:
 """
 import pandas as pd
 
-from csv2df.helpers import DateHelper, PathHelper
+from config import DateHelper, PathHelper
 from csv2df.specification import SPEC
 from csv2df.reader import Reader, open_csv
 from csv2df.parser import extract_tables
@@ -89,19 +89,17 @@ class Collection:
     """Methods to manipulate entire set of data releases."""
 
     all_dates = DateHelper.get_supported_dates()
-    year, month = DateHelper.get_latest_date()    
-    latest_vintage = Vintage(year, month)
 
     @staticmethod
     def save_latest():
-        year, month = DateHelper.get_latest_date()    
+        year, month = DateHelper.get_latest_date()
         latest_vintage = Vintage(year, month)
         latest_vintage.save()
 
     @staticmethod
     def approve_latest():
         """Quick check for algorithm on latest available data."""
-        year, month = DateHelper.get_latest_date()    
+        year, month = DateHelper.get_latest_date()
         latest_vintage = Vintage(year, month)
         latest_vintage.validate()
 
@@ -135,7 +133,6 @@ if __name__ == "__main__":
     vint.validate()
     dfa, dfq, dfm = vint.dfs()
 
-    import pandas as pd
     from io import StringIO
     s = dfa.to_csv()
     dx = pd.read_csv(StringIO(s))

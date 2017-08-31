@@ -1,9 +1,10 @@
-import py.test
+import pytest
 import tempfile
 import os
 import pandas as pd
 
-from results.latest import to_xls, get_dataframe
+from finaliser import to_xls
+from getter import get_dataframe
 
 
 def test_get_dataframe():
