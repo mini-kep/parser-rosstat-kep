@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pytest
+import datetime as dt
 from csv2df.helpers import PathHelper, DateHelper
 
 year, month = DateHelper.get_latest_date()
@@ -32,6 +33,14 @@ class Test_DateHelper:
 
     def test_get_supported_dates_starts_in_2009_4(self):
         assert DateHelper.get_supported_dates()[0] == (2009, 4)
+
+    def test_get_supported_dates_ends_with_latest_date(self):
+        prev_month_date = dt.datetime.today().replace(day=1) - dt.timedelta(days=1)
+        assert DateHelper.get_supported_dates()[-1] == (prev_month_date.year,
+                                                        prev_month_date.month)
+
+    def test_get_supported_dates_excludes_2013_11(self):
+        assert (2013, 11) not in DateHelper.get_supported_dates()
 
     def test_get_latest_date(self):
         year, month = DateHelper.get_latest_date()
