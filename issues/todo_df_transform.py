@@ -2,10 +2,12 @@
 import pandas as pd
 from io import StringIO
 
+
 def to_dataframe(text):
-    return pd.read_csv(StringIO(text), sep="\t", 
+    return pd.read_csv(StringIO(text), sep="\t",
                        converters={0: pd.to_datetime},
                        index_col=0)
+
 
 dfa_text = u"""	year	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GDP_bln_rub	GDP_yoy	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_yoy
 1999-12-31	1999	143.2	135.0	139.2	134.0	136.5	75.6	4823.0	106.4	1258.0	666.9	653.8	1213.6	615.5	660.8	-51.4	7.0	39.5		670.4	105.3	866.1	93.6	931.3	94.7	1797.4	94.2	3372.0	13.0	1523.0	78.0
@@ -27,7 +29,7 @@ dfa_text = u"""	year	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_r
 2015-12-31	2015	110.7	114.5	113.7	110.2	112.9	341.5	83233.0	97.2	29741.5	15620.3	9479.8	26922.0	13659.2	9308.2	-1961.0	-171.6	193.0	99.2	13897.2	89.9	13412.3	91.0	14114.5	89.1	27526.8	90.0	4978.0	5.6	34030.0	91.0
 2016-12-31	2016	106.4	104.3	106.5	104.9	105.4	281.7	86044.0	99.8	31323.7	16416.4	9936.4	28181.5	13460.0	9923.8	-2956.4	-12.6	191.7	101.3	14639.8	99.1	13751.8	95.0	14565.5	95.8	28317.3	95.4	5070.0	5.5	36709.0	100.8"""
 
-dfq_text =u"""	year	qtr	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GDP_bln_rub	GDP_yoy	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_rog	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_rog	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_rog	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_rog	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_rog	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_rog	WAGE_REAL_yoy
+dfq_text = u"""	year	qtr	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GDP_bln_rub	GDP_yoy	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_rog	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_rog	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_rog	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_rog	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_rog	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_rog	WAGE_REAL_yoy
 1999-03-31	1999	1	118.2	118.4	114.0	109.5	116.0	15.3	901.0	98.1	189.0	108.3	91.5	171.9	89.1	93.6	-19.2	2.1	9.1			96.8		93.8	186.8	85.0	92.7	192.2	90.7	84.3	379.0	88.0	88.1	821.0	14.3	1248.0	80.9	60.7
 1999-06-30	1999	2	106.8	106.4	108.6	109.0	107.3	17.1	1102.0	103.1	486.8	272.1	240.0	448.6	226.6	247.3	-45.5	7.3	10.1			131.1		99.2	204.3	101.4	91.6	212.2	100.2	88.5	416.5	100.8	90.0	831.0	13.0	1511.0	111.5	65.1
 1999-09-30	1999	3	106.0	104.3	107.2	107.2	105.6	18.9	1373.0	111.4	795.8	434.2	400.6	759.3	387.3	411.0	-46.9	10.4	9.5			185.6		105.0	222.6	103.1	89.2	242.0	107.0	91.3	464.6	105.1	90.3	833.0	12.3	1642.0	102.4	76.4
@@ -67,49 +69,57 @@ dfa = to_dataframe(dfa_text)
 assert dfa.index[0] == pd.Timestamp("1999-12-31")
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
-   
+
 # Issue: <https://github.com/epogrebnyak/mini-kep/issues/66>
 
 # *gov_vars* variables accumulate from the start of the year
-# need to take a difference and produce new variables with monthly and quarterly values
+# need to take a difference and produce new variables with monthly and
+# quarterly values
+
 
 def select_varnames(df):
     return [vn for vn in df.columns if vn.startswith('GOV') and "ACCUM" in vn]
 
+
 assert select_varnames(dfm) == select_varnames(dfq)
 assert select_varnames(dfm) == select_varnames(dfa)
 
-COLNAME_MAPPER = {vn:vn.replace("_ACCUM", "") for vn in dfa.columns}
-COLNAME_MAPPER_REVERSE = {v:k for k,v in COLNAME_MAPPER.items()}
+COLNAME_MAPPER = {vn: vn.replace("_ACCUM", "") for vn in dfa.columns}
+COLNAME_MAPPER_REVERSE = {v: k for k, v in COLNAME_MAPPER.items()}
 
-def rename(df):    
+
+def rename(df):
     df.rename(columns=COLNAME_MAPPER, inplace=True)
-    
-# TODO (EP): change names of variables to GOV_ACCUM_something    
+
+# TODO (EP): change names of variables to GOV_ACCUM_something
+
 
 def deaccumulate_qtr(df):
     return deaccumulate(df, first_month=3)
 
+
 def deaccumulate_month(df):
     return deaccumulate(df, first_month=1)
+
 
 def deaccumulate(df, first_month):
     # first_month is 1 for dfm, 3 for dfq
     assert first_month in [1, 3]
-    # save start of year values 
+    # save start of year values
     original_start_year_values = df[df.index.month == first_month].copy()
     # take a difference
     df = df.diff()
-    # write back start of year values 
+    # write back start of year values
     # (January in monthly data, March in qtr data)
     ix = original_start_year_values.index
     # FIXME: can we do this without loop? this fails:
     # df.loc[ix,] = original_start_year_values.loc[ix, ]
     for i in ix:
         for varname in df.columns:
-            df.loc[i,varname] = original_start_year_values.loc[i,varname]
-    return df        
-        
+            df.loc[i, varname] = original_start_year_values.loc[i, varname]
+    return df
+
+
 varnames = select_varnames(dfm)
 
 gov_dfm = dfm[varnames]
@@ -123,13 +133,14 @@ rename(diff_dfq)
 diff_dfa = dfa[varnames]
 rename(diff_dfa)
 
-print (diff_dfm, diff_dfq, diff_dfa)
+print(diff_dfm, diff_dfq, diff_dfa)
 
-# TODO-1: check - accumulate diff_dfm and diff_dfq and compare to  gov_dfm and gov_dfq
+# TODO-1: check - accumulate diff_dfm and diff_dfq and compare to  gov_dfm
+# and gov_dfq
 
-# TODO-2: suggest more checks 
+# TODO-2: suggest more checks
 
 # TODO-3: replace old variables with new variables at dfa, dfq, dfm
 
-# TODO-4: supress warning or change code: 
+# TODO-4: supress warning or change code:
 #         A value is trying to be set on a copy of a slice from a DataFrame

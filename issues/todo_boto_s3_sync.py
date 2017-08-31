@@ -1,7 +1,7 @@
 import boto3
 import botocore
 
-# Setup AWS credentials as in 
+# Setup AWS credentials as in
 # https://boto3.readthedocs.io/en/latest/guide/quickstart.html#configuration
 #
 #  cd %HOMEDRIVE%\%HOMEPATH%
@@ -14,8 +14,8 @@ import botocore
 #
 
 
-BUCKET_NAME = 'mini-csv2df-docs' # replace with your bucket name
-KEY = 'index.html' # replace with your object key
+BUCKET_NAME = 'mini-csv2df-docs'  # replace with your bucket name
+KEY = 'index.html'  # replace with your object key
 
 s3 = boto3.resource('s3')
 
@@ -32,38 +32,37 @@ except botocore.exceptions.ClientError as e:
         print("The object does not exist.")
     else:
         raise
-        
-        
+
+
 class RawData:
 
     def init(year, month):
         self.date = year, month
-        # NOT NOW: may check if date is valid 
-        
-        #S3 bucket:
+        # NOT NOW: may check if date is valid
+
+        # S3 bucket:
         #'mini-csv2df-raw-data'
-        
-        
+
     def download_from_s3(self):
         # TODO 1: *download_raw_data_from_s3* download data/raw from s3
-        pass    
-              
+        pass
+
         # listing all objects in S3 bucket https://goo.gl/p4SCv4
 
     def upload_to_s3(self):
         # TODO 2: *upload_raw_data_to_s3* data/raw to s3
-        pass    
+        pass
 
 
 def upload_html_docsto_s3():
     pass
     # TODO 3: *doc_upload* upload docs to from s3 mini-csv2df-docs
-    # upload all files from doc\_build\html\ 
+    # upload all files from doc\_build\html\
     # to aws https://mini-kep-docs.s3.amazonaws.com/
     # mini-csv2df-docs + is region neded?
-        
 
-# for reference:     
+
+# for reference:
 # Download Data from S3
 # sync_data_from_s3:
 # ifeq (default,$(PROFILE))

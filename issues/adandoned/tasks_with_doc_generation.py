@@ -8,7 +8,6 @@ from os import environ, chdir
 from pathlib import Path
 
 
-
 from invoke import Collection, task
 
 
@@ -30,12 +29,12 @@ def find_all(glob):
         if glob in f.name:
             yield f
 
-            
+
 def yield_python_files(folder):
     for file in filter(lambda x: x.suffix == ".py", walk_files(folder)):
-        yield file           
+        yield file
 
-            
+
 @task
 def pep8(ctx, folder="csv2df"):
     path = PROJECT_DIR / "src" / folder
@@ -44,15 +43,16 @@ def pep8(ctx, folder="csv2df"):
         # FIXME: may use 'import autopep8' without console
         ctx.run("autopep8 --aggressive --aggressive --in-place {}".format(f))
 
-# 
-#def docstrings(ctx):
+#
+# def docstrings(ctx):
 #    print(inspect.cleandoc(__doc__))
 #    path = PROJECT_DIR / "src" / folder
 #    for f in yield_python_files(path):
         # FIXME: list modules as in https://stackoverflow.com/questions/487971/is-there-a-standard-way-to-list-names-of-python-modules-in-a-package
-        # print(inspect.cleandoc(__doc__))        
+        # print(inspect.cleandoc(__doc__))
 #        pass
-       
+
+
 @task
 def clean(ctx):
     """Delete all compiled Python files"""
@@ -72,29 +72,30 @@ def lint(ctx, folder="src/csv2df"):
     # --max-line-length=100
     ctx.run('flake8 {} --exclude test* --ignore E501'.format(folder))
 
+
 @task
 def rst_rich_menu(ctx, root='csv2df', all=None):
     """get docs of each module  in root package (__all__ or defined in params)
     and  generate TOC menu: link with docs below in "rich_menu_{root}.rst"
     """
 
-    srcdir = str( PROJECT_DIR / "src" )
-    sys.path.append( srcdir )
+    srcdir = str(PROJECT_DIR / "src")
+    sys.path.append(srcdir)
 
     if not all:
-        pkg = __import__( root )
+        pkg = __import__(root)
         all = pkg.__all__
 
     # generate menu..
-    menu =  []
+    menu = []
     for modname in all:
         fullname = f"{root}.{modname}" if root else modname
         docs = f"    .. automodule:: {fullname}"
-        menu.append( f""":doc:`{fullname}` \n{docs}\n""" )
-        print( modname )  # show progress
+        menu.append(f""":doc:`{fullname}` \n{docs}\n""")
+        print(modname)  # show progress
 
-    with open( PROJECT_DIR / "doc" / f"rich_menu_{root}.rst", 'w') as f:
-        f.writelines( menu )
+    with open(PROJECT_DIR / "doc" / f"rich_menu_{root}.rst", 'w') as f:
+        f.writelines(menu)
 
 
 @task
@@ -106,11 +107,11 @@ def rst(ctx):
 
     packages = ['download',
                 'word2csv',
-                'csv2df src/csv2df/tests', # second param lists excluded dir
+                'csv2df src/csv2df/tests',  # second param lists excluded dir
                 'frontpage src/frontpage/markdown']
 
     for pkg in packages:
-        ctx.run("sphinx-apidoc -efM -o doc src/"+pkg)
+        ctx.run("sphinx-apidoc -efM -o doc src/" + pkg)
 
     # inject modules_menu
     def inject_modules_menu(linkfrom="csv2df", linkto="csv2df"):
@@ -119,28 +120,40 @@ def rst(ctx):
         first_part = txt.split(separator)[0]
 
         with open(PROJECT_DIR / "doc" / f"{linkfrom}.rst", 'w') as f:
-            f.writelines( first_part + separator + f".. include:: rich_menu_{linkto}.rst")
+            f.writelines(
+                first_part +
+                separator +
+                f".. include:: rich_menu_{linkto}.rst")
 
     inject_modules_menu()
 
     # may comment this if csv2df module names don't change..
-    rst_rich_menu(ctx, "csv2df") # regenerate rich_menu_csv2df.rst
-    rst_rich_menu(ctx, "", all=['download', 'word2csv', 'csv2df', 'frontpage'] ) # regenerate rich_menu_.rst
+    rst_rich_menu(ctx, "csv2df")  # regenerate rich_menu_csv2df.rst
+    rst_rich_menu(
+        ctx,
+        "",
+        all=[
+            'download',
+            'word2csv',
+            'csv2df',
+            'frontpage'])  # regenerate rich_menu_.rst
+
 
 @task
 def doc(ctx):
-    source_dir = os.path.join('doc', 'rst') 
-    html_dir = os.path.join('doc', 'html') 
+    source_dir = os.path.join('doc', 'rst')
+    html_dir = os.path.join('doc', 'html')
     index_html = os.path.join(html_dir, 'index.html')
     # call without parameters
-    # for paarmeters may add: 
-    #     -aE - to overwrite files 
-    build_command = f'sphinx-build -b html {source_dir} {html_dir}' 
-    if platform=="linux":
+    # for paarmeters may add:
+    #     -aE - to overwrite files
+    build_command = f'sphinx-build -b html {source_dir} {html_dir}'
+    if platform == "linux":
         ctx.run(build_command)
     else:
         ctx.run(build_command)
         ctx.run('start {}'.format(index_html))
+
 
 @task
 def github(ctx):
@@ -149,10 +162,11 @@ def github(ctx):
 
 @task
 def test(ctx):
-    ctx.run("py.test") #--cov=csv2df
+    ctx.run("py.test")  # --cov=csv2df
 
 # TODO:
 # coverage annotate -d csv2df\tests\annotate -i csv2df/runner.py
+
 
 @task
 def cov(ctx):
@@ -171,44 +185,57 @@ def ls(ctx):
 
 @task
 def add(ctx, year, month):
-    _add(year, month)    
-    
-def _add(year, month):    
+    _add(year, month)
+
+
+def _add(year, month):
     src = str(Path(__file__).parent / 'src')
     sys.path.insert(0, src)
     from locations.folder import FolderBase
-        
+
     #download, unpack
     from download.download import RemoteFile
     year, month = int(year), int(month)
     rf = RemoteFile(year, month)
     assert rf.download()
     assert rf.unrar()
-    
-    #make interim csv
+
+    # make interim csv
     interim_csv = FolderBase(year, month).get_interim_csv()
     if not os.path.exists(interim_csv):
         from word2csv.word import make_interim_csv
         assert make_interim_csv(year, month)
-        assert FolderBase(year, month).copy_tab_csv()        
-    
+        assert FolderBase(year, month).copy_tab_csv()
+
     #parse, validate, save
     from csv2df.runner import Vintage
     vint = Vintage(year, month)
     assert vint.validate()
     assert vint.save()
-    
-    #copy to latest
+
+    # copy to latest
     if FolderBase.get_latest_date() == (year, month):
         from locations.folder import copy_latest
         copy_latest()
-    
-    # see for context manager https://stackoverflow.com/questions/17211078/how-to-temporarily-modify-sys-path-in-python
+
+    # see for context manager
+    # https://stackoverflow.com/questions/17211078/how-to-temporarily-modify-sys-path-in-python
     sys.path.remove(src)
-    
+
 
 ns = Collection()
-for t in [clean, pep8, ls, cov, test, doc, rst, github, lint, add, rst_rich_menu]:
+for t in [
+        clean,
+        pep8,
+        ls,
+        cov,
+        test,
+        doc,
+        rst,
+        github,
+        lint,
+        add,
+        rst_rich_menu]:
     ns.add_task(t)
 
 

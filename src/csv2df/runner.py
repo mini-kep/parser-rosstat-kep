@@ -74,8 +74,8 @@ class Vintage:
         self.dfq.to_csv(folder_path / 'dfq.csv')
         self.dfm.to_csv(folder_path / 'dfm.csv')
         print("Saved dataframes to", folder_path)
-        return True  
-    
+        return True
+
     def validate(self):
         checker = Validator(self.dfa, self.dfq, self.dfm)
         checker.run()
@@ -118,6 +118,7 @@ class Collection:
             vintage = Vintage(year, month)
             vintage.validate()
 
+
 if __name__ == "__main__":
     # Collection calls
     # Collection.approve_latest()
@@ -130,7 +131,7 @@ if __name__ == "__main__":
     vint = Vintage(year, month)
     vint.validate()
     dfa, dfq, dfm = vint.dfs()
-    
+
     import pandas as pd
     from io import StringIO
     s = dfa.to_csv()

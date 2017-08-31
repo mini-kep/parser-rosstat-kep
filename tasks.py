@@ -8,7 +8,6 @@ from os import environ
 from pathlib import Path
 
 
-
 from invoke import Collection, task
 
 
@@ -30,12 +29,12 @@ def find_all(glob):
         if glob in f.name:
             yield f
 
-            
+
 def yield_python_files(folder):
     for file in filter(lambda x: x.suffix == ".py", walk_files(folder)):
-        yield file           
+        yield file
 
-            
+
 @task
 def pep8(ctx, folder="csv2df"):
     path = PROJECT_DIR / "src" / folder
@@ -44,15 +43,16 @@ def pep8(ctx, folder="csv2df"):
         # FIXME: may use 'import autopep8' without console
         ctx.run("autopep8 --aggressive --aggressive --in-place {}".format(f))
 
-# 
-#def docstrings(ctx):
+#
+# def docstrings(ctx):
 #    print(inspect.cleandoc(__doc__))
 #    path = PROJECT_DIR / "src" / folder
 #    for f in yield_python_files(path):
         # FIXME: list modules as in https://stackoverflow.com/questions/487971/is-there-a-standard-way-to-list-names-of-python-modules-in-a-package
-        # print(inspect.cleandoc(__doc__))        
+        # print(inspect.cleandoc(__doc__))
 #        pass
-       
+
+
 @task
 def clean(ctx):
     """Delete all compiled Python files"""
@@ -74,11 +74,11 @@ def lint(ctx, folder="src/csv2df"):
 
 
 def apidoc(pkg, exclude=''):
-    """Call sphinx-apidoc to document *pkg* package without files 
+    """Call sphinx-apidoc to document *pkg* package without files
        in *exclude* pattern. """
-    rst_source_dir = os.path.join('doc', 'rst')  
-    pkg_dir = os.path.join('src', pkg) 
-    flags = '--module-first --no-toc --force'   
+    rst_source_dir = os.path.join('doc', 'rst')
+    pkg_dir = os.path.join('src', pkg)
+    flags = '--module-first --no-toc --force'
     return f'sphinx-apidoc {flags} -o {rst_source_dir} {pkg_dir} {exclude}'
 
 
@@ -86,29 +86,31 @@ def apidoc(pkg, exclude=''):
 def rst(ctx):
     """Build new rst files with sphinx"""
     args_list = [
-            ('locations', ''),
-            ('download', ''),
-            ('word2csv', ''),
-            ('csv2df', '*tests*')
-            #,('frontpage', '*markdown*')
+        ('locations', ''),
+        ('download', ''),
+        ('word2csv', ''),
+        ('csv2df', '*tests*')
+        #,('frontpage', '*markdown*')
     ]
 
-    for args in args_list:        
+    for args in args_list:
         command = apidoc(*args)
         ctx.run(command)
 
+
 @task
 def doc(ctx):
-    source_dir = os.path.join('doc', 'rst') 
-    html_dir = os.path.join('doc', 'html') 
+    source_dir = os.path.join('doc', 'rst')
+    html_dir = os.path.join('doc', 'html')
     index_html = os.path.join(html_dir, 'index.html')
     # call without parameters
-    # for paarmeters may add: 
-    #     -aE - to overwrite files 
-    build_command = f'sphinx-build -b html {source_dir} {html_dir}' 
-    ctx.run(build_command)    
-    if platform=="win32":        
+    # for paarmeters may add:
+    #     -aE - to overwrite files
+    build_command = f'sphinx-build -b html {source_dir} {html_dir}'
+    ctx.run(build_command)
+    if platform == "win32":
         ctx.run('start {}'.format(index_html))
+
 
 @task
 def github(ctx):
@@ -117,7 +119,7 @@ def github(ctx):
 
 @task
 def test(ctx):
-    ctx.run("py.test src") #--cov=csv2df
+    ctx.run("py.test src")  # --cov=csv2df
 
 
 @task
@@ -137,44 +139,45 @@ def ls(ctx):
 
 @task
 def add(ctx, year, month):
-    _add(year, month)    
-    
-def _add(year, month):    
+    _add(year, month)
+
+
+def _add(year, month):
     src = str(Path(__file__).parent / 'src')
     sys.path.insert(0, src)
     from locations.folder import FolderBase
-        
+
     #download and  unpack
     from download.download import RemoteFile
     year, month = int(year), int(month)
     rf = RemoteFile(year, month)
     assert rf.download()
     assert rf.unrar()
-    
-    #make interim csv
+
+    # make interim csv
     interim_csv = FolderBase(year, month).get_interim_csv()
     if not os.path.exists(interim_csv):
         from word2csv.word import make_interim_csv
         assert make_interim_csv(year, month)
-        assert FolderBase(year, month).copy_tab_csv()        
-    
+        assert FolderBase(year, month).copy_tab_csv()
+
     #parse, validate, save
     from csv2df.runner import Vintage
     vint = Vintage(year, month)
     assert vint.validate()
     assert vint.save()
-    
-    #copy to latest and make Excel file
+
+    # copy to latest and make Excel file
     if FolderBase.get_latest_date() == (year, month):
         from locations.folder import copy_latest
         copy_latest()
         from results.latest import save_xls
         save_xls()
-        
-    
-    # see for context manager - https://stackoverflow.com/questions/17211078/how-to-temporarily-modify-sys-path-in-python
+
+    # see for context manager -
+    # https://stackoverflow.com/questions/17211078/how-to-temporarily-modify-sys-path-in-python
     sys.path.remove(src)
-    
+
 
 ns = Collection()
 for t in [clean, pep8, ls, cov, test, doc, rst, github, lint, add]:
@@ -190,7 +193,7 @@ if platform == 'win32':
 if __name__ == '__main__':
     _add(2017, 6)
     print(apidoc('download'))
-    
+
 
 ##########################################################################
 # GLOBALS                                                                       #

@@ -25,17 +25,17 @@ import pandas as pd
 
 def get_dataframe(freq):
     url = get_url(freq)
-    df = pd.read_csv(url)
-    # converters={'time_index': pd.to_datetime},
-    # index_col='time_index')
+    df = pd.read_csv(url,
+                     converters={'time_index': pd.to_datetime},
+                     index_col='time_index')
     return df
 
 
 def read_csv(source):
     """Canonical wrapper for pd.read_csv"""
-    df = pd.read_csv(source)
-    # converters={'time_index': pd.to_datetime},
-    # index_col='time_index')
+    df = pd.read_csv(source,
+                     converters={'time_index': pd.to_datetime},
+                     index_col='time_index')
     return df
 
 

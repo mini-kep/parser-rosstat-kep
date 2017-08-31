@@ -194,20 +194,22 @@ def folder_to_csv(folder):
     csv_filename = get_csv_filename(folder)
     dump_doc_files_to_csv(file_list, csv_filename)
     print("Finished creating raw CSV file:", csv_filename)
-    
-def make_interim_csv(year, month):    
+
+
+def make_interim_csv(year, month):
     from locations.folder import FolderBase
-    folder = FolderBase(year, month).get_raw_folder()    
+    folder = FolderBase(year, month).get_raw_folder()
     folder_to_csv(folder)
     return True
+
 
 if __name__ == "__main__":
     #from run_word import get_word_folder
     #from pathlib import Path
     #WORD_ROOT = Path("D:/digital/kep_data2")
     #word_folder = get_word_folder(2012, 11, WORD_ROOT)
-    
+
     #word_folder = Path("D:/digital/kep_data/2015_01")
-    #folder_to_csv(word_folder)
-    
+    # folder_to_csv(word_folder)
+
     pass

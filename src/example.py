@@ -47,7 +47,9 @@ from csv2df.parser import extract_tables
 from csv2df.emitter import Emitter
 from csv2df.validator import Validator
 
-#from csv2df.runner.py
+# from csv2df.runner.py
+
+
 def get_dataframes(csvfile, spec):
     """Extract dataframes from *csvfile* using *spec* parsing instructions.
 
@@ -55,13 +57,13 @@ def get_dataframes(csvfile, spec):
       csvfile (file connection or StringIO) - CSV file for parsing
       spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
     """
-    
+
     # Reader.items() yeild a tuple of csv file segment and its parsing definition
     #    csv_segment - list of reader.Row instances
-    #    pdef - parsing definition is specification.Definition instance    
-    # We construct list of Table()'s from csv_segment and identify 
-    # variable names and units in each table 
-    parsed_tables = []    
+    #    pdef - parsing definition is specification.Definition instance
+    # We construct list of Table()'s from csv_segment and identify
+    # variable names and units in each table
+    parsed_tables = []
     for csv_segment, pdef in Reader(csvfile, spec).items():
         tables = extract_tables(csv_segment, pdef)
         # accumulate results
@@ -74,16 +76,16 @@ def get_dataframes(csvfile, spec):
     dfm = emitter.get_dataframe(freq='m')
     return dfa, dfq, dfm
 
-    
-# Example 1. StringIO *csvfile1* is parsed with *spec1* instruction 
 
-#data
-csvfile1 = io.StringIO("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles					
+# Example 1. StringIO *csvfile1* is parsed with *spec1* instruction
+
+# data
+csvfile1 = io.StringIO("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447
 2000	7306	1527	1697	2038	2044""")
 
 # parsing instruction
-main = Definition(units={'млрд.рублей':'bln_rub'})
+main = Definition(units={'млрд.рублей': 'bln_rub'})
 main.append(varname='GDP',
             text='Объем ВВП',
             required_units=['bln_rub'])
@@ -93,17 +95,29 @@ spec1 = Specification(default=main)
 dfa, dfq, dfm = get_dataframes(csvfile1, spec1)
 assert isinstance(dfa, pd.DataFrame)
 assert isinstance(dfq, pd.DataFrame)
-assert isinstance(dfm, pd.DataFrame) 
+assert isinstance(dfm, pd.DataFrame)
 assert dfm.empty is True
 
 
 # Example 2. Parsing result validation
-check_points = [{'freq': 'a', 'label': 'GDP_bln_rub', 'period': False, 'value': 4823.0, 'year': 1999},
-                {'freq': 'q', 'label': 'GDP_bln_rub', 'period': 1, 'value': 901.0, 'year': 1999},
-                {'freq': 'q', 'label': 'GDP_bln_rub', 'period': 4, 'value': 2044, 'year': 2000}]
+check_points = [{'freq': 'a',
+                 'label': 'GDP_bln_rub',
+                 'period': False,
+                 'value': 4823.0,
+                 'year': 1999},
+                {'freq': 'q',
+                 'label': 'GDP_bln_rub',
+                 'period': 1,
+                 'value': 901.0,
+                 'year': 1999},
+                {'freq': 'q',
+                 'label': 'GDP_bln_rub',
+                 'period': 4,
+                 'value': 2044,
+                 'year': 2000}]
 checker = Validator(dfa, dfq, dfm)
 for c in check_points:
-    assert checker.is_included(c) 
+    assert checker.is_included(c)
 
 # Example 3 Read actual data by month and year
 year, month = 2017, 5
@@ -127,4 +141,5 @@ assert dfm1.equals(dfm2)
 # validation
 assert vint.validate()
 
-# LATER: parse several tables with a larger parsing definition (from test folder)
+# LATER: parse several tables with a larger parsing definition (from test
+# folder)

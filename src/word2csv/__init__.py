@@ -1,1 +1,1 @@
-"""word2csv docs..""" #FIXME
+"""word2csv docs.."""  # FIXME
