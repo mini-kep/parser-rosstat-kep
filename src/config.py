@@ -1,4 +1,37 @@
-"""Get paths for repo root, *latest* and *output* folders and UnRAR binary."""
+"""Get paths for repo root, *latest* and *output* folders and UnRAR binary.
+
+TODO: rewrite below, pay attn to references.
+
+Functions based on :class:`csv2df.locations.folder.FolderBase` class methods:
+
+    - :func:`DateHelper.get_latest_date` returns latest available
+      year and month
+    - :func:`PathHelper.locate_csv` retrieves interim CSV file for parsing
+      from *data/interim* folder by year and month
+    - based on year and month :func:`get_processed_folder` provides
+      location to save parsing result in *data/processed* folder
+
+
+For housekeeping :mod:`csv2df.helpers` provides:
+
+ - :func:`init_dirs` - make directory structure on startup
+ - :func:`locations.folder.copy_latest` - copy CSVs to *latest* folder which
+   has stable URL
+
+
+For reference - data directory structure::
+
+    \\data
+      \\interim
+          \\2017
+          \\2016
+          \\...
+      \\processed
+          \\latest
+          \\2017
+          \\2016
+          \\...
+"""
 
 from pathlib import Path
 import pandas as pd

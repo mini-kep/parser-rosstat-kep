@@ -71,6 +71,7 @@ dfa = to_dataframe(dfa_text)
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
 
+
 # TODO <https://github.com/epogrebnyak/mini-kep/issues/61>
 
 # Check on resulting dataframes dfa, dfq, dfm based on following rules:
@@ -109,8 +110,13 @@ assert rounding_error > 0.05 * 3 - 0.03
 # ----- exprimental class
 # FIXME: possibly refactor as LevelErrors and GrowthRateErrors
 
-class Errors:
+class TypeErrorManager:
+    DirectionType = [['m2q', 'm2a', 'q2a'], ['r2y']]
 
+    def __init__(self, error_type):
+        self.error_type = error_type
+
+<<<<<<< HEAD
     DefaultThreshold = [
         dict(
             m2q=0.05 * 3,
@@ -118,14 +124,21 @@ class Errors:
             q2a=0.05 * 4),
         dict(
             r2y=0.15)]
+=======
+    def _get_directions(self):
+        return self.DirectionType[self.error_type]
+>>>>>>> 9f4277e20d64def1f5640a8b065dc1f8c01820d1
 
-    def __init__(self, varname, error_type):
-        # FIXME: globals here not good
+    def _get_error(self, direction):
+        if self.error_type == 0:
+            df_error = dict(m2q=self.m2q, m2a=self.m2a, q2a=self.q2a)[direction]
+        elif self.error_type == 1:
+            df_error = self.r2y
 
-        self.error_type = error_type
-        self.directions = list(self.DefaultThreshold[error_type].keys())
+        return df_error
 
-        if error_type == 0:
+    def _calculate_errors(self, varname):
+        if self.error_type == 0:
             tsm = dfm[varname]
             tsq = dfq[varname]
             tsa = dfa[varname]
@@ -134,16 +147,27 @@ class Errors:
             self.m2a = error(tsm, tsa, sum_to_year)
             self.q2a = error(tsq, tsa, sum_to_year)
 
-        elif error_type == 1:
+        elif self.error_type == 1:
             tsm = dfm[varname + 'rog']
             tsa = dfa[varname + 'yoy'] / 100
 
             self.r2y = error(tsm, tsa, rog_to_yoy)
 
+
+class Errors:
+    DefaultThreshold = [dict(m2q=0.05 * 3, m2a=0.05 * 12, q2a=0.05 * 4), dict(r2y=0.15)]
+
+    def __init__(self, varname, error_type):
+        # FIXME: globals here not good
+
+        self.error_manager = TypeErrorManager(error_type)
+        self.error_manager._calculate_errors(varname)
+
     def _get_failed(self, direction, threshold=False):
         if not threshold:
-            threshold = self.DefaultThreshold[self.error_type][direction]
+            threshold = self.DefaultThreshold[self.error_manager.error_type][direction]
 
+<<<<<<< HEAD
         df_error = None
         if self.error_type == 0:
             df_error = dict(
@@ -152,6 +176,9 @@ class Errors:
                 q2a=self.q2a)[direction]
         elif self.error_type == 1:
             df_error = self.r2y
+=======
+        df_error = self.error_manager._get_error(direction)
+>>>>>>> 9f4277e20d64def1f5640a8b065dc1f8c01820d1
 
         # form fucntions below
         return df_error.where(df_error > threshold).dropna()
@@ -160,7 +187,8 @@ class Errors:
         return self._get_failed(direction).empty
 
     def is_valid(self):
-        return all(self._is_valid_on_direction(d) for d in self.directions)
+        return all(self._is_valid_on_direction(d) for d in self.error_manager._get_directions())
+
 
 # ----- end exprimental class
 
@@ -171,7 +199,10 @@ def check_levels_aggregate_up(varnames, error_type):
 
 labels = [lab for lab in dfa.columns if 'rub' in lab or 'usd' in lab]
 labels = ['EXPORT_GOODS_bln_usd', 'IMPORT_GOODS_bln_usd']
+<<<<<<< HEAD
 
+=======
+>>>>>>> 9f4277e20d64def1f5640a8b065dc1f8c01820d1
 
 err = Errors('EXPORT_GOODS_bln_usd', 0)
 assert err._get_failed('m2q').empty
@@ -180,7 +211,6 @@ assert err._get_failed('q2a').empty
 
 err1 = Errors('RETAIL_SALES_', 1)
 assert err1._get_failed('r2y').empty
-
 
 # TODO: add testing with different thrseholds
 
@@ -192,10 +222,16 @@ if __name__ == '__main__':
 
     # TODO: must pick all testable variables, present in dfa, dfq, dfm
     labels = [lab for lab in dfa.columns if 'rub' in lab or 'usd' in lab]
+<<<<<<< HEAD
     #is_passed = all(check_levels_aggregate_up(labels))
     #print('Month/quarter aggregation test passed:', is_passed)
     labels2 = set([lab[0: len(lab) - 3]
                    for lab in dfm.columns if 'rog' in lab or 'yoy' in lab])
+=======
+    # is_passed = all(check_levels_aggregate_up(labels))
+    # print('Month/quarter aggregation test passed:', is_passed)
+    labels2 = set([lab[0: len(lab) - 3] for lab in dfm.columns if 'rog' in lab or 'yoy' in lab])
+>>>>>>> 9f4277e20d64def1f5640a8b065dc1f8c01820d1
     labels3 = []
     for label in labels2:
         if (label + 'rog') in dfm.columns and (label + 'yoy') in dfa.columns:
@@ -212,7 +248,16 @@ if __name__ == '__main__':
     is_passed = check_levels_aggregate_up(varnames, 1)
     print('Rog -> yoy check ', is_passed)
 
+<<<<<<< HEAD
     # TODO: write test for GDP and INVESTMENT
+=======
+
+
+
+    # TODO: write test for GDP and INVESTMENT
+
+
+>>>>>>> 9f4277e20d64def1f5640a8b065dc1f8c01820d1
 
 
 # BAD_RESULT = pd.DataFrame({'A': [1]})
