@@ -36,7 +36,7 @@ For reference - data directory structure::
 import pandas as pd
 from locations.folder import FolderBase, md
 
-__all__ = ['PathHelper', 'DateHelper']
+__all__ = ['PathHelper', 'DateHelper', 'init_dirs']
 
 # csv file parameters
 ENC = 'utf8'
