@@ -4,7 +4,6 @@ from io import StringIO
 import functools
 
 
-
 def to_dataframe(text):
     return pd.read_csv(StringIO(text), sep="\t",
                        converters={0: pd.to_datetime},
@@ -72,6 +71,7 @@ dfa = to_dataframe(dfa_text)
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
 
+
 # TODO <https://github.com/epogrebnyak/mini-kep/issues/61>
 
 # Check on resulting dataframes dfa, dfq, dfm based on following rules:
@@ -87,18 +87,22 @@ def sum_to_quarter(ts):
     ts.index += pd.offsets.QuarterEnd()
     return ts
 
+
 def sum_to_year(ts):
     return ts.resample('A').sum()
+
 
 def rog_to_yoy(ts):
     return (ts / 100).resample('A').prod()
 
+
 def error(ts, ref_ts, grouper_func):
     return abs(grouper_func(ts) - ref_ts).dropna()
 
+
 # demo rounding error proportions
 true_values = [0.049, 0.049, 0.049]
-rounded_values = [round(x,1) for x in true_values]
+rounded_values = [round(x, 1) for x in true_values]
 rounding_error = sum(true_values) - sum(rounded_values)
 assert rounding_error > 0.05 * 3 - 0.03
 
@@ -106,17 +110,25 @@ assert rounding_error > 0.05 * 3 - 0.03
 # ----- exprimental class
 # FIXME: possibly refactor as LevelErrors and GrowthRateErrors
 
-class Errors:
+class TypeErrorManager:
+    DirectionType = [['m2q', 'm2a', 'q2a'], ['r2y']]
 
-    DefaultThreshold = [dict(m2q=0.05*3, m2a=0.05*12, q2a=0.05*4), dict(r2y=0.15)]
-
-    def __init__(self, varname, error_type):
-        # FIXME: globals here not good
-
+    def __init__(self, error_type):
         self.error_type = error_type
-        self.directions = list(self.DefaultThreshold[error_type].keys())
 
-        if error_type == 0:
+    def _get_directions(self):
+        return self.DirectionType[self.error_type]
+
+    def _get_error(self, direction):
+        if self.error_type == 0:
+            df_error = dict(m2q=self.m2q, m2a=self.m2a, q2a=self.q2a)[direction]
+        elif self.error_type == 1:
+            df_error = self.r2y
+
+        return df_error
+
+    def _calculate_errors(self, varname):
+        if self.error_type == 0:
             tsm = dfm[varname]
             tsq = dfq[varname]
             tsa = dfa[varname]
@@ -125,21 +137,27 @@ class Errors:
             self.m2a = error(tsm, tsa, sum_to_year)
             self.q2a = error(tsq, tsa, sum_to_year)
 
-        elif error_type == 1:
+        elif self.error_type == 1:
             tsm = dfm[varname + 'rog']
             tsa = dfa[varname + 'yoy'] / 100
 
             self.r2y = error(tsm, tsa, rog_to_yoy)
 
+
+class Errors:
+    DefaultThreshold = [dict(m2q=0.05 * 3, m2a=0.05 * 12, q2a=0.05 * 4), dict(r2y=0.15)]
+
+    def __init__(self, varname, error_type):
+        # FIXME: globals here not good
+
+        self.error_manager = TypeErrorManager(error_type)
+        self.error_manager._calculate_errors(varname)
+
     def _get_failed(self, direction, threshold=False):
         if not threshold:
-            threshold = self.DefaultThreshold[self.error_type][direction]
+            threshold = self.DefaultThreshold[self.error_manager.error_type][direction]
 
-        df_error = None
-        if self.error_type == 0:
-            df_error = dict(m2q=self.m2q, m2a=self.m2a, q2a=self.q2a)[direction]
-        elif self.error_type == 1:
-            df_error = self.r2y
+        df_error = self.error_manager._get_error(direction)
 
         # form fucntions below
         return df_error.where(df_error > threshold).dropna()
@@ -148,7 +166,8 @@ class Errors:
         return self._get_failed(direction).empty
 
     def is_valid(self):
-        return all(self._is_valid_on_direction(d) for d in self.directions)
+        return all(self._is_valid_on_direction(d) for d in self.error_manager._get_directions())
+
 
 # ----- end exprimental class
 
@@ -157,8 +176,7 @@ def check_levels_aggregate_up(varnames, error_type):
 
 
 labels = [lab for lab in dfa.columns if 'rub' in lab or 'usd' in lab]
-labels = ['EXPORT_GOODS_bln_usd',  'IMPORT_GOODS_bln_usd']
-
+labels = ['EXPORT_GOODS_bln_usd', 'IMPORT_GOODS_bln_usd']
 
 err = Errors('EXPORT_GOODS_bln_usd', 0)
 assert err._get_failed('m2q').empty
@@ -168,20 +186,19 @@ assert err._get_failed('q2a').empty
 err1 = Errors('RETAIL_SALES_', 1)
 assert err1._get_failed('r2y').empty
 
-
 # TODO: add testing with different thrseholds
 
 
 if __name__ == '__main__':
-    varnames = ['EXPORT_GOODS_bln_usd',  'IMPORT_GOODS_bln_usd']
+    varnames = ['EXPORT_GOODS_bln_usd', 'IMPORT_GOODS_bln_usd']
     is_passed = all(check_levels_aggregate_up(varnames, 0))
     print('Month/quarter aggregation test passed:', is_passed)
 
-    #TODO: must pick all testable variables, present in dfa, dfq, dfm
+    # TODO: must pick all testable variables, present in dfa, dfq, dfm
     labels = [lab for lab in dfa.columns if 'rub' in lab or 'usd' in lab]
-    #is_passed = all(check_levels_aggregate_up(labels))
-    #print('Month/quarter aggregation test passed:', is_passed)
-    labels2 = set([lab[0 : len(lab) - 3] for lab in dfm.columns if 'rog' in lab or 'yoy' in lab])
+    # is_passed = all(check_levels_aggregate_up(labels))
+    # print('Month/quarter aggregation test passed:', is_passed)
+    labels2 = set([lab[0: len(lab) - 3] for lab in dfm.columns if 'rog' in lab or 'yoy' in lab])
     labels3 = []
     for label in labels2:
         if (label + 'rog') in dfm.columns and (label + 'yoy') in dfa.columns:
@@ -195,7 +212,7 @@ if __name__ == '__main__':
 
 
 
-    #TODO: write test for GDP and INVESTMENT
+    # TODO: write test for GDP and INVESTMENT
 
 
 
@@ -203,7 +220,7 @@ if __name__ == '__main__':
 # BAD_RESULT = pd.DataFrame({'A': [1]})
 
 #
-#def check_month_to_year(month_frame, quarter_frame, year_frame, acceptable_error,
+# def check_month_to_year(month_frame, quarter_frame, year_frame, acceptable_error,
 #                        variable_to_check='EXPORT_GOODS_bln_usd'):
 #    """
 #        Check consistency sum of particular column in month_frame and year_frame
@@ -240,7 +257,7 @@ if __name__ == '__main__':
 #    return False
 #
 #
-#def check_month_to_qtr(month_frame, quarter_frame, year_frame, acceptable_error,
+# def check_month_to_qtr(month_frame, quarter_frame, year_frame, acceptable_error,
 #                       variable_to_check='EXPORT_GOODS_bln_usd'):
 #    """
 #        Check consistency sum of particular column in month_frame and year_frame
@@ -275,7 +292,7 @@ if __name__ == '__main__':
 #    return False
 #
 #
-#def check_qtr_to_year(month_frame, quarter_frame, year_frame, acceptable_error,
+# def check_qtr_to_year(month_frame, quarter_frame, year_frame, acceptable_error,
 #                      variable_to_check='EXPORT_GOODS_bln_usd'):
 #    """
 #        Check consistency sum of particular column in month_frame and year_frame
@@ -308,7 +325,7 @@ if __name__ == '__main__':
 #    return False
 #
 #
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 #
 #
 #    columns_passed = [column for column in dfm.columns
