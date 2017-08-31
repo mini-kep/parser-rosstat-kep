@@ -33,6 +33,7 @@ For reference - data directory structure::
 """
 
 
+import pandas as pd
 from locations.folder import FolderBase, md
 
 __all__ = ['PathHelper', 'DateHelper']
@@ -111,7 +112,17 @@ class PathHelper:
 class DateHelper:
 
     def get_supported_dates():
-        return DATES
+         """Get a list of year, month tuples starting from (2009, 4) until the
+         current month, excluding (2013, 11).
+         
+         Returns:
+             List of (year, month) tuples
+         """
+         start_date = '2009-4'
+         end_date = pd.to_datetime('today') - pd.offsets.MonthEnd()
+         dates = pd.date_range(start_date, end_date, freq='MS')
+         return [(date.year, date.month) for date in dates
+                 if (date.year, date.month) != (2013, 11)]
 
     def get_latest_date():
         """Return year and month for latest available interim data folder.
