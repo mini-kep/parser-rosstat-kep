@@ -52,10 +52,11 @@ dfm = get_dataframe_from_web('m')
 
 Check more access methods [in example here](https://github.com/epogrebnyak/mini-kep/blob/dev/src/example_access_data.py).
 
-# Can I have this data as Excel file?
+# Can I get this data in Excel?
 
- Here it is: [kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true), 
- but the real benefit is when you work with it in pandas, R or some econometric package.
+ Here it is: [kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true)
+ 
+ But the real research is when you load a CSV file to pandas (as shown above), R or some econometric package.
  
 # How do you update this repo?
 
