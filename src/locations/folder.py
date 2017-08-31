@@ -59,6 +59,7 @@ class FolderBase:
 
     def __init__(self, year=None, month=None):
         self.year, self.month = year, month
+        self.make_dirs()
 
     @classmethod
     def get_latest_date(cls):

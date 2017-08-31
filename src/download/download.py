@@ -6,6 +6,7 @@
 import os
 import subprocess
 import requests
+import datetime
 
 from locations.folder import FolderBase
 from locations.folder import get_unrar_binary
@@ -37,20 +38,18 @@ def unrar(path, folder, unrar=UNPACK_RAR_EXE):
 class RemoteFile():
 
     def __init__(self, year, month):
-        if (year, month) not in self._accepted_web_dates():
-            raise ValueError((year, month))
         self.year, self.month = year, month
+        self._check_date()
         self.url = self._make_url()
         folder = FolderBase(year, month).get_raw_folder()
         self.folder = str(folder)
         self.local_path = str(folder / 'ind.rar')
 
-    def _accepted_web_dates(self):
-        # TODO: make similar  sequence starting 2016, 12
-        #      and ending no leter than currnet month
-        return [(2016, 12),
-                (2017, 1), (2017, 2), (2017, 3),
-                (2017, 4), (2017, 5), (2017, 6)]
+    def _check_date(self):
+        def as_date(year, month):
+            return datetime.date(year, month, 1)        
+        if as_date(self.year, self.month) < as_date(2016, 12):
+            raise ValueError('No web files before 2016-12')
 
     def _make_url(self):
         month = str(self.month).zfill(2)
@@ -85,7 +84,8 @@ class RemoteFile():
             path = os.path.join(self.folder, file)
             if not path.endswith(".rar"):
                 os.remove(path)
-
+                
+    #FIXME: wrong responsibility
     def make_interim_csv(self):
         from word2csv.word import folder_to_csv
         folder_to_csv(self.folder)

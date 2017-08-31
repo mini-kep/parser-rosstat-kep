@@ -57,10 +57,9 @@ def get_dataframes(csvfile, spec=SPEC):
 class Vintage:
     """Represents dataset release for a given year and month."""
 
-    def __init__(self, year=False, month=False):
-        _year, _month = DateHelper.filter_date(year, month)
-        self.year, self.month = _year, _month
-        csv_path = PathHelper.locate_csv(_year, _month)
+    def __init__(self, year, month):
+        self.year, self.month = year, month
+        csv_path = PathHelper.locate_csv(year, month)
         with open_csv(csv_path) as csvfile:
             self.dfa, self.dfq, self.dfm = get_dataframes(csvfile)
 
@@ -90,17 +89,21 @@ class Collection:
     """Methods to manipulate entire set of data releases."""
 
     all_dates = DateHelper.get_supported_dates()
+    year, month = DateHelper.get_latest_date()    
+    latest_vintage = Vintage(year, month)
 
     @staticmethod
     def save_latest():
-        vintage = Vintage(year=None, month=None)
-        vintage.save()
+        year, month = DateHelper.get_latest_date()    
+        latest_vintage = Vintage(year, month)
+        latest_vintage.save()
 
     @staticmethod
     def approve_latest():
         """Quick check for algorithm on latest available data."""
-        vintage = Vintage(year=None, month=None)
-        vintage.validate()
+        year, month = DateHelper.get_latest_date()    
+        latest_vintage = Vintage(year, month)
+        latest_vintage.validate()
 
     @staticmethod
     def save_all():

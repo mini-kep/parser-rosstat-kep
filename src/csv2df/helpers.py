@@ -42,36 +42,6 @@ __all__ = ['PathHelper', 'DateHelper']
 ENC = 'utf8'
 CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
-
-# FIXME: hardcoded constant will not update to new months
-DATES = [(2009, 4), (2009, 5), (2009, 6),
-         (2009, 7), (2009, 8), (2009, 9), (2009, 10), (2009, 11), (2009, 12),
-
-         (2010, 1), (2010, 2), (2010, 3), (2010, 4), (2010, 5), (2010, 6),
-         (2010, 7), (2010, 8), (2010, 9), (2010, 10), (2010, 11), (2010, 12),
-
-         (2011, 1), (2011, 2), (2011, 3), (2011, 4), (2011, 5), (2011, 6),
-         (2011, 7), (2011, 8), (2011, 9), (2011, 10), (2011, 11), (2011, 12),
-
-         (2012, 1), (2012, 2), (2012, 3), (2012, 4), (2012, 5), (2012, 6),
-         (2012, 7), (2012, 8), (2012, 9), (2012, 10), (2012, 11), (2012, 12),
-
-         (2013, 1), (2013, 2), (2013, 3), (2013, 4), (2013, 5), (2013, 6),
-         (2013, 7), (2013, 8), (2013, 9), (2013, 10),  # missing (2013, 11)
-         (2013, 12),
-
-         (2014, 1), (2014, 2), (2014, 3), (2014, 4), (2014, 5), (2014, 6),
-         (2014, 7), (2014, 8), (2014, 9), (2014, 10), (2014, 11), (2014, 12),
-
-         (2015, 1), (2015, 2), (2015, 3), (2015, 4), (2015, 5), (2015, 6),
-         (2015, 7), (2015, 8), (2015, 9), (2015, 10), (2015, 11), (2015, 12),
-
-         (2016, 1), (2016, 2), (2016, 3), (2016, 4), (2016, 5), (2016, 6),
-         (2016, 7), (2016, 8), (2016, 9), (2016, 10), (2016, 11), (2016, 12),
-
-         (2017, 1), (2017, 2), (2017, 3), (2017, 4), (2017, 5), (2017, 6)]
-
-
 # folder locations
 
 class Folder(FolderBase):
@@ -80,21 +50,30 @@ class Folder(FolderBase):
 
 
 class PathHelper:
-    def locate_csv(year: int=None, month: int=None):
+    
+    def locate_latest_csv():
+        year, month = DateHelper.get_latest_date()
+        return PathHelper.locate_csv(year, month)        
+   
+    
+    def locate_csv(year: int, month: int):
         """Return interim CSV file based on *year* and *month*. Defaults to
            latest year and month.
 
            Returns:
                 pathlib.Path() instance
         """
-        year, month = DateHelper.filter_date(year, month)
+        if (year, month) not in DateHelper.get_supported_dates():
+            raise ValueError(year, month)
         folder = Folder(year, month).get_interim_folder()
         csv_path = folder / "tab.csv"
-        if csv_path.exists() and csv_path.stat().st_size > 0:
+        if not csv_path.exists():
+            raise FileNotFoundError(csv_path)
+        elif csv_path.stat().st_size == 0:   
+            raise FileNotFoundError('File has zero length: {}'.format(csv_path))
+        else:    
             return csv_path
-        else:
-            raise FileNotFoundError(
-                "File not found or has zero length: {}".format(csv_path))
+        
 
     def get_processed_folder(year, month):
         """Return processed CSV file folder based on *year* and *month*.
@@ -112,8 +91,12 @@ class PathHelper:
 class DateHelper:
 
     def get_supported_dates():
-         """Get a list of year, month tuples starting from (2009, 4) until the
-         current month, excluding (2013, 11).
+         """Get a list of (year, month) tuples starting from (2009, 4) 
+            up to month before current. 
+            
+            For example, on September 1 will return (8, 2017).
+            
+            Excludes (2013, 11) - no archive for this month.
          
          Returns:
              List of (year, month) tuples
@@ -121,9 +104,10 @@ class DateHelper:
          start_date = '2009-4'
          end_date = pd.to_datetime('today') - pd.offsets.MonthEnd()
          dates = pd.date_range(start_date, end_date, freq='MS')
+         excluded = (2013, 11)
          return [(date.year, date.month) for date in dates
-                 if (date.year, date.month) != (2013, 11)]
-
+                 if (date.year, date.month) != excluded]
+         
     def get_latest_date():
         """Return year and month for latest available interim data folder.
 
@@ -133,23 +117,21 @@ class DateHelper:
         """
         return Folder.get_latest_date()
 
-    def filter_date(year, month):
-        """Set (year, month) to latest date, even if year or month omitted.
-
-        Returns:
-            (year, month) tuple of two integers
-        """
-        latest_year, latest_month = DateHelper.get_latest_date()
-        return year or latest_year, month or latest_month
+#    def filter_date(year, month):
+#        """Set (year, month) to latest date, even if year or month omitted.
+#
+#        Returns:
+#            (year, month) tuple of two integers
+#        """
+#        latest_year, latest_month = DateHelper.get_latest_date()
+#        return year or latest_year, month or latest_month
 
 
 # create local data dirs for DATES
 
-
-def init_dirs(supported_dates=None):
+def init_dirs():
     """Create required directory structure in *data* folder."""
-    if not supported_dates:
-        supported_dates = DATES
+    supported_dates = DateHelper.get_supported_dates()
     for (year, month) in supported_dates:
         f = Folder(year, month)
         md(f.get_interim_folder())
