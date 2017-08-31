@@ -1,20 +1,20 @@
 # TODO: edit module docstring
 """File and folder locations for interim and processed CSV files.
 
-Functions based on :class:`csv2df.files.Folder` class methods:
+Functions based on :class:`csv2df.locations.folder.FolderBase` class methods:
 
-    - :func:`csv2df.files.get_latest_date` returns latest available
+    - :func:`DateHelper.get_latest_date` returns latest available
       year and month
-    - :func:`csv2df.files.locate_csv` retrieves interim CSV file for parsing
+    - :func:`PathHelper.locate_csv` retrieves interim CSV file for parsing
       from *data/interim* folder by year and month
-    - based on year and month :func:`csv2df.files.get_processed_folder` provides
+    - based on year and month :func:`get_processed_folder` provides
       location to save parsing result in *data/processed* folder
 
 
-For housekeeping :mod:`csv2df.files` provides:
+For housekeeping :mod:`csv2df.helpers` provides:
 
- - :func:`csv2df.files.init_dirs` - make directory structure on startup
- - :func:`csv2df.files.copy_latest` - copy CSVs to *latest* folder which
+ - :func:`init_dirs` - make directory structure on startup
+ - :func:`locations.folder.copy_latest` - copy CSVs to *latest* folder which
    has stable URL
 
 
