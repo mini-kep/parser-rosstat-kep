@@ -86,6 +86,20 @@ dfm = to_dataframe(dfm_text)
 #   return column in np.intersect1d(df_transform.columns, df_original.columns)
 
 def check_levels(direction, freq, epsilon, column):
+    """Helper function for comparing dataframes with variables that are levels.
+        The transformed dataframe is aggregated and compared to the original
+        dataframe.
+    
+    Args:
+        direction: Tuple of dataframes - the first value is the dataframe to be
+        transformed, the second value is the original dataframe to compare to.
+        freq; The time period over which to aggregate.
+        epsilon: Tolerance for numeric precision
+        column: Variable to compare
+        
+    Returns:
+        Boolean value indicating whether all values are within epsilon.
+    """
     df_transformed, df_original = direction
     if freq == 'A':
         column = column.replace('_rog', '_yoy')
@@ -95,6 +109,20 @@ def check_levels(direction, freq, epsilon, column):
 
 
 def check_rates(direction, freq, epsilon, column):
+    """Helper function for comparing dataframes with variables that are rates.
+        The transformed dataframe is aggregated and compared to the original
+        dataframe.
+    
+    Args:
+        direction: Tuple of dataframes - the first value is the dataframe to be
+        transformed, the second value is the original dataframe to compare to.
+        freq; The time period over which to aggregate.
+        epsilon: Tolerance for numeric precision
+        column: Variable to compare
+        
+    Returns:
+        Boolean value indicating whether all values are within epsilon.
+    """
     df_transformed, df_original = direction
     df = (df_transformed / 100).cumprod()[column]  # Compute annualized values
     z = df.resample(freq).sum()
@@ -106,7 +134,18 @@ def check_rates(direction, freq, epsilon, column):
 
 
 def check_month_to_year(dfm, dfq, dfa, epsilon, column):
-    """Check consistency of values across dataframes."""
+    """Check consistency of values across month and year dataframes.
+    
+    Args:
+        dfm: Dataframe with monthly values
+        dfa: Dataframe with annual values
+        dfq: Dataframe with quarterly values (unused)
+        epsilon: Tolerance for numeric precision
+        column: Variable to compare
+        
+    Returns:
+        Boolean value indicating whether all values are within epsilon.
+    """
     if '_bln_rub' in column or '_bln_usd' in column:
         return check_levels((dfm, dfa), 'A', epsilon, column)
     elif '_rog' in column:
@@ -116,7 +155,18 @@ def check_month_to_year(dfm, dfq, dfa, epsilon, column):
 
 
 def check_month_to_qtr(dfm, dfq, dfa, epsilon, column):
-    """Check consistency of values across dataframes."""
+    """Check consistency of values across month and quarter dataframes.
+    
+    Args:
+        dfm: Dataframe with monthly values
+        dfa: Dataframe with annual values (unused)
+        dfq: Dataframe with quarterly values
+        epsilon: Tolerance for numeric precision
+        column: Variable to compare
+        
+    Returns:
+        Boolean value indicating whether all values are within epsilon.
+    """
     if '_bln_rub' in column or '_bln_usd' in column:
         return check_levels((dfm, dfq), 'Q', epsilon, column)
     elif '_rog' in column:
@@ -126,7 +176,18 @@ def check_month_to_qtr(dfm, dfq, dfa, epsilon, column):
 
 
 def check_qtr_to_year(dfm, dfq, dfa, epsilon, column):
-    """Check consistency of values across dataframes."""
+    """Check consistency of values across quarter and year dataframes.
+    
+    Args:
+        dfm: Dataframe with monthly values (unused)
+        dfa: Dataframe with annual values
+        dfq: Dataframe with quarterly values
+        epsilon: Tolerance for numeric precision
+        column: Variable to compare
+        
+    Returns:
+        Boolean value indicating whether all values are within epsilon.
+    """
     if '_bln_rub' in column or '_bln_usd' in column:
         return check_levels((dfq, dfa), 'A', epsilon, column)
     elif '_rog' in column:
