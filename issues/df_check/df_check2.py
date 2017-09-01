@@ -85,17 +85,20 @@ def validate_column(df_transform, df_original, column):
 
 def check_month_to_year(dfm, dfq, dfa, epsilon, column):
     """Check consistency of values across dataframes."""
-    return np.all((np.abs(
-        dfm.resample('A').sum()[column] - dfa[column]).dropna()) < epsilon)
+    if '_bln_rub' in column or '_bln_usd' in column:
+        return np.all((np.abs(
+            dfm.resample('A').sum()[column] - dfa[column]).dropna()) < epsilon)
 
 
 def check_month_to_qtr(dfm, dfq, dfa, epsilon, column):
     """Check consistency of values across dataframes."""
-    return np.all((np.abs(
-        dfm.resample('Q').sum()[column] - dfq[column]).dropna()) < epsilon)
+    if '_bln_rub' in column or '_bln_usd' in column:
+        return np.all((np.abs(
+            dfm.resample('Q').sum()[column] - dfq[column]).dropna()) < epsilon)
 
 
 def check_qtr_to_year(dfm, dfq, dfa, epsilon, column):
     """Check consistency of values across dataframes."""
-    return np.all((np.abs(
-        dfq.resample('A').sum()[column] - dfa[column]).dropna()) < epsilon)
+    if '_bln_rub' in column or '_bln_usd' in column:
+        return np.all((np.abs(
+            dfq.resample('A').sum()[column] - dfa[column]).dropna()) < epsilon)
