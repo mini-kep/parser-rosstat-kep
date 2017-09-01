@@ -76,17 +76,17 @@ dfm = to_dataframe(dfm_text)
 
 class Test_Check_Time_Period:
 
-    def test_validate_column_var_in_only_one_df(self):
-        assert df_check2.validate_column(
-                dfq, dfa, 'INDPRO_rog') == False
+    # def test_validate_column_var_in_only_one_df(self):
+        # assert df_check2.validate_column(
+                # dfq, dfa, 'INDPRO_rog') == False
 
-    def test_validate_column_empty_string(self):
-        assert df_check2.validate_column(
-                dfq, dfa, '') == False
+    # def test_validate_column_empty_string(self):
+        # assert df_check2.validate_column(
+                # dfq, dfa, '') == False
 
-    def test_validate_column_var_in_both_dfs(self):
-        assert df_check2.validate_column(
-                dfm, dfa, 'RETAIL_SALES_FOOD_bln_rub') == True
+    # def test_validate_column_var_in_both_dfs(self):
+        # assert df_check2.validate_column(
+                # dfm, dfa, 'RETAIL_SALES_FOOD_bln_rub') == True
 
     def test_month_to_year_levels(self):
         columns_to_test = [
