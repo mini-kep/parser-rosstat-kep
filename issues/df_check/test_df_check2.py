@@ -91,9 +91,9 @@ class Test_Check_Time_Period:
     def test_month_to_year_levels(self):
         columns_to_test = [
             'IMPORT_GOODS_bln_usd',
-            # 'INDPRO_rog',
-            # 'INDPRO_yoy',
-            # 'INVESTMENT_rog',
+            'INDPRO_rog',
+            'INDPRO_yoy',
+            'INVESTMENT_rog',
             'RETAIL_SALES_FOOD_bln_rub',
             'RETAIL_SALES_NONFOOD_bln_rub',
             'RETAIL_SALES_bln_rub']
@@ -106,9 +106,9 @@ class Test_Check_Time_Period:
     def test_month_to_qtr_levels(self):
         columns_to_test = [
             'IMPORT_GOODS_bln_usd',
-            # 'INDPRO_rog',
-            # 'INDPRO_yoy',
-            # 'INVESTMENT_rog',
+            'INDPRO_rog',
+            'INDPRO_yoy',
+            'INVESTMENT_rog',
             'RETAIL_SALES_FOOD_bln_rub',
             'RETAIL_SALES_NONFOOD_bln_rub',
             'RETAIL_SALES_bln_rub']
@@ -121,9 +121,9 @@ class Test_Check_Time_Period:
     def test_qtr_to_year_levels(self):
         columns_to_test = [
             'IMPORT_GOODS_bln_usd',
-            # 'INDPRO_rog',
-            # 'INDPRO_yoy',
-            # 'INVESTMENT_rog',
+            'INDPRO_rog',
+            'INDPRO_yoy',
+            'INVESTMENT_rog',
             'RETAIL_SALES_FOOD_bln_rub',
             'RETAIL_SALES_NONFOOD_bln_rub',
             'RETAIL_SALES_bln_rub']
