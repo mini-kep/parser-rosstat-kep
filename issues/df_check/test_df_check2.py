@@ -72,11 +72,12 @@ dfa = to_dataframe(dfa_text)
 # assert dfa.index[0] == pd.Timestamp("1999-12-31")
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
-
+ 
+feed = [(dfm, df_check2.month_to_year, dfa, 0.15), (dfm, df_check2.quarter_to_year, dfa, 0.15)]
 
 class Test_Check_Time_Period:
 
-    def test_month_to_year_levels(self):
+    def test_month_to_year(self):
         # columns_to_test = [
             # 'IMPORT_GOODS_bln_usd',
             # 'INDPRO_rog',
@@ -87,7 +88,11 @@ class Test_Check_Time_Period:
             # 'RETAIL_SALES_NONFOOD_bln_rub',
             # 'RETAIL_SALES_bln_rub']
         assert df_check2.compare_dataframes(
-                dfm, df_check2.aggregate_levels, dfa, .25)
+                dfm, df_check2.month_to_year, dfa, .25)
+
+    
+    def test_runner(self):
+        assert df_check2.runner(feed)
 
 
 if __name__ == "__main__":
