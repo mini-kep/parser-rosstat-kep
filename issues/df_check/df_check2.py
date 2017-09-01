@@ -78,6 +78,10 @@ dfm = to_dataframe(dfm_text)
 #  1. absolute values by month/qtr accumulate to qtr/year (with some delta for rounding)
 #  2. rog rates accumulate to yoy (with some delta for rounding)
 
+def validate_column(df_transform, df_original, column):
+    """Check whether column is present in both dataframes being compared."""
+    return column in np.intersect1d(df_transform.columns, df_original.columns)
+
 
 def check_month_to_year(dfm, dfq, dfa, epsilon, column):
     """Check consistency of values across dataframes."""
