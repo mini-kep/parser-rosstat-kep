@@ -81,17 +81,17 @@ dfm = to_dataframe(dfm_text)
 
 def check_month_to_year(dfm, dfq, dfa, epsilon, column):
     """Check consistency of values across dataframes."""
-    return np.all((
-        dfm.resample('A').sum()[column] - dfa[column]).dropna() < epsilon)
+    return np.all((np.abs(
+        dfm.resample('A').sum()[column] - dfa[column]).dropna()) < epsilon)
 
 
 def check_month_to_qtr(dfm, dfq, dfa, epsilon, column):
     """Check consistency of values across dataframes."""
-    return np.all((
-        dfm.resample('Q').sum()[column] - dfq[column] < epsilon))
+    return np.all((np.abs(
+        dfm.resample('Q').sum()[column] - dfq[column]).dropna()) < epsilon)
 
 
 def check_qtr_to_year(dfm, dfq, dfa, epsilon, column):
     """Check consistency of values across dataframes."""
-    return np.all((
-        dfq.resample('A').sum()[column] - dfa[column]).dropna() < epsilon)
+    return np.all((np.abs(
+        dfq.resample('A').sum()[column] - dfa[column]).dropna()) < epsilon)
