@@ -78,24 +78,39 @@ dfm = to_dataframe(dfm_text)
 #  1. absolute values by month/qtr accumulate to qtr/year (with some delta for rounding)
 #  2. rog rates accumulate to yoy (with some delta for rounding)
 
-def validate_column(df_transform, df_original, column):
-    """Check whether column is present in both dataframes being compared."""
-    return column in np.intersect1d(df_transform.columns, df_original.columns)
+# Validation currently doesn't account for variables with different names such
+# as INDPRO_rog, INDPRO_yoy.
+#
+# def validate_column(df_transform, df_original, column):
+#   """Check whether column is present in both dataframes being compared."""
+#   return column in np.intersect1d(df_transform.columns, df_original.columns)
+
+def check_levels(direction, freq, epsilon, column):
+    df_transformed, df_original = direction
+    if freq == 'A':
+        column = column.replace('_rog', '_yoy')
+    return np.all((np.abs(
+        df_transformed.resample(freq).sum()[column] -
+        df_original[column]).dropna()) < epsilon)
+
+
+def check_rates(direction, freq, epsilon, column):
+    df_transformed, df_original = direction
+    df = (df_transformed / 100).cumprod()[column]  # Compute annualized values
+    z = df.resample(freq).sum()
+    z = z / z.shift() * 100
+    if freq == 'A':
+        column = column.replace('_rog', '_yoy')
+    return np.all((np.abs(
+        z - df_original[column]).dropna()) < epsilon)
 
 
 def check_month_to_year(dfm, dfq, dfa, epsilon, column):
     """Check consistency of values across dataframes."""
     if '_bln_rub' in column or '_bln_usd' in column:
-        return np.all((np.abs(
-            dfm.resample('A').sum()[column] - dfa[column]).dropna()) < epsilon)
+        return check_levels((dfm, dfa), 'A', epsilon, column)
     elif '_rog' in column:
-        dfm = (dfm / 100).cumprod()[column] # Compute annualized values
-        z = dfm.resample('A').sum()
-        z = z / z.shift() * 100
-        return np.all((np.abs(
-            # Compare with yoy value of annual df
-            z - dfa[column.replace('_rog', '_yoy')]
-            ).dropna()) < epsilon)
+        return check_rates((dfm, dfa), 'A', epsilon, column)
     else:
         raise ValueError("Unsupported variable")
 
@@ -103,15 +118,9 @@ def check_month_to_year(dfm, dfq, dfa, epsilon, column):
 def check_month_to_qtr(dfm, dfq, dfa, epsilon, column):
     """Check consistency of values across dataframes."""
     if '_bln_rub' in column or '_bln_usd' in column:
-        return np.all((np.abs(
-            dfm.resample('Q').sum()[column] - dfq[column]).dropna()) < epsilon)
+        return check_levels((dfm, dfq), 'Q', epsilon, column)
     elif '_rog' in column:
-        dfm = (dfm / 100).cumprod()[column] # Compute annualized values
-        z = dfm.resample('Q').sum()
-        z = z / z.shift() * 100
-        return np.all((np.abs(
-            z - dfq[column]
-            ).dropna()) < epsilon)
+        return check_rates((dfm, dfq), 'Q', epsilon, column)
     else:
         raise ValueError("Unsupported variable")
 
@@ -119,15 +128,8 @@ def check_month_to_qtr(dfm, dfq, dfa, epsilon, column):
 def check_qtr_to_year(dfm, dfq, dfa, epsilon, column):
     """Check consistency of values across dataframes."""
     if '_bln_rub' in column or '_bln_usd' in column:
-        return np.all((np.abs(
-            dfq.resample('A').sum()[column] - dfa[column]).dropna()) < epsilon)
+        return check_levels((dfq, dfa), 'A', epsilon, column)
     elif '_rog' in column:
-        dfm = (dfm / 100).cumprod()[column] # Compute annualized values
-        z = dfm.resample('A').sum()
-        z = z / z.shift() * 100
-        return np.all((np.abs(
-            # Compare with yoy value of annual df
-            z - dfa[column.replace('_rog', '_yoy')]
-            ).dropna()) < epsilon)
+        return check_rates((dfq, dfa), 'A', epsilon, column)
     else:
         raise ValueError("Unsupported variable")
