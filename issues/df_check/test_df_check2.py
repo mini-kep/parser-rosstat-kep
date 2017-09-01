@@ -76,6 +76,18 @@ dfm = to_dataframe(dfm_text)
 
 class Test_Check_Time_Period:
 
+    def test_validate_column_var_in_only_one_df(self):
+        assert df_check2.validate_column(
+                dfq, dfa, 'INDPRO_rog') == False
+
+    def test_validate_column_empty_string(self):
+        assert df_check2.validate_column(
+                dfq, dfa, '') == False
+
+    def test_validate_column_var_in_both_dfs(self):
+        assert df_check2.validate_column(
+                dfm, dfa, 'RETAIL_SALES_FOOD_bln_rub') == True
+
     def test_month_to_year_levels(self):
         columns_to_test = [
             'IMPORT_GOODS_bln_usd',
@@ -121,50 +133,53 @@ class Test_Check_Time_Period:
                 df_check2.check_qtr_to_year(
                     dfm, dfq, dfa, 0.15, column))
 
-    # def test_month_to_year_rates(self):
-        # columns_to_test = [
-            # # 'IMPORT_GOODS_bln_usd',
-            # 'INDPRO_rog',
-            # 'INDPRO_yoy',
-            # 'INVESTMENT_rog',
-            # # 'RETAIL_SALES_FOOD_bln_rub',
-            # # 'RETAIL_SALES_NONFOOD_bln_rub',
-            # # 'RETAIL_SALES_bln_rub']
+    def test_month_to_year_rates(self):
+        columns_to_test = [
+            # 'IMPORT_GOODS_bln_usd',
+            'INDPRO_rog',
+            'INDPRO_yoy',
+            'INVESTMENT_rog',
+            # 'RETAIL_SALES_FOOD_bln_rub',
+            # 'RETAIL_SALES_NONFOOD_bln_rub',
+            # 'RETAIL_SALES_bln_rub'
+            ]
 
-        # for column in columns_to_test:
-            # assert (
-                # df_check2.check_month_to_year(
-                    # dfm, dfq, dfa, 10.00, column))
+        for column in columns_to_test:
+            assert (
+                df_check2.check_month_to_year(
+                    dfm, dfq, dfa, 10.0, column))
 
-    # def test_month_to_qtr_rates(self):
-        # columns_to_test = [
-            # # 'IMPORT_GOODS_bln_usd',
-            # 'INDPRO_rog',
-            # 'INDPRO_yoy',
-            # 'INVESTMENT_rog',
-            # # 'RETAIL_SALES_FOOD_bln_rub',
-            # # 'RETAIL_SALES_NONFOOD_bln_rub',
-            # # 'RETAIL_SALES_bln_rub']
+    def test_month_to_qtr_rates(self):
+        columns_to_test = [
+            # 'IMPORT_GOODS_bln_usd',
+            'INDPRO_rog',
+            'INDPRO_yoy',
+            'INVESTMENT_rog',
+            # 'RETAIL_SALES_FOOD_bln_rub',
+            # 'RETAIL_SALES_NONFOOD_bln_rub',
+            # 'RETAIL_SALES_bln_rub'
+            ]
 
-        # for column in columns_to_test:
-            # assert (
-                # df_check2.check_month_to_qtr(
-                    # dfm, dfq, dfa, 10.00, column))
+        for column in columns_to_test:
+            assert (
+                df_check2.check_month_to_qtr(
+                    dfm, dfq, dfa, 10.0, column))
 
-    # def test_qtr_to_year_rates(self):
-        # columns_to_test = [
-            # # 'IMPORT_GOODS_bln_usd',
-            # 'INDPRO_rog',
-            # 'INDPRO_yoy',
-            # 'INVESTMENT_rog',
-            # # 'RETAIL_SALES_FOOD_bln_rub',
-            # # 'RETAIL_SALES_NONFOOD_bln_rub',
-            # # 'RETAIL_SALES_bln_rub']
+    def test_qtr_to_year_rates(self):
+        columns_to_test = [
+            # 'IMPORT_GOODS_bln_usd',
+            'INDPRO_rog',
+            'INDPRO_yoy',
+            'INVESTMENT_rog',
+            # 'RETAIL_SALES_FOOD_bln_rub',
+            # 'RETAIL_SALES_NONFOOD_bln_rub',
+            # 'RETAIL_SALES_bln_rub'
+            ]
 
-        # for column in columns_to_test:
-            # assert (
-                # df_check2.check_qtr_to_year(
-                    # dfm, dfq, dfa, 10.00, column))
+        for column in columns_to_test:
+            assert (
+                df_check2.check_qtr_to_year(
+                    dfm, dfq, dfa, 10.0, column))
 
 
 if __name__ == "__main__":
