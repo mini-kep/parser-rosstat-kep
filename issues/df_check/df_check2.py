@@ -88,6 +88,15 @@ def check_month_to_year(dfm, dfq, dfa, epsilon, column):
     if '_bln_rub' in column or '_bln_usd' in column:
         return np.all((np.abs(
             dfm.resample('A').sum()[column] - dfa[column]).dropna()) < epsilon)
+    elif '_rog' in column:
+        dfm = (dfm / 100).cumprod()[column] # Compute annualized values
+        z = dfm.resample('A').sum()
+        z = z / z.shift() * 100
+        return np.all((np.abs(
+            z - dfa[column.replace('_rog', '_yoy')]
+            ).dropna()) < epsilon)
+    else:
+        raise ValueError("Unsupported variable")
 
 
 def check_month_to_qtr(dfm, dfq, dfa, epsilon, column):
