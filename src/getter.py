@@ -16,9 +16,9 @@ def read_csv(source):
                        index_col='time_index')
 
 
-def get_dataframe(freq):
+def get_dataframe(freq, helper=PathHelper):
     """Read dataframe from local folder"""
-    path = PathHelper.get_latest_csv(freq)
+    path = helper.get_csv_in_latest_folder(freq)
     # a workaround for Windows problem with non-ASCII paths
     # https://github.com/pandas-dev/pandas/issues/15086
     content = Path(path).read_text()

@@ -37,11 +37,11 @@ def unrar(path, folder, unrar=UNPACK_RAR_EXE):
 
 class RemoteFile():
 
-    def __init__(self, year, month):
+    def __init__(self, year, month, helper = PathHelper):
         self.year, self.month = year, month
         self._check_date()
         self.url = self._make_url()
-        folder = PathHelper.get_raw_folder(year, month)
+        folder = helper.get_raw_folder(year, month)
         self.folder = str(folder)
         self.local_path = str(folder / 'ind.rar')
 

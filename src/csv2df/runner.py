@@ -1,19 +1,12 @@
 """Get pandas dataframes for a given data and month.
 
-*get_dataframes(csvfile, spec=SPEC)* is a lower-level function to get
-dataframes from *csvfile* connection under *spec* parsing instruction.
+*get_dataframes(csvfile, spec=SPEC)* is a function to get dataframes 
+    from *csvfile* connection under *spec* parsing instruction.
 
 *Vintage* class addresses dataset by year and month:
 
     Vintage(year, month).save()
     Vintage(year, month).validate()
-
-These calls should give similar results:
-
-    csv_path = PathHelper.locate_csv(year, month)
-    csvfile = open_csv(csv_path)
-
-    Vintage(year, month).dfs()
 
 *Collection* manipulates all datasets, released at various dates:
 
@@ -58,10 +51,10 @@ def get_dataframes(csvfile, spec=SPEC):
 class Vintage:
     """Represents dataset release for a given year and month."""
 
-    def __init__(self, year, month, path_helper=PathHelper):
+    def __init__(self, year, month, helper=PathHelper):
         self.year, self.month = year, month        
-        self.folder_Path = path_helper.get_processed_folder(year, month)
-        csv_path = path_helper.locate_csv(year, month)
+        self.folder_path = helper.get_processed_folder(year, month)
+        csv_path = helper.locate_csv(year, month)
         with open_csv(csv_path) as csvfile:
             self.dfa, self.dfq, self.dfm = get_dataframes(csvfile)
         
@@ -71,10 +64,10 @@ class Vintage:
         return self.dfa, self.dfq, self.dfm
 
     def save(self):
-        self.dfa.to_csv(self.folder_Path / 'dfa.csv')
-        self.dfq.to_csv(self.folder_Path / 'dfq.csv')
-        self.dfm.to_csv(self.folder_Path / 'dfm.csv')
-        print("Saved dataframes to", self.folder_Path)
+        self.dfa.to_csv(self.folder_path / 'dfa.csv')
+        self.dfq.to_csv(self.folder_path / 'dfq.csv')
+        self.dfm.to_csv(self.folder_path / 'dfm.csv')
+        print("Saved dataframes to", self.folder_path)
         return True
 
     def validate(self):
@@ -91,32 +84,30 @@ class Collection:
     """Methods to manipulate entire set of data releases."""
 
     all_dates = DateHelper.get_supported_dates()
+    year, month = DateHelper.get_latest_date()
+    latest_vintage = Vintage(year, month)
 
-    @staticmethod
-    def save_latest():
-        year, month = DateHelper.get_latest_date()
-        latest_vintage = Vintage(year, month)
-        latest_vintage.save()
+    @classmethod
+    def save_latest(cls):
+        cls.latest_vintage.save()
 
-    @staticmethod
-    def approve_latest():
+    @classmethod
+    def approve_latest(cls):
         """Quick check for algorithm on latest available data."""
-        year, month = DateHelper.get_latest_date()
-        latest_vintage = Vintage(year, month)
-        latest_vintage.validate()
+        cls.latest_vintage.validate()
 
-    @staticmethod
-    def save_all():
-        for year, month in Collection.all_dates:
+    @classmethod
+    def save_all(cls):
+        for year, month in cls.all_dates:
             Vintage(year, month).save()
 
-    @staticmethod
-    def approve_all():
+    @classmethod
+    def approve_all(cls):
         """Checks all dates, runs for about 1-2 min of a fast computer.
            May fail if dataset not complete, eg word2csv written only part
            of CSV file.
         """
-        for year, month in Collection.all_dates:
+        for year, month in cls.all_dates:
             print("Checking", year, month)
             vintage = Vintage(year, month)
             vintage.validate()
@@ -126,16 +117,12 @@ if __name__ == "__main__":
     # Collection calls
     Collection.approve_latest()
     # Collection.approve_all()
-    # Collection.save_latest()
+    Collection.save_latest()
     # Collection.save_all()
 
     # sample Vintage call
-    year, month = 2017, 5
+    year, month = 2015, 5
     vint = Vintage(year, month)
     vint.validate()
     dfa, dfq, dfm = vint.dfs()
-
-    from io import StringIO
-    s = dfa.to_csv()
-    dx = pd.read_csv(StringIO(s))
     

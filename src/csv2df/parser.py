@@ -155,24 +155,18 @@ class Table:
 
 
 if __name__ == "__main__":
-    import itertools
-    from config import PathHelper, DateHelper
+    from config import PathHelper, DateHelper # this is in __main__ section
     import csv2df.reader as reader
     import csv2df.specification as spec
 
-    assert list(itertools.chain.from_iterable([[1, 2], [3, 4]])) == \
-        [1, 2, 3, 4]
-
     year, month = DateHelper.get_latest_date()
     csv_path = PathHelper.locate_csv(year, month)
-    csvfile = reader.open_csv(csv_path)
-    parsed_tables = []
-    for csv_segment, pdef in reader.Reader(csvfile, spec.SPEC).items():
-        tables = extract_tables(csv_segment, pdef)
-        parsed_tables.extend(tables)
-
-    for t in tables:
-        print()
-        print(t)
-
-    csvfile.close()
+    with reader.open_csv(csv_path) as csvfile:
+        parsed_tables = []
+        for csv_segment, pdef in reader.Reader(csvfile, spec.SPEC).items():
+            tables = extract_tables(csv_segment, pdef)
+            parsed_tables.extend(tables)
+    
+        for t in tables:
+            print()
+            print(t)    
