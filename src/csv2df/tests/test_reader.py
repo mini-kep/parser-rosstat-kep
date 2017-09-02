@@ -12,47 +12,18 @@ from csv2df.reader import Reader
 from csv2df.specification import Specification
 
 
-
-OS_Specific_Path = type(Path())
-class MockPath1(OS_Specific_Path):
-    # EP: it is an interesting inspection of the parameters involved
-    def open(self, mode='r', buffering=-1, encoding=None, 
-                   errors=None, newline=None):
-        # EP: True is better than a string
-        return True
-
-class Test_open_csv_submitted_version_after_adding_setup_and_rename:
-    
-    def setup_method(self):
-        self.path_good = MockPath1()
-        self.path_bad = "This is not pathlib.Path, this is a string"
-
-    def test_error_on_wrong_instance(self):
-        with pytest.raises(TypeError):
-            open_csv(self.path_bad)
-
-    def test_open_is_called(self):
-        assert open_csv(self.path_good) is True
-
-# Exmple of a mock with mock_open, can be fed in to test above in setup
-# EP: drawback - any args to m seem to suffice
-class MockPath2(type(Path())):
-    def open(self, *arg, **kwarg):
-        m = mock_open()
-        return m(*arg, **kwarg)
-    
-@pytest.fixture    
+@pytest.fixture
 def temp_path():
     with NamedTemporaryFile() as f:
         abspath = f.name
-    p = Path(abspath)    
+    p = Path(abspath)
     p.write_text("abc\n123")
     return p
 
-class Test_open_csv:    
+class Test_open_csv:
 
     def test_on_string_argument_raises_TypeError(self):
-        path_string = 'abc.csv'
+        path_string = "abc.csv"
         with pytest.raises(TypeError):
             open_csv(path_string)
 
@@ -60,10 +31,10 @@ class Test_open_csv:
         assert open_csv(temp_path)
 
     def test_on_Path_provides_readable_input(self, temp_path):
-        with open_csv(temp_path) as f:            
-            assert f.readlines() == ['abc\n', '123']    
-   
-    
+        with open_csv(temp_path) as f:
+            assert f.readlines() == ["abc\n", "123"]
+
+
 # TODO: implement tests
 @pytest.mark.skip("Only a sceleton.")
 def test_reader():
@@ -78,9 +49,9 @@ full_string = "\n".join([junk_string, content_string])
 def test_yield_csv_rows():
     csvfile = io.StringIO(content_string)
     rows = list(yield_csv_rows(csvfile))
-    assert rows[0] == ['Объем ВВП']
-    assert rows[1] == ['1999', '4823']
-    assert rows[2] == ['2000', '7306']
+    assert rows[0] == ["Объем ВВП"]
+    assert rows[1] == ["1999", "4823"]
+    assert rows[2] == ["2000", "7306"]
 
 
 def test_filter_csv_rows():
@@ -97,9 +68,9 @@ def test_filter_csv_rows():
 def test_to_rows():
     csvfile = io.StringIO(full_string)
     rows = list(to_rows(csvfile))
-    assert rows[0] == Row(['Объем ВВП'])
-    assert rows[1] == Row(['1999', '4823'])
-    assert rows[2] == Row(['2000', '7306'])
+    assert rows[0] == Row(["Объем ВВП"])
+    assert rows[1] == Row(["1999", "4823"])
+    assert rows[2] == Row(["2000", "7306"])
 
 
 class Test_get_year():
@@ -190,15 +161,6 @@ class Test_Row_Methods_Used_for_Matching_Strings(Test_Row):
         assert row.matches("words") is True
         assert row.startswith("words") is False
 
-        # FIXME: delete this
-        # matches also can check multiple words
-        # EP: this is so-so case, not sure what it ilustrates.
-        # assert row.matches("words in") is True
-        # EP: this is not expected behaviour, why any of the functions would mathch
-        #     something not in order, pls delete
-        # as long as they are in order
-        #assert row.matches("words head") is False
-
 
 class Test_Row_get_varname(Test_Row):
 
@@ -223,7 +185,7 @@ class Test_Row_get_unit(Test_Row):
         assert Row(["Rate, %"]).get_unit(unit_mapper) == "pct"
 
     def test_get_unit_uses_first_entry_in_unit_mapper_oredered_dict(self):
-        unit_mapper = odict([('% change', "rog"), ('%', "pct")])
+        unit_mapper = odict([("% change", "rog"), ("%", "pct")])
         assert Row(["1. abcd, % change"]).get_unit(unit_mapper) == "rog"
         assert Row(["1. abcd, % change"]).get_unit(unit_mapper) != "pct"
 
