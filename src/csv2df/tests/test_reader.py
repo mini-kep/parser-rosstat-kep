@@ -2,8 +2,6 @@ import pytest
 from collections import OrderedDict as odict
 import io
 
-import pathlib
-
 from csv2df.reader import yield_csv_rows, to_rows, filter_csv_rows
 from csv2df.reader import get_year, is_year, Row, RowStack
 from csv2df.reader import Reader
@@ -15,19 +13,17 @@ from csv2df.specification import Specification
 
 
 class test_open_csv:
+    from pathlib import Path
+    def fake_open(*args, **kwargs):
+	    return "test"
+    Path.open = fake_open
 
-    class MockPath(pathlib.Path):
-        def __init__(self):
-            pass
-        def open(*args, **kwargs):
-            return "test"
-
-    path_good = MockPath()
-    bad_path = "This is not pathlib.Path, this is a string"
+    path_good = Path()
+    path_bad = "This is not pathlib.Path, this is a string"
 
     def test_error_on_wrong_instance(self):
         with pytest.raises(TypeError):
-            open_csv(bad_path)
+            open_csv(path_bad)
 
     def test_open_is_called(self):
         assert open_csv(good_path) == "test"
