@@ -2,7 +2,7 @@
 import pytest
 from io import StringIO
 
-import df_check2
+import df_check
 import pandas as pd
 
 
@@ -73,7 +73,7 @@ dfa = to_dataframe(dfa_text)
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
  
-feed = [(dfm, df_check2.month_to_year, dfa, 0.15), (dfm, df_check2.quarter_to_year, dfa, 0.15)]
+feed = [(dfm, df_check.month_to_year, dfa, 0.15), (dfm, df_check.quarter_to_year, dfa, 0.15)]
 
 class Test_Check_Time_Period:
 
@@ -87,12 +87,12 @@ class Test_Check_Time_Period:
             # 'RETAIL_SALES_rog',
             # 'RETAIL_SALES_NONFOOD_bln_rub',
             # 'RETAIL_SALES_bln_rub']
-        assert df_check2.compare_dataframes(
-                dfm, df_check2.month_to_year, dfa, .25)
+        assert df_check.compare_dataframes(
+                dfm, df_check.month_to_year, dfa, .25)
 
     
     def test_runner(self):
-        assert df_check2.runner(feed)
+        assert df_check.runner(feed)
 
 
 if __name__ == "__main__":
