@@ -43,13 +43,4 @@ if '__main__' == __name__:
     dfq = get_dataframe('q')
     dfm = get_dataframe('m')
 
-
-# TEMPORARY: will remove later
-def get_dfs_as_dictionary():
-    """Get three dataframes from local csv files"""
-    dfs = {}
-    for k in ['a', 'q', 'm']:
-        dfs[k] = get_dataframe(k)
-    return dfs
-
 # TODO: add local file caching
