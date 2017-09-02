@@ -5,7 +5,6 @@ import io
 from csv2df.reader import yield_csv_rows, to_rows, filter_csv_rows
 from csv2df.reader import get_year, is_year, Row, RowStack
 from csv2df.reader import Reader
-
 from csv2df.specification import Specification
 
 # FIXME: is it ok to xfail missing tests?
