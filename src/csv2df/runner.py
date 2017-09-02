@@ -24,7 +24,8 @@ These calls should give similar results:
 """
 import pandas as pd
 
-from config import DateHelper, PathHelper
+from config import PathHelper
+from config import DateHelper
 from csv2df.specification import SPEC
 from csv2df.reader import Reader, open_csv
 from csv2df.parser import extract_tables
@@ -57,22 +58,23 @@ def get_dataframes(csvfile, spec=SPEC):
 class Vintage:
     """Represents dataset release for a given year and month."""
 
-    def __init__(self, year, month):
-        self.year, self.month = year, month
-        csv_path = PathHelper.locate_csv(year, month)
+    def __init__(self, year, month, path_helper=PathHelper):
+        self.year, self.month = year, month        
+        self.folder_Path = path_helper.get_processed_folder(year, month)
+        csv_path = path_helper.locate_csv(year, month)
         with open_csv(csv_path) as csvfile:
             self.dfa, self.dfq, self.dfm = get_dataframes(csvfile)
+        
 
     def dfs(self):
         """Shorthand for obtaining three dataframes."""
         return self.dfa, self.dfq, self.dfm
 
     def save(self):
-        folder_path = PathHelper.get_processed_folder(self.year, self.month)
-        self.dfa.to_csv(folder_path / 'dfa.csv')
-        self.dfq.to_csv(folder_path / 'dfq.csv')
-        self.dfm.to_csv(folder_path / 'dfm.csv')
-        print("Saved dataframes to", folder_path)
+        self.dfa.to_csv(self.folder_Path / 'dfa.csv')
+        self.dfq.to_csv(self.folder_Path / 'dfq.csv')
+        self.dfm.to_csv(self.folder_Path / 'dfm.csv')
+        print("Saved dataframes to", self.folder_Path)
         return True
 
     def validate(self):
@@ -105,7 +107,7 @@ class Collection:
 
     @staticmethod
     def save_all():
-        for (year, month) in Collection.all_dates:
+        for year, month in Collection.all_dates:
             Vintage(year, month).save()
 
     @staticmethod
@@ -122,9 +124,9 @@ class Collection:
 
 if __name__ == "__main__":
     # Collection calls
-    # Collection.approve_latest()
+    Collection.approve_latest()
     # Collection.approve_all()
-    Collection.save_latest()
+    # Collection.save_latest()
     # Collection.save_all()
 
     # sample Vintage call
@@ -136,3 +138,4 @@ if __name__ == "__main__":
     from io import StringIO
     s = dfa.to_csv()
     dx = pd.read_csv(StringIO(s))
+    
