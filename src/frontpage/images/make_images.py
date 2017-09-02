@@ -83,7 +83,7 @@ class DataHandler:
         elif gtype == GraphInstance:
             subp = 'misc'
         else:
-            raise TypeError('Unknown graph type')
+            raise TypeError(repr(gtype)+' is not a known graph type')
 
         outpath = self.pngfolder / subp
 
