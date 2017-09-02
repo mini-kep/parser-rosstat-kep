@@ -14,11 +14,11 @@ from csv2df.specification import Specification
 
 class test_open_csv:
     from pathlib import Path
-    def fake_open(*args, **kwargs):
-	    return "test"
-    Path.open = fake_open
+    class MockPath(Path):
+        def open(*args, **kwargs):
+            return "test"
 
-    path_good = Path()
+    path_good = MockPath()
     path_bad = "This is not pathlib.Path, this is a string"
 
     def test_error_on_wrong_instance(self):
