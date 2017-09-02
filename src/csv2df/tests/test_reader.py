@@ -23,10 +23,10 @@ class test_open_csv:
 
     def test_error_on_wrong_instance(self):
         with pytest.raises(TypeError):
-            open_csv(path_bad)
+            open_csv(self.path_bad)
 
     def test_open_is_called(self):
-        assert open_csv(good_path) == "test"
+        assert open_csv(self.good_path) == "test"
 
 
 # TODO: implement tests
