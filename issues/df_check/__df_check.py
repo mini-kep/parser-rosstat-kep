@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-import pytest
-from io import StringIO
-
-import df_check2
 import pandas as pd
+from io import StringIO
+import functools
 
 
 def to_dataframe(text):
@@ -72,28 +70,318 @@ dfa = to_dataframe(dfa_text)
 # assert dfa.index[0] == pd.Timestamp("1999-12-31")
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
- 
-feed = [(dfm, df_check2.month_to_year, dfa, 0.15), (dfm, df_check2.quarter_to_year, dfa, 0.15)]
-
-class Test_Check_Time_Period:
-
-    def test_month_to_year(self):
-        # columns_to_test = [
-            # 'IMPORT_GOODS_bln_usd',
-            # 'INDPRO_rog',
-            # 'INDPRO_yoy',
-            # 'INVESTMENT_rog',
-            # 'RETAIL_SALES_FOOD_bln_rub',
-            # 'RETAIL_SALES_rog',
-            # 'RETAIL_SALES_NONFOOD_bln_rub',
-            # 'RETAIL_SALES_bln_rub']
-        assert df_check2.compare_dataframes(
-                dfm, df_check2.month_to_year, dfa, .25)
-
-    
-    def test_runner(self):
-        assert df_check2.runner(feed)
 
 
-if __name__ == "__main__":
-    pytest.main([__file__])
+# TODO <https://github.com/epogrebnyak/mini-kep/issues/61>
+
+# Check on resulting dataframes dfa, dfq, dfm based on following rules:
+#  1. absolute values by month/qtr accumulate to qtr/year (with some delta for rounding)
+#  2. rog rates accumulate to yoy (with some delta for rounding)
+#  3. formulate other checks
+
+
+# checking 1
+
+def sum_to_quarter(ts):
+    ts = ts.resample('QS').sum()
+    ts.index += pd.offsets.QuarterEnd()
+    return ts
+
+
+def sum_to_year(ts):
+    return ts.resample('A').sum()
+
+
+def rog_to_yoy(ts):
+    return (ts / 100).resample('A').prod()
+
+
+def error(ts, ref_ts, grouper_func):
+    return abs(grouper_func(ts) - ref_ts).dropna()
+
+
+# demo rounding error proportions
+true_values = [0.049, 0.049, 0.049]
+rounded_values = [round(x, 1) for x in true_values]
+rounding_error = sum(true_values) - sum(rounded_values)
+assert rounding_error > 0.05 * 3 - 0.03
+
+
+# ----- exprimental class
+# FIXME: possibly refactor as LevelErrors and GrowthRateErrors
+
+class TypeErrorManager:
+    DirectionType = [['m2q', 'm2a', 'q2a'], ['r2y']]
+
+    def __init__(self, error_type):
+        self.error_type = error_type
+
+<<<<<<< HEAD
+    DefaultThreshold = [
+        dict(
+            m2q=0.05 * 3,
+            m2a=0.05 * 12,
+            q2a=0.05 * 4),
+        dict(
+            r2y=0.15)]
+=======
+    def _get_directions(self):
+        return self.DirectionType[self.error_type]
+>>>>>>> 9f4277e20d64def1f5640a8b065dc1f8c01820d1
+
+    def _get_error(self, direction):
+        if self.error_type == 0:
+            df_error = dict(m2q=self.m2q, m2a=self.m2a, q2a=self.q2a)[direction]
+        elif self.error_type == 1:
+            df_error = self.r2y
+
+        return df_error
+
+    def _calculate_errors(self, varname):
+        if self.error_type == 0:
+            tsm = dfm[varname]
+            tsq = dfq[varname]
+            tsa = dfa[varname]
+
+            self.m2q = error(tsm, tsq, sum_to_quarter)
+            self.m2a = error(tsm, tsa, sum_to_year)
+            self.q2a = error(tsq, tsa, sum_to_year)
+
+        elif self.error_type == 1:
+            tsm = dfm[varname + 'rog']
+            tsa = dfa[varname + 'yoy'] / 100
+
+            self.r2y = error(tsm, tsa, rog_to_yoy)
+
+
+class Errors:
+    DefaultThreshold = [dict(m2q=0.05 * 3, m2a=0.05 * 12, q2a=0.05 * 4), dict(r2y=0.15)]
+
+    def __init__(self, varname, error_type):
+        # FIXME: globals here not good
+
+        self.error_manager = TypeErrorManager(error_type)
+        self.error_manager._calculate_errors(varname)
+
+    def _get_failed(self, direction, threshold=False):
+        if not threshold:
+            threshold = self.DefaultThreshold[self.error_manager.error_type][direction]
+
+<<<<<<< HEAD
+        df_error = None
+        if self.error_type == 0:
+            df_error = dict(
+                m2q=self.m2q,
+                m2a=self.m2a,
+                q2a=self.q2a)[direction]
+        elif self.error_type == 1:
+            df_error = self.r2y
+=======
+        df_error = self.error_manager._get_error(direction)
+>>>>>>> 9f4277e20d64def1f5640a8b065dc1f8c01820d1
+
+        # form fucntions below
+        return df_error.where(df_error > threshold).dropna()
+
+    def _is_valid_on_direction(self, direction):
+        return self._get_failed(direction).empty
+
+    def is_valid(self):
+        return all(self._is_valid_on_direction(d) for d in self.error_manager._get_directions())
+
+
+# ----- end exprimental class
+
+
+def check_levels_aggregate_up(varnames, error_type):
+    return [Errors(varname, error_type).is_valid() for varname in varnames]
+
+
+labels = [lab for lab in dfa.columns if 'rub' in lab or 'usd' in lab]
+labels = ['EXPORT_GOODS_bln_usd', 'IMPORT_GOODS_bln_usd']
+<<<<<<< HEAD
+
+=======
+>>>>>>> 9f4277e20d64def1f5640a8b065dc1f8c01820d1
+
+err = Errors('EXPORT_GOODS_bln_usd', 0)
+assert err._get_failed('m2q').empty
+assert err._get_failed('m2a').empty
+assert err._get_failed('q2a').empty
+
+err1 = Errors('RETAIL_SALES_', 1)
+assert err1._get_failed('r2y').empty
+
+# TODO: add testing with different thrseholds
+
+
+if __name__ == '__main__':
+    varnames = ['EXPORT_GOODS_bln_usd', 'IMPORT_GOODS_bln_usd']
+    is_passed = all(check_levels_aggregate_up(varnames, 0))
+    print('Month/quarter aggregation test passed:', is_passed)
+
+    # TODO: must pick all testable variables, present in dfa, dfq, dfm
+    labels = [lab for lab in dfa.columns if 'rub' in lab or 'usd' in lab]
+<<<<<<< HEAD
+    #is_passed = all(check_levels_aggregate_up(labels))
+    #print('Month/quarter aggregation test passed:', is_passed)
+    labels2 = set([lab[0: len(lab) - 3]
+                   for lab in dfm.columns if 'rog' in lab or 'yoy' in lab])
+=======
+    # is_passed = all(check_levels_aggregate_up(labels))
+    # print('Month/quarter aggregation test passed:', is_passed)
+    labels2 = set([lab[0: len(lab) - 3] for lab in dfm.columns if 'rog' in lab or 'yoy' in lab])
+>>>>>>> 9f4277e20d64def1f5640a8b065dc1f8c01820d1
+    labels3 = []
+    for label in labels2:
+        if (label + 'rog') in dfm.columns and (label + 'yoy') in dfa.columns:
+            labels3.append(label)
+
+    varnames = [
+        'INVESTMENT_',
+        'RETAIL_SALES_FOOD_',
+        'RETAIL_SALES_',
+        'RETAIL_SALES_NONFOOD_',
+        'INDPRO_',
+        'WAGE_REAL_']
+
+    is_passed = check_levels_aggregate_up(varnames, 1)
+    print('Rog -> yoy check ', is_passed)
+
+<<<<<<< HEAD
+    # TODO: write test for GDP and INVESTMENT
+=======
+
+
+
+    # TODO: write test for GDP and INVESTMENT
+
+
+>>>>>>> 9f4277e20d64def1f5640a8b065dc1f8c01820d1
+
+
+# BAD_RESULT = pd.DataFrame({'A': [1]})
+
+#
+# def check_month_to_year(month_frame, quarter_frame, year_frame, acceptable_error,
+#                        variable_to_check='EXPORT_GOODS_bln_usd'):
+#    """
+#        Check consistency sum of particular column in month_frame and year_frame
+#
+#        Args:
+#             month: month data frame
+#             quarter_frame: quarter data frame.
+#             year_frame: year data frame
+#             acceptable_error: acceptable_error of consistency
+#             variable_to_check: column_name which we will check
+#
+#        Returns:
+#            True, if we have not found unconsistent entry else: False
+#     """
+#
+#    try:
+#        monthly = month_frame[variable_to_check]
+#        annual = year_frame[variable_to_check]
+#
+#        month_to_year = monthly.resample('A').sum()
+#        month_to_year.index += pd.offsets.YearEnd()
+#
+#        error_month_to_year = (month_to_year - annual).abs()
+#
+#        error_month_to_year.dropna(inplace=True)
+#
+#        return error_month_to_year.where(error_month_to_year >= acceptable_error).dropna().empty
+#
+#    #        assert (error_month_to_year < acceptable_error).all()
+#
+#    except KeyError:
+#        pass
+#
+#    return False
+#
+#
+# def check_month_to_qtr(month_frame, quarter_frame, year_frame, acceptable_error,
+#                       variable_to_check='EXPORT_GOODS_bln_usd'):
+#    """
+#        Check consistency sum of particular column in month_frame and year_frame
+#
+#        Args:
+#             month: month data frame
+#             quarter_frame: quarter data frame.
+#             year_frame: year data frame
+#             acceptable_error: acceptable_error of consistency
+#             variable_to_check: column_name which we will check
+#
+#        Returns:
+#            True, if we have not found unconsistent entry else: False
+#     """
+#
+#    try:
+#        monthly = month_frame[variable_to_check]
+#        qtr = quarter_frame[variable_to_check]
+#
+#        month_to_qtr = monthly.resample('QS').sum()
+#        month_to_qtr.index += pd.offsets.QuarterEnd()
+#        error_month_to_qtr = (month_to_qtr - qtr).abs()
+#        error_month_to_qtr.dropna(inplace=True)
+#
+#        return error_month_to_qtr.where(error_month_to_qtr >= acceptable_error).dropna().empty
+#
+#    #        assert (error_month_to_qtr < acceptable_error).all()
+#
+#    except KeyError:
+#        pass
+#
+#    return False
+#
+#
+# def check_qtr_to_year(month_frame, quarter_frame, year_frame, acceptable_error,
+#                      variable_to_check='EXPORT_GOODS_bln_usd'):
+#    """
+#        Check consistency sum of particular column in month_frame and year_frame
+#
+#        Args:
+#             month: month data frame
+#             quarter_frame: quarter data frame.
+#             year_frame: year data frame
+#             acceptable_error: acceptable_error of consistency
+#             variable_to_check: column_name which we will check
+#
+#        Returns:
+#            True, if we have not found unconsistent entry else: False
+#    """
+#
+#    try:
+#        qtr = quarter_frame[variable_to_check]
+#        annual = year_frame[variable_to_check]
+#
+#        qtr_to_year = qtr.resample('A').sum()
+#        qtr_to_year.index += pd.offsets.YearEnd()
+#        error_qtr_to_year = (qtr_to_year - annual).abs()
+#        error_qtr_to_year.dropna(inplace=True)
+#
+#        return error_qtr_to_year.where(error_qtr_to_year >= acceptable_error).dropna().empty
+#
+#    except KeyError:
+#        pass
+#
+#    return False
+#
+#
+# if __name__ == "__main__":
+#
+#
+#    columns_passed = [column for column in dfm.columns
+#                      if check_month_to_year(dfm, dfq, dfa, 0.15, column)]
+#
+#    print("Column passed for month->year ", columns_passed)
+#
+#    columns_passed = [column for column in dfm.columns
+#                      if check_month_to_qtr(dfm, dfq, dfa, 0.1, column)]
+#
+#    print("Column passed for month->qtr ", columns_passed)
+#
+#    columns_passed = [column for column in dfm.columns
+#                      if check_qtr_to_year(dfm, dfq, dfa, 0.15, column)]
+#
+#    print("Column passed for qtr->year ", columns_passed)

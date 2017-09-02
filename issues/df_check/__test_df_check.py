@@ -2,7 +2,7 @@
 import pytest
 from io import StringIO
 
-import df_check2
+from issues import todo_df_check
 import pandas as pd
 
 
@@ -72,27 +72,54 @@ dfa = to_dataframe(dfa_text)
 # assert dfa.index[0] == pd.Timestamp("1999-12-31")
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
- 
-feed = [(dfm, df_check2.month_to_year, dfa, 0.15), (dfm, df_check2.quarter_to_year, dfa, 0.15)]
+
 
 class Test_Check_Time_Period:
 
     def test_month_to_year(self):
-        # columns_to_test = [
-            # 'IMPORT_GOODS_bln_usd',
-            # 'INDPRO_rog',
-            # 'INDPRO_yoy',
-            # 'INVESTMENT_rog',
-            # 'RETAIL_SALES_FOOD_bln_rub',
-            # 'RETAIL_SALES_rog',
-            # 'RETAIL_SALES_NONFOOD_bln_rub',
-            # 'RETAIL_SALES_bln_rub']
-        assert df_check2.compare_dataframes(
-                dfm, df_check2.month_to_year, dfa, .25)
+        columns_to_test = [
+            'IMPORT_GOODS_bln_usd',
+            'INDPRO_rog',
+            'INDPRO_yoy',
+            'INVESTMENT_rog',
+            'RETAIL_SALES_FOOD_bln_rub',
+            'RETAIL_SALES_NONFOOD_bln_rub',
+            'RETAIL_SALES_bln_rub']
 
-    
-    def test_runner(self):
-        assert df_check2.runner(feed)
+        for column in columns_to_test:
+            assert (
+                todo_df_check.check_month_to_year(
+                    dfm, dfq, dfa, 0.15, column))
+
+    def test_month_to_qtr(self):
+        columns_to_test = [
+            'IMPORT_GOODS_bln_usd',
+            'INDPRO_rog',
+            'INDPRO_yoy',
+            'INVESTMENT_rog',
+            'RETAIL_SALES_FOOD_bln_rub',
+            'RETAIL_SALES_NONFOOD_bln_rub',
+            'RETAIL_SALES_bln_rub']
+
+        for column in columns_to_test:
+            assert (
+                todo_df_check.check_month_to_qtr(
+                    dfm, dfq, dfa, 0.15, column))
+
+    def test_qtr_to_year(self):
+        columns_to_test = [
+            'IMPORT_GOODS_bln_usd',
+            'INDPRO_rog',
+            'INDPRO_yoy',
+            'INVESTMENT_rog',
+            'RETAIL_SALES_FOOD_bln_rub',
+            'RETAIL_SALES_NONFOOD_bln_rub',
+            'RETAIL_SALES_bln_rub']
+
+        for column in columns_to_test:
+            assert (
+                todo_df_check.check_qtr_to_year(
+                    dfm, dfq, dfa, 0.15, column))
 
 
 if __name__ == "__main__":
