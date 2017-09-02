@@ -44,8 +44,9 @@ dfm = get_dataframe('m')
 # ############### #
 
 class Sparkline():
-
-    LOCAL_FOLDER = get_root() / "output" / "png"
+    
+    import config
+    LOCAL_FOLDER = config.find_repo_root() / "output" / "png"
     GITHUB_FOLDER = \
         "https://github.com/epogrebnyak/mini-csv2df/raw/master/output/png/{}"
 
