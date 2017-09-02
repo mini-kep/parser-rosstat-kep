@@ -123,7 +123,7 @@ for c in check_points:
 year, month = 2017, 5
 
 # 3.1 Access to csv file using path helper
-from csv2df.helpers import PathHelper
+from config import PathHelper
 from csv2df.specification import SPEC
 csv_path = PathHelper.locate_csv(year, month)
 with open_csv(csv_path) as csvfile:
