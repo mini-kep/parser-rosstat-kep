@@ -9,7 +9,6 @@ import numpy as np
 #
 ##############################################################################
 
-
 ANNUAL_FREQUENCY = 'A'
 
 
@@ -41,11 +40,31 @@ def get_rates(columns):
 
 
 def aggregate_levels(df, freq='A'):
+    """Aggregates a dataframe that has levels columns.
+
+    Args: 
+        df: A dataframe to aggregate. It is subsetted to have only columns that
+        are levels.
+        freq: The frequency to resample to. The default is annual.
+
+    Returns:
+        An aggregated dataframe depending on the frequency.
+    """
     df = levels_df(df)
     return df.resample(freq).sum()
 
 
 def aggregate_rates(df, freq='A'):
+    """Aggregates a dataframe that has rates columns.
+
+    Args:
+        df: A dataframe to aggregate. It is subsetted to have only columns that
+        are rates..
+        freq: The frequency to resample to. The default is annual.
+
+    Returns:
+        An aggregated dataframe depending on the frequency.
+    """
     df = rates_df(df)
     df = (df / 100).cumprod()  # Compute annualized values
     z = df.resample(freq).sum()
@@ -53,16 +72,17 @@ def aggregate_rates(df, freq='A'):
 
 
 def levels_df(df):
-    levels = get_levels(df.columns)
-    return df[levels]
+    """Subsets a dataframe with levels columns only."""
+    return df[get_levels(df.columns)]
 
 
 def rates_df(df):
-    rates = get_rates(df.columns)
-    return df[rates]
+    """Subsets a dataframe with rates columns only."""
+    return df[get_rates(df.columns)]
 
 
 def build(df):
+    """Combines a subsetted levels and rates dataframe (without aggregating)."""
     return levels_df(df).join(rates_df(df))
 
 
@@ -81,20 +101,28 @@ def compare_dataframes(df1, agg_func, df2, epsilon):
     return np.all(abs((agg_func(df1) - build(df2)).dropna()) < epsilon)
 
 
-###############################################################################
-
-
 def month_to_year(dfm):
+    """Aggregates a monthly dataframe to an annual one."""
     df_levels = aggregate_levels(dfm, ANNUAL_FREQUENCY)
     df_rates = aggregate_rates(dfm, ANNUAL_FREQUENCY)
     return df_levels.join(df_rates)
 
 
 def quarter_to_year(dfq):
+    """Aggregates a quarterly dataframe to an annual one."""
     df_levels = aggregate_levels(dfq, ANNUAL_FREQUENCY)
     df_rates = aggregate_rates(dfq, ANNUAL_FREQUENCY)
     return df_levels.join(df_rates)
 
 
 def runner(feed):
+    """Tests a list of tuples to pass as an argument to the compare_dataframes()
+        function.
+
+    Args:
+        feed: (df1, accum, df2, epsilon)
+
+    Returns:
+        A boolean, true if all tests are successful.
+    """
     return np.all(compare_dataframes(*test_case) for test_case in feed)
