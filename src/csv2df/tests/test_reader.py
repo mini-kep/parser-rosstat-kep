@@ -15,7 +15,7 @@ from csv2df.specification import Specification
 class test_open_csv:
     from pathlib import Path
     class MockPath(type(Path())):
-        def open(*args, **kwargs):
+        def open(self, mode='r', buffering=-1, encoding=None, errors=None, newline=None):
             return "test"
 
     path_good = MockPath()
