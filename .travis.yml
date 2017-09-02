@@ -1,16 +1,13 @@
 language: python
 python:
   - "3.6"
-# command to install dependencies 
 install:
   - pip install -r requirements.txt
   - pip install pytest
   - pip install codecov
   - pip install pytest-cov
-#  - pip install coveralls
 # command to run tests
 script: 
-  - pytest src/csv2df --doctest-modules --cov=csv2df
+  - pytest src --doctest-modules --cov=src
 after_success:
   - codecov
-#  - coveralls
