@@ -126,3 +126,23 @@ def runner(feed):
         A boolean, true if all tests are successful.
     """
     return np.all(compare_dataframes(*test_case) for test_case in feed)
+
+
+def column_to_aggfunc(column, dfm, dfq):
+    """Chooses an appropriate aggregation function, depending on the whether
+        the column exists in the dataframe.
+    
+    Args:
+        column: String containing the column name
+        dfm: Monthly dataframe
+        dfq: Quarterly dataframe
+
+    Returns:
+        A function - either month_to_year or quarter_to_year
+    """
+    if column in dfm.columns:
+        return month_to_year
+    elif column not in dfm.columns and column in dfq.columns:
+        return quarter_to_year
+    else:
+        raise ValueError("Unknown variable")
