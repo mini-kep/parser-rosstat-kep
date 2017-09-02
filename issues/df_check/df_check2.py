@@ -50,7 +50,7 @@ def aggregate_levels(df, freq='A'):
     Returns:
         An aggregated dataframe depending on the frequency.
     """
-    df = levels_df(df)
+    df = subset_levels(df)
     return df.resample(freq).sum()
 
 
@@ -65,25 +65,25 @@ def aggregate_rates(df, freq='A'):
     Returns:
         An aggregated dataframe depending on the frequency.
     """
-    df = rates_df(df)
+    df = subset_rates(df)
     df = (df / 100).cumprod()  # Compute annualized values
     z = df.resample(freq).sum()
     return z / z.shift() * 100
 
 
-def levels_df(df):
+def subset_levels(df):
     """Subsets a dataframe with levels columns only."""
     return df[get_levels(df.columns)]
 
 
-def rates_df(df):
+def subset_rates(df):
     """Subsets a dataframe with rates columns only."""
     return df[get_rates(df.columns)]
 
 
-def build(df):
+def merge_rates_levels(df):
     """Combines a subsetted levels and rates dataframe (without aggregating)."""
-    return levels_df(df).join(rates_df(df))
+    return subset_levels(df).join(subset_rates(df))
 
 
 def compare_dataframes(df1, agg_func, df2, epsilon):
@@ -98,7 +98,7 @@ def compare_dataframes(df1, agg_func, df2, epsilon):
     Returns:
         Boolean value indicating whether all values are within epsilon.
     """
-    return np.all(abs((agg_func(df1) - build(df2)).dropna()) < epsilon)
+    return np.all(abs((agg_func(df1) - merge_rates_levels(df2)).dropna()) < epsilon)
 
 
 def month_to_year(dfm):
