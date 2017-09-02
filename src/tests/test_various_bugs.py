@@ -1,14 +1,15 @@
+"""Regression tests / bug fixes on occasional errors."""
+
 import pytest
 from pathlib import Path
 import pandas as pd
 from io import StringIO
 
-from config import PathHelper
+from config import PathHelper, find_repo_root
 
 
-# regression tests - after bug fixes on occasional errors
 
-ROOT = Path(__file__).parents[3]
+ROOT = find_repo_root()
 
 
 def test_time_index_is_included_in_access():
