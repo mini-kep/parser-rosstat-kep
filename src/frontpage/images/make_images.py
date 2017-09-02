@@ -1,18 +1,21 @@
 # -*- coding: utf-8 -*-
 
+import sys
+
 import datetime
 from pathlib import Path
 
 def get_root():
     return Path(__file__).parents[3]
 
-import access_dfs
+sys.path.append(str(get_root() / 'src'))
+import getter
 
 import matplotlib.pyplot as plt
 
 class Visualizer:
     def __init__(self):
-        self.dfs = access_dfs.get_dfs_from_web()
+        self.dfs = getter.get_dfs_from_web()
         self.rootfolder = get_root()
         self.pngfolder = self.rootfolder / 'output' / 'png'
 

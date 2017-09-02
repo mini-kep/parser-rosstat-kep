@@ -4,7 +4,7 @@ from pathlib import Path
 from io import StringIO
 import pandas as pd
 
-from config import PathHelper
+# from config import PathHelper
 
 __all__ = ['get_dataframe']
 
@@ -37,10 +37,19 @@ def get_dataframe_from_web(freq):
     url = make_url(freq)
     return read_csv(url)
 
-# TODO: add local file caching
-
 
 if '__main__' == __name__:
     dfa = get_dataframe('a')
     dfq = get_dataframe('q')
     dfm = get_dataframe('m')
+
+
+# TEMPORARY: will remove later
+def get_dfs_from_web():
+    """Get three dataframes from local csv files"""
+    dfs = {}
+    for k in ['a', 'q', 'm']:
+        dfs[k] = get_dataframe_from_web(k)
+    return dfs
+
+# TODO: add local file caching
