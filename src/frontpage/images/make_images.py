@@ -71,7 +71,7 @@ class IndicatorInstance(GraphInstance):
 
 class DataHandler:
     def __init__(self):
-        self.dfs = getter.get_dfs_from_web()
+        self.dfs = getter.get_dfs_as_dictionary()
         self.rootfolder = get_root()
         self.pngfolder = self.rootfolder / 'output' / 'png'
 
