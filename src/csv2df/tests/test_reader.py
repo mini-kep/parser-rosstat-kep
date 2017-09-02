@@ -4,15 +4,29 @@ import io
 
 from csv2df.reader import yield_csv_rows, to_rows, filter_csv_rows
 from csv2df.reader import get_year, is_year, Row, RowStack
+from csv2df.reader import Reader
+from csv2df.specification import Specification
 
 # FIXME: is it ok to xfail missing tests?
 
 # FIXME: can I test open_csv? with a mock file?
 
 
-@pytest.mark.skip("don't know how to test this")
-def test_open_csv():
-    assert 0
+class test_open_csv:
+    from pathlib import Path
+    class MockPath(type(Path())):
+        def open(self, mode='r', buffering=-1, encoding=None, errors=None, newline=None):
+            return "test"
+
+    path_good = MockPath()
+    path_bad = "This is not pathlib.Path, this is a string"
+
+    def test_error_on_wrong_instance(self):
+        with pytest.raises(TypeError):
+            open_csv(self.path_bad)
+
+    def test_open_is_called(self):
+        assert open_csv(self.good_path) == "test"
 
 
 # TODO: implement tests
