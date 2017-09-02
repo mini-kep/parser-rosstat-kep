@@ -14,23 +14,21 @@ from csv2df.specification import Specification
 # FIXME: can I test open_csv? with a mock file?
 
 
-
-
 class test_open_csv:
-    
+
     class MockPath(pathlib.Path):
         def __init__(self):
             pass
         def open(*args, **kwargs):
             return "test"
-    
+
     path_good = MockPath()
     bad_path = "This is not pathlib.Path, this is a string"
-    
+
     def test_error_on_wrong_instance(self):
         with pytest.raises(TypeError):
             open_csv(bad_path)
-        
+
     def test_open_is_called(self):
         assert open_csv(good_path) == "test"
 
