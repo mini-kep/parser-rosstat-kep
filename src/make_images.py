@@ -1,17 +1,11 @@
 # -*- coding: utf-8 -*-
 
-import sys
-
 import datetime
-from pathlib import Path
-
-def get_root():
-    return Path(__file__).parents[3]
-
-sys.path.append(str(get_root() / 'src'))
-import getter
-
 import matplotlib.pyplot as plt
+
+from config import find_repo_root
+
+import getter
 
 DEFAULT_TIMERANGE = datetime.date(1998, 12, 31), datetime.date(2017, 12, 31)
 
@@ -68,11 +62,10 @@ class IndicatorInstance(GraphInstance):
     #     return None
 
 
-
 class DataHandler:
     def __init__(self):
         self.dfs = getter.get_dfs_as_dictionary()
-        self.rootfolder = get_root()
+        self.rootfolder = find_repo_root()
         self.pngfolder = self.rootfolder / 'output' / 'png'
 
     def gen_all_graphs(self, freq, gtype=GraphInstance):
@@ -125,3 +118,10 @@ def save_all_images():
     inds = ['RETAIL_SALES_FOOD_bln_rub', 
             'RETAIL_SALES_NONFOOD_bln_rub']
     dh.gen_multiple_indicators(inds, 'm')
+    
+    
+  
+    
+if __name__ == "__main__":
+    save_all_images()    
+    
