@@ -1,34 +1,47 @@
 import pytest
 from collections import OrderedDict as odict
 import io
+from pathlib import Path
+from unittest.mock import mock_open
+from tempfile import NamedTemporaryFile
 
-from csv2df.reader import yield_csv_rows, to_rows, filter_csv_rows
+
+from csv2df.reader import yield_csv_rows, to_rows, filter_csv_rows, open_csv
 from csv2df.reader import get_year, is_year, Row, RowStack
 from csv2df.reader import Reader
 from csv2df.specification import Specification
 
-# FIXME: is it ok to xfail missing tests?
-
-# FIXME: can I test open_csv? with a mock file?
 
 
-class test_open_csv:
-    from pathlib import Path
-    class MockPath(type(Path())):
-        def open(self, mode='r', buffering=-1, encoding=None, errors=None, newline=None):
-            return "test"
+OS_Specific_Path = type(Path())
+class MockPath1(OS_Specific_Path):
+    # EP: it is an interesting inspection of the parameters involved
+    def open(self, mode='r', buffering=-1, encoding=None, 
+                   errors=None, newline=None):
+        # EP: True is better than a string
+        return True
 
-    path_good = MockPath()
-    path_bad = "This is not pathlib.Path, this is a string"
+class Test_open_csv_submitted_version_after_adding_setup_and_rename:
+    
+    def setup_method(self):
+        self.path_good = MockPath1()
+        self.path_bad = "This is not pathlib.Path, this is a string"
 
     def test_error_on_wrong_instance(self):
         with pytest.raises(TypeError):
             open_csv(self.path_bad)
 
     def test_open_is_called(self):
-        assert open_csv(self.good_path) == "test"
+        assert open_csv(self.path_good) is True
 
-
+# Exmple of a mock with mock_open, can be fed in to test above in setup
+# EP: drawback - any args to m seem to suffice
+class MockPath2(type(Path())):
+    def open(self, *arg, **kwarg):
+        m = mock_open()
+        return m(*arg, **kwarg)
+   
+    
 # TODO: implement tests
 @pytest.mark.skip("Only a sceleton.")
 def test_reader():
