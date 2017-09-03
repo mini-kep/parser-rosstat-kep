@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from pandas.util.testing import assert_frame_equal
 import pandas as pd
 from io import StringIO
 
@@ -114,9 +115,7 @@ def deaccumulate(df, first_month):
     ix = original_start_year_values.index
     # FIXME: can we do this without loop? this fails:
     # df.loc[ix,] = original_start_year_values.loc[ix, ]
-    for i in ix:
-        for varname in df.columns:
-            df.loc[i, varname] = original_start_year_values.loc[i, varname]
+    df.loc[ix, :] = original_start_year_values
     return df
 
 
@@ -124,6 +123,8 @@ varnames = select_varnames(dfm)
 
 gov_dfm = dfm[varnames]
 diff_dfm = deaccumulate_month(gov_dfm)
+last_month_values = gov_dfm[gov_dfm.index.month==12]
+assert_frame_equal(diff_dfm.resample('A').sum(), last_month_values)
 rename(diff_dfm)
 
 gov_dfq = dfq[varnames]
