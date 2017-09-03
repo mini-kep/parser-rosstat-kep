@@ -5,7 +5,6 @@
 
            
 # Concept
-
 [mini-kep] parses MS Word files from [Rosstat KEP publication][Rosstat], creates pandas dataframes with 
 macroeconomic time series and saves them as [CSV files at stable URL][backend]. 
 
@@ -14,15 +13,19 @@ macroeconomic time series and saves them as [CSV files at stable URL][backend].
   [backend]: https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest
 
 [mini-kep] follows [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
-directory structure. The code in *src* folder consists of following packages:
+directory structure. 
+
+The parcer itself consists of following packages (in 
+[src](https://github.com/epogrebnyak/mini-kep/blob/master/src/) folder):
    - **download**: download and unpack rar files from Rosstat website
    - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
    - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
-   - **frontpage**: draw graphs and provide simple interface to latest data. 
+
+[getter.py](https://github.com/epogrebnyak/mini-kep/blob/master/src/getter.py) is 
+an entry point to get parsed data.
    
 [mini-kep] is inspired by [FRED](https://fred.stlouisfed.org/) and replaces a predecessor repo,
-[data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of
-macroeconomic data well. 
+[data-rosstat-kep](https
 
 Project documentation is [here](http://mini-kep-parcer-for-rosstat-kep-publication.readthedocs.io/en/latest/?badge=latest)
 and little glossary [here](https://github.com/epogrebnyak/mini-kep/blob/master/doc/rst/glossary.rst).
