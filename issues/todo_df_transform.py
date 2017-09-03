@@ -113,8 +113,6 @@ def deaccumulate(df, first_month):
     # write back start of year values
     # (January in monthly data, March in qtr data)
     ix = original_start_year_values.index
-    # FIXME: can we do this without loop? this fails:
-    # df.loc[ix,] = original_start_year_values.loc[ix, ]
     df.loc[ix, :] = original_start_year_values
     return df
 
@@ -123,7 +121,7 @@ varnames = select_varnames(dfm)
 
 gov_dfm = dfm[varnames]
 diff_dfm = deaccumulate_month(gov_dfm)
-last_month_values = gov_dfm[gov_dfm.index.month==12]
+last_month_values = gov_dfm[gov_dfm.index.month == 12]
 assert_frame_equal(diff_dfm.resample('A').sum(), last_month_values)
 rename(diff_dfm)
 
@@ -134,7 +132,7 @@ rename(diff_dfq)
 diff_dfa = dfa[varnames]
 rename(diff_dfa)
 
-print(diff_dfm, diff_dfq, diff_dfa)
+# print(diff_dfm, diff_dfq, diff_dfa)
 
 # TODO-1: check - accumulate diff_dfm and diff_dfq and compare to  gov_dfm
 # and gov_dfq
