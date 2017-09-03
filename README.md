@@ -33,7 +33,7 @@ and little glossary [here](https://github.com/epogrebnyak/mini-kep/blob/master/d
 *TODO: add spline graphs here <https://github.com/epogrebnyak/mini-kep/issues/12>*
 
 
-# How can I download macroeconomic indicators from here?
+# How do I download macroeconomic indicators from here?
 
 ```python
 
@@ -56,9 +56,11 @@ Check more access methods at
 
 # Can I get this data in Excel?
 
- Here it is: [kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true)
+ Here is the latest data in Excel: 
  
- But using CSV files in pandas (as shown above), R or some econometric package is highly preferred over Excel.
+ - [kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true)
+ 
+ But it strongly adviced you give CSV files a chance in pandas (as shown above), R or some econometric package.
  
 # How do you update this repo?
 
@@ -82,6 +84,38 @@ Basically this command:
 
 
 See [DEV.md](https://github.com/epogrebnyak/mini-kep/blob/master/DEV.md) for development notes/roadmap. 
+
+
+# Parcer summary
+
+Parcer              |  mini-kep 
+--------------------|----------------------------------------
+Job                 |  Parse sections of Short-term Economic Indicators (KEP) monthly Rosstat publication 
+Source URL          |  [Rosstat KEP page](http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391)
+Source type         |  MS Word  <!-- Word, Excel, CSV, HTML, XML, API, other -->
+Frequency           |  Monthly
+When released       |  Start of month as in [schedule](http://www.gks.ru/gis/images/graf-oper2017.htm) 
+Code                | <https://github.com/epogrebnyak/mini-kep/tree/master/src/>
+Controller          |  TODO: Add here
+Test health         | [![Build Status](https://travis-ci.org/epogrebnyak/mini-kep.svg?branch=master)](https://travis-ci.org/epogrebnyak/mini-kep)
+Test coverage       |  [![Coverage badge](https://codecov.io/gh/epogrebnyak/mini-kep/branch/master/graphs/badge.svg)](https://codecov.io/gh/epogrebnyak/mini-kep)
+Documentation       |  [![Documentation Status](https://readthedocs.org/projects/mini-kep-parcer-for-rosstat-kep-publication/badge/?version=latest)](http://mini-kep-parcer-for-rosstat-kep-publication.readthedocs.io/en/latest/?badge=latest)
+CSV endpoint        | <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>
+List of variables   |  TODO: Add here
+Transformation      |  Government revenue/expenses deaccumaulated to monthly values 
+Validation          |  Hardcoded checkpoints and consistency checks 
+
+
+All historic raw data available on internet? 
+- [ ] Yes
+- [x] No (data prior to 2016-12 is in this repo only)  
+
+Is scrapper automated (can download required information from internet  without manual operations)? 
+- [x] Yes
+- [ ] No 
+
+
+
 
 
 
