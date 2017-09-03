@@ -105,7 +105,7 @@ def aggregate_rates_to_annual_average(df):
     """
     df = (df / 100).cumprod()  # Compute annualized values
     z = df.resample('A').sum()
-    return z / z.shift() * 100
+    return z / z.shift()
 
 def get_deltas(df1, agg_func, df2):
     """Calculate delta as:
@@ -122,7 +122,7 @@ def get_deltas(df1, agg_func, df2):
         Returns:
             delta, pd.DataFrame
     """
-    return abs(agg_func(df1) - df2).dropna().round(2)
+    return abs(agg_func(df1) - df2).fillna(0).round(2)
 
     
 #FIXME: epsilon is very generic, may use 'threshold' instead
@@ -142,7 +142,7 @@ def compare_dataframes(df1, agg_func, df2, epsilon):
     """
     # EP: this requires severla step to follow, dont throug it all in one expression
     #     someone has to read it and understand what is going on... :)
-    delta = (agg_func(df1) - df2).dropna()
+    delta = (agg_func(df1) - df2).fillna(0)
     is_passed = abs(delta) < epsilon
     return is_passed.all().all()
 
@@ -170,22 +170,26 @@ all_setups.append([df1, aggregate_levels_to_annual, df2, epsilon])
 
 # test 2 
 
-#TODO: not working yet
-
 # setup
+
+
 def as_yoy(varnames):
     return [vn.replace('rog', 'yoy') for vn in varnames]
 
+
 def as_rog(varnames):
     return [vn.replace('yoy', 'rog') for vn in varnames]
+
 
 m_rog_vars = [x for x in dfm.columns if 'rog' in x]
 y_yoy_vars = [x for x in as_yoy(m_rog_vars) 
                 if x in dfa.columns.tolist()]
 m_rog_vars = [x for x in as_rog(y_yoy_vars)] 
+COLNAME_YOY_TO_ROG = {k: v for k, v in zip(y_yoy_vars, m_rog_vars)}
 
 df1 = dfm[m_rog_vars]
 df2 = dfa[y_yoy_vars] / 100
+df2 = df2.rename(columns=COLNAME_YOY_TO_ROG)
 # FIXME: need different tolerance
 epsilon = 0.2
 
@@ -195,7 +199,6 @@ _y = get_deltas(df1, aggregate_rates_to_annual_average, df2)
 # test result
 res_2 = compare_dataframes(df1,  aggregate_rates_to_annual_average, 
                            df2, epsilon)
-
 
 
 # TODO:
