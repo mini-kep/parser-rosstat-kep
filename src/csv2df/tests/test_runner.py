@@ -5,7 +5,7 @@ import io
 from csv2df.specification import Definition, Specification
 from csv2df.reader import Reader
 from csv2df.parser import extract_tables
-from csv2df.runner import Emitter  # ID. why is it imported from runner?
+from csv2df.emitter import Emitter
 from csv2df.runner import get_dataframes, Vintage, Collection
 from config import DateHelper, PathHelper
 from csv2df.validator import Validator
@@ -60,19 +60,11 @@ def test_resulting_dataframes():
 
 
 def test_resulting_dataframes_with_time_index():
-    # FIXME: this gets spoiled after runing pep8
-    assert dfq.to_string() == \
-        """            year  qtr  GDP_bln_rub
-time_index
-1999-03-31  1999    1        901.0
-1999-06-30  1999    2       1102.0
-1999-09-30  1999    3       1373.0
-1999-12-31  1999    4       1447.0
-2000-03-31  2000    1       1527.0
-2000-06-30  2000    2       1697.0
-2000-09-30  2000    3       2038.0
-2000-12-31  2000    4       2044.0"""
-
+    assert dfq.to_dict('list') == {
+        'year': [1999, 1999, 1999, 1999, 2000, 2000, 2000, 2000], 
+         'qtr': [1, 2, 3, 4, 1, 2, 3, 4], 
+ 'GDP_bln_rub': [901.0, 1102.0, 1373.0, 1447.0, 1527.0, 1697.0, 2038.0, 2044.0]}
+        
 
 def test_resulting_dataframes_no_dfm():
     assert dfm.empty is True
