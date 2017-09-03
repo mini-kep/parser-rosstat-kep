@@ -49,7 +49,7 @@ class DatapointMaker:
         self.period = False
 
     def set_value(self, x):
-        if x:
+        if x: # (ID) if x can have value of 0 then `else` will be executed.
             self.value = to_float(x)
         else:
             self.value = None
