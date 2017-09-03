@@ -29,14 +29,15 @@ import getter
 
 DEFAULT_TIMERANGE = datetime.date(1998, 12, 31), datetime.date(2017, 12, 31)
 
+DEFAULT_GPARAMS = {'timerange':DEFAULT_TIMERANGE, 
+                        'figsize':(10,10), 'style':'ggplot', 'facecolor':'white',
+                        'auto_x':False, 'axis_on':True}
 
 # TODO: allocate parameters between GraphBase and child classes
 
 class GraphBase:
     #TODO: need real short docstring what this class is.
-    def __init__(self, tss, timerange=DEFAULT_TIMERANGE, 
-                        figsize=(10,10), style='ggplot', facecolor='gray',
-                        auto_x=False, axis_on=True):
+    def __init__(self, tss, params=DEFAULT_GPARAMS):
         """
         Args:
             WTF is tss? dataframe? time series?        
@@ -45,12 +46,7 @@ class GraphBase:
         #        лучше зесь оставить параметры, которые не меняются дочерним классом  
         #        можно также словарем конфигурировать
         self.tss = tss
-        self.timerange = timerange
-        self.figsize = figsize
-        self.style = style
-        self.facecolor = facecolor
-        self.auto_x = auto_x
-        self.axis_on = axis_on
+        self.params = params
 
     def __del__(self):
         plt.close()
@@ -63,15 +59,15 @@ class GraphBase:
         Returns:
             what type?            
         """
-        plt.style.use(self.style)
-        fig = plt.figure(figsize=self.figsize)
-        axes = fig.add_subplot(1, 1, 1, facecolor=self.facecolor)
+        plt.style.use(self.params['style'])
+        fig = plt.figure(figsize=self.params['figsize'])
+        axes = fig.add_subplot(1, 1, 1, facecolor=self.params['facecolor'])
         for ts in self.tss:
             axes.plot(ts)
-        axes.set_xlim(self.timerange)
-        if self.auto_x:
+        axes.set_xlim(self.params['timerange'])
+        if self.params['auto_x']:
             fig.autofmt_xdate()
-        if not self.axis_on:
+        if not self.params['axis_on']:
             plt.axis('off')
         return fig
 
@@ -82,18 +78,25 @@ class Spline(GraphBase):
         #FIXME: надо как-то разоббраться с аргументами - какие не меняются 
         #       и устанавливаются в GraphBase, а какие заадаются в завивмости от типа
         #        
-        super().__init__(tss, timerange=DEFAULT_TIMERANGE, 
-                        figsize=(2, 0.6), style='ggplot', facecolor='white', 
-                        auto_x=False, axis_on=False)
+        params = dict(DEFAULT_GPARAMS) # shallow copy
+        params['figsize'] = (2, 0.6)
+        params['style'] = 'ggplot'
+        params['facecolor'] = 'white'
+        params['auto_x'] = False
+        params['axis_on'] = False
+
+        super().__init__(tss, params=params)
 
 class IndicatorChart(GraphBase):
     def __init__(self, tss):
-        super().__init__(tss, timerange=DEFAULT_TIMERANGE, 
-                        figsize=(5, 5), style='bmh', facecolor='white', 
-                        auto_x=True)
+        params = dict(DEFAULT_GPARAMS) # shallow copy
+        params['figsize'] = (5, 5)
+        params['style'] = 'bmh'
+        params['facecolor'] = 'white'
+        params['auto_x'] = True
+        params['axis_on'] = True
 
-#NEED COMMENT: у нас был третий тип граификов c с группой показателей - он отрисовывается черз IndicatorGraph?
-#              или на него забили пока? в этом случае нужен пустой класс. или него забили? тоже нужен комментарий 
+        super().__init__(tss, params=params)
 
 
 # COMMENT все ниже видимо под нож, к сожалениюю 
