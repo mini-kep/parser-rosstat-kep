@@ -90,7 +90,7 @@ COLNAME_MAPPER_REVERSE = {v: k for k, v in COLNAME_MAPPER.items()}
 
 
 def rename(df):
-    df.rename(columns=COLNAME_MAPPER, inplace=True)
+    df = df.rename(columns=COLNAME_MAPPER)
 
 # TODO (EP): change names of variables to GOV_ACCUM_something
 
