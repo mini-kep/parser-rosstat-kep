@@ -9,8 +9,8 @@ download package
 Submodules
 ----------
 
-download\.download module
--------------------------
+download.download module
+------------------------
 
 .. automodule:: download.download
     :members:

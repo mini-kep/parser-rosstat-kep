@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Download and unpack Word files from Rosstat web site
-   to 'data/raw/<year>/<month>' folder.
-"""
+"""Download and unpack Word files from Rosstat web site."""
 
 import os
 import subprocess

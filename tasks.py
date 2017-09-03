@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
 import os
-import inspect
 
 from sys import platform
 from os import environ
@@ -43,15 +42,6 @@ def pep8(ctx, folder=''):
         # FIXME: may use 'import autopep8' without console
         ctx.run("autopep8 --aggressive --aggressive --in-place {}".format(f))
 
-#
-# def docstrings(ctx):
-#    print(inspect.cleandoc(__doc__))
-#    path = PROJECT_DIR / "src" / folder
-#    for f in yield_python_files(path):
-        # FIXME: list modules as in https://stackoverflow.com/questions/487971/is-there-a-standard-way-to-list-names-of-python-modules-in-a-package
-        # print(inspect.cleandoc(__doc__))
-#        pass
-
 
 @task
 def clean(ctx):
@@ -73,29 +63,25 @@ def lint(ctx, folder="src/csv2df"):
     ctx.run('flake8 {} --exclude test* --ignore E501'.format(folder))
 
 
-def apidoc(pkg, exclude=''):
+# documentation 
+
+
+def apidoc(subpkg=None, exclude=''):
     """Call sphinx-apidoc to document *pkg* package without files
        in *exclude* pattern. """
-    rst_source_dir = os.path.join('doc', 'rst')
-    pkg_dir = os.path.join('src', pkg)
-    flags = '--module-first --no-toc --force'
+    rst_source_dir = os.path.join('doc', 'rst')    
+    pkg_dir = 'src'
+    if subpkg is not None:
+        pkg_dir = os.path.join('src', subpkg)
+    flags = '--module-first --no-toc --force' 
     return f'sphinx-apidoc {flags} -o {rst_source_dir} {pkg_dir} {exclude}'
 
 
 @task
 def rst(ctx):
-    """Build new rst files with sphinx"""
-    args_list = [
-        ('locations', ''),
-        ('download', ''),
-        ('word2csv', ''),
-        ('csv2df', '*tests*')
-        #,('frontpage', '*markdown*')
-    ]
-
-    for args in args_list:
-        command = apidoc(*args)
-        ctx.run(command)
+    """Build new rst files with sphinx-apidoc"""
+    command = apidoc(exclude='*tests* *example*')
+    ctx.run(command)
 
 
 @task
@@ -103,9 +89,6 @@ def doc(ctx):
     source_dir = os.path.join('doc', 'rst')
     html_dir = os.path.join('doc', 'html')
     index_html = os.path.join(html_dir, 'index.html')
-    # call without parameters
-    # for paarmeters may add:
-    #     -aE - to overwrite files
     build_command = f'sphinx-build -b html {source_dir} {html_dir}'
     ctx.run(build_command)
     if platform == "win32":
@@ -113,8 +96,16 @@ def doc(ctx):
 
 
 @task
+def find(ctx, regex):
+    exclude = """ -name "*.py" ! -name "__init__.py" ! -name "test*" """
+    command = ' | '.join([f"find . -type f {exclude}"
+                        , f"xargs grep -nH '{regex}'"])
+    ctx.run(command)
+    
+
+@task
 def test(ctx):
-    ctx.run("py.test src")  # --cov=csv2df
+    ctx.run("py.test src --doctest-modules")  # --cov=csv2df
 
 
 @task
@@ -195,6 +186,7 @@ for t in [ls, clean,
           pep8, lint,
           test, cov,
           doc, rst,
+          find,
           add, latest]:
     ns.add_task(t)
 
@@ -206,9 +198,7 @@ if platform == 'win32':
 
 
 if __name__ == '__main__':
-    _add(2017, 6)
-    print(apidoc('download'))
-
+    print(apidoc('', exclude='*test*'))
 
 ##########################################################################
 # GLOBALS                                                                       #

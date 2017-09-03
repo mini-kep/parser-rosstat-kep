@@ -9,8 +9,8 @@ word2csv package
 Submodules
 ----------
 
-word2csv\.word module
----------------------
+word2csv.word module
+--------------------
 
 .. automodule:: word2csv.word
     :members:

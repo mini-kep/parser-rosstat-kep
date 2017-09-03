@@ -141,5 +141,12 @@ assert dfm1.equals(dfm2)
 # validation
 assert vint.validate()
 
-# LATER: parse several tables with a larger parsing definition (from test
-# folder)
+
+def show_dicts(df=dfq):
+    """Demo for serialising a DataFrame"""
+    types = ['dict', 'list', 'series', 'split', 'records', 'index']
+    for t in types:
+        print()
+        print(t)
+        print(df.to_dict(t))
+

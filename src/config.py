@@ -1,40 +1,14 @@
-"""Get paths for repo root, *latest* and *output* folders and UnRAR binary.
-
-TODO: rewrite below, pay attn to references.
-
-Functions based on :class:`csv2df.locations.folder.FolderBase` class methods:
-
-    - :func:`DateHelper.get_latest_date` returns latest available
-      year and month
-    - :func:`PathHelper.locate_csv` retrieves interim CSV file for parsing
-      from *data/interim* folder by year and month
-    - based on year and month :func:`get_processed_folder` provides
-      location to save parsing result in *data/processed* folder
-
-
-For housekeeping :mod:`csv2df.helpers` provides:
-
- - :func:`init_dirs` - make directory structure on startup
- - :func:`locations.folder.copy_latest` - copy CSVs to *latest* folder which
-   has stable URL
-
-
-For reference - data directory structure::
-
-    \\data
-      \\interim
-          \\2017
-          \\2016
-          \\...
-      \\processed
-          \\latest
-          \\2017
-          \\2016
-          \\...
+"""Path and date helpers:
+    
+   - :class:`PathHelper` and :func:`find_repo_root` to navigate repo filesystem
+   - :class:`DateHelper` to manage release dates as (year, month)
+   
 """
 
 from pathlib import Path
 import pandas as pd
+
+__all__ = ['find_repo_root', 'PathHelper', 'DateHelper']
 
 
 INTERIM_CSV_FILENAME = 'tab.csv'
@@ -68,8 +42,6 @@ def find_repo_root():
     Current file is assumed to be at:
         <repo_root>/src/config.py
 
-    Levels up from current file to reach repo root:
-        1
     """
     levels_up = 1
     root = Path(__file__).parents[levels_up]
@@ -133,6 +105,15 @@ class DataFolder:
 
 
 class PathHelper:
+    """
+    In parsing used by:
+       
+     - :class:`download.download.RemoteFile`
+     - :func:`word2csv.word.make_interim_csv`
+     - :class:`csv2df.runner.Vintage`
+     
+    """
+
 
     # folders
 
@@ -207,26 +188,3 @@ class DateHelper:
         excluded = (2013, 11)
         return [(date.year, date.month) for date in dates
                 if (date.year, date.month) != excluded]
-
-
-# create local data dirs for DATES
-
-
-# For housekeeping :mod:`csv2df.helpers` provides:
-#
-# - :func:`init_dirs` - make directory structure on startup
-# - :func:`locations.folder.copy_latest` - copy CSVs to *latest* folder which
-#   has stable URL
-
-
-# def init_dirs():
-#    """Create required directory structure in *data* folder."""
-#    supported_dates = get_supported_dates()
-#    for (year, month) in supported_dates:
-#        f = DataFolder(year, month)
-#        # why not making raw folder?
-#        md(f.get_interim_folder())
-#        md(f.get_processed_folder())
-#
-# if __name__ == "__main__":
-#    year, date = DateHelper.get_latest_date()

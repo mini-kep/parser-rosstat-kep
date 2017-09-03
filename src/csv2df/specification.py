@@ -1,27 +1,23 @@
-# -*- coding: utf-8 -*-
+"""Contains data structures used as parsing instructions.
 
-""":mod:`csv2df.spec` module contains data structures used as parsing instructions.
+Global variable  **SPEC**  allows access to parsing definitions:
 
-Global variable  **SPEC** (:class:`csv2df.spec.Specification`) allows access to
-parsing definitions:
-
-  - :func:`csv2df.spec.Specification.get_main_parsing_definition` retrieves
+  - :func:`csv2df.specification.Specification.get_main_parsing_definition` retrieves
     main (default) parsing definition, where most indicators are defined;
 
-  - :func:`csv2df.spec.Specification.get_segment_parsing_definitions` provides
+  - :func:`csv2df.specification.Specification.get_segment_parsing_definitions` provides
     a list of parsing defintions by csv segment.
-
-We parse CSV file by segment, because some table headers repeat themselves in
-CSV file. Extracting a piece out of CSV file gives a good isolated input for
-parsing.
-
-Previously **SPEC** was initialised from yaml file, but this led to many errors,
-so the parsing instructions are now created internally in *spec.py*.
 
 **SPEC** is used by:
 
-  - :class:`csv2df.rows.RowStack`
-  - :func:`csv2df.tables.extract_tables`
+  - :class:`csv2df.reader.RowStack`
+  - :func:`csv2df.parser.extract_tables`
+    
+We parse CSV file by segment, because some table headers repeat themselves in
+CSV file. Extracting a piece out of CSV file gives a good isolated input for parsing.
+
+Previously parsing instructions were initialised from yaml file, but this led to many errors,
+so the parsing instructions are now created internally in *spec.py*.
 
 """
 

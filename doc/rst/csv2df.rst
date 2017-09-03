@@ -9,72 +9,64 @@ csv2df package
 Submodules
 ----------
 
-csv2df\.emitter module
-----------------------
+csv2df.emitter module
+---------------------
 
 .. automodule:: csv2df.emitter
     :members:
     :undoc-members:
     :show-inheritance:
 
-csv2df\.helpers module
-----------------------
-
-.. automodule:: csv2df.helpers
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-csv2df\.parser module
----------------------
+csv2df.parser module
+--------------------
 
 .. automodule:: csv2df.parser
     :members:
     :undoc-members:
     :show-inheritance:
 
-csv2df\.reader module
----------------------
+csv2df.reader module
+--------------------
 
 .. automodule:: csv2df.reader
     :members:
     :undoc-members:
     :show-inheritance:
 
-csv2df\.runner module
----------------------
+csv2df.runner module
+--------------------
 
 .. automodule:: csv2df.runner
     :members:
     :undoc-members:
     :show-inheritance:
 
-csv2df\.specification module
-----------------------------
+csv2df.specification module
+---------------------------
 
 .. automodule:: csv2df.specification
     :members:
     :undoc-members:
     :show-inheritance:
 
-csv2df\.util\_label module
---------------------------
+csv2df.util_label module
+------------------------
 
 .. automodule:: csv2df.util_label
     :members:
     :undoc-members:
     :show-inheritance:
 
-csv2df\.util\_row\_splitter module
-----------------------------------
+csv2df.util_row_splitter module
+-------------------------------
 
 .. automodule:: csv2df.util_row_splitter
     :members:
     :undoc-members:
     :show-inheritance:
 
-csv2df\.validator module
-------------------------
+csv2df.validator module
+-----------------------
 
 .. automodule:: csv2df.validator
     :members:

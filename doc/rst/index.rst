@@ -9,22 +9,24 @@ Documentation by package
 
 .. toctree::
     :maxdepth: 1
-   
-    locations  
+
+    config	
     download
     word2csv
     csv2df
+    finaliser
+    getter
+    images
 
-..    frontpage
-
-
+	
 Docstring review
 ================
 
-locations
----------
 
-.. automodule:: locations.folder
+config
+------
+
+.. automodule:: config
 
 
 download
@@ -42,12 +44,6 @@ csv2df
 ------
 
 .. automodule:: csv2df
-
-
-csv2df.helpers
-~~~~~~~~~~~~~~
-
-.. automodule:: csv2df.helpers
 
 
 csv2df.specification

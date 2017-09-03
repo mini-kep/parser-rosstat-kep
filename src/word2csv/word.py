@@ -10,6 +10,7 @@
 
 import csv
 import os
+from config import PathHelper
 
 ENCODING = 'utf8'
 
@@ -196,10 +197,9 @@ def folder_to_csv(folder, csv_filename=False):
     print("Finished creating raw CSV file:", csv_filename)
 
 
-def make_interim_csv(year, month):
-    from config import DataFolder
-    folder = DataFolder(year, month).get_raw_folder()
-    interim_csv = DataFolder(year, month).get_interim_csv()
+def make_interim_csv(year, month, helper = PathHelper):
+    folder = helper.get_raw_folder()
+    interim_csv = helper.get_interim_csv(year, month)
     folder_to_csv(folder, interim_csv)
     return True
 
