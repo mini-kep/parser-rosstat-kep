@@ -5,7 +5,7 @@ import io
 from csv2df.specification import Definition, Specification
 from csv2df.reader import Reader
 from csv2df.parser import extract_tables
-from csv2df.runner import Emitter # ID. why is it imported from runner?
+from csv2df.runner import Emitter  # ID. why is it imported from runner?
 from csv2df.runner import get_dataframes, Vintage, Collection
 from config import DateHelper, PathHelper
 from csv2df.validator import Validator
@@ -58,11 +58,12 @@ def test_collection():
 def test_resulting_dataframes():
     assert dfa.GDP_bln_rub['1999-12-31'] == 4823.0
 
+
 def test_resulting_dataframes_with_time_index():
     # FIXME: this gets spoiled after runing pep8
     assert dfq.to_string() == \
         """            year  qtr  GDP_bln_rub
-time_index                        
+time_index
 1999-03-31  1999    1        901.0
 1999-06-30  1999    2       1102.0
 1999-09-30  1999    3       1373.0
@@ -71,6 +72,7 @@ time_index
 2000-06-30  2000    2       1697.0
 2000-09-30  2000    3       2038.0
 2000-12-31  2000    4       2044.0"""
+
 
 def test_resulting_dataframes_no_dfm():
     assert dfm.empty is True

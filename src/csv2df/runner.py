@@ -1,6 +1,6 @@
 """Get pandas dataframes for a given data and month.
 
-*get_dataframes(csvfile, spec=SPEC)* is a function to get dataframes 
+*get_dataframes(csvfile, spec=SPEC)* is a function to get dataframes
     from *csvfile* connection under *spec* parsing instruction.
 
 *Vintage* class addresses dataset by year and month:
@@ -52,12 +52,11 @@ class Vintage:
     """Represents dataset release for a given year and month."""
 
     def __init__(self, year, month, helper=PathHelper):
-        self.year, self.month = year, month        
+        self.year, self.month = year, month
         self.folder_path = helper.get_processed_folder(year, month)
         csv_path = helper.locate_csv(year, month)
         with open_csv(csv_path) as csvfile:
             self.dfa, self.dfq, self.dfm = get_dataframes(csvfile)
-        
 
     def dfs(self):
         """Shorthand for obtaining three dataframes."""
@@ -125,4 +124,3 @@ if __name__ == "__main__":
     vint = Vintage(year, month)
     vint.validate()
     dfa, dfq, dfm = vint.dfs()
-    

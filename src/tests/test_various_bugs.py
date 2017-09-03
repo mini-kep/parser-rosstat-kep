@@ -8,7 +8,6 @@ from io import StringIO
 from config import PathHelper, find_repo_root
 
 
-
 ROOT = find_repo_root()
 
 

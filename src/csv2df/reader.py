@@ -312,8 +312,8 @@ class RowStack:
 
 
 if __name__ == "__main__":
-    from config import PathHelper, DateHelper # this is in __main__ section
-    import csv2df.specification as spec 
+    from config import PathHelper, DateHelper  # this is in __main__ section
+    import csv2df.specification as spec
 
     # print all rows from csvpath
     year, month = DateHelper.get_latest_date()

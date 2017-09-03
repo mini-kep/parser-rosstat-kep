@@ -36,8 +36,8 @@ def yield_python_files(folder):
 
 
 @task
-def pep8(ctx, folder="csv2df"):
-    path = PROJECT_DIR / "src" / folder
+def pep8(ctx, folder=''):
+    path = PROJECT_DIR / 'src' / folder
     for f in yield_python_files(path):
         print("Formatting", f)
         # FIXME: may use 'import autopep8' without console

@@ -155,7 +155,7 @@ class Table:
 
 
 if __name__ == "__main__":
-    from config import PathHelper, DateHelper # this is in __main__ section
+    from config import PathHelper, DateHelper  # this is in __main__ section
     import csv2df.reader as reader
     import csv2df.specification as spec
 
@@ -166,7 +166,7 @@ if __name__ == "__main__":
         for csv_segment, pdef in reader.Reader(csvfile, spec.SPEC).items():
             tables = extract_tables(csv_segment, pdef)
             parsed_tables.extend(tables)
-    
+
         for t in tables:
             print()
-            print(t)    
+            print(t)

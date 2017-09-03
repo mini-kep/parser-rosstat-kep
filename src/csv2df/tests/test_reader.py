@@ -12,17 +12,19 @@ from csv2df.reader import Reader
 from csv2df.specification import Specification
 
 
-
 OS_Specific_Path = type(Path())
+
+
 class MockPath1(OS_Specific_Path):
     # EP: it is an interesting inspection of the parameters involved
-    def open(self, mode='r', buffering=-1, encoding=None, 
-                   errors=None, newline=None):
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
         # EP: True is better than a string
         return True
 
+
 class Test_open_csv_submitted_version_after_adding_setup_and_rename:
-    
+
     def setup_method(self):
         self.path_good = MockPath1()
         self.path_bad = "This is not pathlib.Path, this is a string"
@@ -36,20 +38,24 @@ class Test_open_csv_submitted_version_after_adding_setup_and_rename:
 
 # Exmple of a mock with mock_open, can be fed in to test above in setup
 # EP: drawback - any args to m seem to suffice
+
+
 class MockPath2(type(Path())):
     def open(self, *arg, **kwarg):
         m = mock_open()
         return m(*arg, **kwarg)
-    
-@pytest.fixture    
+
+
+@pytest.fixture
 def temp_path():
     with NamedTemporaryFile() as f:
         abspath = f.name
-    p = Path(abspath)    
+    p = Path(abspath)
     p.write_text("abc\n123")
     return p
 
-class Test_open_csv:    
+
+class Test_open_csv:
 
     def test_on_string_argument_raises_TypeError(self):
         path_string = 'abc.csv'
@@ -60,10 +66,10 @@ class Test_open_csv:
         assert open_csv(temp_path)
 
     def test_on_Path_provides_readable_input(self, temp_path):
-        with open_csv(temp_path) as f:            
-            assert f.readlines() == ['abc\n', '123']    
-   
-    
+        with open_csv(temp_path) as f:
+            assert f.readlines() == ['abc\n', '123']
+
+
 # TODO: implement tests
 @pytest.mark.skip("Only a sceleton.")
 def test_reader():

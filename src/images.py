@@ -8,8 +8,8 @@ from config import find_repo_root
 import getter
 
 
-#Псеводкод использования:
-# выбрать конкретный показатель 
+# Псеводкод использования:
+# выбрать конкретный показатель
 # ts = dfm.RETAIL_SALES_FOOD_bln_rub
 # создать инстанс графика
 # spline1 = Spline(ts)
@@ -33,16 +33,16 @@ DEFAULT_TIMERANGE = datetime.date(1998, 12, 31), datetime.date(2017, 12, 31)
 # TODO: allocate parameters between GraphBase and child classes
 
 class GraphBase:
-    #TODO: need real short docstring what this class is.
-    def __init__(self, tss, timerange=DEFAULT_TIMERANGE, 
-                        figsize=(10,10), style='ggplot', facecolor='gray',
-                        auto_x=False, axis_on=True):
+    # TODO: need real short docstring what this class is.
+    def __init__(self, tss, timerange=DEFAULT_TIMERANGE,
+                 figsize=(10, 10), style='ggplot', facecolor='gray',
+                 auto_x=False, axis_on=True):
         """
         Args:
-            WTF is tss? dataframe? time series?        
+            WTF is tss? dataframe? time series?
         """
-        # FIXME: это и так базовый класс, может не загонять через аргумент, а сразу присвоить 
-        #        лучше зесь оставить параметры, которые не меняются дочерним классом  
+        # FIXME: это и так базовый класс, может не загонять через аргумент, а сразу присвоить
+        #        лучше зесь оставить параметры, которые не меняются дочерним классом
         #        можно также словарем конфигурировать
         self.tss = tss
         self.timerange = timerange
@@ -59,9 +59,9 @@ class GraphBase:
         """
         What does this function do?
         Is there special kind of formatting applied to all graphs?
-        
+
         Returns:
-            what type?            
+            what type?
         """
         plt.style.use(self.style)
         fig = plt.figure(figsize=self.figsize)
@@ -79,36 +79,41 @@ class GraphBase:
 class Spline(GraphBase):
     def __init__(self, tss):
         assert len(tss) == 1
-        #FIXME: надо как-то разоббраться с аргументами - какие не меняются 
+        # FIXME: надо как-то разоббраться с аргументами - какие не меняются
         #       и устанавливаются в GraphBase, а какие заадаются в завивмости от типа
-        #        
-        super().__init__(tss, timerange=DEFAULT_TIMERANGE, 
-                        figsize=(2, 0.6), style='ggplot', facecolor='white', 
-                        auto_x=False, axis_on=False)
+        #
+        super().__init__(tss, timerange=DEFAULT_TIMERANGE,
+                         figsize=(2, 0.6), style='ggplot', facecolor='white',
+                         auto_x=False, axis_on=False)
+
 
 class IndicatorChart(GraphBase):
     def __init__(self, tss):
-        super().__init__(tss, timerange=DEFAULT_TIMERANGE, 
-                        figsize=(5, 5), style='bmh', facecolor='white', 
-                        auto_x=True)
+        super().__init__(tss, timerange=DEFAULT_TIMERANGE,
+                         figsize=(5, 5), style='bmh', facecolor='white',
+                         auto_x=True)
 
-#NEED COMMENT: у нас был третий тип граификов c с группой показателей - он отрисовывается черз IndicatorGraph?
-#              или на него забили пока? в этом случае нужен пустой класс. или него забили? тоже нужен комментарий 
+# NEED COMMENT: у нас был третий тип граификов c с группой показателей - он отрисовывается черз IndicatorGraph?
+# или на него забили пока? в этом случае нужен пустой класс. или него
+# забили? тоже нужен комментарий
 
 
-# COMMENT все ниже видимо под нож, к сожалениюю 
+# COMMENT все ниже видимо под нож, к сожалениюю
 # часть с файловыми именами должна быть переложена в соотв
-# отдельно - скрыйтый метод для создания имени, отдельно метод для создания пути файла 
+# отдельно - скрыйтый метод для создания имени, отдельно метод для
+# создания пути файла
 
-# жалко что все пошло не по пути который мы одсуждали - dataHndler есть, но он пытается 
-# разобраться в типах данных и большой (если честно - жесть;), а не маленький для каждого.   
+# жалко что все пошло не по пути который мы одсуждали - dataHndler есть, но он пытается
+# разобраться в типах данных и большой (если честно - жесть;), а не
+# маленький для каждого.
 
-# функция типа plot_all() должна создавать серию инстансов и применять метод save кним.
+# функция типа plot_all() должна создавать серию инстансов и применять
+# метод save кним.
 
 class DataHandler:
     def __init__(self):
         #
-        self.dfs = {key:getter.get_dataframe(key) for key in 'aqm'}
+        self.dfs = {key: getter.get_dataframe(key) for key in 'aqm'}
         self.rootfolder = find_repo_root()
         self.pngfolder = self.rootfolder / 'output' / 'png'
 
@@ -120,13 +125,13 @@ class DataHandler:
         elif gtype == GraphBase:
             subp = 'misc'
         else:
-            raise TypeError(repr(gtype)+' is not a known graph type')
+            raise TypeError(repr(gtype) + ' is not a known graph type')
 
         outpath = self.pngfolder / subp
 
         cols = self.dfs[freq].columns
-        cols = cols.drop(['year', 'month'])   
-   
+        cols = cols.drop(['year', 'month'])
+
         for col in cols:
             ts = self.dfs[freq][col]
             ginstance = gtype([ts])
@@ -153,23 +158,19 @@ class DataHandler:
         del ginstance
 
 
-
 def save_all_images():
     dh = DataHandler()
     dh.gen_splines('m')
     dh.gen_indicators('m')
 
-
-    # видимо это и есть третий тип индикаторов, нужнов Indiciator 
-    # отметиьт что аргумент может быть dataframe'ом    
-    inds = ['RETAIL_SALES_FOOD_bln_rub', 
+    # видимо это и есть третий тип индикаторов, нужнов Indiciator
+    # отметиьт что аргумент может быть dataframe'ом
+    inds = ['RETAIL_SALES_FOOD_bln_rub',
             'RETAIL_SALES_NONFOOD_bln_rub']
     dh.gen_multiple_indicators(inds, 'm')
-    
-    
-# TODO: EP - add tasks.py command/integrate to finaliser.py for latest graphs.   
-    
+
+
+# TODO: EP - add tasks.py command/integrate to finaliser.py for latest graphs.
+
 if __name__ == "__main__":
-    save_all_images()    
-    
- 
+    save_all_images()

@@ -134,8 +134,8 @@ class DataFolder:
 
 class PathHelper:
 
-    #folders
-    
+    # folders
+
     def get_raw_folder(year, month):
         return DataFolder(year, month).get_raw_folder()
 
@@ -151,9 +151,9 @@ class PathHelper:
 
     def get_latest_folder():
         return DataFolder.latest
-    
-    #files
-    
+
+    # files
+
     def locate_csv(year: int, month: int):
         """Return interim CSV file based on *year* and *month*.
 
@@ -162,20 +162,17 @@ class PathHelper:
         """
         return DataFolder(year, month).get_interim_csv()
 
-
     def get_csv_in_latest_folder(freq):
         return DataFolder.latest / 'df{}.csv'.format(freq)
-
 
     def get_xl_path(filename=XL_FILENAME):
         return str(find_repo_root() / 'output' / filename)
 
-    # bin file 
+    # bin file
     def get_unrar_binary():
         root = find_repo_root()
         unrar_filename = "UnRAR.exe"
         return str(root / 'bin' / unrar_filename)
-
 
 
 class DateHelper:
