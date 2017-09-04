@@ -202,8 +202,6 @@ res_2 = compare_dataframes(df1,  aggregate_rates_to_annual_average,
                            df2, threshold)
 
 
-print(_y)
-print(res_2)
 # TODO:
 # run compare_dataframes on all_setups and get resulting bool
 
