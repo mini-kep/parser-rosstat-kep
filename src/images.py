@@ -25,31 +25,42 @@ import getter
 # Spline
 # IndicatorChart
 
-# QUESTION Вопрос - может ли это все тестироваться? Частично?
-
 DEFAULT_TIMERANGE = datetime.date(1998, 12, 31), datetime.date(2017, 12, 31)
 
 DEFAULT_GPARAMS = {'timerange':DEFAULT_TIMERANGE, 
-                        'figsize':(10,10), 'style':'ggplot', 'facecolor':'white',
+                        'figsize':(10, 10), 'style':'ggplot', 'facecolor':'white',
                         'auto_x':False, 'axis_on':True}
 
-# TODO: allocate parameters between GraphBase and child classes
+SPLINE_GPARAMS = {'timerange':DEFAULT_TIMERANGE, 
+                        'figsize':(2, 0.6), 'style':'ggplot', 'facecolor':'white',
+                        'auto_x':False, 'axis_on':False}
+
+INDICATOR_GPARAMS = {'timerange':DEFAULT_TIMERANGE, 
+                        'figsize':(5, 5), 'style':'bmh', 'facecolor':'white',
+                        'auto_x':True, 'axis_on':True}
+
 
 class GraphBase:
     #TODO: need real short docstring what this class is.
-    def __init__(self, tss, params=DEFAULT_GPARAMS):
+    def __init__(self, tss, params=DEFAULT_GPARAMS, fname='untitled'):
         """
         Args:
-            WTF is tss? dataframe? time series?        
+            tss: list of timeseries to plot.
+                for a simple chart len(tss) = 1
+            params: chart formatting/style parameters      
         """
-        # FIXME: это и так базовый класс, может не загонять через аргумент, а сразу присвоить 
-        #        лучше зесь оставить параметры, которые не меняются дочерним классом  
-        #        можно также словарем конфигурировать
         self.tss = tss
         self.params = params
+        self.fig = None
+        
+        self.rootfolder = find_repo_root()
+        self.pngfolder = self.rootfolder / 'output' / 'png'
+        self.subfolder = 'misc'     # will be overridden by child classes
+        self.fname = fname
 
     def __del__(self):
-        plt.close()
+        # plt.close()
+        pass
 
     def plot(self):
         """
@@ -57,7 +68,7 @@ class GraphBase:
         Is there special kind of formatting applied to all graphs?
         
         Returns:
-            what type?            
+            None          
         """
         plt.style.use(self.params['style'])
         fig = plt.figure(figsize=self.params['figsize'])
@@ -69,110 +80,79 @@ class GraphBase:
             fig.autofmt_xdate()
         if not self.params['axis_on']:
             plt.axis('off')
-        return fig
+        
+        self.fig = fig
+
+    def save(self):
+        if self.fig == None:
+            raise ValueError('Figure is empty, call GraphBase.plot() first')
+        else:
+            self.fig.savefig(self.get_fpath())
+            
+    def close(self):
+        plt.close()
+        del self.fig
+        self.fig = None
+
+    def get_fpath(self):
+        fpath = str(self.pngfolder / self.subfolder / (self.fname+'.png'))
+        return fpath
 
 
 class Spline(GraphBase):
-    def __init__(self, tss):
+    def __init__(self, tss, fname):
         assert len(tss) == 1
-        #FIXME: надо как-то разоббраться с аргументами - какие не меняются 
-        #       и устанавливаются в GraphBase, а какие заадаются в завивмости от типа
-        #        
-        params = dict(DEFAULT_GPARAMS) # shallow copy
-        params['figsize'] = (2, 0.6)
-        params['style'] = 'ggplot'
-        params['facecolor'] = 'white'
-        params['auto_x'] = False
-        params['axis_on'] = False
+        super().__init__(tss, params=SPLINE_GPARAMS, fname=fname)
+        self.subfolder = 'splines'
 
-        super().__init__(tss, params=params)
 
 class IndicatorChart(GraphBase):
-    def __init__(self, tss):
-        params = dict(DEFAULT_GPARAMS) # shallow copy
-        params['figsize'] = (5, 5)
-        params['style'] = 'bmh'
-        params['facecolor'] = 'white'
-        params['auto_x'] = True
-        params['axis_on'] = True
-
-        super().__init__(tss, params=params)
-
-
-# COMMENT все ниже видимо под нож, к сожалениюю 
-# часть с файловыми именами должна быть переложена в соотв
-# отдельно - скрыйтый метод для создания имени, отдельно метод для создания пути файла 
-
-# жалко что все пошло не по пути который мы одсуждали - dataHndler есть, но он пытается 
-# разобраться в типах данных и большой (если честно - жесть;), а не маленький для каждого.   
-
-# функция типа plot_all() должна создавать серию инстансов и применять метод save кним.
-
-class DataHandler:
-    def __init__(self):
-        #
-        self.dfs = {key:getter.get_dataframe(key) for key in 'aqm'}
-        self.rootfolder = find_repo_root()
-        self.pngfolder = self.rootfolder / 'output' / 'png'
-
-    def gen_all_graphs(self, freq, gtype=GraphBase):
-        if gtype == Spline:
-            subp = 'splines'
-        elif gtype == IndicatorChart:
-            subp = 'indicators'
-        elif gtype == GraphBase:
-            subp = 'misc'
+    def __init__(self, tss, fname):
+        assert len(tss) > 0
+        super().__init__(tss, params=INDICATOR_GPARAMS, fname=fname)
+        if len(tss) > 1:
+            self.subfolder = 'mul_indicators'
         else:
-            raise TypeError(repr(gtype)+' is not a known graph type')
-
-        outpath = self.pngfolder / subp
-
-        cols = self.dfs[freq].columns
-        cols = cols.drop(['year', 'month'])   
-   
-        for col in cols:
-            ts = self.dfs[freq][col]
-            ginstance = gtype([ts])
-            name = "{}.png".format(col)
-            fpath = str(outpath / name)
-            ginstance.plot().savefig(fpath)
-            del ginstance
-
-    def gen_splines(self, freq='m'):
-        self.gen_all_graphs(freq, gtype=Spline)
-
-    def gen_indicators(self, freq='m'):
-        self.gen_all_graphs(freq, gtype=IndicatorChart)
-
-    def gen_multiple_indicators(self, inds, freq='m'):
-        outpath = self.pngfolder / 'mul_indicators'
-
-        tss = [self.dfs[freq][col] for col in inds]
-        name = "{}.png".format('_AND_'.join(sorted(inds)))
-        fpath = str(outpath / name)
-
-        ginstance = IndicatorChart(tss)
-        ginstance.plot().savefig(fpath)
-        del ginstance
+            self.subfolder = 'indicators'        
 
 
 
-def save_all_images():
-    dh = DataHandler()
-    dh.gen_splines('m')
-    dh.gen_indicators('m')
 
 
-    # видимо это и есть третий тип индикаторов, нужнов Indiciator 
-    # отметиьт что аргумент может быть dataframe'ом    
+def plot_all_images(save=True):
+    dfs = {key:getter.get_dataframe(key) for key in 'aqm'}
+
+    df = dfs['m']
+    cols = df.columns
+    cols = cols.drop(['year', 'month'])       
+
+    graphs = []
+
+# type 1 and 2 graphs
+    for col in cols:
+        ts = df[col]
+        graphs.append(Spline        ([ts], col))
+        graphs.append(IndicatorChart([ts], col))
+
+# type 3 graphs
     inds = ['RETAIL_SALES_FOOD_bln_rub', 
             'RETAIL_SALES_NONFOOD_bln_rub']
-    dh.gen_multiple_indicators(inds, 'm')
+    tss = [df[col] for col in inds]
+    name = '_AND_'.join(sorted(inds))
+    graphs.append(IndicatorChart(tss, name))
     
+# plotting and saving all
+    for graph in graphs:
+        graph.plot()
+        graph.save()
+        graph.close()
+
+
+
     
 # TODO: EP - add tasks.py command/integrate to finaliser.py for latest graphs.   
     
 if __name__ == "__main__":
-    save_all_images()    
+    plot_all_images()    
     
  
