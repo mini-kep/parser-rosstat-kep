@@ -104,6 +104,7 @@ def aggregate_rates_to_annual_average(df):
           An aggregated dataframe with annual averge growth rates (yoy).
     """
     df = (df / 100).cumprod()  # Compute annualized values
+    df = df.rename(columns=COLNAME_YOY_TO_ROG)
     z = df.resample('A').sum()
     return z / z.shift() * 100
 
@@ -185,11 +186,10 @@ m_rog_vars = [x for x in dfm.columns if 'rog' in x]
 y_yoy_vars = [x for x in as_yoy(m_rog_vars) 
                 if x in dfa.columns.tolist()]
 m_rog_vars = [x for x in as_rog(y_yoy_vars)] 
-COLNAME_YOY_TO_ROG = {k: v for k, v in zip(y_yoy_vars, m_rog_vars)}
+COLNAME_YOY_TO_ROG = {k: v for k, v in zip(m_rog_vars, y_yoy_vars)}
 
 df1 = dfm[m_rog_vars]
-df2 = dfa[y_yoy_vars] / 100
-df2 = df2.rename(columns=COLNAME_YOY_TO_ROG)
+df2 = dfa[y_yoy_vars] 
 # FIXME: need different tolerance
 epsilon = 0.2
 
@@ -201,6 +201,8 @@ res_2 = compare_dataframes(df1,  aggregate_rates_to_annual_average,
                            df2, epsilon)
 
 
+print(_y)
+print(res_2)
 # TODO:
 # run compare_dataframes on all_setups and get resulting bool
 
