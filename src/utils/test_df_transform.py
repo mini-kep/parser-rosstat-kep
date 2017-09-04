@@ -36,19 +36,21 @@ last_month_values = gov_dfm[gov_dfm.index.month == 12]
 diff_dfm = df_transform.deaccumulate_month(gov_dfm)
 diff_dfq = df_transform.deaccumulate_qtr(gov_dfq)
 
-@pytest.mark.skip()
+# @pytest.mark.skip()
 class Test_Deaccumulated:
     def test_monthly_diff_adds_to_annual(self):
         """The deaccumulated GOV values in the monthly dataframe should add up
             to the last month in the year in the annual dataframe.
         """
-        assert_frame_equal(diff_dfm.resample('A').sum(), last_month_values)
+        assert_frame_equal(diff_dfm.resample('A').sum(),
+                df_transform.rename(last_month_values))
 
     def test_quarterly_diff_adds_to_annual(self):
         """The deaccumulated GOV values in the quarterly dataframe should add
             up to the last month in the year in the annual dataframe.
         """
-        assert_frame_equal(diff_dfq.resample('A').sum(), last_month_values)
+        assert_frame_equal(diff_dfq.resample('A').sum(),
+                df_transform.rename(last_month_values))
 
     def test_monthly_diff_adds_to_quarterly_diff(self):
         """The deaccumulated monthly dataframe aggregated to the quarter should
@@ -61,7 +63,8 @@ class Test_Deaccumulated:
         end should add up to the first quarter end in the quarterly dataframe.
         """
         assert_frame_equal(diff_dfm.resample('Q').sum()[::4],  # every quarter
-                           gov_dfq[gov_dfq.index.month == 3])
+                           df_transform.rename(gov_dfq[gov_dfq.index.month ==
+                               3]))
         
 
 if __name__ == "__main__":
