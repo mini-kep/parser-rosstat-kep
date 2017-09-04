@@ -83,7 +83,7 @@ diff_dfq = todo_df_transform.deaccumulate_qtr(gov_dfq)
 
 
 # @pytest.mark.skip(reason="for local testing only")
-class TestDeaccumulated:
+class Deaccumulated:
     def test_monthly_diff_adds_to_annual(self):
         """The deaccumulated GOV values in the monthly dataframe should add up
             to the last month in the year in the annual dataframe.

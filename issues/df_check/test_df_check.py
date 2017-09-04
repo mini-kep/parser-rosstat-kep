@@ -90,7 +90,7 @@ COLNAME_YOY_TO_ROG = {k: v for k, v in zip(m_rog_vars, y_yoy_vars)}
 df1 = dfm[m_rog_vars]
 df2 = dfa[y_yoy_vars] 
 
-class Test_Check_Time_Period:
+class Time_Period:
 
     @pytest.mark.xfail
     def test_month_to_year_rates_with_low_threshold(self):
