@@ -126,25 +126,24 @@ def get_deltas(df1, agg_func, df2):
     return abs(agg_func(df1) - df2).fillna(0).round(2)
 
     
-#FIXME: epsilon is very generic, may use 'threshold' instead
-def compare_dataframes(df1, agg_func, df2, epsilon):
+def compare_dataframes(df1, agg_func, df2, threshold):
     """Check consistency of *df1* and *df2* using:
         
-         abs(agg_func(df1) - df2) < epsilon    
+         abs(agg_func(df1) - df2) < threshold    
     
         Args:
         df1 (pd.DataFrame): orginal dataframe to be aggragated 
         agg_func: aggregation function, like 
         df2 (pd.DataFrame): dataframe to check against
-        epsilon (float): tolerance level for comparison precision
+        threshold (float): tolerance level for comparison precision
 
     Returns:
-        Bool, True is all values are within epsilon.
+        Bool, True is all values are within threshold.
     """
     # EP: this requires severla step to follow, dont throug it all in one expression
     #     someone has to read it and understand what is going on... :)
     delta = (agg_func(df1) - df2).fillna(0)
-    is_passed = abs(delta) < epsilon
+    is_passed = abs(delta) < threshold
     return is_passed.all().all()
 
 
@@ -158,14 +157,14 @@ all_setups = []
 m_level_vars = [x for x in dfm.columns if 'bln' in x and 'ACCUM' not in x]
 df1 = dfm[m_level_vars]
 df2 = dfa[m_level_vars]
-epsilon = 0.049 * 12
+threshold = 0.049 * 12
 
 # screening
 _z = get_deltas(df1, aggregate_levels_to_annual, df2)
 
 # test result
-res_1 = compare_dataframes(df1, aggregate_levels_to_annual, df2, epsilon)
-all_setups.append([df1, aggregate_levels_to_annual, df2, epsilon])
+res_1 = compare_dataframes(df1, aggregate_levels_to_annual, df2, threshold)
+all_setups.append([df1, aggregate_levels_to_annual, df2, threshold])
 
 
 
@@ -191,14 +190,14 @@ COLNAME_YOY_TO_ROG = {k: v for k, v in zip(m_rog_vars, y_yoy_vars)}
 df1 = dfm[m_rog_vars]
 df2 = dfa[y_yoy_vars] 
 # FIXME: need different tolerance
-epsilon = 0.2
+threshold = 0.2
 
 # screening
 _y = get_deltas(df1, aggregate_rates_to_annual_average, df2)
 
 # test result
 res_2 = compare_dataframes(df1,  aggregate_rates_to_annual_average, 
-                           df2, epsilon)
+                           df2, threshold)
 
 
 print(_y)
@@ -222,7 +221,7 @@ print(res_2)
 #        function.
 #
 #    Args:
-#        feed: (df1, accum, df2, epsilon)
+#        feed: (df1, accum, df2, threshold)
 #
 #    Returns:
 #        A boolean, true if all tests are successful.
