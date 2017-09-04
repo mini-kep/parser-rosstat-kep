@@ -25,7 +25,8 @@ The parcer itself consists of following packages (in
 an entry point to get parsed data.
    
 [mini-kep] is inspired by [FRED](https://fred.stlouisfed.org/) and replaces a predecessor repo,
-[data-rosstat-kep](https
+[data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of
+macroeconomic data well. 
 
 Project documentation is [here](http://mini-kep-parcer-for-rosstat-kep-publication.readthedocs.io/en/latest/?badge=latest)
 and little glossary [here](https://github.com/epogrebnyak/mini-kep/blob/master/doc/rst/glossary.rst).
