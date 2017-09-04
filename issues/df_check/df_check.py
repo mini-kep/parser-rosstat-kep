@@ -104,7 +104,7 @@ def aggregate_rates_to_annual_average(df):
           An aggregated dataframe with annual averge growth rates (yoy).
     """
     df = (df / 100).cumprod()  # Compute annualized values
-    df = df.rename(columns=COLNAME_YOY_TO_ROG)
+    df = df.rename(columns=lambda x: x.replace('rog', 'yoy'))
     z = df.resample('A').sum()
     return z / z.shift() * 100
 
