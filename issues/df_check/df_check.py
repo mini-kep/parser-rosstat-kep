@@ -105,7 +105,7 @@ def aggregate_rates_to_annual_average(df):
     """
     df = (df / 100).cumprod()  # Compute annualized values
     z = df.resample('A').sum()
-    return z / z.shift()
+    return z / z.shift() * 100
 
 def get_deltas(df1, agg_func, df2):
     """Calculate delta as:
