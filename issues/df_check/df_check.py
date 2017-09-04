@@ -208,7 +208,7 @@ res_2 = compare_dataframes(df1,  aggregate_rates_to_annual_average,
 
 
 # TODO:
-#y detect varibale not tested
+# detect variable not tested
 
 
 # TODO:
