@@ -42,7 +42,7 @@ INDICATOR_GPARAMS = {'timerange':DEFAULT_TIMERANGE,
 
 class GraphBase:
     #TODO: need real short docstring what this class is.
-    def __init__(self, tss, params=DEFAULT_GPARAMS, fname='untitled'):
+    def __init__(self, tss, params=DEFAULT_GPARAMS, name='untitled'):
         """
         Args:
             tss: list of timeseries to plot.
@@ -56,7 +56,7 @@ class GraphBase:
         self.rootfolder = find_repo_root()
         self.pngfolder = self.rootfolder / 'output' / 'png'
         self.subfolder = 'misc'     # will be overridden by child classes
-        self.fname = fname
+        self.name = name
 
     def __del__(self):
         # plt.close()
@@ -87,29 +87,29 @@ class GraphBase:
         if self.fig == None:
             raise ValueError('Figure is empty, call GraphBase.plot() first')
         else:
-            self.fig.savefig(self.get_fpath())
+            self.fig.savefig(self.get_file_path())
             
     def close(self):
         plt.close()
         del self.fig
         self.fig = None
 
-    def get_fpath(self):
-        fpath = str(self.pngfolder / self.subfolder / (self.fname+'.png'))
-        return fpath
+    def get_file_path(self):
+        file_path = str(self.pngfolder / self.subfolder / (self.name+'.png'))
+        return file_path
 
 
 class Spline(GraphBase):
-    def __init__(self, tss, fname):
+    def __init__(self, tss, name):
         assert len(tss) == 1
-        super().__init__(tss, params=SPLINE_GPARAMS, fname=fname)
+        super().__init__(tss, params=SPLINE_GPARAMS, name=name)
         self.subfolder = 'splines'
 
 
 class IndicatorChart(GraphBase):
-    def __init__(self, tss, fname):
+    def __init__(self, tss, name):
         assert len(tss) > 0
-        super().__init__(tss, params=INDICATOR_GPARAMS, fname=fname)
+        super().__init__(tss, params=INDICATOR_GPARAMS, name=name)
         if len(tss) > 1:
             self.subfolder = 'mul_indicators'
         else:
@@ -120,9 +120,9 @@ class IndicatorChart(GraphBase):
 
 
 def plot_all_images(save=True):
-    dfs = {key:getter.get_dataframe(key) for key in 'aqm'}
+    dfa, dfq, dfm = [getter.get_dataframe(freq) for freq in 'aqm']
 
-    df = dfs['m']
+    df = dfm
     cols = df.columns
     cols = cols.drop(['year', 'month'])       
 
