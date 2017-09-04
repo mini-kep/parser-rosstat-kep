@@ -210,7 +210,16 @@ print(res_2)
 
 
 # TODO:
-# detect varibale not tested
+#y detect varibale not tested
+
+
+# TODO:
+# - the setup can be a small class TCase (cannot use TestCase as in will be picked up by pytest) with passing parameters at init, screen() and result() methods
+# - epsilon can be found by lookup function depending on frequencies compared and type of accum function, this can be a dictionary
+# - all_tests can be a list of TCase() instances
+# - as we want to see what variables were not tested and might want to use the lookup for epsilon passing the parameters to TCase can use a dictionary: TCase({'m':df1, 'a':df2}, accum_func) - this way we have full information about what is compared and it opens a road to m2q comparison in principle.
+# - maybe just Case instead of TCase, simple class names are great
+# - the runner for test queue has a responsibility to come up to one bool 'did all tests pass?' and other responsibility to check 'what variables were not tested'
 
 
 # below likely not needed
