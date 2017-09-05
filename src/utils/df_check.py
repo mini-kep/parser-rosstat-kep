@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
+from collections import defaultdict
 
 # TODO <https://github.com/epogrebnyak/mini-kep/issues/61>
 
@@ -174,6 +175,48 @@ if __name__ == "__main__":
     
     runner(feed=all_setups)
     
+    # variable coverage
+    def variables_union(test_args):
+        """Finds the set union of the variabes in the two dataframes in
+            a single test case."""
+        df1, _, df2, _ = test_args
+        return set(df1.columns).union(df2)
+
+
+    def get_all_variables(**kwargs):
+        """Gets the set union of all the variables in the dataframes.
+            Arguments must be specified with dfm, dfq, or dfa.
+
+            Example: get_all_variables(dfm=dfm, dfa=dfa)
+        
+            Args:
+                **dfm (DataFrame): pandas DataFrame with monthly values
+                **dfq (DataFrame): pandas DataFrame with quarterly values
+                **dfa (DataFrame): pandas DataFrame with annual values
+        """
+        kwargs = defaultdict(lambda: pd.DataFrame(), kwargs)
+        return (set(kwargs['dfa'].columns) |
+                set(kwargs['dfm'].columns) |
+                set(kwargs['dfq'].columns)) - {'month', 'qtr', 'year'}
+
+
+    def all_setups_union(all_setups):
+        """Finds the set union of the variables across all test cases."""
+        test_vars = set()
+        for case in all_setups:
+            test_vars.update(variables_union(case))
+        return test_vars - {'month', 'qtr', 'year'}
+
+
+    all_variables = get_all_variables(dfm=dfm, dfa=dfa)
+    total_test_vars = all_setups_union(all_setups)
+
+    print()
+    print("Coverage: {}".format(len(total_test_vars) / len(all_variables)))
+    print("Variables not covered:\n\n{}".format('\n'.join(all_variables
+        - total_test_vars)))
+    print()
+
 # COMMENTS:
 # - detect variable not tested
 # - the setup can be a small class Case with passing parameters at init, screen() and result() methods
