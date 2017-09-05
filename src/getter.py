@@ -2,6 +2,8 @@
 
 # TODO: add local file caching
 
+import pandas as pd
+
 from pathlib import Path
 from io import StringIO
 
@@ -10,13 +12,17 @@ from config import PathHelper
 __all__ = ['get_dataframe', 'get_dataframe_from_repo']
 
 # repo file
-import pandas as pd
 
 def read_csv(source):
-    """Canonical wrapper for pd.read_csv()."""
-    return pd.read_csv(source,
-                       converters={'time_index': pd.to_datetime},
-                       index_col='time_index')
+    """Canonical wrapper for pd.read_csv().
+    
+       Treats first column at time index. 
+       
+       Retruns:
+           pd.DataFrame()    
+    """
+    converter_arg = dict(converters={0: pd.to_datetime}, index_col=0) 
+    return pd.read_csv(source, **converter_arg)
 
 def make_url(freq):
     url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
@@ -56,5 +62,5 @@ def get_dataframe(freq, helper=PathHelper):
 dfa, dfq, dfm = (get_dataframe(freq) for freq in 'aqm')
 
 if '__main__' == __name__:
-    dfa = get_dataframe_from_repo('a')
-
+    #dfa = get_dataframe_from_repo('a')
+    pass
