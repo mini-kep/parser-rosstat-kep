@@ -1,13 +1,16 @@
 """Read canonical dataset from *latest* folder."""
 
+# TODO: add local file caching
+
 from pathlib import Path
 from io import StringIO
-import pandas as pd
 
 from config import PathHelper
 
-__all__ = ['get_dataframe']
+__all__ = ['get_dataframe', 'get_dataframe_from_repo']
 
+# repo file
+import pandas as pd
 
 def read_csv(source):
     """Canonical wrapper for pd.read_csv()."""
@@ -15,32 +18,43 @@ def read_csv(source):
                        converters={'time_index': pd.to_datetime},
                        index_col='time_index')
 
-
-def get_dataframe(freq, helper=PathHelper):
-    """Read dataframe from local folder"""
-    path = helper.get_csv_in_latest_folder(freq)
-    # a workaround for Windows problem with non-ASCII paths
-    # https://github.com/pandas-dev/pandas/issues/15086
-    content = Path(path).read_text()
-    filelike = StringIO(content)
-    return read_csv(filelike)
-
-
 def make_url(freq):
     url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
     filename = "df{}.csv".format(freq)
     return url_base.format(filename)
 
 
-def get_dataframe_from_web(freq):
-    """Suggested code to read pandas dataframes from stable URL."""
+def get_dataframe_from_repo(freq):
+    """Suggested code to read pandas dataframes from 'mini-kep' stable URL."""
     url = make_url(freq)
     return read_csv(url)
 
 
-if '__main__' == __name__:
-    dfa = get_dataframe('a')
-    dfq = get_dataframe('q')
-    dfm = get_dataframe('m')
+# local path 
 
-# TODO: add local file caching
+def proxy(path):
+    """A workaround for pandas problem with non-ASCII paths on Windows 
+       See <https://github.com/pandas-dev/pandas/issues/15086>
+       
+       Args:
+           path (pathlib.Path) - CSV filepath
+       
+       Returns:
+           io.StringIO with CSV content           
+       """
+    content = Path(path).read_text()
+    return StringIO(content)    
+
+
+def get_dataframe(freq, helper=PathHelper):
+    """Read dataframe from local folder"""
+    path = helper.get_csv_in_latest_folder(freq)
+    filelike = proxy(path)
+    return read_csv(filelike)
+
+# make df's importable from here
+dfa, dfq, dfm = (get_dataframe(freq) for freq in 'aqm')
+
+if '__main__' == __name__:
+    dfa = get_dataframe_from_repo('a')
+
