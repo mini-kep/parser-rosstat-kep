@@ -94,6 +94,14 @@ class BranchChart(GraphBase):
         self.subfolder = 'indicators'   
         
     # TODO: overload drawing method    
+    def plot(self):
+        plt.style.use(self.params['style'])
+        fig = plt.figure(figsize=self.params['figsize'])
+        num_plots = len(self.ts.columns)
+        for i in range(num_plots):
+            ax = fig.add_subplot(num_plots, 1, i+1)
+            ax.plot(df.iloc[:, i])
+
 
     # TODO: overload naming method  
 
@@ -148,12 +156,17 @@ if __name__ == "__main__":
     s = Spline(ts, 'name')
     ic = IndicatorChart(ts, 'name2')
     
-    s.plot()
-    ic.plot()
+    # s.plot()
+    # ic.plot()
     
     
     # type 3 graphs
     varnames = ['RETAIL_SALES_FOOD_bln_rub', 
-                'RETAIL_SALES_NONFOOD_bln_rub']
+                'RETAIL_SALES_NONFOOD_bln_rub'
+                ]
     df = dfm[varnames]
     bc = BranchChart(df)
+    bc.plot()
+
+    # For testing:
+    # plt.show()
