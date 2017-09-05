@@ -64,3 +64,4 @@ dfa, dfq, dfm = (get_dataframe(freq) for freq in 'aqm')
 if '__main__' == __name__:
     #dfa = get_dataframe_from_repo('a')
     pass
+    z = [varname for df in [dfa, dfq, dfm] for varname in df.columns]

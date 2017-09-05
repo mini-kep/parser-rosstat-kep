@@ -26,7 +26,11 @@ def test_deaccumulate_qtr():
 
 # half integration test, half algorithm validation, not working now due to rename()
 
-from df_values import dfq, dfm, dfa
+
+#would the test hold 
+from getter import dfa, dfm, dfq 
+#from df_values import dfq, dfm, dfa
+
 
 varnames = df_transform.select_varnames(dfm)
 gov_dfm = dfm[varnames]
