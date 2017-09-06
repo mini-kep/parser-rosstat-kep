@@ -26,9 +26,7 @@ INDICATOR_GPARAMS = {'timerange':DEFAULT_TIMERANGE,
                      'figsize':(5, 5), 
                      'style':'bmh', 
                      'facecolor':'white',
-                     # EP: when shutting down this parameter 
-                     #     the labels are horizintal. 
-                     #'auto_x':True,                     
+                     'auto_x':False,                     
                      'axis_on':True}
 
 #TODO: we need some nice way to decide at what frequency 
@@ -40,6 +38,9 @@ INDICATOR_GPARAMS = {'timerange':DEFAULT_TIMERANGE,
 def get_frequency(ts):
     return 'm' # 'q' or 'm'
 
+
+# TO DISCUSS: if title is present, can we make it title of the chart
+#             not much larger font than labels 
 
 class GraphBase:
     """Parent class for project charts (Spline, Chart and other)."""
@@ -67,22 +68,32 @@ class GraphBase:
 
 
     @property    
-    def folder(self):        
+    def local_folder(self):        
         """Returns:
                pathlib.Path()
         """
         return get_pix_folder(self.subfolder) 
         
+    
+    @property    
+    def github_folder(self):        
+        """Returns:
+               pathlib.Path()
+        """
+        pass
 
     @property    
     def path(self):        
         """Returns:
               string 
         """
-        return str(self.folder / self.filename)
+        return str(self.local_folder / self.filename)
+    
     
     def as_markdown(self):
-        return '![{self.name}]({self.path})'
+        #FIXME: make this retrun github address
+        url = ''
+        return f'![{self.ts.name}]({url})'
     
     def plot_data(self, axes):  
         # EP: rationale to separate it - drawing may be different 
@@ -188,8 +199,8 @@ if __name__ == "__main__":
     s = Spline(ts, 'name')
     c = Chart(ts, 'name2')
 
-    s.plot()
-    c.plot()
+    #s.plot()
+    #c.plot()
     
     
     varnames = ['RETAIL_SALES_FOOD_bln_rub', 
@@ -197,10 +208,27 @@ if __name__ == "__main__":
                 ]
     df = dfm[varnames]
     v = ChartStack(df)
-    v.plot()
+    #v.plot()
     
     d = ChartDF(dfq[varnames])
     # d.plot
+     
+    qv = ['GDP_rog'
+     'INDPRO_rog',
+     'INVESTMENT_rog']
+    
+    mv = ['INDPRO_yoy', 
+          'TRANSPORT_FREIGHT_bln_tkm',
+          'CPI_rog',
+          'WAGE_REAL_rog',
+          'UNEMPL_pct',
+          'GOV_SURPLUS_ACCUM_FEDERAL_bln_rub',
+          'EXPORT_GOODS_bln_usd',
+          'IMPORT_GOODS_bln_usd']
+    # RUR_USD_eop
+    
+    charts = [Chart(dfm[name]) for name in mv]  
+    md = [z.as_markdown() for z in charts]
+    
 
-    # For testing:
-    # plt.show()
+

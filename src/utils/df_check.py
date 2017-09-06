@@ -199,7 +199,6 @@ if __name__ == "__main__":
     print("Variables not covered:")
     print('\n'.join(not_tested))
     
-
 # COMMENTS:
 # - the setup can be a small class Case with passing parameters at init, screen() and result() methods
 # - epsilon can be found by lookup function depending on frequencies compared and type of accum function, this can be a dictionary
