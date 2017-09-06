@@ -16,22 +16,34 @@ DEFAULT_TIMERANGE = start, end
 # graphics parameters in dicts
 
 SPLINE_GPARAMS = {'timerange':DEFAULT_TIMERANGE, 
-                        'figsize':(2, 0.6), 'style':'ggplot', 'facecolor':'white',
-                        'auto_x':False, 'axis_on':False}
+                  'figsize':(2, 0.6), 
+                  'style':'ggplot', 
+                  'facecolor':'white',
+                  'auto_x':False, 
+                  'axis_on':False}
 
 INDICATOR_GPARAMS = {'timerange':DEFAULT_TIMERANGE, 
-                        'figsize':(5, 5), 'style':'bmh', 'facecolor':'white',
-                        'auto_x':True, 'axis_on':True}
+                     'figsize':(5, 5), 
+                     'style':'bmh', 
+                     'facecolor':'white',
+                     # EP: when shutting down this parameter 
+                     #     the labels are horizintal. 
+                     #'auto_x':True,                     
+                     'axis_on':True}
+
+#TODO: we need some nice way to decide at what frequency 
+#      a time series or a dataframe and return 'a', 'q' or 'm'
+#      maybe take first element of the dataframe index add
+#      ofsset for month, qtr and year and see which oth them 
+#      hits the second element in graph
+
+def get_frequency(ts):
+    return 'm' # 'q' or 'm'
 
 
 class GraphBase:
-    """Parent class for standard project charts.     
-    
-       Parent to:
-            Spline
-            IndicatorChart    
-    """ 
-    def __init__(self, ts, params):
+    """Parent class for project charts (Spline, Chart and other)."""
+    def __init__(self, ts, title=None, params = {}):
         """
         Args:
             ts (pd.TimeSeries): 
@@ -39,36 +51,67 @@ class GraphBase:
         """
         self.ts = ts
         self.params = params
+        # nothing plotted yet
         self.fig = None
-        self.subfolder = None       
+        # will overload this
+        self.subfolder = None                       
 
-    def _get_filename(self):
-        # FIXME will need to put frequency in, not todo now
-        return f'{self.ts.name}.png'
+    @property
+    def filename(self):        
+        """Returns:
+              string 
+        """
+        # FIXME: make the frequency function above
+        freq = get_frequency(self.ts)
+        return f'{freq}_{self.ts.name}.png'
+
+
+    @property    
+    def folder(self):        
+        """Returns:
+               pathlib.Path()
+        """
+        return get_pix_folder(self.subfolder) 
         
-    def _get_path(self):        
-        return str(get_pix_folder(self.subfolder) / self._get_filename(self))
-            
+
+    @property    
+    def path(self):        
+        """Returns:
+              string 
+        """
+        return str(self.folder / self.filename)
+    
+    def as_markdown(self):
+        return '![{self.name}]({self.path})'
+    
+    def plot_data(self, axes):  
+        # EP: rationale to separate it - drawing may be different 
+        #     on the same convas if self.ts is different class 
+        axes.plot(self.ts)
+    
     def plot(self):
-        #FIXME: желательно разделить на подгтовку осей / отрисовку / выдачу фигуры
         plt.style.use(self.params['style'])
+        # create figure
         fig = plt.figure(figsize=self.params['figsize'])
+        # add 1 subplot and format it
         axes = fig.add_subplot(1, 1, 1, facecolor=self.params['facecolor'])
-        # собственно plot, его желталеьно выделить чтобы перезагрузить в BranchChart
-        axes.plot(ts)
-        # ----
         axes.set_xlim(self.params['timerange'])
+        # draw data at axis
+        self.plot_data(axes)
+        # format figure
         if self.params['auto_x']:
             fig.autofmt_xdate()
         if not self.params['axis_on']:
             plt.axis('off')        
-        self.fig = fig
+        self.fig = fig        
+        return self
 
     def save(self):
         if self.fig is None:
-            raise ValueError('Figure is empty, call GraphBase.plot() first')
+            raise ValueError('Figure is empty, call .plot() method first')
         else:
             self.fig.savefig(self.get_file_path())
+        return self    
             
     def close(self):
         plt.close()
@@ -77,23 +120,43 @@ class GraphBase:
 
 
 class Spline(GraphBase):
-    def __init__(self, ts, name=None):
-        super().__init__(ts, params=SPLINE_GPARAMS)
+    def __init__(self, ts, title=None):
+        super().__init__(ts, title, params=SPLINE_GPARAMS)
         self.subfolder = 'splines'
 
+class Chart(GraphBase):
+    def __init__(self, df, title=None):
+        super().__init__(df, title, params=INDICATOR_GPARAMS)
+        self.subfolder = 'indicator_chart'        
 
-class IndicatorChart(GraphBase):
+
+class ChartDF(GraphBase):
+    def __init__(self, df, title=None):
+        super().__init__(df, title, params=INDICATOR_GPARAMS)
+        self.df = df
+        self.subfolder = 'dataframe_chart'        
+    
+    def plot(self):  
+       # TODO: is it possible to replicate graph below?
+       # it is a wrapper around df.plot with some resolution
+       # https://github.com/epogrebnyak/data-lab/blob/565f431605b708246fa0f3323a651a747e9d9dfb/lab.py#L50-L53
+       # the graph looks like this:
+       # https://user-images.githubusercontent.com/11600722/29885655-42981f88-8dc0-11e7-9db4-bbcb27bab48f.png    
+          
+       # ax = self.df.plot(figsize=(pix[0]/my_dpi, pix[1]/my_dpi))
+       # fig = ax.get_figure()
+       # fig.savefig(path, dpi = MY_DPI)
+       # fig.clear()
+       pass
+
+# EP: lets keep it as experimental class with several subplots
+#     it is useful for seeing how plt.style.use(self.params['style'])
+#     behaves without parameters.
+class ChartStack(GraphBase):
     def __init__(self, df, name=None):
         super().__init__(df, params=INDICATOR_GPARAMS)
-        self.subfolder = 'indicators'        
-
-
-class BranchChart(GraphBase):
-    def __init__(self, df, name=None):
-        super().__init__(df, params=INDICATOR_GPARAMS)
-        self.subfolder = 'indicators'   
+        self.subfolder = 'temp'   
         
-    # TODO: overload drawing method    
     def plot(self):
         plt.style.use(self.params['style'])
         fig = plt.figure(figsize=self.params['figsize'])
@@ -102,50 +165,19 @@ class BranchChart(GraphBase):
             ax = fig.add_subplot(num_plots, 1, i+1)
             ax.plot(df.iloc[:, i])
 
-
-    # TODO: overload naming method  
-
-def plot_all_images(save=True):
-    dfa, dfq, dfm = [getter.get_dataframe(freq) for freq in 'aqm']
-
-    df = dfm
-    cols = df.columns
-    cols = cols.drop(['year', 'month'])       
-
-    graphs = []
-
-    # type 1 and 2 graphs
+def save_all_series(df):    
+    def plt(graph):
+        graph.plot().save().close()    
+    cols = [x for x in dfm.columns if x not in ['year', 'month', 'qtr']]
     for col in cols:
-        ts = df[col]
-        graphs.append(Spline        ([ts], col))
-        graphs.append(IndicatorChart([ts], col))
-
-   
-    # plotting and saving all
-    for graph in graphs:
-        graph.plot()
-        graph.save()
-        graph.close()
-
-
-# Checklist
-
-# SK:
-# ключевое:    
-# - [ ] разделили GraphBase.plot() 
-# дополниельно:    
-# - [ ] сделали класс BranchChart
-# - [ ] assert/тесты для публичных классов
-
-# EP:
-# - [ ] ввели новый нейминг для картинок с разной частотой типа mCPI_rog.png
-# - [ ] создаем очередь что рисовать 
-# - [ ] запускаем очередь что рисовать 
-# - [ ] tasks.py command/integrate to finaliser.py for latest graphs 
-
-
-# Checklist 2
-# - [ ] убрали name из инита + добавили set_name()  
+        plt(Spline(col))
+        plt(Chart(col))
+    
+def plot_all_dataframes():
+    dfa, dfq, dfm = (getter.get_dataframe(freq) for freq in 'aqm')
+    save_all_series(dfa)
+    save_all_series(dfq)
+    save_all_series(dfm)
 
 if __name__ == "__main__":
     
@@ -154,19 +186,21 @@ if __name__ == "__main__":
     
     ts = dfm.CPI_rog
     s = Spline(ts, 'name')
-    ic = IndicatorChart(ts, 'name2')
+    c = Chart(ts, 'name2')
+
+    s.plot()
+    c.plot()
     
-    # s.plot()
-    # ic.plot()
     
-    
-    # type 3 graphs
     varnames = ['RETAIL_SALES_FOOD_bln_rub', 
                 'RETAIL_SALES_NONFOOD_bln_rub'
                 ]
     df = dfm[varnames]
-    bc = BranchChart(df)
-    bc.plot()
+    v = ChartStack(df)
+    v.plot()
+    
+    d = ChartDF(dfq[varnames])
+    # d.plot
 
     # For testing:
     # plt.show()

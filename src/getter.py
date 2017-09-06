@@ -35,7 +35,6 @@ def get_dataframe_from_repo(freq):
     url = make_url(freq)
     return read_csv(url)
 
-
 # local path 
 
 def proxy(path):
@@ -47,7 +46,7 @@ def proxy(path):
        
        Returns:
            io.StringIO with CSV content           
-       """
+    """
     content = Path(path).read_text()
     return StringIO(content)    
 
