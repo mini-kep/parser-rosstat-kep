@@ -37,7 +37,14 @@ INDICATOR_GPARAMS = {'timerange':DEFAULT_TIMERANGE,
 #      hits the second element in graph
 
 def get_frequency(ts):
-    """Returns the frequency of a timeseries or dataframe."""
+    """Returns the frequency of a timeseries or dataframe.
+
+        Args:
+            ts: pd.Timeseries
+
+        Returns:
+            string
+    """
     return str.lower(pd.infer_freq(ts.index))
 
 
@@ -57,7 +64,7 @@ class GraphBase:
         # nothing plotted yet
         self.fig = None
         # will overload this
-        self.subfolder = None                       
+        self.subfolder = ""                       
 
     @property
     def filename(self):        
