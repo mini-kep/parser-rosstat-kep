@@ -73,7 +73,6 @@ class GraphBase:
         """Returns:
               string 
         """
-        # FIXME: make the frequency function above
         freq = get_frequency(self.ts)
         return f'{freq}_{self.ts.name}.png'
 
@@ -105,7 +104,6 @@ class GraphBase:
     
     
     def as_markdown(self):
-        #FIXME: make this retrun github address
         url = urljoin(self.github_folder, self.filename)
         return f'![{self.ts.name}]({url})'
     
@@ -145,8 +143,8 @@ class GraphBase:
 
 
 class Spline(GraphBase):
-    def __init__(self, ts, title=None):
-        super().__init__(ts, title, params=SPLINE_GPARAMS)
+    def __init__(self, ts):
+        super().__init__(ts, params=SPLINE_GPARAMS)
         self.subfolder = 'splines'
 
 class Chart(GraphBase):
@@ -210,7 +208,7 @@ if __name__ == "__main__":
     dfa, dfq, dfm = (getter.get_dataframe(freq) for freq in 'aqm')
     
     ts = dfm.CPI_rog
-    s = Spline(ts, 'name')
+    s = Spline(ts)
     c = Chart(ts, 'name2')
 
     #s.plot()
