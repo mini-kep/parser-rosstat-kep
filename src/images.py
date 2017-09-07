@@ -2,6 +2,7 @@
 
 import datetime
 import matplotlib.pyplot as plt
+import pandas as pd
 
 from config import find_repo_root
 
@@ -36,7 +37,8 @@ INDICATOR_GPARAMS = {'timerange':DEFAULT_TIMERANGE,
 #      hits the second element in graph
 
 def get_frequency(ts):
-    return 'm' # 'q' or 'm'
+    """Returns the frequency of a timeseries or dataframe."""
+    return str.lower(pd.infer_freq(ts.index))
 
 
 # TO DISCUSS: if title is present, can we make it title of the chart
