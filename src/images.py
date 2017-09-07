@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 from config import find_repo_root
+from urllib.parse import urljoin
+
 
 def get_pix_folder(subfolder):    
     return find_repo_root() / 'output' / 'png' / subfolder
@@ -89,7 +91,10 @@ class GraphBase:
         """Returns:
                pathlib.Path()
         """
-        pass
+        base_url = "https://github.com/epogrebnyak/mini-kep/tree/master/output/png/"
+        subfolder = f"{self.subfolder}/" if self.subfolder else ""
+        return urljoin(base_url, subfolder)
+        
 
     @property    
     def path(self):        
@@ -101,7 +106,7 @@ class GraphBase:
     
     def as_markdown(self):
         #FIXME: make this retrun github address
-        url = ''
+        url = urljoin(self.github_folder, self.filename)
         return f'![{self.ts.name}]({url})'
     
     def plot_data(self, axes):  
