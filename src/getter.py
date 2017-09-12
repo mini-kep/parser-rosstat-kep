@@ -1,37 +1,37 @@
 """Read canonical dataset from *latest* folder."""
 
-# TODO: add local file caching
+# TODO: add local file caching after import from web
+# (?) TODO: with converters 0table may strip 'time_index' columns, not sure
+
+from io import StringIO
+from pathlib import Path
+import urllib
 
 import pandas as pd
 
-from pathlib import Path
-from io import StringIO
-
-from config import PathHelper
+from config import PathHelper, WebSource
 
 __all__ = ['get_dataframe', 'get_dataframe_from_repo']
 
 # repo file
 
 def read_csv(source):
-    """Canonical wrapper for pd.read_csv().
-    
-       Treats first column at time index. 
+    """Wrapper for pd.read_csv(). Treats first column at time index. 
        
-       Retruns:
+       Returns:
            pd.DataFrame()    
     """
     converter_arg = dict(converters={0: pd.to_datetime}, index_col=0) 
     return pd.read_csv(source, **converter_arg)
 
+
 def make_url(freq):
-    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
     filename = "df{}.csv".format(freq)
-    return url_base.format(filename)
+    return urllib.parse.urljoin(WebSource.BASE_URL, filename) 
 
 
 def get_dataframe_from_repo(freq):
-    """Suggested code to read pandas dataframes from 'mini-kep' stable URL."""
+    """Code to read pandas dataframes from stable URL."""
     url = make_url(freq)
     return read_csv(url)
 
@@ -57,7 +57,8 @@ def get_dataframe(freq, helper=PathHelper):
     filelike = proxy(path)
     return read_csv(filelike)
 
-# make df's importable from here
+# make dataframes importable for this module as:
+# from getter import dfa, dfq, dfm   
 dfa, dfq, dfm = (get_dataframe(freq) for freq in 'aqm')
 
 if '__main__' == __name__:

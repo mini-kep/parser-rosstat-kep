@@ -11,6 +11,10 @@ import pandas as pd
 __all__ = ['find_repo_root', 'PathHelper', 'DateHelper']
 
 
+class WebSource(object):
+    BASE_URL = 'https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest'
+
+
 INTERIM_CSV_FILENAME = 'tab.csv'
 XL_FILENAME = 'kep.xlsx'
 
