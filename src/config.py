@@ -10,6 +10,7 @@ import pandas as pd
 
 __all__ = ['find_repo_root', 'PathHelper', 'DateHelper']
 
+THIS_REPO_NAME = 'parser-rosstat-kep'
 
 class WebSource(object):
     BASE_URL = 'https://raw.githubusercontent.com/mini-kep/parser-rosstat-kep/master/data/processed/latest'
@@ -49,7 +50,7 @@ def find_repo_root():
     """
     levels_up = 1
     root = Path(__file__).parents[levels_up]
-    assert root.name == 'mini-kep'
+    assert root.name == THIS_REPO_NAME
     return root
 
 
