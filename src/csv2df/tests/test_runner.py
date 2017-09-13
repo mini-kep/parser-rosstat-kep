@@ -61,10 +61,11 @@ def test_resulting_dataframes():
 
 def test_resulting_dataframes_with_time_index():
     assert dfq.to_dict('list') == {
-        'year': [1999, 1999, 1999, 1999, 2000, 2000, 2000, 2000], 
-         'qtr': [1, 2, 3, 4, 1, 2, 3, 4], 
- 'GDP_bln_rub': [901.0, 1102.0, 1373.0, 1447.0, 1527.0, 1697.0, 2038.0, 2044.0]}
-        
+        'year': [
+            1999, 1999, 1999, 1999, 2000, 2000, 2000, 2000], 'qtr': [
+            1, 2, 3, 4, 1, 2, 3, 4], 'GDP_bln_rub': [
+                901.0, 1102.0, 1373.0, 1447.0, 1527.0, 1697.0, 2038.0, 2044.0]}
+
 
 def test_resulting_dataframes_no_dfm():
     assert dfm.empty is True

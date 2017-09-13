@@ -4,31 +4,39 @@ from pandas.util.testing import assert_frame_equal
 import df_transform
 import pandas as pd
 
-#unit test
+# unit test
+
 
 def make_df(data_dict):
-    return pd.DataFrame(data=data_dict, 
-        index=pd.date_range(start="1999-01-01", periods=8, freq='Q'))
+    return pd.DataFrame(
+        data=data_dict,
+        index=pd.date_range(
+            start="1999-01-01",
+            periods=8,
+            freq='Q'))
 
 
 from itertools import accumulate
-a = [10, 10, 10, 10] 
-b = [3, 3, 3, 3] 
-a1, b1 = (list(accumulate(x)) for x in (a,b))
+a = [10, 10, 10, 10]
+b = [3, 3, 3, 3]
+a1, b1 = (list(accumulate(x)) for x in (a, b))
 
 dq = make_df({'VARNAME_bln': a + b})
 dq_accum = make_df({'VARNAME_ACCUM_bln': a1 + b1})
 
-def test_deaccumulate_qtr(): 
+
+def test_deaccumulate_qtr():
     deacc = df_transform.deaccumulate_qtr(dq_accum)
     assert all(deacc - dq == 0)
 
 
-# half integration test, half algorithm validation, not working now due to rename()
+# half integration test, half algorithm validation, not working now due to
+# rename()
 
 
 import pandas as pd
 from io import StringIO
+
 
 def to_dataframe(text):
     return pd.read_csv(StringIO(text), sep="\t",
@@ -97,8 +105,8 @@ dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
 
 
-#this breaks a test:
-#from getter import dfa, dfm, dfq 
+# this breaks a test:
+#from getter import dfa, dfm, dfq
 
 
 varnames = df_transform.select_varnames(dfm)
@@ -110,20 +118,22 @@ diff_dfm = df_transform.deaccumulate_month(gov_dfm)
 diff_dfq = df_transform.deaccumulate_qtr(gov_dfq)
 
 # @pytest.mark.skip()
+
+
 class Test_Deaccumulated:
     def test_monthly_diff_adds_to_annual(self):
         """The deaccumulated GOV values in the monthly dataframe should add up
             to the last month in the year in the annual dataframe.
         """
         assert_frame_equal(diff_dfm.resample('A').sum(),
-                df_transform.rename(last_month_values))
+                           df_transform.rename(last_month_values))
 
     def test_quarterly_diff_adds_to_annual(self):
         """The deaccumulated GOV values in the quarterly dataframe should add
             up to the last month in the year in the annual dataframe.
         """
         assert_frame_equal(diff_dfq.resample('A').sum(),
-                df_transform.rename(last_month_values))
+                           df_transform.rename(last_month_values))
 
     def test_monthly_diff_adds_to_quarterly_diff(self):
         """The deaccumulated monthly dataframe aggregated to the quarter should
@@ -137,8 +147,8 @@ class Test_Deaccumulated:
         """
         assert_frame_equal(diff_dfm.resample('Q').sum()[::4],  # every quarter
                            df_transform.rename(gov_dfq[gov_dfq.index.month ==
-                               3]))
-        
+                                                       3]))
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

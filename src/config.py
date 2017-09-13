@@ -1,8 +1,8 @@
 """Path and date helpers:
-    
+
    - :class:`PathHelper` and :func:`find_repo_root` to navigate repo filesystem
    - :class:`DateHelper` to manage release dates as (year, month)
-   
+
 """
 
 from pathlib import Path
@@ -11,6 +11,7 @@ import pandas as pd
 __all__ = ['find_repo_root', 'PathHelper', 'DateHelper']
 
 THIS_REPO_NAME = 'parser-rosstat-kep'
+
 
 class WebSource(object):
     BASE_URL = 'https://raw.githubusercontent.com/mini-kep/parser-rosstat-kep/master/data/processed/latest'
@@ -112,13 +113,12 @@ class DataFolder:
 class PathHelper:
     """
     In parsing used by:
-       
+
      - :class:`download.download.RemoteFile`
      - :func:`word2csv.word.make_interim_csv`
      - :class:`csv2df.runner.Vintage`
-     
-    """
 
+    """
 
     # folders
 

@@ -34,6 +34,8 @@ class Test_open_csv:
             assert f.readlines() == ["abc\n", "123"]
 
 # TODO: implement tests
+
+
 @pytest.mark.skip("Only a sceleton.")
 def test_reader():
     assert Reader()

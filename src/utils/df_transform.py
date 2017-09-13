@@ -40,7 +40,7 @@ def deaccumulate(df, first_month):
 
 
 if __name__ == '__main__':
-    from getter import dfa, dfm, dfq 
+    from getter import dfa, dfm, dfq
 
     varnames = [vn for vn in dfa.columns
                 if vn.startswith('GOV') and "ACCUM" in vn]

@@ -12,7 +12,7 @@ Global variable  **SPEC**  allows access to parsing definitions:
 
   - :class:`csv2df.reader.RowStack`
   - :func:`csv2df.parser.extract_tables`
-    
+
 We parse CSV file by segment, because some table headers repeat themselves in
 CSV file. Extracting a piece out of CSV file gives a good isolated input for parsing.
 

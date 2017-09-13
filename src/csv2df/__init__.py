@@ -37,5 +37,5 @@ __all__ = ['specification',
            'validator',
            'util_label', 'util_row_splitter']
 
-from . import (specification, reader, parser, runner, validator, 
-               util_label,  util_row_splitter)
+from . import (specification, reader, parser, runner, validator,
+               util_label, util_row_splitter)

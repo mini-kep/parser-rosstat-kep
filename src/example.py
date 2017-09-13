@@ -149,4 +149,3 @@ def show_dicts(df=dfq):
         print()
         print(t)
         print(df.to_dict(t))
-

@@ -197,7 +197,7 @@ def folder_to_csv(folder, csv_filename=False):
     print("Finished creating raw CSV file:", csv_filename)
 
 
-def make_interim_csv(year, month, helper = PathHelper):
+def make_interim_csv(year, month, helper=PathHelper):
     folder = helper.get_raw_folder()
     interim_csv = helper.get_interim_csv(year, month)
     folder_to_csv(folder, interim_csv)
