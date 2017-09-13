@@ -12,7 +12,7 @@ __all__ = ['find_repo_root', 'PathHelper', 'DateHelper']
 
 
 class WebSource(object):
-    BASE_URL = 'https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest'
+    BASE_URL = 'https://raw.githubusercontent.com/mini-kep/parser-rosstat-kep/master/data/processed/latest'
 
 
 INTERIM_CSV_FILENAME = 'tab.csv'
