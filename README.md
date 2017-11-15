@@ -35,8 +35,6 @@ directory structure.
 [getter.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/getter.py) 
 is an entry point to get parsed data.
 
-Note: spline graphs for data are developed [here](https://github.com/epogrebnyak/mini-kep/issues/12)
-
 # Code for data download
 
 ```python
