@@ -8,8 +8,6 @@ import datetime
 
 import config 
 
-UNPACK_RAR_EXE = config.UNPACK_RAR_EXE
-
 def download(url, path):
     r = requests.get(url.strip(), stream=True)
     with open(path, 'wb') as f:
@@ -17,14 +15,22 @@ def download(url, path):
             if chunk:  # filter out keep-alive new chunks
                 f.write(chunk)
 
+def make_url(year, month):
+    check_date(year, month)    
+    month = str(month).zfill(2)
+    return f'http://www.gks.ru/free_doc/doc_{year}/Ind/ind{month}.rar'
 
-def mask_with_end_separator(folder):
-    """UnRAR wants its folder parameter to send with /
-       This function supplies a valid folder argument for UnRAR."""
-    return "{}{}".format(folder, os.sep)
+def check_date(year, month):
+    def as_date(year, month):
+        return datetime.date(year, month, 1)
+    if as_date(year, month) < as_date(2016, 12):
+        raise ValueError('No web files before 2016-12')
 
-
-def unrar(path, folder, unrar=UNPACK_RAR_EXE):
+def unrar(path, folder, unrar=config.UNPACK_RAR_EXE):
+    def mask_with_end_separator(folder):
+        """UnRAR wants its folder argument  with '/'
+        """
+        return "{}{}".format(folder, os.sep)    
     folder = mask_with_end_separator(folder)
     assert folder.endswith("/") or folder.endswith("\\")
     tokens = [unrar, 'e', path, folder, '-y']
@@ -32,26 +38,13 @@ def unrar(path, folder, unrar=UNPACK_RAR_EXE):
     return exit_code
 
 
-class LocalFile:
-    def __init__(self, year, month):        
-        self._folder = config.DataFolder(year, month).raw
-    
-    @property
-    def folder(self):
-        return str(self._folder)
-    
-    @property
-    def path(self):
-        return str(self._folder / 'ind.rar')
-
 class RemoteFile():
 
     def __init__(self, year, month):
-        self.check_date(year, month)
-        self.year, self.month = year, month    
-        lf = LocalFile(year, month)           
-        self.path = lf.path
-        self.folder = lf.folder
+        self.url = make_url(year, month)
+        locfile = config.LocalRarFile(year, month)           
+        self.path = locfile.path
+        self.folder = locfile.folder
 
     @staticmethod
     def check_date(year, month):
@@ -60,12 +53,6 @@ class RemoteFile():
         if as_date(year, month) < as_date(2016, 12):
             raise ValueError('No web files before 2016-12')
             
-    @property
-    def url(self):
-        month = str(self.month).zfill(2)
-        year = self.year
-        return f'http://www.gks.ru/free_doc/doc_{year}/Ind/ind{month}.rar'
-
     def download(self):
         download(self.url, self.path)
         print('Downloaded', self.path)
@@ -73,16 +60,16 @@ class RemoteFile():
     def unrar(self):
         res = unrar(self.path, self.folder)
         if res == 0:
-            print('UnRARed', self.path)
-            return True
-        else:
-            return False
+            print('UnRARed', self.path)       
+            
 
+    # FIXME: refactor to more compact code. 
     def clean(self):
         for file in os.listdir(self.folder):
             path = os.path.join(self.folder, file)
             if not path.endswith(".rar"):
                 os.remove(path)
+    # ------------------------------------
 
 
 if __name__ == "__main__":

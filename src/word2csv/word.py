@@ -11,7 +11,6 @@
 import csv
 import os
 import config
-from config import PathHelper
 
 ENCODING = 'utf8'
 
@@ -172,10 +171,6 @@ def yield_rows_from_many_files(file_list):
             print("File does not exist:", p)
 
 
-def get_csv_filename(folder):
-    return os.path.join(folder, 'tab.csv')
-
-
 def dump_doc_files_to_csv(file_list, csv_path):
     """Write tables from .doc in *file_list* into one *csv_path* file. """
     folder_iter = yield_rows_from_many_files(file_list)
@@ -189,14 +184,20 @@ def make_file_list(folder):
 
 def folder_to_csv(folder, csv_filename):
     """Make single csv based on 5 .doc files in *folder*. """
-    if not csv_filename:
-        csv_filename = get_csv_filename(folder)
     print()
     print("Folder:\n    ", folder)
     file_list = make_file_list(folder)
     dump_doc_files_to_csv(file_list, csv_filename)
     print("Finished creating raw CSV file:", csv_filename)
     return True
+
+
+def word2csv(year, month, force=False):
+    raw_folder = config.DataFolder(year, month).raw
+    interim_csv = config.LocalCSV(year, month).interim
+    if force or not os.path.exists(interim_csv):
+        folder_to_csv(folder=raw_folder, csv_filename=interim_csv)
+    
 
 if __name__ == "__main__":
     pass

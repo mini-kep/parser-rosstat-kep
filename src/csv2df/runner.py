@@ -15,10 +15,8 @@
     Collection.approve_latest()
     Collection.approve_all()
 """
-import pandas as pd
 
-
-from config import LocalCSV, LATEST, SUPPORTED_DATES 
+from config import LocalCSV, LATEST_DATE, SUPPORTED_DATES 
 from csv2df.specification import SPEC
 from csv2df.reader import Reader, open_csv
 from csv2df.parser import extract_tables
@@ -40,7 +38,7 @@ def get_dataframes(csvfile, spec=SPEC):
 
     Returns:
        Three pandas dataframes at annual, qtr and monthly frequencies
-       ina dictionary.
+       in a dictionary.
     """
     tables = [t for csv_segment, pdef in Reader(csvfile, spec).items()
               for t in extract_tables(csv_segment, pdef)]
@@ -82,7 +80,7 @@ class Collection:
     """Methods to manipulate entire set of data releases."""
 
     all_dates = SUPPORTED_DATES 
-    latest_vintage = Vintage(*LATEST)
+    latest_vintage = Vintage(*LATEST_DATE)
 
     @classmethod
     def save_latest(cls):
