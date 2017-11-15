@@ -22,7 +22,7 @@ macroeconomic data well.
 [kep] follows [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
 directory structure. 
 
-[Source code (src) folder]:
+[Source code (src) folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/src):
    - **download**: download and unpack rar files from Rosstat website
    - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
    - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
