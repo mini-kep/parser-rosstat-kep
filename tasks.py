@@ -62,9 +62,7 @@ def lint(ctx, folder="src/csv2df"):
     # --max-line-length=100
     ctx.run('flake8 {} --exclude test* --ignore E501'.format(folder))
 
-
 # documentation 
-
 
 def apidoc(subpkg=None, exclude=''):
     """Call sphinx-apidoc to document *pkg* package without files
@@ -125,7 +123,10 @@ def ls(ctx):
 
 @task
 def add(ctx, year, month):
-    _add(year, month)
+    year, month = int(year), int(month)
+    with PathContext():
+        import manage
+        manage.run(year, month)
 
 
 class PathContext():
@@ -137,33 +138,6 @@ class PathContext():
 
     def __exit__(self, exc_type, exc_value, traceback):
         sys.path.remove(self.path)
-
-
-def _add(year, month):
-    year, month = int(year), int(month)
-
-    with PathContext():
-
-        from config import DataFolder
-
-        #download and  unpack
-        from download.download import RemoteFile
-        remote = RemoteFile(year, month)
-        assert remote.download()
-        assert remote.unrar()
-
-        # make interim csv from Word files
-        interim_csv = DataFolder(year, month).get_interim_csv()
-        if not os.path.exists(interim_csv):
-            from word2csv.word import make_interim_csv
-            assert make_interim_csv(year, month)
-            assert DataFolder(year, month).copy_tab_csv()
-
-        #parse, validate, save
-        from csv2df.runner import Vintage
-        vint = Vintage(year, month)
-        assert vint.validate()
-        assert vint.save()
 
 
 @task
@@ -198,39 +172,4 @@ if platform == 'win32':
 
 
 if __name__ == '__main__':
-    print(apidoc('', exclude='*test*'))
-
-##########################################################################
-# GLOBALS                                                                       #
-##########################################################################
-
-# PROJECT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
-#BUCKET = {{ cookiecutter.s3_bucket }}
-#PROFILE = {{ cookiecutter.aws_profile }}
-#PROJECT_NAME = {{ cookiecutter.repo_name }}
-#PYTHON_INTERPRETER = {{ cookiecutter.python_interpreter }}
-
-##########################################################################
-# COMMANDS                                                                      #
-##########################################################################
-
-# Make Dataset
-#data: requirements
-#	$(PYTHON_INTERPRETER) src/data/make_dataset.py
-
-
-# Upload Data to S3
-# sync_data_to_s3:
-# ifeq (default,$(PROFILE))
-#	aws s3 sync data/ s3://$(BUCKET)/data/
-# else
-#	aws s3 sync data/ s3://$(BUCKET)/data/ --profile $(PROFILE)
-# endif
-
-# Download Data from S3
-# sync_data_from_s3:
-# ifeq (default,$(PROFILE))
-#	aws s3 sync s3://$(BUCKET)/data/ data/
-# else
-#	aws s3 sync s3://$(BUCKET)/data/ data/ --profile $(PROFILE)
-# endif
+    pass

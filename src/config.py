@@ -10,8 +10,6 @@ import pandas as pd
 
 __all__ = ['find_repo_root', 'PathHelper', 'DateHelper']
 
-THIS_REPO_NAME = 'parser-rosstat-kep'
-
 
 class WebSource(object):
     BASE_URL = 'https://raw.githubusercontent.com/mini-kep/parser-rosstat-kep/master/data/processed/latest'
@@ -21,16 +19,9 @@ INTERIM_CSV_FILENAME = 'tab.csv'
 XL_FILENAME = 'kep.xlsx'
 
 
-def md(folder, i=0):
-    """Create *folder* if not exists. Also create up to 3 parent folders."""
-    if i > 3:
-        msg = "Cannot create full path, iteration too deep: {}".format(folder)
-        ValueError(msg)
+def md(folder):
+    """Create *folder* if not exists"""
     if not folder.exists():
-        parent = folder.parent
-        if not parent.exists():
-            i += 1
-            md(parent, i)
         folder.mkdir()
 
 
@@ -50,64 +41,74 @@ def find_repo_root():
 
     """
     levels_up = 1
-    root = Path(__file__).parents[levels_up]
-    assert root.name == THIS_REPO_NAME
-    return root
+    return Path(__file__).parents[levels_up]
 
 
 class DataFolder:
-    root = find_repo_root()
-    raw = root / 'data' / 'raw'
-    interim = root / 'data' / 'interim'
-    processed = root / 'data' / 'processed'
-    latest = root / 'data' / 'processed' / 'latest'
+    data_root = find_repo_root() / 'data'
+    _raw = data_root  / 'raw'
+    _interim = data_root  / 'interim'
+    _processed = data_root  / 'processed'
+    _latest = _processed / 'latest'
 
     def __init__(self, year=None, month=None):
         DateHelper.validate(year, month)
         self.year, self.month = year, month
-        # TODO: instantinating folders here is risky
-        # self.make_dirs()
+        self.guarantee_folders()
+        
+        
+    def guarantee_folders(self):
+        for base in [self._raw, self._interim, self._processed]:
+            md(base)
+            md(base / str(self.year))
+            md(self.dated_folder(base)) 
+        md(self._latest)    
 
-    @classmethod
-    def get_latest_date(cls):
-        """Return (year, month) tuple corresponding to latest filled
-           *data/interim* subfolder."""
+  
+    def dated_folder(self, which_subfolder):
+        return which_subfolder / str(self.year) / str(self.month).zfill(2)
+    
+    @property
+    def raw(self):
+        return self.dated_folder(self._raw)
 
-        def max_subdir(folder):
-            subfolders = [f.name for f in folder.iterdir() if f.is_dir()]
-            return max(map(int, subfolders))
+    @property
+    def interim(self):
+        return self.dated_folder(self._interim)
 
-        root = cls.interim
-        year = max_subdir(root)
-        month = max_subdir(root / str(year))
-        return year, month
-
-    def make_dirs(self):
-        for folder in [self.get_raw_folder(),
-                       self.get_interim_folder(),
-                       self.get_processed_folder()]:
-            md(folder)
-
-    def _local_folder(self, parent_folder):
-        folder = parent_folder / str(self.year) / str(self.month).zfill(2)
-        # WARNING: risky - may get to here from tests
-        md(folder)
-        return folder
-
-    def get_raw_folder(self):
-        return self._local_folder(self.raw)
-
-    def get_interim_folder(self):
-        return self._local_folder(self.interim)
-
-    def get_processed_folder(self):
-        return self._local_folder(self.processed)
-
-    def get_interim_csv(self, filename=INTERIM_CSV_FILENAME):
-        return self.get_interim_folder() / filename
+    @property
+    def processed(self):
+        return self.dated_folder(self._processed)
 
     def __repr__(self):
         return "DataFolder({}, {})".format(self.year, self.month)
+
+
+class LocalCSV(DataFolder):
+    
+    @property
+    def interim(self, filename=INTERIM_CSV_FILENAME):
+        return super().interim / filename
+
+    def processed(self, freq):
+        return super().processed / 'df{}.csv'.format(freq)
+
+    def latest(self, freq):
+        return super()._latest / 'df{}.csv'.format(freq)
+
+def get_latest_date(base_dir):
+    """Return (year, month) tuple corresponding to 
+       latest filled subfolder of *base_dir*.
+    """
+    def max_subdir(folder):
+        subfolders = [f.name for f in folder.iterdir() if f.is_dir()]
+        return max(map(int, subfolders))
+    year = max_subdir(base_dir)
+    month = max_subdir(base_dir / str(year))
+    return year, month
+
+LATEST = get_latest_date(DataFolder._interim) 
+
 
 
 class PathHelper:
@@ -122,8 +123,8 @@ class PathHelper:
 
     # folders
 
-    def get_raw_folder(year, month):
-        return DataFolder(year, month).get_raw_folder()
+    #def get_raw_folder(year, month):
+    #    return DataFolder(year, month).raw
 
     def get_processed_folder(year, month):
         """Return processed CSV file folder based on *year* and *month*.
@@ -161,8 +162,10 @@ class PathHelper:
         return str(root / 'bin' / unrar_filename)
 
 
-class DateHelper:
+UNPACK_RAR_EXE = str(find_repo_root() / 'bin' / 'UnRAR.exe') 
 
+
+class DateHelper:
     def get_latest_date():
         """Return year and month for latest available interim data folder.
 
@@ -177,19 +180,28 @@ class DateHelper:
             raise ValueError(f'Not in supported date range: {year}, {month}')
 
     def get_supported_dates():
-        """Get a list of (year, month) tuples starting from (2009, 4)
-           up to month before current.
+        return supported_dates()
 
-           For example, on September 1 will return (8, 2017).
 
-           Excludes (2013, 11) - no archive for this month.
+def supported_dates():
+    """Get a list of (year, month) tuples starting from (2009, 4)
+       up to month before current.
 
-        Returns:
-            List of (year, month) tuples
-        """
-        start_date = '2009-4'
-        end_date = pd.to_datetime('today') - pd.offsets.MonthEnd()
-        dates = pd.date_range(start_date, end_date, freq='MS')
-        excluded = (2013, 11)
-        return [(date.year, date.month) for date in dates
-                if (date.year, date.month) != excluded]
+       For example, on September 1 will return (8, 2017).
+
+       Excludes (2013, 11) - no archive for this month.
+
+    Returns:
+        List of (year, month) tuples
+    """
+    start_date = '2009-04'
+    end_date = pd.to_datetime('today') - pd.offsets.MonthEnd()
+    dates = pd.date_range(start_date, end_date, freq='MS')
+    excluded = (2013, 11)
+    return [(date.year, date.month) 
+            for date in dates
+            if (date.year, date.month) != excluded]
+    
+SUPPORTED_DATES = supported_dates()
+
+

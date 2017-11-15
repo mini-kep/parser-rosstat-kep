@@ -17,8 +17,8 @@
 """
 import pandas as pd
 
-from config import PathHelper
-from config import DateHelper
+
+from config import LocalCSV, LATEST, SUPPORTED_DATES 
 from csv2df.specification import SPEC
 from csv2df.reader import Reader, open_csv
 from csv2df.parser import extract_tables
@@ -27,6 +27,8 @@ from csv2df.validator import Validator
 
 
 __all__ = ['get_dataframes', 'Vintage', 'Collection']
+
+FREQUENCIES = ['a', 'q', 'm']
 
 
 def get_dataframes(csvfile, spec=SPEC):
@@ -37,40 +39,37 @@ def get_dataframes(csvfile, spec=SPEC):
        spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
 
     Returns:
-       Three pandas dataframes at annual, qtr and monthly frequencies.
+       Three pandas dataframes at annual, qtr and monthly frequencies
+       ina dictionary.
     """
     tables = [t for csv_segment, pdef in Reader(csvfile, spec).items()
               for t in extract_tables(csv_segment, pdef)]
     emitter = Emitter(tables)
-    dfa = emitter.get_dataframe(freq='a')
-    dfq = emitter.get_dataframe(freq='q')
-    dfm = emitter.get_dataframe(freq='m')
-    return dfa, dfq, dfm
+    return {freq: emitter.get_dataframe(freq) for freq in FREQUENCIES}
 
 
 class Vintage:
     """Represents dataset release for a given year and month."""
 
-    def __init__(self, year, month, helper=PathHelper):
+    def __init__(self, year, month):
         self.year, self.month = year, month
-        self.folder_path = helper.get_processed_folder(year, month)
-        csv_path = helper.locate_csv(year, month)
-        with open_csv(csv_path) as csvfile:
-            self.dfa, self.dfq, self.dfm = get_dataframes(csvfile)
-
-    def dfs(self):
-        """Shorthand for obtaining three dataframes."""
-        return self.dfa, self.dfq, self.dfm
+        self.local_csv = LocalCSV(year, month)        
+        
+    def _read(self):        
+        with open_csv(self.local_csv.interim) as csvfile:
+            self.dfs = get_dataframes(csvfile)
 
     def save(self):
-        self.dfa.to_csv(self.folder_path / 'dfa.csv')
-        self.dfq.to_csv(self.folder_path / 'dfq.csv')
-        self.dfm.to_csv(self.folder_path / 'dfm.csv')
-        print("Saved dataframes to", self.folder_path)
+        self._read()
+        for freq, df in self.dfs.items():
+            path = self.local_csv.processed(freq)
+            df.to_csv(path)
+            print("Saved dataframe to", path)
         return True
 
     def validate(self):
-        checker = Validator(self.dfa, self.dfq, self.dfm)
+        self._read()
+        checker = Validator(*[self.dfs[freq] for freq in FREQUENCIES])
         checker.run()
         print("Test values parsed OK for", self)
         return True
@@ -82,9 +81,8 @@ class Vintage:
 class Collection:
     """Methods to manipulate entire set of data releases."""
 
-    all_dates = DateHelper.get_supported_dates()
-    year, month = DateHelper.get_latest_date()
-    latest_vintage = Vintage(year, month)
+    all_dates = SUPPORTED_DATES 
+    latest_vintage = Vintage(*LATEST)
 
     @classmethod
     def save_latest(cls):
@@ -123,4 +121,4 @@ if __name__ == "__main__":
     year, month = 2015, 5
     vint = Vintage(year, month)
     vint.validate()
-    dfa, dfq, dfm = vint.dfs()
+    #dfa, dfq, dfm = vint.dfs()

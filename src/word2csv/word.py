@@ -10,6 +10,7 @@
 
 import csv
 import os
+import config
 from config import PathHelper
 
 ENCODING = 'utf8'
@@ -186,7 +187,7 @@ def make_file_list(folder):
     return [os.path.abspath(os.path.join(folder, fn)) for fn in files]
 
 
-def folder_to_csv(folder, csv_filename=False):
+def folder_to_csv(folder, csv_filename):
     """Make single csv based on 5 .doc files in *folder*. """
     if not csv_filename:
         csv_filename = get_csv_filename(folder)
@@ -195,22 +196,7 @@ def folder_to_csv(folder, csv_filename=False):
     file_list = make_file_list(folder)
     dump_doc_files_to_csv(file_list, csv_filename)
     print("Finished creating raw CSV file:", csv_filename)
-
-
-def make_interim_csv(year, month, helper=PathHelper):
-    folder = helper.get_raw_folder()
-    interim_csv = helper.get_interim_csv(year, month)
-    folder_to_csv(folder, interim_csv)
     return True
 
-
 if __name__ == "__main__":
-    #from run_word import get_word_folder
-    #from pathlib import Path
-    #WORD_ROOT = Path("D:/digital/kep_data2")
-    #word_folder = get_word_folder(2012, 11, WORD_ROOT)
-
-    #word_folder = Path("D:/digital/kep_data/2015_01")
-    # folder_to_csv(word_folder)
-
     pass

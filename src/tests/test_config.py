@@ -3,6 +3,7 @@ import pytest
 import datetime as dt
 
 from config import DataFolder
+from config import LocalCSV
 from config import PathHelper, DateHelper
 
 
@@ -12,28 +13,28 @@ def test_md(folder):
 
 
 class Test_DataFolder():
+    
+    # we assume a typical state of repo for (2015, 5)      
+    
     def test_repr(self):
         assert repr(DataFolder(2015, 5))
 
     def test_get_folder_methods_return_existing_folders(self):
         assert DataFolder(2015, 5).get_processed_folder().exists()
         assert DataFolder(2015, 5).get_interim_folder().exists()
-
-    @pytest.mark.skip
-    def test_raw_folder_may_not_be_present(self):
-        assert DataFolder(2015, 5).get_raw_folder().exists()
-
-    def test_get_interim_csv_method_returns_existing_file(self):
-        assert DataFolder(2015, 5).get_interim_csv().exists()
+        # raw_folder_may_not_be_present(self)
 
     def test_out_of_range_year_does_raises_error(self):
         with pytest.raises(ValueError):
             DataFolder(2030, 1)
 
+class Test_LocalCSV():
+    def test_get_interim_property_method_returns_existing_file(self):
+        assert LocalCSV(2015, 5).interim.exists()
+
+
 # skipping
-
-
-@pytest.mark.skip(reason="not testing maintenance scripts yet")
+@pytest.mark.skip(reason="not testing maintenance scripts")
 def test_copy_latest():
     assert False
 
@@ -69,10 +70,6 @@ class Test_DateHelper:
     def test_get_supported_dates_starts_in_2009_4(self):
         assert DateHelper.get_supported_dates()[0] == (2009, 4)
 
-    def test_get_supported_dates_ends_with_latest_date(self):
-        prev_month_date = dt.datetime.today().replace(day=1) - dt.timedelta(days=1)
-        assert DateHelper.get_supported_dates()[-1] == (prev_month_date.year,
-                                                        prev_month_date.month)
 
     def test_get_supported_dates_excludes_2013_11(self):
         assert (2013, 11) not in DateHelper.get_supported_dates()

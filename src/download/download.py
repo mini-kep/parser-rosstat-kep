@@ -6,10 +6,9 @@ import subprocess
 import requests
 import datetime
 
-from config import PathHelper
+import config 
 
-UNPACK_RAR_EXE = PathHelper.get_unrar_binary()
-
+UNPACK_RAR_EXE = config.UNPACK_RAR_EXE
 
 def download(url, path):
     r = requests.get(url.strip(), stream=True)
@@ -19,60 +18,62 @@ def download(url, path):
                 f.write(chunk)
 
 
-def _mask_with_end_separator(folder):
+def mask_with_end_separator(folder):
     """UnRAR wants its folder parameter to send with /
-       This function supllies a valid folder argument for UnRAR."""
+       This function supplies a valid folder argument for UnRAR."""
     return "{}{}".format(folder, os.sep)
 
 
 def unrar(path, folder, unrar=UNPACK_RAR_EXE):
-    folder = _mask_with_end_separator(folder)
+    folder = mask_with_end_separator(folder)
     assert folder.endswith("/") or folder.endswith("\\")
     tokens = [unrar, 'e', path, folder, '-y']
     exit_code = subprocess.check_call(tokens)
     return exit_code
 
 
+class LocalFile:
+    def __init__(self, year, month):        
+        self._folder = config.DataFolder(year, month).raw
+    
+    @property
+    def folder(self):
+        return str(self._folder)
+    
+    @property
+    def path(self):
+        return str(self._folder / 'ind.rar')
+
 class RemoteFile():
 
-    def __init__(self, year, month, helper=PathHelper):
-        self.year, self.month = year, month
-        self._check_date()
-        self.url = self._make_url()
-        folder = helper.get_raw_folder(year, month)
-        self.folder = str(folder)
-        self.local_path = str(folder / 'ind.rar')
+    def __init__(self, year, month):
+        self.check_date(year, month)
+        self.year, self.month = year, month    
+        lf = LocalFile(year, month)           
+        self.path = lf.path
+        self.folder = lf.folder
 
-    def _check_date(self):
+    @staticmethod
+    def check_date(year, month):
         def as_date(year, month):
             return datetime.date(year, month, 1)
-        if as_date(self.year, self.month) < as_date(2016, 12):
+        if as_date(year, month) < as_date(2016, 12):
             raise ValueError('No web files before 2016-12')
-
-    def _make_url(self):
+            
+    @property
+    def url(self):
         month = str(self.month).zfill(2)
         year = self.year
         return f'http://www.gks.ru/free_doc/doc_{year}/Ind/ind{month}.rar'
 
-    def download(self, force=False):
-        must_run = True
-        if os.path.exists(self.local_path):
-            must_run = False
-        if force:
-            must_run = True
-        if must_run:
-            download(self.url, self.local_path)
-        if os.path.exists(self.local_path):
-            print('Downloaded', self.local_path)
-            return True
-        else:
-            print('Already downloaded', self.local_path)
-            return False
+    def download(self):
+        download(self.url, self.path)
+        print('Downloaded', self.path)
 
     def unrar(self):
-        res = unrar(self.local_path, self.folder)
+        res = unrar(self.path, self.folder)
         if res == 0:
-            print('UnRARed', self.local_path)
+            print('UnRARed', self.path)
             return True
         else:
             return False
@@ -91,30 +92,3 @@ if __name__ == "__main__":
     rf = RemoteFile(2017, 6)
     rf.download()
     rf.unrar()
-
-# May use messages:
-
-#    def _rar_content(self):
-#        """Return single filename stored in RAR archive."""
-#        return subprocess.check_output([
-#            UNPACK_RAR_EXE,
-#            'lb', self.rar_path]).decode("utf-8").strip()
-#
-#    # public methods download, unrar, get_filename
-#    def download(self):
-#        if os.path.exists(self.rar_path):
-#            print("Already downloaded:", self.rar_path)
-#        else:
-#            print("Downloading:", self.url)
-#            self._download(self.url, self.rar_path)
-#            print("Saved as:", self.rar_path)
-#            self._init_csv_filename()
-#        return self
-#
-#    def unrar(self):
-#        if os.path.exists(self.csv_path):
-#            print("Already unpacked:", self.csv_path)
-#        else:
-#            print("Unpacking:", self.csv_path)
-#            self._unrar(self.rar_path, folder=Folder('raw_csv').path())
-#        return self.csv_path
