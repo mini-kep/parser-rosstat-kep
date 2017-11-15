@@ -14,6 +14,12 @@ macroeconomic time series and saves them as [CSV files at stable URL][backend].
 [kep] follows [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
 directory structure. 
 
+[kep] is inspired by [FRED](https://fred.stlouisfed.org/) and replaces a predecessor repo,
+[data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of
+macroeconomic data well. 
+
+# Directory structure
+
 The parcer itself consists of following subpackages in **/src** folder:
    - **download**: download and unpack rar files from Rosstat website
    - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
@@ -23,10 +29,6 @@ The parcer itself consists of following subpackages in **/src** folder:
 [getter.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/getter.py) 
 is an entry point to get parsed data.
    
-[kep] is inspired by [FRED](https://fred.stlouisfed.org/) and replaces a predecessor repo,
-[data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of
-macroeconomic data well. 
-
 
 # Latest data
 
