@@ -3,39 +3,41 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8a467743314641b4a22b66b327834367)](https://www.codacy.com/app/epogrebnyak/mini-kep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=epogrebnyak/mini-kep&amp;utm_campaign=Badge_Grade)
 
            
-[parser-rosstat-kep][kep] downloads MS Word files from [Rosstat KEP publication][Rosstat], 
-assigns variable names to tables found and creates pandas dataframes with 
-macroeconomic time series and saves them as [CSV files at stable URL][backend]. 
+[parser-rosstat-kep]( or ```kep```) downloads MS Word files from [Rosstat KEP publication][Rosstat], 
+assigns variable names to tables found, creates pandas dataframes with 
+macroeconomic time series at annual, quarterly and monthly frequencies 
+and saves them as [CSV files at stable URL][backend]. 
 
   [kep]: https://github.com/mini-kep/parser-rosstat-kep
   [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
   [backend]: https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest
 
-[kep] follows [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
-directory structure. 
-
 [kep] is inspired by [FRED](https://fred.stlouisfed.org/) and replaces a predecessor repo,
 [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of
 macroeconomic data well. 
 
+
 # Directory structure
 
-**/src** folder:
+[kep] follows [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
+directory structure. 
+
+[Source code (src) folder]:
    - **download**: download and unpack rar files from Rosstat website
    - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
    - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
    - **finaliser.py** script
 
+[Data folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/data):
+   - **processed** has datasets by year and month (vintages)
+   - **latest** is latest parsed dataset
+
 [getter.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/getter.py) 
 is an entry point to get parsed data.
-   
 
-# Latest data
+Note: spline graphs for data are developed [here](https://github.com/epogrebnyak/mini-kep/issues/12)
 
-*TODO: add spline graphs here <https://github.com/epogrebnyak/mini-kep/issues/12>*
-
-
-# How do I download macroeconomic indicators from here?
+# Code for data download
 
 ```python
 import pandas as pd
@@ -55,13 +57,13 @@ Check more access methods at
 [getter.py](https://github.com/epogrebnyak/mini-kep/blob/dev/src/getter.py).
 
 
-# Can I get this data in Excel?
+# Data in Excel
 
- Here is the latest data in Excel: 
+ Here is the latest data in Excel (but use of csv is still encouraged/): 
  
  - [kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true)
   
-# How do you update this repo?
+# Repo management
 
 Around [this schedule](http://www.gks.ru/gis/images/graf-oper2017.htm) on a Windows machine I run:   
 
@@ -100,7 +102,6 @@ Test health         | [![Build Status](https://travis-ci.org/epogrebnyak/mini-ke
 Test coverage       |  [![Coverage badge](https://codecov.io/gh/epogrebnyak/mini-kep/branch/master/graphs/badge.svg)](https://codecov.io/gh/epogrebnyak/mini-kep)
 Documentation       |  [![Documentation Status](https://readthedocs.org/projects/mini-kep-parcer-for-rosstat-kep-publication/badge/?version=latest)](http://mini-kep-parcer-for-rosstat-kep-publication.readthedocs.io/en/latest/?badge=latest)
 CSV endpoint        | <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>
-List of variables   |  TODO: Add here
 Transformation      |  Government revenue/expenses deaccumaulated to monthly values 
 Validation          |  Hardcoded checkpoints and consistency checks 
 
