@@ -20,7 +20,7 @@ macroeconomic data well.
 
 # Directory structure
 
-The parcer itself consists of following subpackages in **/src** folder:
+**/src** folder:
    - **download**: download and unpack rar files from Rosstat website
    - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
    - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
