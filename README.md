@@ -97,9 +97,8 @@ Source type         |  MS Word  <!-- Word, Excel, CSV, HTML, XML, API, other -->
 Frequency           |  Monthly
 When released       |  Start of month as in [schedule](http://www.gks.ru/gis/images/graf-oper2017.htm) 
 Code                | <https://github.com/epogrebnyak/mini-kep/tree/master/src/>
-Controller          |  TODO: Add here
-Test health         | [![Build Status](https://travis-ci.org/epogrebnyak/mini-kep.svg?branch=master)](https://travis-ci.org/epogrebnyak/mini-kep)
-Test coverage       |  [![Coverage badge](https://codecov.io/gh/epogrebnyak/mini-kep/branch/master/graphs/badge.svg)](https://codecov.io/gh/epogrebnyak/mini-kep)
+Test health         | [![Build Status](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=master)](https://travis-ci.org/mini-kep/parser-rosstat-kep)
+Test coverage       |  [![Coverage badge](https://codecov.io/gh/mini-kep/parser-rosstat-kep/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parser-rosstat-kep)
 Documentation       |  [![Documentation Status](https://readthedocs.org/projects/mini-kep-parcer-for-rosstat-kep-publication/badge/?version=latest)](http://mini-kep-parcer-for-rosstat-kep-publication.readthedocs.io/en/latest/?badge=latest)
 CSV endpoint        | <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>
 Transformation      |  Government revenue/expenses deaccumaulated to monthly values 
