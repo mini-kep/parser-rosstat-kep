@@ -3,7 +3,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8a467743314641b4a22b66b327834367)](https://www.codacy.com/app/epogrebnyak/mini-kep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=epogrebnyak/mini-kep&amp;utm_campaign=Badge_Grade)
 
            
-[parser-rosstat-kep][kep]( or ```kep```) downloads MS Word files from [Rosstat KEP publication][Rosstat], 
+[parser-rosstat-kep][kep] (or ```kep```) downloads MS Word files from [Rosstat KEP publication][Rosstat], 
 assigns variable names to tables found, creates pandas dataframes with 
 macroeconomic time series at annual, quarterly and monthly frequencies 
 and saves them as [CSV files at stable URL][backend]. 
