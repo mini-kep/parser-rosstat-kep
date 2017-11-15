@@ -1,5 +1,3 @@
-import os
-
 import config
 from download.download import RemoteFile
 from word2csv.word import word2csv 
