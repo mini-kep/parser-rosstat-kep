@@ -9,7 +9,9 @@ import urllib
 
 import pandas as pd
 
-from config import PathHelper, WebSource
+from config import DataFolder
+#Hayk
+#from config import PathHelper, WebSource
 
 __all__ = ['get_dataframe', 'get_dataframe_from_repo']
 
@@ -52,10 +54,19 @@ def proxy(path):
     content = Path(path).read_text()
     return StringIO(content)
 
-
-def get_dataframe(freq, helper=PathHelper):
+# Hayk
+# replace the PathHelper with DataFolder: Not sure if this is correct, ask!
+#def get_dataframe(freq, helper=PathHelper):
     """Read dataframe from local folder"""
-    path = helper.get_csv_in_latest_folder(freq)
+    #path = helper.get_csv_in_latest_folder(freq)
+    #filelike = proxy(path)
+    #return read_csv(filelike)
+
+# Ask question
+def get_dataframe(freq, helper=DataFolder):
+    """Read dataframe from local folder"""
+    #path = helper.get_csv_in_latest_folder(freq)
+    path = str(helper.latest)+'/df'+freq+'.csv'
     filelike = proxy(path)
     return read_csv(filelike)
 

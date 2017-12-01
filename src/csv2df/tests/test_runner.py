@@ -7,7 +7,8 @@ from csv2df.reader import Reader
 from csv2df.parser import extract_tables
 from csv2df.emitter import Emitter
 from csv2df.runner import get_dataframes, Vintage, Collection
-from config import DateHelper, PathHelper
+# Hayk
+#from config import DateHelper, PathHelper
 from csv2df.validator import Validator
 
 # input data
@@ -37,7 +38,12 @@ def test_get_dataframes():
     # csvfile1 was consumed once, buffer position if not at zero
     if csvfile1.tell() != 0:
         csvfile1.seek(0)
-    dfa_, dfq_, dfm_ = get_dataframes(csvfile1, spec1)
+    # Hayk: get_dataframes return a dictionary of dataframes
+    #dfa_, dfq_, dfm_ = get_dataframes(csvfile1, spec1)
+    dict_dfs = get_dataframes(csvfile1, spec1)
+    dfa_ = dict_dfs['a']
+    dfq_ = dict_dfs['q']
+    dfm_ = dict_dfs['m']
     assert dfa_.equals(dfa)
     assert dfq_.equals(dfq)
     assert dfm_.equals(dfm)
