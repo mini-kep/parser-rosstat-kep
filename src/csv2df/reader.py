@@ -51,7 +51,7 @@ def open_csv(path):
         path (pathlib.Path) - path to csv file with data
     """
     if not isinstance(path, Path):
-        raise TypeError('<{path}> should be pathlib.Path() instance')
+        raise TypeError(f'<{path}> should be pathlib.Path() instance')
     return path.open(encoding=ENC)
 
 

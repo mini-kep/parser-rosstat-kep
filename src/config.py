@@ -57,7 +57,7 @@ class DataFolder:
     
     def __init__(self, year=None, month=None):
         if (year, month) not in SUPPORTED_DATES:
-            raise ValueError('<{year}, {month}> is not a supported date.')
+            raise ValueError(f'<{year}, {month}> is not a supported date.')
         self.year, self.month = year, month
         self.guarantee_folders()        
         

@@ -106,7 +106,7 @@ def runner(feed):
     """
     test_results = [compare_dataframes(*setup) for setup in feed]
     for i, t in enumerate(test_results):
-        print('Test {i} result:', t)
+        print(f'Test {i} result:', t)
     global_result = all(test_results)
     print('Global result:', global_result)
     return global_result
