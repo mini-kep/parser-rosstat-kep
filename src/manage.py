@@ -32,5 +32,10 @@ def copy_latest():
         src = csv_file.processed(freq)
         dst = latest.csv(freq) 
         shutil.copyfile(src, dst)
-        print('Copied', src)    
+        print('Copied', src)   
+        
+if '__main__' == __name__:
+    year, month = 2017, 9    
+    remote = RemoteFile(year, month)
+    remote.download()      
     
