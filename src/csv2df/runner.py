@@ -51,22 +51,21 @@ class Vintage:
 
     def __init__(self, year, month):
         self.year, self.month = year, month
-        self.local_csv = LocalCSV(year, month)        
-        
-    def _read(self):        
-        with open_csv(self.local_csv.interim) as csvfile:
-            self.dfs = get_dataframes(csvfile)
+        self.csv = LocalCSV(year, month)
+
+    @property        
+    def dfs(self):    
+        with open_csv(self.csv.interim) as csvfile:
+            return get_dataframes(csvfile)
 
     def save(self):
-        self._read()
         for freq, df in self.dfs.items():
-            path = self.local_csv.processed(freq)
+            path = self.csv.processed(freq)
             df.to_csv(path)
             print("Saved dataframe to", path)
         return True
 
     def validate(self):
-        self._read()
         checker = Validator(*[self.dfs[freq] for freq in FREQUENCIES])
         checker.run()
         print("Test values parsed OK for", self)
@@ -110,9 +109,9 @@ class Collection:
 
 if __name__ == "__main__":
     # Collection calls
-    Collection.approve_latest()
+    # Collection.approve_latest()
     # Collection.approve_all()
-    Collection.save_latest()
+    # Collection.save_latest()
     # Collection.save_all()
 
     # sample Vintage call

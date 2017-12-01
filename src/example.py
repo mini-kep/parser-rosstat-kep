@@ -41,21 +41,26 @@ Workflow as follows (doc/pseudo.rst)
 import pandas as pd
 import io
 
-from csv2df.specification import Definition, Specification
+from config import LocalCSV
+from csv2df.specification import Definition, Specification, SPEC
 from csv2df.reader import Reader, open_csv
 from csv2df.parser import extract_tables
 from csv2df.emitter import Emitter
+from csv2df.runner import Vintage
 from csv2df.validator import Validator
 
-# from csv2df.runner.py
 
+
+# copied from csv2df.runner.py
 
 def get_dataframes(csvfile, spec):
     """Extract dataframes from *csvfile* using *spec* parsing instructions.
 
     Arg:
-      csvfile (file connection or StringIO) - CSV file for parsing
-      spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
+       csvfile (file connection or StringIO) - CSV file for parsing
+       spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
+    Returns:
+       a tuple of dataframes       
     """
 
     # Reader.items() yeild a tuple of csv file segment and its parsing definition
@@ -121,37 +126,28 @@ for c in check_points:
 
 # Example 3 Read actual data by month and year
 year, month = 2017, 5
-#Hayk
-# 3.1 Access to csv file using path helper
-#from config import PathHelper
-#from csv2df.specification import SPEC
-#csv_path = PathHelper.locate_csv(year, month)
-#with open_csv(csv_path) as csvfile:
-#    dfa1, dfq1, dfm1 = get_dataframes(csvfile, SPEC)
+
+# 3.1 Access to csv file using config.LocalCSV
+csv_path = LocalCSV(year, month).interim
+with open_csv(csv_path) as csvfile:
+    dfa1, dfq1, dfm1 = get_dataframes(csvfile, SPEC)
 
 # 3.2 Access to csv file using Vintage class (identical to 3.1)
-from csv2df.runner import Vintage
 vint = Vintage(year, month)
-# No such method: dfs().
-#dfa2, dfq2, dfm2 = vint.dfs()
-#There is dfs members for the Vintage class, which
-# needs to be first created by invoking the _read() method
-# One way of doing this is to call the vaidate() method
+dfs_dict = vint.dfs
+dfa2, dfq2, dfm2 = [dfs_dict[freq] for freq in 'aqm']
+assert dfa1.equals(dfa2)
+assert dfq1.equals(dfq2)
+assert dfm1.equals(dfm2)
+
+# Example 4. validation
 assert vint.validate()
-dfa2, dfq2, dfm2 = vint.dfs
-# No dfa1 anymore, because of the abscence of PathHelper. Comment in
-#assert dfa1.equals(dfa2)
-#assert dfq1.equals(dfq2)
-#assert dfm1.equals(dfm2)
-
-# validation
-#assert vint.validate()
-
 
 def show_dicts(df=dfq):
     """Demo for serialising a DataFrame"""
     types = ['dict', 'list', 'series', 'split', 'records', 'index']
     for t in types:
         print()
-        print(t)
+        print('Serialising example', t)
         print(df.to_dict(t))
+show_dicts()
