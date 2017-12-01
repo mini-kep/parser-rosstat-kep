@@ -46,3 +46,11 @@ if '__main__' == __name__:
     vint.save()
     copy_latest()
     
+    # MAY DO:
+    # - may use a webhook to upload to database
+    # - can import parser code to upload to database from here
+    # - check the data is in database
+    
+    
+    
+    
