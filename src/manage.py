@@ -35,7 +35,14 @@ def copy_latest():
         print('Copied', src)   
         
 if '__main__' == __name__:
-    year, month = 2017, 9    
+    # same lines are run in 'invoke add 2017 10'
+    year, month = 2017, 10 
     remote = RemoteFile(year, month)
     remote.download()      
+    remote.unrar()
+    word2csv(year, month)
+    vint = Vintage(year, month)
+    vint.validate()
+    vint.save()
+    copy_latest()
     
