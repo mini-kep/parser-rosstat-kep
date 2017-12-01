@@ -18,7 +18,7 @@ def download(url, path):
 def make_url(year, month):
     check_date(year, month)    
     month = str(month).zfill(2)
-    return f'http://www.gks.ru/free_doc/doc_{year}/Ind/ind{month}.rar'
+    return 'http://www.gks.ru/free_doc/doc_{year}/Ind/ind{month}.rar'
 
 def check_date(year, month):
     def as_date(year, month):

@@ -121,25 +121,31 @@ for c in check_points:
 
 # Example 3 Read actual data by month and year
 year, month = 2017, 5
-
+#Hayk
 # 3.1 Access to csv file using path helper
-from config import PathHelper
-from csv2df.specification import SPEC
-csv_path = PathHelper.locate_csv(year, month)
-with open_csv(csv_path) as csvfile:
-    dfa1, dfq1, dfm1 = get_dataframes(csvfile, SPEC)
+#from config import PathHelper
+#from csv2df.specification import SPEC
+#csv_path = PathHelper.locate_csv(year, month)
+#with open_csv(csv_path) as csvfile:
+#    dfa1, dfq1, dfm1 = get_dataframes(csvfile, SPEC)
 
 # 3.2 Access to csv file using Vintage class (identical to 3.1)
 from csv2df.runner import Vintage
 vint = Vintage(year, month)
-dfa2, dfq2, dfm2 = vint.dfs()
-
-assert dfa1.equals(dfa2)
-assert dfq1.equals(dfq2)
-assert dfm1.equals(dfm2)
+# No such method: dfs().
+#dfa2, dfq2, dfm2 = vint.dfs()
+#There is dfs members for the Vintage class, which
+# needs to be first created by invoking the _read() method
+# One way of doing this is to call the vaidate() method
+assert vint.validate()
+dfa2, dfq2, dfm2 = vint.dfs
+# No dfa1 anymore, because of the abscence of PathHelper. Comment in
+#assert dfa1.equals(dfa2)
+#assert dfq1.equals(dfq2)
+#assert dfm1.equals(dfm2)
 
 # validation
-assert vint.validate()
+#assert vint.validate()
 
 
 def show_dicts(df=dfq):
