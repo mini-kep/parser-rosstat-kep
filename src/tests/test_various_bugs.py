@@ -5,10 +5,11 @@ from pathlib import Path
 import pandas as pd
 from io import StringIO
 
-# Hayk: import the find_repo_root
+# HS did: import the find_repo_root
 from config import find_repo_root
 #from config import PathHelper, find_repo_root
-
+# HS did:
+from download.download import make_url
 
 ROOT = find_repo_root()
 
@@ -32,6 +33,15 @@ def test_time_index_is_included_in_access():
 #    csv_path = PathHelper.locate_csv(2015, 2)
 #    z = csv_path.read_text(encoding='utf-8')
 #    assert "\0" not in z
+
+# HS did: add a test function for the make_url -- check that the formatting works
+def test_make_url():
+
+    year = 2017
+    month = 2
+    url = make_url(year, month)
+    if '{' in url or '}' in url:
+        assert False
 
 
 if __name__ == "__main__":
