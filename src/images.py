@@ -76,7 +76,7 @@ class GraphBase:
               string
         """
         freq = get_frequency(self.ts)
-        return '{freq}_{self.ts.name}.png'
+        return f'{freq}_{self.ts.name}.png'
 
     @property
     def local_folder(self):
@@ -91,7 +91,7 @@ class GraphBase:
                pathlib.Path()
         """
         base_url = "https://github.com/epogrebnyak/mini-kep/tree/master/output/png/"
-        subfolder = "{self.subfolder}/" if self.subfolder else ""
+        subfolder = f"{self.subfolder}/" if self.subfolder else ""
         return urljoin(base_url, subfolder)
 
     @property
@@ -103,7 +103,7 @@ class GraphBase:
 
     def as_markdown(self):
         url = urljoin(self.github_folder, self.filename)
-        return '![{self.ts.name}]({url})'
+        return f'![{self.ts.name}]({url})'
 
     def plot_data(self, axes):
         # EP: rationale to separate it - drawing may be different
