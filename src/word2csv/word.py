@@ -122,18 +122,18 @@ def row_iter(table):
 #
 # -------------------------------------------------------------------------------
 
-def query_all_tables(p, func):
+def query_all_tables(path, func):
     """Queries data from all tables within doc file.
 
     Args:
-        p: path to doc file.
+        path: path to doc file.
         func: name of the function used to parse the table
 
-    Returns:
-        yields data from the tables
+    Yields:
+        list of lists (rows)
     """
     word = open_ms_word()
-    doc = open_doc(p, word)
+    doc = open_doc(path, word)
     #import pdb; pdb.set_trace()
     total_tables = get_table_count(doc)
     for i, table in enumerate(doc.Tables):
@@ -142,16 +142,16 @@ def query_all_tables(p, func):
     close_ms_word(word)
 
 
-def yield_continious_rows(p):
+def yield_continious_rows(path):
     """Yields rows of the table within doc file.
 
     Args:
-        p: path to doc file.
+        path: path to doc file.
 
-    Returns:
-        yields table from doc file row by row
+    Yields:
+        list of strings (row elements)
     """
-    for y in query_all_tables(p, func=row_iter):
+    for y in query_all_tables(path, func=row_iter):
         for row in y:
             yield row
 
