@@ -2,19 +2,26 @@
 [![Coverage badge](https://codecov.io/gh/mini-kep/parser-rosstat-kep/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parser-rosstat-kep)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8a467743314641b4a22b66b327834367)](https://www.codacy.com/app/epogrebnyak/mini-kep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=epogrebnyak/mini-kep&amp;utm_campaign=Badge_Grade)
 
-           
-[parser-rosstat-kep][kep] (or ```kep```) downloads MS Word files from [Rosstat KEP publication][Rosstat], 
-assigns variable names to tables found, creates pandas dataframes with 
-macroeconomic time series at annual, quarterly and monthly frequencies 
-and saves them as [CSV files at stable URL][backend]. 
 
-  [kep]: https://github.com/mini-kep/parser-rosstat-kep
-  [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
-  [backend]: https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest
+Concept
+-------
 
-[kep] is inspired by [FRED](https://fred.stlouisfed.org/) and replaces a predecessor repo,
-[data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of
-macroeconomic data well. 
+This code allows to extract pandas dataframes from MS Word files from [Rosstat KEP publication][Rosstat].
+The parsing result is saved as [CSV files at stable URL][backend]. 
+
+This code replaces a predecessor repo, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
+
+Interface 
+---------
+[manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py) does the following job:
+- download MS Word files from Rostst
+- extracts tables from Word files and assigns variable names
+- creates pandas dataframes with time series (at annual, quarterly and monthly frequency) 
+- saves dataframes as [CSV files at stable URL][backend]. 
+
+[kep]: https://github.com/mini-kep/parser-rosstat-kep
+[Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
+[backend]: https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest
 
 
 # Directory structure
@@ -26,16 +33,16 @@ directory structure.
    - **download**: download and unpack rar files from Rosstat website
    - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
    - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
-   - **finaliser.py** script
+   - **finaliser.py** 
 
-[Data folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/data):
-   - **processed** has datasets by year and month (vintages)
-   - **latest** is latest parsed dataset
+[Processed data folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed)
+has datasets by year and month (vintages).
+
+
+# Access to parsing result
 
 [getter.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/getter.py) 
 is an entry point to get parsed data.
-
-# Code for data download
 
 ```python
 import pandas as pd
@@ -50,10 +57,6 @@ dfa = get_dataframe_from_web('a')
 dfq = get_dataframe_from_web('q')
 dfm = get_dataframe_from_web('m')
 ```
-
-Check more access methods at
-[getter.py](https://github.com/epogrebnyak/mini-kep/blob/dev/src/getter.py).
-
 
 # Data in Excel
 
@@ -81,9 +84,7 @@ Basically this command:
 - saves dataframes as processed CSV files
 - saves an Excel file for latest date.
 
-
-See [DEV.md](https://github.com/epogrebnyak/mini-kep/blob/master/DEV.md) for development notes/roadmap. 
-
+Same job is done by [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py)
 
 # Parcer summary
 
