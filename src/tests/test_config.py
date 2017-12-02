@@ -4,8 +4,10 @@ import datetime as dt
 
 from config import DataFolder
 from config import LocalCSV
-# Hayk
-#from config import PathHelper, DateHelper
+from config import supported_dates
+from config import Latest
+from config import get_latest_date
+from config import find_repo_root
 
 
 @pytest.mark.skip()
@@ -16,41 +18,10 @@ def test_md(folder):
 def test_md(folder):
     assert False
 
-
-# skipping
 
 @pytest.mark.skip(reason="not testing maintenance scripts yet")
 def test_copy_latest():
     assert False
-
-
-# Hayk: Remove the tests for the DateHelper: no such a module anymore
-#class Test_DateHelper:
-
-#    def test_validate_passes(self):
-#        DateHelper.validate(2015, 6)
-
-#    def test_validate_failes(self):
-#        with pytest.raises(ValueError):
-#            DateHelper.validate(2030, 1)
-
-#    def test_get_latest_date(self):
-#        year, month = DateHelper.get_latest_date()
-#        assert year >= 2017
-#        assert month >= 1
-#        assert month <= 12
-
-#    def test_get_supported_dates_starts_in_2009_4(self):
-#        assert DateHelper.get_supported_dates()[0] == (2009, 4)
-
-#    def test_get_supported_dates_ends_with_latest_date(self):
-#        prev_month_date = dt.datetime.today().replace(day=1) - dt.timedelta(days=1)
-#        assert DateHelper.get_supported_dates()[-1] == (prev_month_date.year,
-#                                                        prev_month_date.month)
-
-#    def test_get_supported_dates_excludes_2013_11(self):
-#        assert (2013, 11) not in DateHelper.get_supported_dates()
-
 
 @pytest.mark.skip(reason="not testing maintenance scripts yet")
 def test_init_dirs():
@@ -82,43 +53,41 @@ class Test_LocalCSV():
     def test_get_interim_property_method_returns_existing_file(self):
         assert LocalCSV(2015, 5).interim.exists()
 
-    def test_processed_method_return_existing_file_for_freq_a(self):
-        assert LocalCSV(2015, 5).processed('a').exists()
-
-    def test_processed_method_return_existing_file_for_freq_q(self):
-        assert LocalCSV(2015, 5).processed('q').exists()
-    
-    def test_processed_method_return_existing_file_for_freq_m(self):
-        assert LocalCSV(2015, 5).processed('m').exists()
+    def test_processed_method_returns_existing_files(self):
+        for freq in 'aqm':
+            assert LocalCSV(2015, 5).processed(freq).exists()
 
 # skipping
 @pytest.mark.skip(reason="not testing maintenance scripts")
 def test_copy_latest():
     assert False
 
+#HS: A test for the csv method of the Latest class is added
+class Test_Latest():
+    def test_csv_method_returns_existing_files(self):
+        for freq in 'aqm':
+            assert Latest.csv(freq).exists()
 
-# Hayk: Remove the tests for the DateHelper: no such a module anymore
-#class Test_DateHelper:
+#HS: a test for the get_latest_date added
+def test_get_latest_date_asserts_if_latest_date_earlier_than_2017():
+    base_dir = find_repo_root()
+    year, month = get_latest_date(base_dir / 'data/interim')
+    assert year >= 2017
 
-#    def test_validate_passes(self):
-#        DateHelper.validate(2015, 6)
+#HS: tests for the supported_dates added, the ones from 
+#    the old DateHelper module removed
+def test_supported_dates_starts_in_2009_4():
+    assert supported_dates()[0] == (2009, 4)
 
-#    def test_validate_failes(self):
-#        with pytest.raises(ValueError):
-#            DateHelper.validate(2030, 1)
+def test_supported_dates_excludes_2013_11():
+    assert (2013, 11) not in supported_dates()
 
-#    def test_get_latest_date(self):
-#        year, month = DateHelper.get_latest_date()
-#        assert year >= 2017
-#        assert month >= 1
-#        assert month <= 12
+@pytest.mark.skip(reason="The data ends with 10.2017")
+def test_supported_dates_ends_with_latest_date():
+    base_dir = find_repo_root()
+    latest_year, latest_month = get_latest_date(base_dir / 'data/interim')
+    assert supported_dates()[-1] == (latest_year, latest_month)
 
-#    def test_get_supported_dates_starts_in_2009_4(self):
-#        assert DateHelper.get_supported_dates()[0] == (2009, 4)
-
-
-#    def test_get_supported_dates_excludes_2013_11(self):
-#        assert (2013, 11) not in DateHelper.get_supported_dates()
 
 
 @pytest.mark.skip(reason="not testing maintenance scripts yet")
