@@ -6,8 +6,7 @@
 Concept
 -------
 
-This code allows to extract pandas dataframes from MS Word files from [Rosstat KEP publication][Rosstat].
-The parsing result is saved as [CSV files at stable URL][backend]. 
+This code allows to extract pandas dataframes from MS Word files from [Rosstat KEP publication][Rosstat] and save them as [CSV files][backend]. 
 
 This code replaces a predecessor repo, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
 
