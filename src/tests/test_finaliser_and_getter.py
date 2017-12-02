@@ -4,7 +4,6 @@ import os
 import pandas as pd
 
 from finaliser import to_xls
-from getter import get_dataframe
 
 
 def test_write_xls_writes_some_xlsx_file():
