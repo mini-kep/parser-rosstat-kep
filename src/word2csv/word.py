@@ -10,7 +10,7 @@
 
 import csv
 import os
-import config
+# import config
 
 ENCODING = 'utf8'
 
@@ -123,6 +123,15 @@ def row_iter(table):
 # -------------------------------------------------------------------------------
 
 def query_all_tables(p, func):
+    """Queries data from all tables within doc file.
+
+    Args:
+        p: path to doc file.
+        func: name of the function used to parse the table
+
+    Returns:
+        yields data from the tables
+    """
     word = open_ms_word()
     doc = open_doc(p, word)
     #import pdb; pdb.set_trace()
@@ -134,6 +143,14 @@ def query_all_tables(p, func):
 
 
 def yield_continious_rows(p):
+    """Yields rows of the table within doc file.
+
+    Args:
+        p: path to doc file.
+
+    Returns:
+        yields table from doc file row by row
+    """
     for y in query_all_tables(p, func=row_iter):
         for row in y:
             yield row
