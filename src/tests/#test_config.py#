@@ -17,6 +17,26 @@ def test_md(folder):
     assert False
 
 
+class Test_Folder():
+    def test_repr(self):
+        assert repr(DataFolder(2015, 5))
+
+    # Hayk: Remove: No such methods in the DataFolder class
+    #def test_get_folder_methods_return_existing_folders(self):
+    #    assert DataFolder(2015, 5).get_processed_folder().exists()
+    #    assert DataFolder(2015, 5).get_interim_folder().exists()
+
+    #@pytest.mark.skip
+    #def test_raw_folder_may_not_be_present(self):
+    #    assert DataFolder(2015, 5).get_raw_folder().exists()
+
+    #def test_get_interim_csv_method_returns_existing_file(self):
+    #    assert DataFolder(2015, 5).get_interim_csv().exists()
+
+    #def test_out_of_range_year_does_raises_error(self):
+    #    with pytest.raises(ValueError):
+    #        DataFolder(2030, 1)
+
 # skipping
 
 @pytest.mark.skip(reason="not testing maintenance scripts yet")
@@ -70,7 +90,6 @@ def test_copy_latest():
 def test_init_dirs():
     assert False
 
-#HS: tests for the property methods added, instead of get_ functions
 class Test_DataFolder():
     
     # we assume a typical state of repo for (2015, 5)      
@@ -78,14 +97,10 @@ class Test_DataFolder():
     def test_repr(self):
         assert repr(DataFolder(2015, 5))
 
-    def test_get_raw_property_method_returns_existing_folder(self):
-        assert DataFolder(2015, 5).raw.exists()
-    
-    def test_get_interim_property_method_returns_existing_folder(self):
-        assert DataFolder(2015, 5).interim.exists()
-    
-    def test_get_processed_property_method_returns_existing_folder(self):
-        assert DataFolder(2015, 5).processed.exists()
+    #def test_get_folder_methods_return_existing_folders(self):
+    #    assert DataFolder(2015, 5).get_processed_folder().exists()
+    #    assert DataFolder(2015, 5).get_interim_folder().exists()
+        # raw_folder_may_not_be_present(self)
 
     def test_out_of_range_year_does_raises_error(self):
         with pytest.raises(ValueError):
