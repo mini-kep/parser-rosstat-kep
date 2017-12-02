@@ -24,20 +24,6 @@ def test_copy_latest():
     assert False
 
 
-# Hayk: Remove the tests for the PathHelper: no such a module anymore
-#class Test_PathHelper:
-
-#    def test_locate_csv_on_year_month_path_esists(self):
-#        assert PathHelper.locate_csv(2017, 5).exists() is True
-
-#    def test_get_processed_folder_returns_existing_folder(self):
-#        assert PathHelper.get_processed_folder(2017, 5).exists() is True
-
-#    def test_get_processed_folder_will_not_work_without_arguments(self):
-#        with pytest.raises(TypeError):
-#            PathHelper.get_processed_folder()
-
-
 # Hayk: Remove the tests for the DateHelper: no such a module anymore
 #class Test_DateHelper:
 
@@ -91,28 +77,24 @@ class Test_DataFolder():
         with pytest.raises(ValueError):
             DataFolder(2030, 1)
 
+#HS: tests for the processed method for freqs 'a', 'q', 'm' added
 class Test_LocalCSV():
     def test_get_interim_property_method_returns_existing_file(self):
         assert LocalCSV(2015, 5).interim.exists()
 
+    def test_processed_method_return_existing_file_for_freq_a(self):
+        assert LocalCSV(2015, 5).processed('a').exists()
+
+    def test_processed_method_return_existing_file_for_freq_q(self):
+        assert LocalCSV(2015, 5).processed('q').exists()
+    
+    def test_processed_method_return_existing_file_for_freq_m(self):
+        assert LocalCSV(2015, 5).processed('m').exists()
 
 # skipping
 @pytest.mark.skip(reason="not testing maintenance scripts")
 def test_copy_latest():
     assert False
-
-# Hayk: Remove the tests for the PathHelper: no such a module anymore
-#class Test_PathHelper:
-
-#    def test_locate_csv_on_year_month_path_esists(self):
-#        assert PathHelper.locate_csv(2017, 5).exists() is True
-
-#    def test_get_processed_folder_returns_existing_folder(self):
-#        assert PathHelper.get_processed_folder(2017, 5).exists() is True
-
-#    def test_get_processed_folder_will_not_work_without_arguments(self):
-#        with pytest.raises(TypeError):
-#            PathHelper.get_processed_folder()
 
 
 # Hayk: Remove the tests for the DateHelper: no such a module anymore
