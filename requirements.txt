@@ -6,9 +6,8 @@
 pandas
 openpyxl
 matplotlib
+pypiwin32==220
 #xlwt
 
 # documentation
 m2r
-
-
