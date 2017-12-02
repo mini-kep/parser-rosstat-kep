@@ -59,7 +59,7 @@ dfm = get_dataframe_from_web('m')
 
 # Data in Excel
 
- Here is the latest data in Excel (but use of csv is still encouraged/): 
+ Here is the latest data in Excel (but use of csv is still encouraged): 
  
  - [kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true)
   
