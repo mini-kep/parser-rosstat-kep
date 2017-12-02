@@ -7,6 +7,11 @@ from config import DataFolder
 #from config import PathHelper, DateHelper
 
 
+def test_get_dataframe():
+    for freq in 'aqm':
+        df_ = get_dataframe(freq)
+        assert isinstance(df_, pd.DataFrame)
+
 @pytest.mark.skip()
 def test_md(folder):
     assert False
