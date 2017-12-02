@@ -8,7 +8,9 @@ openpyxl
 matplotlib
 #xlwt
 
+# Need to be added in order to run on Windows machine, commented due to errors on Travis
+# pypiwin32
+
+
 # documentation
 m2r
-
-
