@@ -6,7 +6,7 @@
 pandas
 openpyxl
 matplotlib
-pypiwin32==220
+pypiwin32
 #xlwt
 
 # documentation
