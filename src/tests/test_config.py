@@ -2,30 +2,32 @@
 import pytest
 import datetime as dt
 
+from config import find_repo_root
+from config import supported_dates
 from config import DataFolder
 from config import LocalCSV
-from config import supported_dates
 from config import Latest
 from config import get_latest_date
-from config import find_repo_root
 
+
+#HS: tests for the supported_dates added, the ones from 
+#    the old DateHelper module removed
+def test_supported_dates_starts_in_2009_4():
+    assert supported_dates()[0] == (2009, 4)
+
+def test_supported_dates_excludes_2013_11():
+    assert (2013, 11) not in supported_dates()
+
+@pytest.mark.skip(reason="The data ends with 10.2017")
+def test_supported_dates_ends_with_latest_date():
+    base_dir = find_repo_root()
+    latest_year, latest_month = get_latest_date(base_dir / 'data/interim')
+    assert supported_dates()[-1] == (latest_year, latest_month)
 
 @pytest.mark.skip()
 def test_md(folder):
     assert False
 
-@pytest.mark.skip()
-def test_md(folder):
-    assert False
-
-
-@pytest.mark.skip(reason="not testing maintenance scripts yet")
-def test_copy_latest():
-    assert False
-
-@pytest.mark.skip(reason="not testing maintenance scripts yet")
-def test_init_dirs():
-    assert False
 
 #HS: tests for the property methods added, instead of get_ functions
 class Test_DataFolder():
@@ -57,10 +59,6 @@ class Test_LocalCSV():
         for freq in 'aqm':
             assert LocalCSV(2015, 5).processed(freq).exists()
 
-# skipping
-@pytest.mark.skip(reason="not testing maintenance scripts")
-def test_copy_latest():
-    assert False
 
 #HS: A test for the csv method of the Latest class is added
 class Test_Latest():
@@ -73,26 +71,6 @@ def test_get_latest_date_asserts_if_latest_date_earlier_than_2017():
     base_dir = find_repo_root()
     year, month = get_latest_date(base_dir / 'data/interim')
     assert year >= 2017
-
-#HS: tests for the supported_dates added, the ones from 
-#    the old DateHelper module removed
-def test_supported_dates_starts_in_2009_4():
-    assert supported_dates()[0] == (2009, 4)
-
-def test_supported_dates_excludes_2013_11():
-    assert (2013, 11) not in supported_dates()
-
-@pytest.mark.skip(reason="The data ends with 10.2017")
-def test_supported_dates_ends_with_latest_date():
-    base_dir = find_repo_root()
-    latest_year, latest_month = get_latest_date(base_dir / 'data/interim')
-    assert supported_dates()[-1] == (latest_year, latest_month)
-
-
-
-@pytest.mark.skip(reason="not testing maintenance scripts yet")
-def test_init_dirs():
-    assert False
 
 
 if __name__ == "__main__":
