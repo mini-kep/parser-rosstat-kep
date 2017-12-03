@@ -4,13 +4,6 @@ import os
 import pandas as pd
 
 from finaliser import to_xls
-from getter import get_dataframe
-
-
-def test_get_dataframe():
-    for freq in 'aqm':
-        df_ = get_dataframe(freq)
-        assert isinstance(df_, pd.DataFrame)
 
 
 def test_write_xls_writes_some_xlsx_file():
