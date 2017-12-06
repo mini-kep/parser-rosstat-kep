@@ -77,6 +77,7 @@ class DatapointMaker:
             return base + pd.offsets.MonthEnd()
 
     def as_dict(self):
+        # FIXME: whu do we need year, qtr and month here?
         basedict = dict(year=int(self.year),
                         label=self.label,
                         freq=self.freq,
@@ -89,6 +90,31 @@ class DatapointMaker:
         return basedict
 
 
+
+def import_table_values_by_frequency(tables):
+    a = []
+    q = []
+    m = []
+    for table in tables:
+        # safeguard - all tables must be definaed at this point
+        if not table.is_defined():
+            raise ValueError('Undefined table:\n{}'.format(table))
+        splitter = table.splitter_func
+        for row in table.datarows:
+            factory = DatapointMaker(row.get_year(), table.label)            
+            a_value, q_values, m_values = splitter(row.data)
+            if a_value:
+                a.append(factory.make('a', a_value))
+            if q_values:
+                qs = [factory.make('q', val, t + 1)
+                      for t, val in enumerate(q_values) if val]
+                q.extend(qs)
+            if m_values:
+                ms = [factory.make('m', val, t + 1)
+                      for t, val in enumerate(m_values) if val]
+                m.extend(ms)
+    return a, q, m                 
+            
 class Emitter:
     """Emitter extractsand emits annual, quarterly and monthly values
        from a list Table() instances.
@@ -101,48 +127,51 @@ class Emitter:
 
     """
 
-    @staticmethod
-    def _assert_defined(table):
-        if not table.is_defined():
-            raise ValueError("Undefined table:\n{}".format(table))
+#    @staticmethod
+#    def _assert_defined(table):
+#        if not table.is_defined():
+#            raise ValueError("Undefined table:\n{}".format(table))
 
     def __init__(self, tables):
-        self.a = []
-        self.q = []
-        self.m = []
-        for t in tables:
-            self._assert_defined(t)
-            self._import(t)
+        a, q, m = import_table_values_by_frequency(tables)
+        self.selector = dict(a=a, q=q, m=m)
+        
+#        self.a = []
+#        self.q = []
+#        self.m = []
+#        for t in tables:
+#            self._assert_defined(t)
+#            self._import(t)
+#
+#    def _import(self, table):
+#        for row in table.datarows:
+#            factory = DatapointMaker(row.get_year(), table.label)
+#            a_value, q_values, m_values = table.splitter_func(row.data)
+#            if a_value:
+#                self.a.append(factory.make('a', a_value))
+#            if q_values:
+#                qs = [factory.make('q', val, t + 1)
+#                      for t, val in enumerate(q_values) if val]
+#                self.q.extend(qs)
+#            if m_values:
+#                ms = [factory.make('m', val, t + 1)
+#                      for t, val in enumerate(m_values) if val]
+#                self.m.extend(ms)
+#
+#    def _collect(self, freq):
+#        if freq in "aqm":
+#            return dict(a=self.a, q=self.q, m=self.m)[freq]
+#        else:
+#            raise ValueError(freq)
+#
+#    @staticmethod
+#    def _assert_has_no_duplicate_rows(df):
+#        dups = get_duplicates(df)
+#        if not dups.empty:
+#            raise ValueError("Duplicate rows found {}".format(dups))
 
-    def _import(self, table):
-        for row in table.datarows:
-            factory = DatapointMaker(row.get_year(), table.label)
-            a_value, q_values, m_values = table.splitter_func(row.data)
-            if a_value:
-                self.a.append(factory.make('a', a_value))
-            if q_values:
-                qs = [factory.make('q', val, t + 1)
-                      for t, val in enumerate(q_values) if val]
-                self.q.extend(qs)
-            if m_values:
-                ms = [factory.make('m', val, t + 1)
-                      for t, val in enumerate(m_values) if val]
-                self.m.extend(ms)
-
-    def _collect(self, freq):
-        if freq in "aqm":
-            return dict(a=self.a, q=self.q, m=self.m)[freq]
-        else:
-            raise ValueError(freq)
-
-    @staticmethod
-    def _assert_has_no_duplicate_rows(df):
-        dups = get_duplicates(df)
-        if not dups.empty:
-            raise ValueError("Duplicate rows found {}".format(dups))
-
-    def get_dataframe(self, freq):
-        df = pd.DataFrame(self._collect(freq))
+    def get_dataframe(self, freq):        
+        df = pd.DataFrame(self.selector[freq])
         if df.empty:
             return pd.DataFrame()
         # check for duplicates
@@ -160,18 +189,19 @@ class Emitter:
         # delete some df internals for better view
         df.columns.name = None
         df.index.name = None
+        # --------------------------------------------
+        # this is injection point of df transomations
         
+        # df tranfromations go here
         
-        
-        
+        # --------------------------------------------
         return df
 
 def get_duplicates(df):
     if df.empty:
         return df
     else:
-        return df[df.duplicated(keep=False)]
-        
+        return df[df.duplicated(keep=False)]       
     
 
 if __name__ == '__main__':       
@@ -181,3 +211,4 @@ if __name__ == '__main__':
     dfa = e.get_dataframe('a')
     dfq = e.get_dataframe('q')
     dfm = e.get_dataframe('m')
+    a, q, m = import_table_values_by_frequency(tables)
