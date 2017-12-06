@@ -89,8 +89,7 @@ class DataFolder:
 
 class LocalCSV(DataFolder):
     
-    name_template = 'df{}.csv'
-    
+
     @staticmethod
     def df_filename(freq):
         return 'df{}.csv'.format(freq)
@@ -101,6 +100,23 @@ class LocalCSV(DataFolder):
 
     def processed(self, freq):
         return super().processed / self.df_filename(freq)
+
+
+class InterimCSV(DataFolder):
+    
+    @property
+    def path(self):
+        return super().interim / 'tab.csv'
+        
+
+class ProcessedCSV(DataFolder):
+    
+    @staticmethod
+    def make_filename(freq):
+        return 'df{}.csv'.format(freq)
+
+    def path(self, freq):
+        return super().processed / self.make_filename(freq)
 
 
 class Latest:

@@ -137,26 +137,47 @@ class Emitter:
 
     @staticmethod
     def _assert_has_no_duplicate_rows(df):
-        if df.empty:
-            dups = df
-        else:
-            dups = df[df.duplicated(keep=False)]
-        if not dups.empty:           #
+        dups = get_duplicates(df)
+        if not dups.empty:
             raise ValueError("Duplicate rows found {}".format(dups))
 
     def get_dataframe(self, freq):
         df = pd.DataFrame(self._collect(freq))
         if df.empty:
             return pd.DataFrame()
-        self._assert_has_no_duplicate_rows(df)
+        # check for duplicates
+        dups = get_duplicates(df)
+        if not dups.empty:
+            raise ValueError("Duplicate rows found {}".format(dups))
         # reshape
         df = df.pivot(columns='label', values='value', index='time_index')
         # add year and period
         df.insert(0, "year", df.index.year)
         if freq == "q":
             df.insert(1, "qtr", df.index.quarter)
-        elif freq == "m":
+        if freq == "m":
             df.insert(1, "month", df.index.month)
         # delete some df internals for better view
         df.columns.name = None
+        df.index.name = None
+        
+        
+        
+        
         return df
+
+def get_duplicates(df):
+    if df.empty:
+        return df
+    else:
+        return df[df.duplicated(keep=False)]
+        
+    
+
+if __name__ == '__main__':       
+    from csv2df.parser import get_tables
+    tables = get_tables(2017, 10)
+    e = Emitter(tables)
+    dfa = e.get_dataframe('a')
+    dfq = e.get_dataframe('q')
+    dfm = e.get_dataframe('m')

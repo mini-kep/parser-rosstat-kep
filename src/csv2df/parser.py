@@ -152,15 +152,28 @@ class Table:
     def __repr__(self):
         return "Table(headers={},\ndatarows={})".format(repr(self.headers),
                                                         repr(self.datarows))
-
+def get_tables(year, month):
+    from config import InterimCSV
+    import csv2df.specification as spec
+    import csv2df.reader as reader
+        
+    parsed_tables = []
+    csv_path = InterimCSV(year, month).path    
+    with reader.open_csv(csv_path) as csvfile:
+        for csv_segment, pdef in reader.Reader(csvfile, spec.SPEC).items():
+            tables = extract_tables(csv_segment, pdef)
+            parsed_tables.extend(tables)
+    return parsed_tables      
+    
+    
 
 if __name__ == "__main__":
-    from config import PathHelper, DateHelper  # this is in __main__ section
+    from config import InterimCSV, LATEST_DATE
     import csv2df.reader as reader
     import csv2df.specification as spec
 
-    year, month = DateHelper.get_latest_date()
-    csv_path = PathHelper.locate_csv(year, month)
+    year, month = LATEST_DATE
+    csv_path = InterimCSV(year, month).path
     with reader.open_csv(csv_path) as csvfile:
         parsed_tables = []
         for csv_segment, pdef in reader.Reader(csvfile, spec.SPEC).items():
@@ -170,3 +183,5 @@ if __name__ == "__main__":
         for t in tables:
             print()
             print(t)
+            
+    tables = get_tables(year, month)        

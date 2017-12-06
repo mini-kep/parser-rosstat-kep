@@ -69,8 +69,7 @@ def yield_csv_rows(csvfile, fmt=CSV_FORMAT):
 
 
 def filter_csv_rows(gen):
-    """Kill empty rows and rows with comments from *gen*.
-    """
+    """Kill empty rows and rows with comments from *gen*."""
     filled = filter(lambda row: row and row[0], gen)
     no_comments = filter(lambda row: not row[0].startswith("___"), filled)
     return no_comments
@@ -312,12 +311,12 @@ class RowStack:
 
 
 if __name__ == "__main__":
-    from config import PathHelper, DateHelper  # this is in __main__ section
+    from config import InterimCSV, LATEST_DATE
     import csv2df.specification as spec
 
     # print all rows from csvpath
-    year, month = DateHelper.get_latest_date()
-    csv_path = PathHelper.locate_csv(year, month)
+    year, month = LATEST_DATE
+    csv_path = InterimCSV(year, month).path
     csvfile = open_csv(csv_path)
     reader = Reader(csvfile, spec=spec.SPEC)
     for csv_segment, pdef in reader.items():
