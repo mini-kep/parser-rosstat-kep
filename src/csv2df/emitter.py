@@ -92,6 +92,9 @@ class DatapointMaker:
 
 
 def import_table_values_by_frequency(tables):
+    """Return lists of annual, quarterly and monthly values
+       from a list of Table() instances.    
+    """
     a = []
     q = []
     m = []
@@ -115,60 +118,21 @@ def import_table_values_by_frequency(tables):
                 m.extend(ms)
     return a, q, m                 
             
+def get_duplicates(df):
+    if df.empty:
+        return df
+    else:
+        return df[df.duplicated(keep=False)]       
+
 class Emitter:
-    """Emitter extractsand emits annual, quarterly and monthly values
-       from a list Table() instances.
-
-       Methods:
+    """Emitter converts tables to dataframes.
+    
+       Method:
            .get_dataframe(freq)
-
-       Raises:
-           ValueError if any table in list is not defined.
-
     """
-
-#    @staticmethod
-#    def _assert_defined(table):
-#        if not table.is_defined():
-#            raise ValueError("Undefined table:\n{}".format(table))
-
     def __init__(self, tables):
         a, q, m = import_table_values_by_frequency(tables)
-        self.selector = dict(a=a, q=q, m=m)
-        
-#        self.a = []
-#        self.q = []
-#        self.m = []
-#        for t in tables:
-#            self._assert_defined(t)
-#            self._import(t)
-#
-#    def _import(self, table):
-#        for row in table.datarows:
-#            factory = DatapointMaker(row.get_year(), table.label)
-#            a_value, q_values, m_values = table.splitter_func(row.data)
-#            if a_value:
-#                self.a.append(factory.make('a', a_value))
-#            if q_values:
-#                qs = [factory.make('q', val, t + 1)
-#                      for t, val in enumerate(q_values) if val]
-#                self.q.extend(qs)
-#            if m_values:
-#                ms = [factory.make('m', val, t + 1)
-#                      for t, val in enumerate(m_values) if val]
-#                self.m.extend(ms)
-#
-#    def _collect(self, freq):
-#        if freq in "aqm":
-#            return dict(a=self.a, q=self.q, m=self.m)[freq]
-#        else:
-#            raise ValueError(freq)
-#
-#    @staticmethod
-#    def _assert_has_no_duplicate_rows(df):
-#        dups = get_duplicates(df)
-#        if not dups.empty:
-#            raise ValueError("Duplicate rows found {}".format(dups))
+        self.selector = dict(a=a, q=q, m=m)        
 
     def get_dataframe(self, freq):        
         df = pd.DataFrame(self.selector[freq])
@@ -180,28 +144,56 @@ class Emitter:
             raise ValueError("Duplicate rows found {}".format(dups))
         # reshape
         df = df.pivot(columns='label', values='value', index='time_index')
-        # add year and period
+        # delete some internals for better view
+        df.columns.name = None
+        df.index.name = None
+        # add year 
         df.insert(0, "year", df.index.year)
+        # add period
         if freq == "q":
             df.insert(1, "qtr", df.index.quarter)
         if freq == "m":
             df.insert(1, "month", df.index.month)
-        # delete some df internals for better view
-        df.columns.name = None
-        df.index.name = None
-        # --------------------------------------------
-        # this is injection point of df transomations
-        
-        # df tranfromations go here
-        
-        # --------------------------------------------
+        # transform variables:
+        if freq == "a":
+            df = rename(df)
+        if freq == "q":
+            df = deaccumulate_qtr(df) 
+        if freq == "m":
+            df = deaccumulate_month(df) 
         return df
 
-def get_duplicates(df):
-    if df.empty:
-        return df
-    else:
-        return df[df.duplicated(keep=False)]       
+# government revenue and expense transformation 
+
+def rename(df):
+    colname_mapper = {vn: vn.replace("_ACCUM", "") for vn in df.columns}
+    return df.rename(columns=colname_mapper)
+
+def select_varnames(df):
+    return [vn for vn in df.columns if vn.startswith('GOV') and "ACCUM" in vn]
+
+def deaccumulate_qtr(df):
+    return deaccumulate(df, first_month=3)
+
+
+def deaccumulate_month(df):
+    return deaccumulate(df, first_month=1)
+
+
+def deaccumulate(df_full, first_month):
+    varnames = select_varnames(df_full)
+    df = df_full[varnames] 
+    # save start of year values
+    original_start_year_values = df[df.index.month == first_month].copy()
+    # take a difference
+    df = df.diff()
+    # write back start of year values 
+    # (January in monthly data, March in qtr data)
+    ix = original_start_year_values.index
+    df.loc[ix, :] = original_start_year_values
+    # write back to original frame
+    df_full[varnames] = df
+    return rename(df_full)
     
 
 if __name__ == '__main__':       
@@ -211,4 +203,4 @@ if __name__ == '__main__':
     dfa = e.get_dataframe('a')
     dfq = e.get_dataframe('q')
     dfm = e.get_dataframe('m')
-    a, q, m = import_table_values_by_frequency(tables)
+    a, q, m = import_table_values_by_frequency(tables)    
