@@ -191,8 +191,10 @@ def deaccumulate(df_full, first_month):
     # (January in monthly data, March in qtr data)
     ix = original_start_year_values.index
     df.loc[ix, :] = original_start_year_values
-    # write back to original frame + rounding
-    df_full[varnames] = df.round(1)
+    # rounding
+    df = df.round(1)
+    # write back to original frame 
+    df_full[varnames] = df
     return rename(df_full)
     
 
