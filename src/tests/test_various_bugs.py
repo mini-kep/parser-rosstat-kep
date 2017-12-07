@@ -8,7 +8,7 @@ from io import StringIO
 from config import find_repo_root, InterimCSV
 from download.download import make_url
 
-@pytest.mark.xfail("with new user import addressing index by 0 column, we do not need time_index")
+@pytest.mark.skip("with new user import addressing index by 0 column, we do not need time_index")
 def test_time_index_is_included_in_access():
     
     def make_path(freq):
