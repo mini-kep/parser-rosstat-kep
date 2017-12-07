@@ -146,7 +146,8 @@ class Emitter:
         df = df.pivot(columns='label', values='value', index='time_index')
         # delete some internals for better view
         df.columns.name = None
-        df.index.name = None
+        # EP: for some reason we need this index name below, we have a test about it
+        # df.index.name = None
         # add year 
         df.insert(0, "year", df.index.year)
         # add period
