@@ -41,7 +41,7 @@ Workflow as follows (doc/pseudo.rst)
 import pandas as pd
 import io
 
-from config import LocalCSV
+from config import InterimCSV
 from csv2df.specification import Definition, Specification, SPEC
 from csv2df.reader import Reader, open_csv
 from csv2df.parser import extract_tables
@@ -127,8 +127,8 @@ for c in check_points:
 # Example 3 Read actual data by month and year
 year, month = 2017, 5
 
-# 3.1 Access to csv file using config.LocalCSV
-csv_path = LocalCSV(year, month).interim
+# 3.1 Access to csv file using config.InterimCSV
+csv_path = InterimCSV(year, month).path
 with open_csv(csv_path) as csvfile:
     dfa1, dfq1, dfm1 = get_dataframes(csvfile, SPEC)
 
