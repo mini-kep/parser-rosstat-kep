@@ -16,7 +16,7 @@
     Collection.approve_all()
 """
 
-from config import LocalCSV, LATEST_DATE, SUPPORTED_DATES 
+from config import InterimCSV, ProcessedCSV, LATEST_DATE, SUPPORTED_DATES 
 from csv2df.specification import SPEC
 from csv2df.reader import Reader, open_csv
 from csv2df.parser import extract_tables
@@ -51,16 +51,17 @@ class Vintage:
 
     def __init__(self, year, month):
         self.year, self.month = year, month
-        self.csv = LocalCSV(year, month)
+        self.csv_interim = InterimCSV(year, month)
+        self.csv_processed = ProcessedCSV(year, month)
 
     @property        
     def dfs(self):    
-        with open_csv(self.csv.interim) as csvfile:
+        with open_csv(self.csv_interim.path) as csvfile:
             return get_dataframes(csvfile)
 
     def save(self):
         for freq, df in self.dfs.items():
-            path = self.csv.processed(freq)
+            path = self.csv_processed.path(freq)
             df.to_csv(path)
             print("Saved dataframe to", path)
         return True

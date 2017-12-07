@@ -26,10 +26,10 @@ def copy_latest():
            *processed/latest* folder.
     """
     year, month = config.LATEST_DATE
-    csv_file = config.LocalCSV(year, month)
+    csv_file = config.ProcessedCSV(year, month)
     latest = config.Latest
     for freq in config.FREQUENCIES:
-        src = csv_file.processed(freq)
+        src = csv_file.path(freq)
         dst = latest.csv(freq) 
         shutil.copyfile(src, dst)
         print('Copied', src)   

@@ -3,7 +3,7 @@
 from pathlib import Path
 import pandas as pd
 
-__all__ = ['find_repo_root', 'DataFolder', 'LocalCSV']
+__all__ = ['find_repo_root', 'DataFolder', 'InterimCSV', 'ProcessedCSV']
 
 
 FREQUENCIES = ['a', 'q', 'm']
@@ -127,7 +127,7 @@ class Latest:
            'master/data/processed/latest')       
     
     def csv(freq):
-        return DataFolder.latest / LocalCSV.df_filename(freq)
+        return DataFolder.latest / ProcessedCSV.make_filename(freq)
     
     
 class LocalRarFile(DataFolder):

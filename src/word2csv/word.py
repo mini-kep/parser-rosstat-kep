@@ -211,7 +211,7 @@ def folder_to_csv(folder, csv_filename):
 
 def word2csv(year, month, force=False):
     raw_folder = config.DataFolder(year, month).raw
-    interim_csv = config.LocalCSV(year, month).interim
+    interim_csv = config.InterimCSV(year, month).path
     if force or not os.path.exists(interim_csv):
         folder_to_csv(folder=raw_folder, csv_filename=interim_csv)
     
