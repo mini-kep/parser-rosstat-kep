@@ -8,10 +8,9 @@ from io import StringIO
 from config import find_repo_root, InterimCSV
 from download.download import make_url
 
+@pytest.mark.xfail("with new user import addressing index by 0 column, we do not need time_index")
 def test_time_index_is_included_in_access():
     
-    # EP: there shoudl be  areason why we need this?
-
     def make_path(freq):
         folder = find_repo_root() / 'data' / 'processed' / 'latest'
         return str(folder / "df{}.csv".format(freq))
@@ -29,7 +28,7 @@ def test_csv_has_no_null_byte():
     assert "\0" not in z
 
 # HS: add a test function for the make_url -- check that the formatting works
-# EP: 'will_not_work_without_string_format' - not very conclusive what is means
+# FIXME: 'will_not_work_without_string_format' - does not explain what happens 
 def test_make_url_will_not_work_without_string_format():
     year = 2017
     month = 2
