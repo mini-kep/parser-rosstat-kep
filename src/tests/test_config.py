@@ -1,7 +1,7 @@
 import pytest
 
 from config import (find_repo_root, supported_dates,
-                    DataFolder, LocalCSV,
+                    DataFolder, InterimCSV, ProcessedCSV,
                     Latest, get_latest_date)
 
 
@@ -56,27 +56,27 @@ class Test_DataFolder():
         with pytest.raises(ValueError):
             DataFolder(2018, 1)
 
-class Test_LocalCSV():
-    def test_get_interim_property_method_returns_existing_file(self):
-        interim_csv = LocalCSV(2015, 5).interim 
+class Test_InterimCSV():
+    def test_get_path_property_method_returns_existing_file(self):
+        interim_csv = InterimCSV(2015, 5).path 
         assert interim_csv.exists()
 
-    def test_get_interim_property_method_returns_tab_csv(self):
-        interim_csv = LocalCSV(2015, 5).interim
+    def test_get_path_property_method_returns_tab_csv(self):
+        interim_csv = InterimCSV(2015, 5).path
         expected_name = 'tab.csv'
         assert interim_csv.name == expected_name
 
-    def test_processed_method_returns_existing_files(self):
+class Test_ProcessedCSV():
+    def test_path_method_returns_existing_files(self):
         for freq in 'aqm':
-            processed_csv = LocalCSV(2015, 5).processed(freq) 
+            processed_csv = ProcessedCSV(2015, 5).path(freq) 
             assert processed_csv.exists()
 
-    def test_processed_method_returns_df_a_q_m_csv(self):
+    def test_path_method_returns_df_a_q_m_csv(self):
         for freq in 'aqm':
+            processed_csv = ProcessedCSV(2015, 5).path(freq) 
             expected_name = 'df{}.csv'.format(freq)
-            processed_csv = LocalCSV(2015, 5).processed(freq) 
             assert processed_csv.name == expected_name
-
 
 class Test_Latest():
     def test_csv_method_returns_existing_files(self):

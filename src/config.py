@@ -87,21 +87,6 @@ class DataFolder:
                                    self.year, self.month)
 
 
-class LocalCSV(DataFolder):
-    
-
-    @staticmethod
-    def df_filename(freq):
-        return 'df{}.csv'.format(freq)
-
-    @property
-    def interim(self):
-        return super().interim / 'tab.csv'
-
-    def processed(self, freq):
-        return super().processed / self.df_filename(freq)
-
-
 class InterimCSV(DataFolder):
     
     @property
