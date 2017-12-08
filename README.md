@@ -13,10 +13,10 @@ This code replaces a predecessor repo, [data-rosstat-kep](https://github.com/epo
 Interface 
 ---------
 [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py) does the following job:
-- download MS Word files from Rostst
-- extracts tables from Word files and assigns variable names
-- creates pandas dataframes with time series (at annual, quarterly and monthly frequency) 
-- saves dataframes as [CSV files at stable URL][backend]. 
+- download and unpack MS Word files from Rosstat
+- extract tables from Word files and assigns variable names
+- create pandas dataframes with time series (at annual, quarterly and monthly frequency) 
+- save dataframes as [CSV files at stable URL][backend] 
 
 [kep]: https://github.com/mini-kep/parser-rosstat-kep
 [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
