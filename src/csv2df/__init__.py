@@ -33,9 +33,9 @@ Such input will result in two dataframes, with annual and quarterly frequency:
 """
 
 __all__ = ['specification',
-           'reader', 'parser', 'runner',
+           'reader', 'parser',
            'validator',
            'util_label', 'util_row_splitter']
 
-from . import (specification, reader, parser, runner, validator,
+from . import (specification, reader, parser, validator,
                util_label, util_row_splitter)

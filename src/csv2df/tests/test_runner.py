@@ -6,9 +6,7 @@ from csv2df.specification import Definition, Specification
 from csv2df.reader import Reader
 from csv2df.parser import extract_tables
 from csv2df.emitter import Emitter
-from csv2df.runner import get_dataframes, Vintage, Collection
-# Hayk
-#from config import DateHelper, PathHelper
+from vintage import get_dataframes, Vintage, Collection
 from csv2df.validator import Validator
 
 # input data
