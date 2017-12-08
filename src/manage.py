@@ -1,7 +1,7 @@
 import config
 from download.download import RemoteFile
 from word2csv.word import word2csv 
-from csv2df.runner import Vintage
+from csv2df.vintage import Vintage
 import shutil
 
 

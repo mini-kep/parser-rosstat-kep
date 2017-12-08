@@ -46,12 +46,12 @@ from csv2df.specification import Definition, Specification, SPEC
 from csv2df.reader import Reader, open_csv
 from csv2df.parser import extract_tables
 from csv2df.emitter import Emitter
-from csv2df.runner import Vintage
+from csv2df.vintage import Vintage
 from csv2df.validator import Validator
 
 
-
 # copied from csv2df.runner.py
+#HS: csv2df.runner.py changed to csv2df.vintage.py
 
 def get_dataframes(csvfile, spec):
     """Extract dataframes from *csvfile* using *spec* parsing instructions.
