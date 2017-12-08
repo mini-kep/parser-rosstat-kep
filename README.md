@@ -73,14 +73,15 @@ invoke add <year> <month>
 
 and commit to this repo.
 
-Basically this command:
+This command:
 - downloads a rar file from Rosstat, 
 - unpacks MS Word files, 
 - dumps all tables from MS Word files to an interim CSV file, 
 - parses interim CSV file to three dataframes by frequency 
 - validates parsing result
-- transforms some variables
+- transforms some variables (eg. deaccumulates government expenditures)
 - saves dataframes as processed CSV files
+- saves csv for latest date
 - saves an Excel file for latest date.
 
 Same job is done by [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py)
