@@ -210,6 +210,7 @@ def folder_to_csv(folder, csv_filename):
 
 
 def word2csv(year, month, force=False):
+    import config
     raw_folder = config.DataFolder(year, month).raw
     interim_csv = config.InterimCSV(year, month).path
     if force or not os.path.exists(interim_csv):
