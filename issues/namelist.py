@@ -1,4 +1,6 @@
 import re
+import itertools
+from fnmatch import fnmatch
 
 NAMES = [
     "BRENT",
@@ -89,7 +91,7 @@ def make_regex(patterns):
 assert make_regex(['WAGE_*', 'UNEMPL']) == 'WAGE_|UNEMPL'    
     
 
-def make_namelist(patterns, names=NAMES):
+def make_namelist0(patterns, names=NAMES):
     namelist = []
     regex = re.compile(make_regex(patterns))
     for name in names:
@@ -100,12 +102,36 @@ def make_namelist(patterns, names=NAMES):
 
 # 3. теперь главный вопрос - зачем это делалось?
 #    см. ниже
-assert make_namelist(['WAGE_*'], ['UNNECESSARY_WAGE_1']) == [] 
+# ERROR:    
+#assert make_namelist(['WAGE_*'], ['UNNECESSARY_WAGE_1']) == [] 
 
+def make_namelist1(patterns, names=NAMES):
+    namelist = []
+    for pat in patterns:
+        for name in names:
+            varhead = extract_varname(name)
+            if fnmatch(varhead, pat):
+                namelist.append(name)
+    return namelist
 
-labor = make_namelist(concepts['labor'])
-assert set(labor) == set(["WAGE_NOMINAL_rub",
-                          "WAGE_REAL_rog",
-                          "WAGE_REAL_yoy",
-                          "UNEMPL_pct"
-                          ])
+def extract_varname(label):
+    words = label.split('_')
+    return '_'.join(itertools.takewhile(lambda word: word.isupper(), words))
+
+def is_matched(name, pat):
+    varhead = extract_varname(name)
+    return fnmatch(varhead, pat)
+
+def make_namelist(patterns, names=NAMES):
+    return sorted([name for pat in patterns for name in names 
+                   if is_matched(name, pat)])
+                
+
+assert make_namelist(concepts['labor']) == \
+   ['UNEMPL_pct', 'WAGE_NOMINAL_rub', 'WAGE_REAL_rog', 'WAGE_REAL_yoy']
+
+assert make_namelist(['WAGE_*'], ['UNNECESSARY_WAGE_1']) == []
+
+assert make_namelist(concepts['output']) == \
+    ['INDPRO_rog', 'INDPRO_yoy', 'TRANSPORT_FREIGHT_bln_tkm']
+    
