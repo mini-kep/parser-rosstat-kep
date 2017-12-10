@@ -68,15 +68,13 @@ def make_namelist(patterns, names):
     return sorted([name for pat in patterns for name in names 
                    if is_matched(name, pat)])
                 
-if __name__ == '__main__':         
-    concepts = dict(labor=['WAGE_*', 'UNEMPL'],
-                    output=['IND*', 'TRANSPORT_FREIGHT'])
-        
-    assert make_namelist(concepts['labor'], names=NAMES) == \
-       ['UNEMPL_pct', 'WAGE_NOMINAL_rub', 'WAGE_REAL_rog', 'WAGE_REAL_yoy']
-    
-    assert make_namelist(['WAGE_*'], names=['UNNECESSARY_WAGE_1']) == []
-    
-    assert make_namelist(concepts['output'], names=NAMES) == \
-        ['INDPRO_rog', 'INDPRO_yoy', 'TRANSPORT_FREIGHT_bln_tkm']
-        
+if __name__ == '__main__':       
+    # https://github.com/mini-kep/db/blob/master/doc/listing.md
+    from collections import OrderedDict
+    concepts = OrderedDict()
+    concepts.update({'GDP': ['GDP*']}) 
+    concepts.update({'Output': ['IND*', 'TRANSPORT_FREIGHT']}) 
+    # FIXME: add here...
+    concepts.update({'Labour': ['WAGE_*', 'UNEMPL']}) 
+
+    print(concepts)
