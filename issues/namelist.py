@@ -74,7 +74,12 @@ if __name__ == '__main__':
     concepts = OrderedDict()
     concepts.update({'GDP': ['GDP*']}) 
     concepts.update({'Output': ['IND*', 'TRANSPORT_FREIGHT']}) 
-    # FIXME: add here...
+    concepts.update({'Prices': ['CPI*']}) 
+    concepts.update({'Retail trade': ['CPI*']}) 
+    concepts.update({'Government - revenue': ['GOV_REVENUE*']}) 
+    concepts.update({'Government - spending': ['GOV_EXP*']}) 
+    concepts.update({'Government - surplus': ['GOV_SURPLUS*']}) 
     concepts.update({'Labour': ['WAGE_*', 'UNEMPL']}) 
-
+    concepts.update({'Exchange rate': ['USDRUR*']}) 
+    concepts.update({'Global': ['UST*', 'BRENT']})
     print(concepts)
