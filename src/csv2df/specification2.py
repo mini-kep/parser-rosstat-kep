@@ -211,39 +211,55 @@ class ParsingCommand():
     def units(self):
         return self._required_units    
 
+# TODO 1: convert this to test 
+#    Properties:
+#        - mapper (dict)
+#        - required (list)
+#        - units (dict)
+pc = ParsingCommand(
+        "GDP",
+         headers=["Oбъем ВВП",
+                  "Индекс физического объема произведенного ВВП, в %",
+                  "Валовой внутренний продукт"],
+         required_units=["bln_rub", "yoy"])
+
+assert pc.mapper == \
+{'Oбъем ВВП': 'GDP',
+ 'Валовой внутренний продукт': 'GDP',
+ 'Индекс физического объема произведенного ВВП, в %': 'GDP'}
+assert pc.required == ['GDP_bln_rub', 'GDP_yoy']
+assert pc.units == ['bln_rub', 'yoy']
+
+
 class Def(object):
     """Holds together:
         - parsing commands
         - (optional) defintion scope 
         - (optional) custom reader function name 
         
-    Properties:
-        - mapper (dict)
-        - required (list)
-        - units (dict)
-        FIXME: is it a fucntion name or fucn itself?
-        - reader (str)
-        
-    Public method:
-        - get_bounds()
+       Properties:
+           - mapper (dict)
+           - required (list)
+           - units (dict)
+           FIXME: is it a fucntion name or fucn itself?
+            - reader (str)
             
+       Public method:
+            - get_bounds()           
         
     """
 
-    def __init__(self, commands, scope=False, reader=False, units=False):
+    def __init__(self, commands, scope=None, reader=None, units=UNITS):
+        self.units = units
         self.commands = as_list(commands)        
         if scope:
             self._set_scope(scope)
         else:
-            self.scope = False
+            self.scope = None
         if reader:
             self._set_reader(reader)
         else:
-            self.reader = False
-        if not units:
-            self.units = UNITS
-        else:
-            self.units = units
+            self.reader = None
 
     def _set_scope(self, sc):
         """
@@ -299,12 +315,25 @@ PARSING_DEFINITION['default'] = Def(commands=[
 ])            
 
 
-assert PARSING_DEFINITION['default'].mapper == \
-{'Oбъем ВВП': 'GDP',
- 'Валовой внутренний продукт': 'GDP',
- 'Индекс промышленного производства': 'INDPRO',
- 'Индекс физического объема произведенного ВВП, в %': 'GDP'}
-    
+# TODO 2: convert this to test
+#    Properties:
+#        - mapper (dict)
+#        - required (list)
+#        - units (dict)
+#        FIXME: is it a fucntion name or fucn itself?
+#        - reader (str)
+#        
+#    Public method:
+#        - get_bounds()
+
+pd = PARSING_DEFINITION['default']
+
+assert pd.mapper
+assert pd.required
+assert pd.units   
+# not defiend, but present
+assert pd.reader is None
+assert pd.get_bounds
 
 
 sc = Scope("1.9. Внешнеторговый оборот – всего",
@@ -326,7 +355,6 @@ x = [
 PARSING_DEFINITION['segments'].append(Def(x, sc))
 
             
-
 #main.append(varname="UNEMPL",
 #            text=["Уровень безработицы", "Общая численность безработных"],
 #            required_units=["pct"])
@@ -470,6 +498,3 @@ PARSING_DEFINITION['segments'].append(Def(x, sc))
 #SPEC.append(d)
 
 # TODO: add more definitons
-# TODO: transformations layer diff GOV_ACCUM
-# TODO: use sample in required
-# TODO: short names for variables in FRED style, short=
