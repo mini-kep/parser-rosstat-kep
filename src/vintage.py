@@ -21,7 +21,7 @@ from csv2df.specification import SPEC
 from csv2df.reader import Reader, open_csv
 from csv2df.parser import extract_tables
 from csv2df.emitter import Emitter
-from csv2df.validator import Validator
+from validator import Validator
 
 
 __all__ = ['get_dataframes', 'Vintage', 'Collection']

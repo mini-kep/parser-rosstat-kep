@@ -112,7 +112,7 @@ def as_list(x):  # : str): # not only str is intended input type
 class ParsingInstruction:
     """Parsing instructions to extract variable names from table headers.
 
-       Parsing instructions consist of:
+       Parsing instructions consists of:
 
        - variable names
        - table header string(s) that correspond to a variable name

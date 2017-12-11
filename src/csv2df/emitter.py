@@ -77,7 +77,7 @@ class DatapointMaker:
             return base + pd.offsets.MonthEnd()
 
     def as_dict(self):
-        # FIXME: whu do we need year, qtr and month here?
+        # FIXME: why do we need year, qtr and month here?
         basedict = dict(year=int(self.year),
                         label=self.label,
                         freq=self.freq,

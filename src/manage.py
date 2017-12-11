@@ -25,7 +25,7 @@ def run(year, month):
 def copy_latest():
     """Copy csv files from folder like 
            *processed/2017/04* 
-        to 
+       to 
            *processed/latest* folder.
     """
     year, month = config.LATEST_DATE
@@ -39,7 +39,7 @@ def copy_latest():
         
 if '__main__' == __name__:
     # same as in 'invoke add 2017 10'
-    year, month = 2016, 6 
+    year, month = 2016, 7 
     remote = RemoteFile(year, month)
     #remote.download()      
     remote.unrar()
