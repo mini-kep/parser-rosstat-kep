@@ -10,7 +10,7 @@ The task is to extract pandas dataframes from MS Word files from [Rosstat KEP pu
 
 This code replaces a predecessor repo, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
 
-We require Windows and Word installed to create table dumps from .doc files, but once done parsing CSV files can run on linux machine.   
+Windows and Word are required to create table dumps from .doc files, but once done CSV files can be parsed on a linux machine.   
 
 Interface 
 ---------
