@@ -10,7 +10,6 @@
 
 import csv
 import os
-# import config
 
 ENCODING = 'utf8'
 
@@ -208,12 +207,18 @@ def folder_to_csv(folder, csv_filename):
     print("Finished creating raw CSV file:", csv_filename)
     return True
 
+# -------------------------------------------------------------------------------
+#
+#    Interface
+#
+# -------------------------------------------------------------------------------
+
 
 def word2csv(year, month, force=False):
     import config
     raw_folder = config.DataFolder(year, month).raw
-    interim_csv = config.InterimCSV(year, month).path
-    if force or not os.path.exists(interim_csv):
+    interim_csv = config.InterimCSV(year, month)
+    if force or not interim_csv.exists() or len(interim_csv) == 0:
         folder_to_csv(folder=raw_folder, csv_filename=interim_csv)
     
 

@@ -12,9 +12,11 @@ def download(url, path):
     r = requests.get(url.strip(), stream=True)
     with open(path, 'wb') as f:
         for chunk in r.iter_content(chunk_size=1024):
-            if chunk:  # filter out keep-alive new chunks
+            # filter out keep-alive new chunks
+            if chunk:  
                 f.write(chunk)
-
+                
+                
 def make_url(year, month):
     month = str(month).zfill(2)
     return (f'http://www.gks.ru/free_doc/doc_{year}/Ind/ind{month}.rar')
@@ -58,9 +60,7 @@ class RemoteFile():
 
 
 if __name__ == "__main__":
-    u = RemoteFile(2016, 12)._make_url()
+    u = RemoteFile(2016, 12).url
     assert u.startswith("http://www.gks.ru/free_doc/")
-
-    rf = RemoteFile(2017, 6)
-    rf.download()
-    rf.unrar()
+    u.download()
+    u.unrar()

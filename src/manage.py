@@ -38,8 +38,8 @@ def copy_latest():
         print('Copied', src)   
         
 if '__main__' == __name__:
-    # same lines are run in 'invoke add 2017 10'
-    year, month = 2016, 3 
+    # same as in 'invoke add 2017 10'
+    year, month = 2016, 6 
     remote = RemoteFile(year, month)
     #remote.download()      
     remote.unrar()

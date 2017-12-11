@@ -87,14 +87,27 @@ class DataFolder:
                                    self.year, self.month)
 
 
-class InterimCSV(DataFolder):
+class File(DataFolder):
+
+    @property
+    def path(self):
+        self.data_root
+
+    def exists(self):
+        return self.path.exists()
+    
+    def __len__(self):
+        return self.path.stat().st_size
+
+
+class InterimCSV(File):
     
     @property
     def path(self):
         return super().interim / 'tab.csv'
         
 
-class ProcessedCSV(DataFolder):
+class ProcessedCSV(File):
     
     @staticmethod
     def make_filename(freq):
