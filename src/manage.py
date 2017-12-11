@@ -39,7 +39,7 @@ def copy_latest():
         
 if '__main__' == __name__:
     # same lines are run in 'invoke add 2017 10'
-    year, month = 2016, 2 
+    year, month = 2016, 3 
     remote = RemoteFile(year, month)
     #remote.download()      
     remote.unrar()
@@ -56,7 +56,7 @@ if '__main__' == __name__:
     #is_found: False <1.7. Инвестиции в основной капитал>
     #is_found: False <1.7.1. Инвестиции в основной капитал организаций>    
     
-    # INTENT:
+    # EP:
     # - may use a webhook to upload to database
     # - can import parser code to upload to database from here
 

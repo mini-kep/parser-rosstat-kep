@@ -19,11 +19,6 @@ def make_url(year, month):
     month = str(month).zfill(2)
     return (f'http://www.gks.ru/free_doc/doc_{year}/Ind/ind{month}.rar')
 
-#def check_date(year, month):
-#    def as_date(year, month):
-#        return datetime.date(year, month, 1)
-#    if as_date(year, month) < as_date(2016, 12):
-#        raise ValueError('No web files before 2016-12')
 
 def unrar(path, folder, unrar=config.UNPACK_RAR_EXE):
     def mask_with_end_separator(folder):
@@ -59,16 +54,7 @@ class RemoteFile():
     def unrar(self):
         res = unrar(self.path, self.folder)
         if res == 0:
-            print('UnRARed', self.path)       
-            
-
-    # FIXME: refactor to more compact code. 
-    def clean(self):
-        for file in os.listdir(self.folder):
-            path = os.path.join(self.folder, file)
-            if not path.endswith(".rar"):
-                os.remove(path)
-    # ------------------------------------
+            print('UnRARed', self.path) 
 
 
 if __name__ == "__main__":
