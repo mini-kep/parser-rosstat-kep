@@ -67,6 +67,7 @@ class Vintage:
         return True
 
     def validate(self):
+        # FUXME: maybe a function
         checker = Validator(*[self.dfs[freq] for freq in FREQUENCIES])
         checker.run()
         print("Test values parsed OK for", self)
@@ -110,10 +111,10 @@ class Collection:
 
 if __name__ == "__main__":
     # Collection calls
-    #Collection.approve_latest()
-    Collection.approve_all()
+    # Collection.approve_latest()
+    # Collection.approve_all()
     # Collection.save_latest()
-    # Collection.save_all()
+    Collection.save_all()
 
     # sample Vintage call
     #year, month = 2015, 5
