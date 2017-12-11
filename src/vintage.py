@@ -110,13 +110,13 @@ class Collection:
 
 if __name__ == "__main__":
     # Collection calls
-    # Collection.approve_latest()
-    # Collection.approve_all()
+    #Collection.approve_latest()
+    Collection.approve_all()
     # Collection.save_latest()
     # Collection.save_all()
 
     # sample Vintage call
-    year, month = 2015, 5
-    vint = Vintage(year, month)
-    vint.validate()
+    #year, month = 2015, 5
+    #vint = Vintage(year, month)
+    #vint.validate()
     #dfa, dfq, dfm = vint.dfs()
