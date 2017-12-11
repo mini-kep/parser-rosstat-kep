@@ -27,9 +27,6 @@ from csv2df.util_label import make_label
 from csv2df.util_row_splitter import FUNC_MAPPER
 
 
-__all__ = []  # TODO: (ID) Which classes/functions need to be added to __all__?
-
-
 # mapper dictionary to convert text in table headers to unit of measurement
 UNITS = odict([  # 1. MONEY
     ('млрд.долларов', 'bln_usd'),
@@ -106,34 +103,6 @@ def as_list(x):  # : str): # not only str is intended input type
         msg = f"{x} has unaccepoted type"
         raise TypeError(msg)
 
-class ParsingCommand():
-    def __init__(self, var, headers, required_units):
-        """Create parsing instructions for an individual variable.
-
-        Args:
-            var (str): varaible name, eg 'GDP'
-            headers (list): header string(s) associated with
-                            variable names, eg "Oбъем ВВП" or
-                           ["Oбъем ВВП", "Индекс физического объема произведенного ВВП"]
-            required_units (str or list): required units of measurement for
-                                          *varname*, like 'bln_usd' or ['rog', 'rub']
-        """
-        self.var = var
-        self._header_strings = as_list(headers)
-        self._required_units = as_list(required_units)
-
-    @property
-    def mapper(self):
-        return {hs: self.var for hs in self._header_strings}
-    
-    @property
-    def required(self):
-        return list(make_label(self.var, unit) for unit in self._required_units)
-
-    @property
-    def units(self):
-        return self._required_units    
-
 class Scope():
     """Start and end lines for CSV file segment and associated variables
        defintion.
@@ -159,8 +128,8 @@ class Scope():
             raise ValueError("Cannot accept empty line as Scope() boundary")
 
     def get_bounds(self, rows):
-        """Get start and end line markers, which can be found in *rows*
-
+        """Get start and end line, which can be found in *rows*.
+        
         Returns:
             start, end - tuple of start and end strings found in *rows*
 
@@ -210,20 +179,65 @@ class Scope():
         e = self.__markers[0]['end'][:10]
         return "bound by start <{}...> and end <{}...>".format(s, e)
 
+# FIXME: not refactoring above, refactroing code below
+
+class ParsingCommand():
+    def __init__(self, varhead, headers, required_units):
+        """Create parsing instructions for an individual variable.
+
+        Args:
+            varhead (str): 
+                varaible name, ex: 'GDP'
+            headers (list): 
+                header string(s) associated with variable names
+                ex: "Oбъем ВВП" or ["Oбъем ВВП", "Индекс физического объема произведенного ВВП"]
+            required_units (str or list): 
+                required units of measurement for *varhead*, 
+                ex: 'bln_usd' or ['rog', 'rub']
+        """
+        self.varhead = varhead
+        self._header_strings = as_list(headers)
+        self._required_units = as_list(required_units)
+
+    @property
+    def mapper(self):
+        return {hs: self.varhead for hs in self._header_strings}
+    
+    @property
+    def required(self):
+        return list(make_label(self.varhead, unit) for unit in self._required_units)
+
+    @property
+    def units(self):
+        return self._required_units    
 
 class Def(object):
-    """Holds together parsing instruction, (optional) scope and (optional)
-       custom reader function name. Also initialised with units.
+    """Holds together:
+        - parsing commands
+        - (optional) defintion scope 
+        - (optional) custom reader function name 
+        
+    Properties:
+        - mapper (dict)
+        - required (list)
+        - units (dict)
+        FIXME: is it a fucntion name or fucn itself?
+        - reader (str)
+        
+    Public method:
+        - get_bounds()
+            
+        
     """
 
     def __init__(self, commands, scope=False, reader=False, units=False):
         self.commands = as_list(commands)        
         if scope:
-            self.set_scope(scope)
+            self._set_scope(scope)
         else:
             self.scope = False
         if reader:
-            self.set_reader(reader)
+            self._set_reader(reader)
         else:
             self.reader = False
         if not units:
@@ -231,10 +245,7 @@ class Def(object):
         else:
             self.units = units
 
-    def append(self, x):
-        self.commands.append(x)
-
-    def set_scope(self, sc):
+    def _set_scope(self, sc):
         """
         Raises:
             TypeError: if *sc* is not Scope().
@@ -244,7 +255,7 @@ class Def(object):
         else:
             raise TypeError(sc)
 
-    def set_reader(self, funcname: str):
+    def _set_reader(self, funcname: str):
         """
         Raises:
             ValueError: if *funcname* is not valid.
@@ -268,38 +279,15 @@ class Def(object):
     def get_bounds(self, rows):
         return self.scope.get_bounds(rows)
 
-class Specification:
-    """Specification class holds default and segment definitions.
+# descriptions
 
-    Getters:
-
-      - get_main_parsing_definition() - returns Definition()
-      - get_segment_parsing_definitions() - returns list of Definition() instances
-
-    """
-
-    def __init__(self, default_commands):
-        # main parsing definition
-        self.main = Def(default_commands)
-        # additional parsing instructions for segments
-        self.segment_definitions = []
-
-    def append(self, commands, scope=None, reader=None):
-        pdef = Def(commands, scope, reader)
-        self.segment_definitions.append(pdef)
-
-    
-    def get_main_parsing_definition(self):
-        return self.main
-
-    def get_segment_parsing_definitions(self):
-        return self.segment_definitions
-
-di = dict(GDP="Валовый внутренний продукт (ВВП)")
+descriptions = dict(GDP="Валовый внутренний продукт (ВВП)")
              
-# Main parsing definition
+# parsing definition
      
-SPEC = Specification(default_commands=[                     
+PARSING_DEFINITION = {}
+PARSING_DEFINITION['segments'] = []
+PARSING_DEFINITION['default'] = Def(commands=[                     
     ParsingCommand("GDP",
                    headers=["Oбъем ВВП",
                            "Индекс физического объема произведенного ВВП, в %",
@@ -309,6 +297,14 @@ SPEC = Specification(default_commands=[
                    headers="Индекс промышленного производства",
                    required_units=["yoy", "rog"])
 ])            
+
+
+assert PARSING_DEFINITION['default'].mapper == \
+{'Oбъем ВВП': 'GDP',
+ 'Валовой внутренний продукт': 'GDP',
+ 'Индекс промышленного производства': 'INDPRO',
+ 'Индекс физического объема произведенного ВВП, в %': 'GDP'}
+    
 
 
 sc = Scope("1.9. Внешнеторговый оборот – всего",
@@ -327,7 +323,7 @@ x = [
           "Импорт товаров"],
           "bln_usd")
 ]
-SPEC.append(x, sc)    
+PARSING_DEFINITION['segments'].append(Def(x, sc))
 
             
 
