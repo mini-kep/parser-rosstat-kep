@@ -8,7 +8,10 @@ import shutil
 def run(year, month):
     #download and unpack
     remote = RemoteFile(year, month)
-    remote.download()
+    try:    
+        remote.download()
+    except ValueError:
+        pass
     remote.unrar()
     
     # make interim csv from Word files
@@ -36,21 +39,24 @@ def copy_latest():
         
 if '__main__' == __name__:
     # same lines are run in 'invoke add 2017 10'
-    year, month = 2017, 10 
-    #remote = RemoteFile(year, month)
+    year, month = 2016, 2 
+    remote = RemoteFile(year, month)
     #remote.download()      
-    #remote.unrar()
-    #word2csv(year, month)
+    remote.unrar()
+    word2csv(year, month)
     vint = Vintage(year, month)
     vint.validate()
     vint.save()
     copy_latest()
     
-    # MAY DO:
+    # EP: this seems to indicate there no file 
+    #ValueError: start or end line markers not found in *rows*
+    #is_found: False <1.6. Инвестиции в основной капитал>
+    #is_found: False <1.6.1. Инвестиции в основной капитал организаций>
+    #is_found: False <1.7. Инвестиции в основной капитал>
+    #is_found: False <1.7.1. Инвестиции в основной капитал организаций>    
+    
+    # INTENT:
     # - may use a webhook to upload to database
     # - can import parser code to upload to database from here
-    # - check the data is in database
-    
-    
-    
-    
+

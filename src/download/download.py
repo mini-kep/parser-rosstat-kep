@@ -4,7 +4,7 @@
 import os
 import subprocess
 import requests
-import datetime
+from datetime import date
 
 import config 
 
@@ -16,23 +16,22 @@ def download(url, path):
                 f.write(chunk)
 
 def make_url(year, month):
-    check_date(year, month)    
     month = str(month).zfill(2)
-    return ('http://www.gks.ru/free_doc/doc_{}'.format(year) + \
-            '/Ind/ind{}.rar'.format(month))
+    return (f'http://www.gks.ru/free_doc/doc_{year}/Ind/ind{month}.rar')
 
-def check_date(year, month):
-    def as_date(year, month):
-        return datetime.date(year, month, 1)
-    if as_date(year, month) < as_date(2016, 12):
-        raise ValueError('No web files before 2016-12')
+#def check_date(year, month):
+#    def as_date(year, month):
+#        return datetime.date(year, month, 1)
+#    if as_date(year, month) < as_date(2016, 12):
+#        raise ValueError('No web files before 2016-12')
 
 def unrar(path, folder, unrar=config.UNPACK_RAR_EXE):
     def mask_with_end_separator(folder):
-        """UnRAR wants its folder argument  with '/'
+        """UnRAR wants its folder argument with '/'
         """
         return "{}{}".format(folder, os.sep)    
     folder = mask_with_end_separator(folder)
+    # FIXME: replace assert
     assert folder.endswith("/") or folder.endswith("\\")
     tokens = [unrar, 'e', path, folder, '-y']
     exit_code = subprocess.check_call(tokens)
@@ -42,19 +41,18 @@ def unrar(path, folder, unrar=config.UNPACK_RAR_EXE):
 class RemoteFile():
 
     def __init__(self, year, month):
+        self.year, self.month = year, month
         self.url = make_url(year, month)
         locfile = config.LocalRarFile(year, month)           
         self.path = locfile.path
         self.folder = locfile.folder
 
-    @staticmethod
-    def check_date(year, month):
-        def as_date(year, month):
-            return datetime.date(year, month, 1)
-        if as_date(year, month) < as_date(2016, 12):
+    def check_date(self):
+        if date(self.year, self.month, 1) < date(2016, 12, 1):
             raise ValueError('No web files before 2016-12')
             
     def download(self):
+        self.check_date()
         download(self.url, self.path)
         print('Downloaded', self.path)
 
