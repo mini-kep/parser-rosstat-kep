@@ -288,6 +288,7 @@ class Specification:
         pdef = Def(commands, scope, reader)
         self.segment_definitions.append(pdef)
 
+    
     def get_main_parsing_definition(self):
         return self.main
 
