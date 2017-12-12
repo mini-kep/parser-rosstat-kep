@@ -100,7 +100,7 @@ class Test_Parsing_Definition:
              'Индекс промышленного производства': 'INDPRO',
              'Индекс физического объема произведенного ВВП, в %': 'GDP'}
 
-# FIXME:
+# WONTFIX:
 #    def test_cannot_add_undefined_unit(self):
 #        p = self.p
 #        with pytest.raises(ValueError):
@@ -117,9 +117,8 @@ class Test_Parsing_Definition:
     def test_units_property(self):
         assert isinstance(self.pd.units, odict)
 
-    def test_reader_property(self):
-        # not defined, but present
-        assert callable(self.pd.reader)
+    def test_reader_property(self):        
+        assert isinstance(self.pd.reader, str)
 
     def test_get_bounds(self):
         assert callable(self.pd.get_bounds)
