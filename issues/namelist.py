@@ -53,8 +53,6 @@ NAMES = [
     "WAGE_NOMINAL_rub",
     "WAGE_REAL_rog",
     "WAGE_REAL_yoy"
-]
-
 
 def extract_varname(label):
     words = label.split('_')
@@ -83,3 +81,4 @@ if __name__ == '__main__':
     concepts.update({'Exchange rate': ['USDRUR*']}) 
     concepts.update({'Global': ['UST*', 'BRENT']})
     print(concepts)
+
