@@ -5,14 +5,13 @@ import re
 from pathlib import Path
 
 
-__all__ = ['Reader', 'open_csv']
+__all__ = ['get_segment_with_pdef']
 
 
 ENC = "utf-8"
 CSV_FORMAT = dict(delimiter="\t", lineterminator="\n")
 
-
-class Reader(object):
+def get_segment_with_pdef(path, pdef_default, pdef_segments=[]):
     """Get CSV file segments with corresponding parsing defintions
        from CSV file and parsing specification.
 
@@ -20,27 +19,11 @@ class Reader(object):
 
        Pasring specification contains segment boundaries and
        parsing defintions by segment.
-
     """
-
-    def __init__(self, csvfile, spec):
-        """
-        Args:
-            csvfile (file connection or StringIO)
-            spec (specification.Specification) - parsing instructions
-                                                 for this file
-        """
-        self.rows = list(to_rows(csvfile))
-        self.spec = spec
-
-    def items(self):
-        """
-        Yields:
-            a tuple of [list of Row instances] and a parsing definiton
-            for this list.
-        """
-        rowstack = RowStack(self.rows)
-        return rowstack.yield_segment_with_defintion(self.spec)
+    with open_csv(path) as csvfile:
+        rows = to_rows(csvfile)
+        rowstack = RowStack(rows)     
+    return rowstack.yield_segment_with_defintion(pdef_default, pdef_segments) 
 
 
 # csv file access
@@ -50,9 +33,11 @@ def open_csv(path):
     Args:
         path (pathlib.Path) - path to csv file with data
     """
-    if not isinstance(path, Path):
+    if isinstance(path, Path):
+        return path.open(encoding=ENC)
+    else:  
         raise TypeError(f'<{path}> should be pathlib.Path() instance')
-    return path.open(encoding=ENC)
+    
 
 
 def yield_csv_rows(csvfile, fmt=CSV_FORMAT):
@@ -290,7 +275,7 @@ class RowStack:
                 i += 1
         return segment
 
-    def yield_segment_with_defintion(self, spec):
+    def yield_segment_with_defintion(self, pdef_default, pdef_segments):
         """Yield CSV segments and corresponding parsing definitons.
 
         Yield CSV segments as Row() instances and corresponding
@@ -303,11 +288,11 @@ class RowStack:
             Yield CSV segments (list of Row() instances)
             and parsing definiton pairs as tuples
         """
-        for pdef in spec.get_segment_parsing_definitions():
+        for pdef in pdef_segments:
             start, end = pdef.get_bounds(self.rows)
             csv_segment = self.pop(start, end)
             yield csv_segment, pdef
-        yield self.remaining_rows(), spec.get_main_parsing_definition()
+        yield self.remaining_rows(), pdef_default
 
 
 if __name__ == "__main__":

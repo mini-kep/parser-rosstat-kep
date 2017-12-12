@@ -27,13 +27,14 @@ def extract_tables(csv_segment, pdef):
 
 
 def parse_tables(tables, pdef):
+    # assign reader function    
+    tables = [t.set_splitter(pdef.reader) for t in tables]
+    
     # parse tables to obtain labels - set label and splitter
-    tables = [t.set_label(pdef.varnames_dict, pdef.units_dict) for t in tables]
-    tables = [t.set_splitter(pdef.funcname) for t in tables]
+    tables = [t.set_label(pdef.mapper, pdef.units) for t in tables]    
     # assign trailing units
-
     def fix_multitable_units(tables):
-        """For tables without *varname*-  copy *varname* from previous table.
+        """For tables without *varname* -> copy *varname* from previous table.
            Applies to tables where all rows are known rows.
         """
         for prev_table, table in zip(tables, tables[1:]):
@@ -91,19 +92,21 @@ def split_to_tables(rows):
 class Table:
     """Representation of CSV table, has headers and datarows."""
 
-    # [4, 5, 12, 13, 17]
-    VALID_ROW_LENGTHS = list(splitter.FUNC_MAPPER.keys())
+#    # [4, 5, 12, 13, 17]
+#    VALID_ROW_LENGTHS = list(splitter.FUNC_MAPPER.keys())
     KNOWN = "+"
     UNKNOWN = "-"
 
     def __init__(self, headers, datarows):
-        self.varname = None
-        self.unit = None
         self.headers = headers
-        self.lines = odict((row.name, self.UNKNOWN) for row in headers)
         self.datarows = datarows
+
+        self.lines = odict((row.name, self.UNKNOWN) for row in headers)
         self.coln = max(len(row) for row in self.datarows)
         self.splitter_func = None
+       
+        self.varname = None
+        self.unit = None
 
     def set_label(self, varnames_dict, units_dict):
         for row in self.headers:
@@ -117,8 +120,11 @@ class Table:
                 self.lines[row.name] = self.KNOWN
         return self
 
-    def set_splitter(self, funcname):
-        self.splitter_func = splitter.get_splitter(funcname or self.coln)
+    def set_splitter(self, reader):
+        if reader:
+            self.splitter_func = reader
+        else:
+            self.splitter_func = splitter.get_splitter(self.coln)
         return self
 
     @property

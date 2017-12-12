@@ -180,7 +180,7 @@ class Scope():
 
 
 class ParsingCommand():
-    def __init__(self, varhead, headers, required_units):
+    def __init__(self, varname, headers, required_units):
         """Create parsing instructions for an individual variable.
 
         Args:
@@ -193,17 +193,17 @@ class ParsingCommand():
                 required units of measurement for *varhead*,
                 ex: 'bln_usd' or ['rog', 'rub']
         """
-        self.varhead = varhead
+        self.varname = varname
         self._header_strings = as_list(headers)
         self._required_units = as_list(required_units)
 
     @property
     def mapper(self):
-        return {hs: self.varhead for hs in self._header_strings}
+        return {hs: self.varname for hs in self._header_strings}
 
     @property
     def required(self):
-        return list(make_label(self.varhead, unit)
+        return list(make_label(self.varname, unit)
                     for unit in self._required_units)
 
     @property
@@ -243,7 +243,7 @@ class Def(object):
         if sc is None:
             return None
         if isinstance(sc, Scope):
-            self.scope = sc
+            return sc
         else:
             raise TypeError(sc)
 
@@ -282,7 +282,7 @@ descriptions = dict(GDP="Валовый внутренний продукт (В�
 
 PARSING_DEFINITION = {'default': None, 'segments': []}
 _commands = [
-    ParsingCommand(varhead="GDP",
+    ParsingCommand(varname="GDP",
                    headers = ["Oбъем ВВП",
                               "Индекс физического объема произведенного ВВП, в %",
                               "Валовой внутренний продукт"],

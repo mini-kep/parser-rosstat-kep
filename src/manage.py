@@ -49,14 +49,7 @@ if '__main__' == __name__:
     vint = Vintage(year, month)
     vint.validate()
     vint.save()
-    copy_latest()
-
-    # EP: this seems to indicate there no file
-    # ValueError: start or end line markers not found in *rows*
-    # is_found: False <1.6. Инвестиции в основной капитал>
-    # is_found: False <1.6.1. Инвестиции в основной капитал организаций>
-    # is_found: False <1.7. Инвестиции в основной капитал>
-    # is_found: False <1.7.1. Инвестиции в основной капитал организаций>
+    #copy_latest()
 
     # EP:
     # - may use a webhook to upload to database
