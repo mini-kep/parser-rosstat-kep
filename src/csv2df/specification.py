@@ -26,7 +26,7 @@
 from collections import OrderedDict as odict
 
 from csv2df.util_label import make_label
-from csv2df.util_row_splitter import FUNC_MAPPER
+
 
 
 # mapper dictionary to convert text in table headers to unit of measurement
@@ -290,9 +290,7 @@ _commands = [
     ParsingCommand("INDPRO",
                    "Индекс промышленного производства",
                    ["yoy", "rog"]),
-    ParsingCommand("UNEMPL", 
-                   ["Уровень безработицы", "Общая численность безработных"],
-                   "pct"),
+    # TODO: can transform to one variable WAGE after parsing
     ParsingCommand("WAGE_NOMINAL", 
                    ["Среднемесячная номинальная начисленная заработная плата работников организаций",
                     "Среднемесячная номинальная начисленная заработная плата одного работника"],
@@ -304,6 +302,23 @@ _commands = [
     ParsingCommand("TRANSPORT_FREIGHT",
                    "Коммерческий грузооборот транспорта",
                    "bln_tkm"),
+    ParsingCommand("AGROPROD",
+                   ["Индекс производства продукции сельского хозяйства в хозяйствах всех категорий",
+                    "Продукция сельского хозяйства в хозяйствах всех категорий"],
+                   "yoy"), 
+    ParsingCommand("UNEMPL", 
+                   ["Уровень безработицы", "Общая численность безработных"],
+                   "pct"),
+    #ParsingCommand("UNEMPL_REGISTERED", 
+    #               "Численность официально зарегистрированных безработных в государственных учреждениях службы занятости",
+    #               "pct"),   
+    ParsingCommand("PPI", 
+                   ["Индексы цен производителей промышленных товаров"],
+                   "rog"),
+    
+                   
+                   
+                   
 ]
 PARSING_DEFINITION['default'] = Def(commands=_commands) 
 

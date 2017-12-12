@@ -48,8 +48,8 @@ def verify_tables(tables, pdef):
     labels_in_tables = [t.label for t in tables]
     labels_missed = [x for x in pdef.required if x not in labels_in_tables]
     if labels_missed:
-        import pdb
-        pdb.set_trace()
+        #mport pdb
+        #pdb.set_trace()
         raise ValueError("Missed labels: {}".format(labels_missed))
 
 

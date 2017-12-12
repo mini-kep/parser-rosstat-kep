@@ -1,19 +1,24 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Aug  8 11:01:45 2017
-
-@author: PogrebnyakEV
-"""
-
+import pytest
 import pandas as pd
 from io import StringIO
 
-import validator as vldr
+from validator import ValidatorAnnual, ValidatorQtr, ValidatorMonthly
 
+ANNUAL = [('GDP_bln_rub', 1999, 4823.0),
+          ('GDP_yoy', 1999, 106.4), 
+          ('AGROPROD_yoy', 1999, 103.8),
+          ]
+QTR = [('GDP_bln_rub', 1999, {4: 1447}),
+       ('CPI_rog', 1999, {1: 116.0, 2: 107.3, 3: 105.6, 4: 103.9})
+       ]
+          
+MONTHLY = [('CPI_rog', 1999, {1: 108.4, 6: 101.9, 12: 101.3}),
+           ('EXPORT_GOODS_bln_usd', 1999, {12: 9.7}),
+           ('IMPORT_GOODS_bln_usd', 1999, {12: 4.0})
+           ]
 
 def to_dataframe(text):
     return pd.read_csv(StringIO(text), sep="\t")
-
 
 dfa_text = """	year	CPI_ALCOHOL_rog	CPI_FOOD_rog	CPI_NONFOOD_rog	CPI_SERVICES_rog	CPI_rog	EXPORT_GOODS_bln_usd	GDP_bln_rub	GDP_yoy	GOV_EXPENSE_ACCUM_CONSOLIDATED_bln_rub	GOV_EXPENSE_ACCUM_FEDERAL_bln_rub	GOV_EXPENSE_ACCUM_SUBFEDERAL_bln_rub	GOV_REVENUE_ACCUM_CONSOLIDATED_bln_rub	GOV_REVENUE_ACCUM_FEDERAL_bln_rub	GOV_REVENUE_ACCUM_SUBFEDERAL_bln_rub	GOV_SURPLUS_ACCUM_FEDERAL_bln_rub	GOV_SURPLUS_ACCUM_SUBFEDERAL_bln_rub	IMPORT_GOODS_bln_usd	INDPRO_yoy	INVESTMENT_bln_rub	INVESTMENT_yoy	RETAIL_SALES_FOOD_bln_rub	RETAIL_SALES_FOOD_yoy	RETAIL_SALES_NONFOOD_bln_rub	RETAIL_SALES_NONFOOD_yoy	RETAIL_SALES_bln_rub	RETAIL_SALES_yoy	TRANSPORT_FREIGHT_bln_tkm	UNEMPL_pct	WAGE_NOMINAL_rub	WAGE_REAL_yoy
 1999-12-31	1999	143.2	135.0	139.2	134.0	136.5	75.6	4823.0	106.4	1258.0	666.9	653.8	1213.6	615.5	660.8	-51.4	7.0	39.5		670.4	105.3	866.1	93.6	931.3	94.7	1797.4	94.2	3372.0	13.0	1523.0	78.0
@@ -59,50 +64,15 @@ dfa = to_dataframe(dfa_text)
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
 
+#FIXME: split tests
+def test_validate():
+    v = ValidatorAnnual(dfa, ANNUAL)
+    assert v.not_found() == ['AGROPROD_yoy']
+    v = ValidatorQtr(dfq, QTR)
+    assert v.not_found() == []
+    v = ValidatorMonthly(dfm, MONTHLY)
+    assert v.not_found() == []
 
-def yield_checkpoints():
-    for c in vldr.ANNUAL + vldr.QTR + vldr.MONTHLY:
-        for pt in vldr.serialise(c):
-            yield(pt)
-
-
-assert vldr.CHECKPOINTS == list(yield_checkpoints())
-
-checkpoint = ('a', 'GDP_bln_rub', 1999, 4823.0)
-assert next(
-    vldr.serialise(checkpoint)) == {
-        'freq': 'a',
-        'label': 'GDP_bln_rub',
-        'period': False,
-        'value': 4823.0,
-    'year': 1999}
-
-checkpoint2 = ('q', 'CPI_rog', 1999, {1: 116.0, 2: 107.3, 3: 105.6, 4: 103.9})
-gen2 = vldr.serialise(checkpoint2)
-assert next(gen2) == {
-    'freq': 'q',
-    'label': 'CPI_rog',
-    'year': 1999,
-    'period': 1,
-    'value': 116.0}
-assert next(gen2) == {
-    'freq': 'q',
-    'label': 'CPI_rog',
-    'year': 1999,
-    'period': 2,
-    'value': 107.3}
-
-checker = vldr.Validator(dfa, dfq, dfm)
-
-pt = {
-    'freq': 'a',
-    'label': 'GDP_bln_rub',
-    'period': False,
-    'value': 4823.0,
-    'year': 1999}
-z = checker.get_value(pt)
-assert z == 4823
-assert checker.is_included(pt)
-
-for p in vldr.CHECKPOINTS:
-    assert checker.is_included(p)
+if __name__ == "__main__":
+    pytest.main([__file__])    
+    

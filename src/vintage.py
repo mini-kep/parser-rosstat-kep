@@ -11,8 +11,6 @@
 *Collection* manipulates all datasets, released at various dates:
 
     Collection.save_all()
-    Collection.save_latest()
-    Collection.approve_latest()
     Collection.approve_all()
 """
 
@@ -21,7 +19,7 @@ from csv2df.specification import PARSING_DEFINITION
 from csv2df.reader import get_segment_with_pdef
 from csv2df.parser import extract_tables
 from csv2df.emitter import Emitter
-from validator import Validator
+from validator import validate
 
 
 __all__ = ['get_dataframes', 'Vintage', 'Collection']
@@ -55,7 +53,7 @@ class Vintage:
         csv_interim = InterimCSV(year, month)
         self.dfs = get_dataframes(csv_interim.path)
 
-    def save(self):
+    def save(self):        
         csv_processed = ProcessedCSV(self.year, self.month)
         for freq, df in self.dfs.items():
             path = csv_processed.path(freq)
@@ -64,9 +62,7 @@ class Vintage:
         return True
 
     def validate(self):
-        # FIXME: may be a function
-        checker = Validator(*[self.dfs[freq] for freq in FREQUENCIES])
-        checker.run()
+        validate(self.dfs)
         print("Test values parsed OK for", self)
         return True
 
@@ -97,7 +93,7 @@ if __name__ == "__main__":
     # Collection.save_all()
 
     # sample Vintage call
-    year, month = 2015, 5
+    year, month = 2017, 8
     vint = Vintage(year, month)
     vint.validate()
     dfa, dfq, dfm = [vint.dfs[freq] for freq in 'aqm']
