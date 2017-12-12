@@ -74,6 +74,5 @@ def test_validate():
     assert v.not_found() == []
 
 if __name__ == "__main__":
-    pytest.main([__file__])
-    
+    pytest.main([__file__])    
     
