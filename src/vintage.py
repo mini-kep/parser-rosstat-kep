@@ -16,8 +16,8 @@
     Collection.approve_all()
 """
 
-from config import InterimCSV, ProcessedCSV, LATEST_DATE, SUPPORTED_DATES 
-from csv2df.specification import SPEC
+from config import InterimCSV, ProcessedCSV, LATEST_DATE, SUPPORTED_DATES
+from csv2df.specification import PARSING_DEFINITION
 from csv2df.reader import Reader, open_csv
 from csv2df.parser import extract_tables
 from csv2df.emitter import Emitter
@@ -29,7 +29,7 @@ __all__ = ['get_dataframes', 'Vintage', 'Collection']
 FREQUENCIES = ['a', 'q', 'm']
 
 
-def get_dataframes(csvfile, spec=SPEC):
+def get_dataframes(csvfile, spec=PARSING_DEFINITION):
     """Extract dataframes from *csvfile* using *spec* parsing instructions.
 
     Args:
@@ -41,7 +41,7 @@ def get_dataframes(csvfile, spec=SPEC):
        in a dictionary.
     """
     tables = [t for csv_segment, pdef in Reader(csvfile, spec).items()
-              for t in extract_tables(csv_segment, pdef)]
+                for t in extract_tables(csv_segment, pdef)]
     emitter = Emitter(tables)
     return {freq: emitter.get_dataframe(freq) for freq in FREQUENCIES}
 
@@ -54,8 +54,8 @@ class Vintage:
         self.csv_interim = InterimCSV(year, month)
         self.csv_processed = ProcessedCSV(year, month)
 
-    @property        
-    def dfs(self):    
+    @property
+    def dfs(self):
         with open_csv(self.csv_interim.path) as csvfile:
             return get_dataframes(csvfile)
 
@@ -80,7 +80,7 @@ class Vintage:
 class Collection:
     """Methods to manipulate entire set of data releases."""
 
-    all_dates = SUPPORTED_DATES 
+    all_dates = SUPPORTED_DATES
     latest_vintage = Vintage(*LATEST_DATE)
 
     @classmethod
@@ -119,5 +119,5 @@ if __name__ == "__main__":
     # sample Vintage call
     #year, month = 2015, 5
     #vint = Vintage(year, month)
-    #vint.validate()
+    # vint.validate()
     #dfa, dfq, dfm = vint.dfs()

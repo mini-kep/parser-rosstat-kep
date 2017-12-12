@@ -31,6 +31,7 @@ def parse_tables(tables, pdef):
     tables = [t.set_label(pdef.varnames_dict, pdef.units_dict) for t in tables]
     tables = [t.set_splitter(pdef.funcname) for t in tables]
     # assign trailing units
+
     def fix_multitable_units(tables):
         """For tables without *varname*-  copy *varname* from previous table.
            Applies to tables where all rows are known rows.
@@ -49,6 +50,7 @@ def verify_tables(tables, pdef):
         import pdb
         pdb.set_trace()
         raise ValueError("Missed labels: {}".format(labels_missed))
+
 
 @unique
 class RowType(Enum):
@@ -147,20 +149,21 @@ class Table:
     def __repr__(self):
         return "Table(headers={},\ndatarows={})".format(repr(self.headers),
                                                         repr(self.datarows))
+
+
 def get_tables(year, month):
     from config import InterimCSV
     import csv2df.specification as spec
     import csv2df.reader as reader
-        
+
     parsed_tables = []
-    csv_path = InterimCSV(year, month).path    
+    csv_path = InterimCSV(year, month).path
     with reader.open_csv(csv_path) as csvfile:
         for csv_segment, pdef in reader.Reader(csvfile, spec.SPEC).items():
             tables = extract_tables(csv_segment, pdef)
             parsed_tables.extend(tables)
-    return parsed_tables      
-    
-    
+    return parsed_tables
+
 
 if __name__ == "__main__":
     from config import InterimCSV, LATEST_DATE
@@ -178,5 +181,5 @@ if __name__ == "__main__":
         for t in tables:
             print()
             print(t)
-            
-    tables = get_tables(year, month)        
+
+    tables = get_tables(year, month)

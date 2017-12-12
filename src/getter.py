@@ -52,10 +52,11 @@ def proxy(path):
     content = Path(path).read_text()
     return StringIO(content)
 
+
 def get_dataframe(freq, helper=DataFolder):
     """Read dataframe from local folder"""
     #path = helper.get_csv_in_latest_folder(freq)
-    path = str(helper.latest)+'/df'+freq+'.csv'
+    path = str(helper.latest) + '/df' + freq + '.csv'
     filelike = proxy(path)
     return read_csv(filelike)
 

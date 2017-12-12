@@ -52,7 +52,7 @@ from validator import Validator
 
 
 # copied from runner.py
-#HS: csv2df.runner.py changed to csv2df.vintage.py
+# HS: csv2df.runner.py changed to csv2df.vintage.py
 
 def get_dataframes(csvfile, spec):
     """Extract dataframes from *csvfile* using *spec* parsing instructions.
@@ -61,7 +61,7 @@ def get_dataframes(csvfile, spec):
        csvfile (file connection or StringIO) - CSV file for parsing
        spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
     Returns:
-       a tuple of dataframes       
+       a tuple of dataframes
     """
 
     # Reader.items() yeild a tuple of csv file segment and its parsing definition
@@ -144,6 +144,7 @@ assert dfm1.equals(dfm2)
 # Example 4. validation
 assert vint.validate()
 
+
 def show_dicts(df=dfq):
     """Demo for serialising a DataFrame"""
     types = ['dict', 'list', 'series', 'split', 'records', 'index']
@@ -151,4 +152,6 @@ def show_dicts(df=dfq):
         print()
         print('Serialising example', t)
         print(df.to_dict(t))
+
+
 show_dicts()

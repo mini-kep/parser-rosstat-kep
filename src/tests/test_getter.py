@@ -11,8 +11,5 @@ def test_get_dataframe():
         assert isinstance(df_, pd.DataFrame)
 
 
-
-
-
 if __name__ == "__main__":
     pytest.main([__file__])
