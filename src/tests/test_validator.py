@@ -2,8 +2,20 @@ import pytest
 import pandas as pd
 from io import StringIO
 
-import validator 
+from validator import ValidatorAnnual, ValidatorQtr, ValidatorMonthly
 
+ANNUAL = [('GDP_bln_rub', 1999, 4823.0),
+          ('GDP_yoy', 1999, 106.4), 
+          ('AGROPROD_yoy', 1999, 103.8),
+          ]
+QTR = [('GDP_bln_rub', 1999, {4: 1447}),
+       ('CPI_rog', 1999, {1: 116.0, 2: 107.3, 3: 105.6, 4: 103.9})
+       ]
+          
+MONTHLY = [('CPI_rog', 1999, {1: 108.4, 6: 101.9, 12: 101.3}),
+           ('EXPORT_GOODS_bln_usd', 1999, {12: 9.7}),
+           ('IMPORT_GOODS_bln_usd', 1999, {12: 4.0})
+           ]
 
 def to_dataframe(text):
     return pd.read_csv(StringIO(text), sep="\t")
@@ -52,10 +64,14 @@ dfa = to_dataframe(dfa_text)
 dfq = to_dataframe(dfq_text)
 dfm = to_dataframe(dfm_text)
 
-
+#FIXME: split tests
 def test_validate():
-    assert validator.validate(dict(a=dfa, q=dfq, m=dfm))
-    
+    v = ValidatorAnnual(dfa, ANNUAL)
+    assert v.not_found() == ['AGROPROD_yoy']
+    v = ValidatorQtr(dfq, QTR)
+    assert v.not_found() == []
+    v = ValidatorMonthly(dfm, MONTHLY)
+    assert v.not_found() == []
 
 if __name__ == "__main__":
     pytest.main([__file__])
