@@ -1,33 +1,32 @@
-"""Contains data structures used as parsing instructions.
-
-Global variable  **SPEC**  allows access to parsing definitions:
-
-  - :func:`csv2df.specification.Specification.get_main_parsing_definition` retrieves
-    main (default) parsing definition, where most indicators are defined;
-
-  - :func:`csv2df.specification.Specification.get_segment_parsing_definitions` provides
-    a list of parsing defintions by csv segment.
-
-**SPEC** is used by:
-
-  - :class:`csv2df.reader.RowStack`
-  - :func:`csv2df.parser.extract_tables`
-
-We parse CSV file by segment, because some table headers repeat themselves in
-CSV file. Extracting a piece out of CSV file gives a good isolated input for parsing.
-
-Previously parsing instructions were initialised from yaml file, but this led to many errors,
-so the parsing instructions are now created internally in *spec.py*.
-
-"""
+#FIXME: need new text
+    
+#"""Contains data structures used as parsing instructions.
+#
+#Global variable  **SPEC**  allows access to parsing definitions:
+#
+#  - :func:`csv2df.specification.Specification.get_main_parsing_definition` retrieves
+#    main (default) parsing definition, where most indicators are defined;
+#
+#  - :func:`csv2df.specification.Specification.get_segment_parsing_definitions` provides
+#    a list of parsing defintions by csv segment.
+#
+#**SPEC** is used by:
+#
+#  - :class:`csv2df.reader.RowStack`
+#  - :func:`csv2df.parser.extract_tables`
+#
+#We parse CSV file by segment, because some table headers repeat themselves in
+#CSV file. Extracting a piece out of CSV file gives a good isolated input for parsing.
+#
+#Previously parsing instructions were initialised from yaml file, but this led to many errors,
+#so the parsing instructions are now created internally in *spec.py*.
+#
+#"""
 
 from collections import OrderedDict as odict
 
 from csv2df.util_label import make_label
 from csv2df.util_row_splitter import FUNC_MAPPER
-
-
-__all__ = []  # TODO: (ID) Which classes/functions need to be added to __all__?
 
 
 # mapper dictionary to convert text in table headers to unit of measurement
@@ -84,7 +83,6 @@ UNIT_NAMES = {'bln_rub': 'млрд.руб.',
               'bln_tkm': 'млрд. тонно-км'}
 
 # validation: all units in mapper dict have an 'offical' name
-# this assert is not to be deleted from spec.py
 assert set(UNIT_NAMES.keys()) == set(UNITS.values())
 
 
@@ -96,107 +94,20 @@ def as_list(x):  # : str): # not only str is intended input type
        Returns:
            list
     """
-    if isinstance(x, str):
-        return [x]
-    elif isinstance(x, list):
+    if isinstance(x, list):
         return x
-    # tuple is a rare border case, not intended use
     elif isinstance(x, tuple):
         return list(x)
     else:
-        msg = "{0} has wrong type <{1}>.".format(
-            x, type(x)) + "list or str expected."
-        raise TypeError(msg)
-
-
-class ParsingInstruction:
-    """Parsing instructions to extract variable names from table headers.
-
-       Parsing instructions consist of:
-
-       - variable names
-       - table header string(s) that correspond to a variable name
-       - required unit(s) of measurement for a variable
-       - (optional) variable description string
-       - (optional, not implemented) sample data row for each required unit
-
-
-    Attributes:
-        varname_mapper (OrderedDict)
-        required_labels (list of strings)
-        descriptions (OrderedDict)
-
-    """
-
-    def __init__(self):
-        self.varname_mapper = odict()
-        self.required_labels = []
-        self.descriptions = odict()
-
-    def _verify_varname(self, varname):
-        """Must define variable only once in specification
-
-        Raises:
-            ValueError: if varname is already specified
-        """
-        if varname in self.varname_mapper.values():
-            msg = "Variable name <{}> already defined".format(varname)
-            raise ValueError(msg)
-
-    def _verify_units(self, required_units):
-        """*required_units* must be in UNITS.values()
-
-        Raises:
-            ValueError: if required_units is not an "official" unit list
-        """
-        for ru in as_list(required_units):
-            if ru not in UNITS.values():
-                msg = "Unit <{}> not defined".format(ru)
-                raise ValueError(msg)
-
-    def append(self, varname, text, required_units, desc=False):
-        """Add a parsing instructions for an individual variable.
-
-        Args:
-            varname (str): varaible name, eg 'GDP'
-            text (str or list): header string(s) associated with
-                                variable names, eg "Oбъем ВВП" or
-                                 ["Oбъем ВВП", "Индекс физического объема произведенного ВВП"]
-            required_units (str or list): required units of measurement for
-                                          *varname*, like 'bln_usd' or ['rog', 'rub']
-            desc (str): (optional) variable desciption like "Валовой внутренний продукт"
-                        If not provided, *text[0]* is used.
-        """
-
-        # validate arguments
-        self._verify_varname(varname)
-        self._verify_units(required_units)
-
-        # convert from user interface
-        header_strings = as_list(text)
-        if desc is False:
-            desc = header_strings[0]
-        required_units = as_list(required_units)
-
-        # make internal variables
-        _vmapper = odict([(hs, varname) for hs in header_strings])
-        _required_labels = list(make_label(varname, unit)
-                                for unit in required_units)
-        _desc = {varname: desc}
-
-        # update internal variables (by dict update and list extend)
-        self.varname_mapper.update(_vmapper)
-        self.required_labels.extend(_required_labels)
-        self.descriptions.update(_desc)
+        return [x]
 
 
 class Scope():
-    """Start and end lines for CSV file segment and associated variables
-       defintion.
+    """Delimit start and end line in CSV file.
 
-       Holds several versions of start and end line, return applicable line
-       for a particular CSV file versions. This solves problem of different
-       headers for same table at various releases.
+       Holds several versions of start and end line, returns applicable lines
+       for a particular CSV  versions. This solves problem of different
+       headers for same table at various data releases.
     """
 
     def __init__(self, start, end):
@@ -215,7 +126,7 @@ class Scope():
             raise ValueError("Cannot accept empty line as Scope() boundary")
 
     def get_bounds(self, rows):
-        """Get start and end line markers, which can be found in *rows*
+        """Get start and end line, which can be found in *rows*.
 
         Returns:
             start, end - tuple of start and end strings found in *rows*
@@ -224,9 +135,7 @@ class Scope():
             ValueError: no start/end line pairs was found in *rows*.
 
         """
-
-        rows = list(rows)  # faster way to consume iterators
-        # rows = [r for r in rows]  # consume iterator
+        rows = list(rows)
         for marker in self.__markers:
             s = marker['start']
             e = marker['end']
@@ -267,277 +176,268 @@ class Scope():
         e = self.__markers[0]['end'][:10]
         return "bound by start <{}...> and end <{}...>".format(s, e)
 
+# FIXME: not refactoring above, refactroing code below
 
-class Definition(object):
-    """Holds together parsing instruction, (optional) scope and (optional)
-       custom reader function name. Also initialised with units.
+
+class ParsingCommand():
+    def __init__(self, varname, headers, required_units):
+        """Create parsing instructions for an individual variable.
+
+        Args:
+            varhead (str):
+                varaible name, ex: 'GDP'
+            headers (str or list of strings):
+                header string(s) associated with variable names
+                ex: "Oбъем ВВП" or ["Oбъем ВВП", "Индекс физического объема произведенного ВВП"]
+            required_units (str or list):
+                required units of measurement for *varhead*,
+                ex: 'bln_usd' or ['rog', 'rub']
+        """
+        self.varname = varname
+        self._header_strings = as_list(headers)
+        self._required_units = as_list(required_units)
+
+    @property
+    def mapper(self):
+        return {hs: self.varname for hs in self._header_strings}
+
+    @property
+    def required(self):
+        return list(make_label(self.varname, unit)
+                    for unit in self._required_units)
+
+    @property
+    def units(self):
+        return self._required_units
+
+
+class Def(object):
+    """Holds together:
+        - parsing commands
+        - (optional) defintion scope
+        - (optional) custom reader function name
+
+       Properties:
+           - mapper (dict)
+           - required (list)
+           - units (dict)
+           FIXME: is it a fucntion name or fucn itself?
+            - reader (str)
+
+       Public method:
+            - get_bounds()
+
     """
 
-    def __init__(self, scope=False, reader=False, units=False):
-        self.instr = ParsingInstruction()
-        # scope
-        if scope:
-            self.set_scope(scope)
-        else:
-            self.scope = False
-        # reader
-        if reader:
-            self.set_reader(reader)
-        else:
-            self.reader = False
-        # set units
-        if not units:
-            self.units = UNITS
-        else:
-            self.units = units
+    def __init__(self, commands, scope=None, func_name=None, units=UNITS):
+        self.commands = as_list(commands)
+        self.scope = self._get_scope(scope)
+        self.reader = self._get_reader(func_name)
+        self.units = units
 
-    def append(self, *arg, **kwarg):
-        self.instr.append(*arg, **kwarg)
-
-    def set_scope(self, sc):
+    def _get_scope(self, sc):
         """
         Raises:
             TypeError: if *sc* is not Scope().
         """
+        if sc is None:
+            return None
         if isinstance(sc, Scope):
-            self.scope = sc
+            return sc
         else:
             raise TypeError(sc)
 
-    def set_reader(self, funcname: str):
+    def _get_reader(self, func_name: str):
         """
         Raises:
-            ValueError: if *funcname* is not valid.
+            TypeError: if *func_name* is not string.
         """
-        if isinstance(funcname, str) and funcname in FUNC_MAPPER.keys():
-            self.reader = funcname
+        if func_name is None:
+            return None
+        elif isinstance(func_name, str):
+            return func_name
         else:
-            raise ValueError(funcname)
-
-    def get_varnames(self):
-        varnames = self.varnames_dict.values()
-        return list(set(varnames))
-
-    # WONTFIX: direct access to internals in methods below
+            raise TypeError(f'<{func_name}> should be string')
 
     @property
-    def varnames_dict(self):
-        return self.instr.varname_mapper
-
-    @property
-    def units_dict(self):
-        return self.units
-
-    @property
-    def funcname(self):
-        return self.reader
+    def mapper(self):
+        d = {}
+        for c in self.commands:
+            d.update(c.mapper)
+        return d
 
     @property
     def required(self):
-        return self.instr.required_labels
+        return [r for c in self.commands for r in c.required]
 
     def get_bounds(self, rows):
-        if self.scope:
-            return self.scope.get_bounds(rows)
-        else:
-            return False
+        return self.scope.get_bounds(rows)
+
+# descriptions
 
 
-class Specification:
-    """Specification class holds default and segment definitions.
+descriptions = dict(GDP="Валовый внутренний продукт (ВВП)")
 
-    Getters:
+# parsing definition
 
-      - get_main_parsing_definition() - returns Definition()
-      - get_segment_parsing_definitions() - returns list of Definition() instances
+PARSING_DEFINITION = {'default': None, 'segments': []}
+_commands = [
+    ParsingCommand(varname="GDP",
+                   headers = ["Oбъем ВВП",
+                              "Индекс физического объема произведенного ВВП, в %",
+                              "Валовой внутренний продукт"],
+                   required_units = ["bln_rub", "yoy"]),
+    ParsingCommand("INDPRO",
+                   "Индекс промышленного производства",
+                   ["yoy", "rog"]),
+    ParsingCommand("UNEMPL", 
+                   ["Уровень безработицы", "Общая численность безработных"],
+                   "pct"),
+    ParsingCommand("WAGE_NOMINAL", 
+                   ["Среднемесячная номинальная начисленная заработная плата работников организаций",
+                    "Среднемесячная номинальная начисленная заработная плата одного работника"],
+                    "rub"), 
+    ParsingCommand("WAGE_REAL", 
+                   ["Реальная начисленная заработная плата работников организаций",
+                    "Реальная начисленная заработная плата одного работника"],
+                    ["yoy", "rog"]), 
+    ParsingCommand("TRANSPORT_FREIGHT",
+                   "Коммерческий грузооборот транспорта",
+                   "bln_tkm"),
+]
+PARSING_DEFINITION['default'] = Def(commands=_commands) 
 
-    Diagnostics:
-
-      - get_varnames() - returns list of strings
-
-    """
-
-    def __init__(self, default):
-        # main parsing definition
-        self.main = default
-        # additional parsing instructions for segments
-        self.segment_definitions = []
-
-    def append(self, pdef):
-        self.segment_definitions.append(pdef)
-        # WONTFIX: validate order of markers - ends are not starts
-
-    def get_main_parsing_definition(self):
-        return self.main
-
-    def get_segment_parsing_definitions(self):
-        return self.segment_definitions
-
-    def get_varnames(self):
-        varnames = set(self.main.get_varnames())
-        for pdef in self.segment_definitions:
-            for vn in pdef.get_varnames():
-                varnames.add(vn)
-        return sorted(list(varnames))
-
-
-# creating definitions
-# step 1 - global (default) parsing defintion
-main = Definition()
-main.append(varname="GDP",
-            text=["Oбъем ВВП",
-                  "Индекс физического объема произведенного ВВП, в %",
-                  "Валовой внутренний продукт"],
-            required_units=["bln_rub", "yoy"],
-            desc="Валовый внутренний продукт (ВВП)")
-# sample="1999	4823	901	1102	1373	1447"
-main.append(varname="INDPRO",
-            text="Индекс промышленного производства",
-            required_units=["yoy", "rog"],
-            desc="Промышленное производство")
-main.append(varname="UNEMPL",
-            text=["Уровень безработицы", "Общая численность безработных"],
-            required_units=["pct"])
-main.append(
-    "WAGE_NOMINAL",
-    ["Среднемесячная номинальная начисленная заработная плата работников организаций",
-     "Среднемесячная номинальная начисленная заработная плата одного работника"],
-    "rub")
-main.append("WAGE_REAL",
-            ["Реальная начисленная заработная плата работников организаций",
-             "Реальная начисленная заработная плата одного работника"],
-            ["yoy", "rog"])
-main.append("TRANSPORT_FREIGHT",
-            "Коммерческий грузооборот транспорта",
-            "bln_tkm")
-
-# step 2 - create Specification based on 'main'
-SPEC = Specification(default=main)
-
-
-# step 3 - segment definitions
-# -- investment
-sc = Scope("1.6. Инвестиции в основной капитал",
-           "1.6.1. Инвестиции в основной капитал организаций")
-sc.add_bounds("1.7. Инвестиции в основной капитал",
-              "1.7.1. Инвестиции в основной капитал организаций")
-d = Definition(scope=sc)
-d.append("INVESTMENT",
-         "Инвестиции в основной капитал",
-         ["bln_rub", "yoy", "rog"])
-SPEC.append(d)
-
-
-# -- EXIM
+# step 2 - segment definitions
 sc = Scope("1.9. Внешнеторговый оборот – всего",
            "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья")
 sc.add_bounds("1.10. Внешнеторговый оборот – всего",
               "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья")
 sc.add_bounds("1.10. Внешнеторговый оборот – всего",
               "1.10.1.Внешнеторговый оборот со странами дальнего зарубежья")
-d = Definition(scope=sc)
-d.append("EXPORT_GOODS",
-         ["экспорт товаров – всего",
-          "Экспорт товаров"],
-         "bln_usd")
-d.append("IMPORT_GOODS",
-         ["импорт товаров – всего",
-          "Импорт товаров"],
-         "bln_usd")
-SPEC.append(d)
+pc = [
+    ParsingCommand("EXPORT_GOODS",
+                   ["экспорт товаров – всего",
+                    "Экспорт товаров"],
+                   "bln_usd"),
+    ParsingCommand("IMPORT_GOODS",
+                   ["импорт товаров – всего",
+                    "Импорт товаров"],
+                   "bln_usd")
+]
+PARSING_DEFINITION['segments'].append(Def(pc, sc))
 
-# -- PPI
+
+sc = Scope("1.6. Инвестиции в основной капитал",
+           "1.6.1. Инвестиции в основной капитал организаций")
+sc.add_bounds("1.7. Инвестиции в основной капитал",
+              "1.7.1. Инвестиции в основной капитал организаций")
+pc = ParsingCommand("INVESTMENT",
+                    "Инвестиции в основной капитал",
+                    ["bln_rub", "yoy", "rog"])
+PARSING_DEFINITION['segments'].append(Def(pc, sc))
+
+
+## TODO: PPI
 # add here
 
-# -- CPI
+# FIXME: must post to api/desc
+#         desc="Индекс потребительских цен (ИПЦ)")
+#         desc="ИПЦ (непродтовары)")
+#         "ИПЦ (продтовары)")
+#         "ИПЦ (услуги)")
+#         "ИПЦ (алкоголь)")
+
+## -- CPI
 sc = Scope(start="3.5. Индекс потребительских цен",
            end="4. Социальная сфера")
-d = Definition(scope=sc)
-d.append("CPI",
-         text="Индекс потребительских цен",
-         required_units="rog",
-         desc="Индекс потребительских цен (ИПЦ)")
-d.append("CPI_NONFOOD",
-         text=["непродовольственные товары",
-               "непродовольст- венные товары"],
-         required_units="rog",
-         desc="ИПЦ (непродтовары)")
-d.append("CPI_FOOD",
-         "продукты питания",
-         ['rog'],
-         "ИПЦ (продтовары)")
-d.append("CPI_SERVICES",
-         "услуги",
-         ['rog'],
-         "ИПЦ (услуги)")
-d.append("CPI_ALCOHOL",
-         "алкогольные напитки",
-         ['rog'],
-         "ИПЦ (алкоголь)")
-SPEC.append(d)
+pc = [
+    ParsingCommand("CPI",
+                   "Индекс потребительских цен",
+                   "rog"),
+    ParsingCommand("CPI_NONFOOD",
+                   ["непродовольственные товары",
+                    "непродовольст- венные товары"],
+                   "rog"),
+    ParsingCommand("CPI_FOOD",
+                   "продукты питания",
+                   "rog"),
+    ParsingCommand("CPI_SERVICES",
+                   "услуги",
+                   "rog"),
+    ParsingCommand("CPI_ALCOHOL",
+                   "алкогольные напитки",
+                   "rog"),
+]
+PARSING_DEFINITION['segments'].append(Def(pc, sc))
 
 
 sc = Scope("1.12. Оборот розничной торговли",
            "1.12.1. Оборот общественного питания")
 sc.add_bounds("1.13. Оборот розничной торговли",
               "1.13.1. Оборот общественного питания")
-d = Definition(scope=sc)
-d.append("RETAIL_SALES",
-         "Оборот розничной торговли",
-         ["bln_rub", "yoy", "rog"])
-d.append("RETAIL_SALES_FOOD",
-         ["продовольственные товары",
-          "пищевые продукты, включая напитки и табачные изделия",
-          "пищевые продукты, включая напитки, и табачные изделия"],
-         ["bln_rub", "yoy", "rog"])
-d.append("RETAIL_SALES_NONFOOD",
-         "непродовольственные товары",
-         ["bln_rub", "yoy", "rog"])
-SPEC.append(d)
+pc = [
+    ParsingCommand("RETAIL_SALES",
+                   "Оборот розничной торговли",
+                   ["bln_rub", "yoy", "rog"]),
+    ParsingCommand("RETAIL_SALES_FOOD",
+                   ["продовольственные товары",
+                    "пищевые продукты, включая напитки и табачные изделия",
+                    "пищевые продукты, включая напитки, и табачные изделия"],
+                   ["bln_rub", "yoy", "rog"]),
+    ParsingCommand("RETAIL_SALES_NONFOOD",
+                   "непродовольственные товары",
+                   ["bln_rub", "yoy", "rog"])
+]
+PARSING_DEFINITION['segments'].append(Def(pc, sc))
 
 
 sc = Scope("2.1.1. Доходы (по данным Федерального казначейства)",
            "2.1.2. Расходы (по данным Федерального казначейства)")
-d = Definition(scope=sc, reader="fiscal")
-d.append("GOV_REVENUE_ACCUM_CONSOLIDATED",
-         "Консолидированный бюджет",
-         "bln_rub")
-d.append("GOV_REVENUE_ACCUM_FEDERAL",
-         "Федеральный бюджет",
-         "bln_rub")
-d.append("GOV_REVENUE_ACCUM_SUBFEDERAL",
-         "Консолидированные бюджеты субъектов Российской Федерации",
-         "bln_rub")
-SPEC.append(d)
-
+pc = [
+    ParsingCommand(
+        "GOV_REVENUE_ACCUM_CONSOLIDATED",
+        "Консолидированный бюджет",
+        "bln_rub"),
+    ParsingCommand(
+        "GOV_REVENUE_ACCUM_FEDERAL",
+        "Федеральный бюджет",
+        "bln_rub"),
+    ParsingCommand(
+        "GOV_REVENUE_ACCUM_SUBFEDERAL",
+        "Консолидированные бюджеты субъектов Российской Федерации",
+        "bln_rub")]
+PARSING_DEFINITION['segments'].append(Def(pc, sc, 'fiscal'))
 
 sc = Scope("2.1.2. Расходы (по данным Федерального казначейства)",
            "2.1.3. Превышение доходов над расходами")
-d = Definition(scope=sc, reader="fiscal")
-d.append("GOV_EXPENSE_ACCUM_CONSOLIDATED",
-         "Консолидированный бюджет",
-         "bln_rub")
-d.append("GOV_EXPENSE_ACCUM_FEDERAL",
-         "Федеральный бюджет",
-         "bln_rub")
-d.append("GOV_EXPENSE_ACCUM_SUBFEDERAL",
-         "Консолидированные бюджеты субъектов Российской Федерации",
-         "bln_rub")
-SPEC.append(d)
+
+pc = [
+    ParsingCommand(
+        "GOV_EXPENSE_ACCUM_CONSOLIDATED",
+        "Консолидированный бюджет",
+        "bln_rub"),
+    ParsingCommand(
+        "GOV_EXPENSE_ACCUM_FEDERAL",
+        "Федеральный бюджет",
+        "bln_rub"),
+    ParsingCommand(
+        "GOV_EXPENSE_ACCUM_SUBFEDERAL",
+        "Консолидированные бюджеты субъектов Российской Федерации",
+        "bln_rub")]
+PARSING_DEFINITION['segments'].append(Def(pc, sc, 'fiscal'))
 
 
 sc = Scope("2.1.3. Превышение доходов над расходами",
            "2.2. Сальдированный финансовый результат")
-d = Definition(scope=sc, reader="fiscal")
-d.append("GOV_SURPLUS_ACCUM_FEDERAL",
-         "Федеральный бюджет",
-         "bln_rub")
-d.append("GOV_SURPLUS_ACCUM_SUBFEDERAL",
-         "Консолидированные бюджеты субъектов Российской Федерации",
-         "bln_rub")
-SPEC.append(d)
+pc = [
+    ParsingCommand(
+        "GOV_SURPLUS_ACCUM_FEDERAL",
+        "Федеральный бюджет",
+        "bln_rub"),
+    ParsingCommand(
+        "GOV_SURPLUS_ACCUM_SUBFEDERAL",
+        "Консолидированные бюджеты субъектов Российской Федерации",
+        "bln_rub")]
+PARSING_DEFINITION['segments'].append(Def(pc, sc, 'fiscal'))
 
 # TODO: add more definitons
-# TODO: transformations layer diff GOV_ACCUM
-# TODO: use sample in required
-# TODO: short names for variables in FRED style, short=

@@ -6,17 +6,19 @@
 Concept
 -------
 
-This code allows to extract pandas dataframes from MS Word files from [Rosstat KEP publication][Rosstat] and save them as [CSV files][backend]. 
+The task is to extract pandas dataframes from MS Word files from [Rosstat KEP publication][Rosstat] and save them as [CSV files][backend]. 
 
 This code replaces a predecessor repo, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
+
+Windows and Word are required to create table dumps from .doc files, but once done CSV files can be parsed on a linux machine.   
 
 Interface 
 ---------
 [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py) does the following job:
-- download MS Word files from Rostst
-- extracts tables from Word files and assigns variable names
-- creates pandas dataframes with time series (at annual, quarterly and monthly frequency) 
-- saves dataframes as [CSV files at stable URL][backend]. 
+- download and unpack MS Word files from Rosstat
+- extract tables from Word files and assigns variable names
+- create pandas dataframes with time series (at annual, quarterly and monthly frequency) 
+- save dataframes as [CSV files at stable URL][backend] 
 
 [kep]: https://github.com/mini-kep/parser-rosstat-kep
 [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
@@ -73,14 +75,15 @@ invoke add <year> <month>
 
 and commit to this repo.
 
-Basically this command:
+This command:
 - downloads a rar file from Rosstat, 
 - unpacks MS Word files, 
 - dumps all tables from MS Word files to an interim CSV file, 
 - parses interim CSV file to three dataframes by frequency 
 - validates parsing result
-- transforms some variables
+- transforms some variables (eg. deaccumulates government expenditures)
 - saves dataframes as processed CSV files
+- saves csv for latest date
 - saves an Excel file for latest date.
 
 Same job is done by [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py)

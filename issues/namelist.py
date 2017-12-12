@@ -1,4 +1,7 @@
-import re
+# part of issue https://github.com/mini-kep/db/blob/master/doc/listing.md
+
+import itertools
+import fnmatch
 
 NAMES = [
     "BRENT",
@@ -50,61 +53,32 @@ NAMES = [
     "WAGE_NOMINAL_rub",
     "WAGE_REAL_rog",
     "WAGE_REAL_yoy"
-]
 
-# part of issue https://github.com/mini-kep/db/blob/master/doc/listing.md
-# https://github.com/mini-kep/db/blob/master/doc/listing.md
+def extract_varname(label):
+    words = label.split('_')
+    return '_'.join(itertools.takewhile(lambda word: word.isupper(), words))
 
-# setting
+def is_matched(name, pat):
+    varhead = extract_varname(name)
+    return fnmatch.fnmatch(varhead, pat)
 
-concepts = dict(labor=['WAGE_*', 'UNEMPL'],
-                output=['IND*', 'TRANSPORT_FREIGHT'])
+def make_namelist(patterns, names):
+    return sorted([name for pat in patterns for name in names 
+                   if is_matched(name, pat)])
+                
+if __name__ == '__main__':       
+    # https://github.com/mini-kep/db/blob/master/doc/listing.md
+    from collections import OrderedDict
+    concepts = OrderedDict()
+    concepts.update({'GDP': ['GDP*']}) 
+    concepts.update({'Output': ['IND*', 'TRANSPORT_FREIGHT']}) 
+    concepts.update({'Prices': ['CPI*']}) 
+    concepts.update({'Retail trade': ['CPI*']}) 
+    concepts.update({'Government - revenue': ['GOV_REVENUE*']}) 
+    concepts.update({'Government - spending': ['GOV_EXP*']}) 
+    concepts.update({'Government - surplus': ['GOV_SURPLUS*']}) 
+    concepts.update({'Labour': ['WAGE_*', 'UNEMPL']}) 
+    concepts.update({'Exchange rate': ['USDRUR*']}) 
+    concepts.update({'Global': ['UST*', 'BRENT']})
+    print(concepts)
 
-
-# TODO 1: make a selection function that produces a list of
-#       variable names based on regex or variable head
-
-#       use <https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/csv2df/util_label.py>
-#       to split labels
-
-# TODO 2: write tests for the fucntion using the guidelines
-#         <https://github.com/mini-kep/guidelines/blob/master/testing.md>
-
-
-def make_regex(patterns):
-    matched = []
-    base_regex = re.compile('([A-Z]+_?)+')
-    for p in patterns:
-        match = base_regex.match(p)
-        matched.append(match.group())
-    return '|'.join(matched)
-    # 1. get_re() - это 'не вынести регекс в отдельную функцию'
-    #    make_regex() делает что-то полезное с законченной зоно ответственности
-    #    + ее можно тестировать
-    # 2. небольшой костыль был: 
-    #    search = search[:-1]
-    #    если что-то надо с хвоста отрезать - непрвильно объединение сделали
-    # 3. теперь галвный вопрос - зачем это делалось?
-    
-assert make_regex(['WAGE_*', 'UNEMPL']) == 'WAGE_|UNEMPL'
-    
-    
-
-def make_namelist(patterns, names=NAMES):
-    namelist = []
-    regex = re.compile(make_regex(patterns))
-    for name in names:
-        hit = regex.search(name)
-        if hit:
-            namelist.append(name)
-    return namelist
-
-
-
-
-labor = make_namelist(concepts['labor'])
-assert set(labor) == set(["WAGE_NOMINAL_rub",
-                          "WAGE_REAL_rog",
-                          "WAGE_REAL_yoy",
-                          "UNEMPL_pct"
-                          ])

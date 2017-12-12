@@ -16,12 +16,12 @@
     Collection.approve_all()
 """
 
-from config import LocalCSV, LATEST_DATE, SUPPORTED_DATES 
-from csv2df.specification import SPEC
-from csv2df.reader import Reader, open_csv
+from config import InterimCSV, ProcessedCSV, SUPPORTED_DATES
+from csv2df.specification import PARSING_DEFINITION
+from csv2df.reader import get_segment_with_pdef
 from csv2df.parser import extract_tables
 from csv2df.emitter import Emitter
-from csv2df.validator import Validator
+from validator import Validator
 
 
 __all__ = ['get_dataframes', 'Vintage', 'Collection']
@@ -29,7 +29,7 @@ __all__ = ['get_dataframes', 'Vintage', 'Collection']
 FREQUENCIES = ['a', 'q', 'm']
 
 
-def get_dataframes(csvfile, spec=SPEC):
+def get_dataframes(path, spec=PARSING_DEFINITION):
     """Extract dataframes from *csvfile* using *spec* parsing instructions.
 
     Args:
@@ -40,8 +40,9 @@ def get_dataframes(csvfile, spec=SPEC):
        Three pandas dataframes at annual, qtr and monthly frequencies
        in a dictionary.
     """
-    tables = [t for csv_segment, pdef in Reader(csvfile, spec).items()
-              for t in extract_tables(csv_segment, pdef)]
+    jobs = get_segment_with_pdef(path, spec['default'], spec['segments'])
+    tables = [t for csv_segment, pdef in jobs
+                for t in extract_tables(csv_segment, pdef)]
     emitter = Emitter(tables)
     return {freq: emitter.get_dataframe(freq) for freq in FREQUENCIES}
 
@@ -51,21 +52,19 @@ class Vintage:
 
     def __init__(self, year, month):
         self.year, self.month = year, month
-        self.csv = LocalCSV(year, month)
-
-    @property        
-    def dfs(self):    
-        with open_csv(self.csv.interim) as csvfile:
-            return get_dataframes(csvfile)
+        csv_interim = InterimCSV(year, month)
+        self.dfs = get_dataframes(csv_interim.path)
 
     def save(self):
+        csv_processed = ProcessedCSV(self.year, self.month)
         for freq, df in self.dfs.items():
-            path = self.csv.processed(freq)
+            path = csv_processed.path(freq)
             df.to_csv(path)
             print("Saved dataframe to", path)
         return True
 
     def validate(self):
+        # FIXME: may be a function
         checker = Validator(*[self.dfs[freq] for freq in FREQUENCIES])
         checker.run()
         print("Test values parsed OK for", self)
@@ -78,44 +77,27 @@ class Vintage:
 class Collection:
     """Methods to manipulate entire set of data releases."""
 
-    all_dates = SUPPORTED_DATES 
-    latest_vintage = Vintage(*LATEST_DATE)
-
-    @classmethod
-    def save_latest(cls):
-        cls.latest_vintage.save()
-
-    @classmethod
-    def approve_latest(cls):
-        """Quick check for algorithm on latest available data."""
-        cls.latest_vintage.validate()
-
-    @classmethod
-    def save_all(cls):
-        for year, month in cls.all_dates:
+    def save_all():
+        for year, month in SUPPORTED_DATES:
             Vintage(year, month).save()
 
-    @classmethod
-    def approve_all(cls):
+    def approve_all():
         """Checks all dates, runs for about 1-2 min of a fast computer.
            May fail if dataset not complete, eg word2csv written only part
            of CSV file.
         """
-        for year, month in cls.all_dates:
+        for year, month in SUPPORTED_DATES:
             print("Checking", year, month)
             vintage = Vintage(year, month)
             vintage.validate()
 
 
 if __name__ == "__main__":
-    # Collection calls
-    # Collection.approve_latest()
     # Collection.approve_all()
-    # Collection.save_latest()
     # Collection.save_all()
 
     # sample Vintage call
     year, month = 2015, 5
     vint = Vintage(year, month)
     vint.validate()
-    #dfa, dfq, dfm = vint.dfs()
+    dfa, dfq, dfm = [vint.dfs[freq] for freq in 'aqm']

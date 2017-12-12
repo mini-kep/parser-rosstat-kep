@@ -1,8 +1,14 @@
 import pandas as pd
+import io
+
 import pytest
 
+from csv2df.reader import Row
+from csv2df.parser import Table
+from csv2df.specification import ParsingCommand, Def
+from csv2df.reader import to_rows
+from csv2df.parser import extract_tables
 import csv2df.emitter as emitter
-
 
 # stateless functions
 
@@ -43,11 +49,6 @@ def test_DatapointMaker():
     k = d.make('m', '6.55', 12)
     assert k['time_index'] == pd.Timestamp('2000-12-31')
 
-# ------------------------
-
-
-from csv2df.reader import Row
-from csv2df.parser import Table
 
 labels = {0: 'GDP_bln_rub',
           1: 'GDP_rog',
@@ -92,7 +93,7 @@ class Sample:
         t = Table(headers[i], data_items[i])
         t.varname = parsed_varnames[i]
         t.unit = parsed_units[i]
-        t.set_splitter(funcname=None)
+        t.set_splitter(reader=None)
         return t
 
     def label(i):
@@ -129,6 +130,39 @@ def test_emitter():
         {pd.Timestamp('1991-12-31'): {'GDP_bln_rub': 4823.0,
                                       'GDP_rog': 106.4,
                                       'year': 1991.0}}
+
+
+# input data
+csvfile1 = io.StringIO("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
+1999	4823	901	1102	1373	1447
+2000	7306	1527	1697	2038	2044""")
+
+# input instruction
+pc = ParsingCommand("GDP", "Объем ВВП", ["bln_rub"])
+pdef = Def(pc, units=  {"млрд.рублей": "bln_rub"})
+
+csv_segment = to_rows(csvfile1)
+tables = extract_tables(csv_segment, pdef)
+etr = emitter.Emitter(tables)
+dfa = etr.get_dataframe(freq='a')
+dfq = etr.get_dataframe(freq='q')
+dfm = etr.get_dataframe(freq='m')
+
+
+def test_resulting_dataframes():
+    assert dfa.GDP_bln_rub['1999-12-31'] == 4823.0
+
+
+def test_resulting_dataframes_with_time_index():
+    assert dfq.to_dict('list') == {
+        'year': [
+            1999, 1999, 1999, 1999, 2000, 2000, 2000, 2000], 'qtr': [
+            1, 2, 3, 4, 1, 2, 3, 4], 'GDP_bln_rub': [
+                901.0, 1102.0, 1373.0, 1447.0, 1527.0, 1697.0, 2038.0, 2044.0]}
+
+
+def test_resulting_dataframes_no_dfm():
+    assert dfm.empty is True
 
 
 if __name__ == "__main__":

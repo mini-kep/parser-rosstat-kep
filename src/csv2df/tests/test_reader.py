@@ -7,7 +7,6 @@ from tempfile import NamedTemporaryFile
 
 from csv2df.reader import yield_csv_rows, to_rows, filter_csv_rows, open_csv
 from csv2df.reader import get_year, is_year, Row, RowStack
-from csv2df.reader import Reader
 
 
 @pytest.fixture
@@ -32,13 +31,6 @@ class Test_open_csv:
     def test_on_Path_provides_readable_input(self, temp_path):
         with open_csv(temp_path) as f:
             assert f.readlines() == ["abc\n", "123"]
-
-# TODO: implement tests
-
-
-@pytest.mark.skip("Only a sceleton.")
-def test_reader():
-    assert Reader()
 
 
 junk_string = "________\n\n\t\t\t"

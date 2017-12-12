@@ -20,7 +20,6 @@ def extract_tables(csv_segment, pdef):
     """Extract tables from *csv_segment* list Rows instances using
        *pdef* parsing defintion.
     """
-    # yield tables from csv_segment
     tables = split_to_tables(csv_segment)
     tables = parse_tables(tables, pdef)
     verify_tables(tables, pdef)
@@ -28,13 +27,14 @@ def extract_tables(csv_segment, pdef):
 
 
 def parse_tables(tables, pdef):
+    # assign reader function    
+    tables = [t.set_splitter(pdef.reader) for t in tables]
+    
     # parse tables to obtain labels - set label and splitter
-    tables = [t.set_label(pdef.varnames_dict, pdef.units_dict) for t in tables]
-    tables = [t.set_splitter(pdef.funcname) for t in tables]
+    tables = [t.set_label(pdef.mapper, pdef.units) for t in tables]    
     # assign trailing units
-
     def fix_multitable_units(tables):
-        """For tables without *varname*-  copy *varname* from previous table.
+        """For tables without *varname* -> copy *varname* from previous table.
            Applies to tables where all rows are known rows.
         """
         for prev_table, table in zip(tables, tables[1:]):
@@ -45,14 +45,12 @@ def parse_tables(tables, pdef):
 
 
 def verify_tables(tables, pdef):
-    _labels_in_tables = [t.label for t in tables]
-    _labels_missed = [x for x in pdef.required if x not in _labels_in_tables]
-    if _labels_missed:
+    labels_in_tables = [t.label for t in tables]
+    labels_missed = [x for x in pdef.required if x not in labels_in_tables]
+    if labels_missed:
         import pdb
         pdb.set_trace()
-        raise ValueError("Missed labels: {}".format(_labels_missed))
-
-# classes for split_to_tables()
+        raise ValueError("Missed labels: {}".format(labels_missed))
 
 
 @unique
@@ -94,19 +92,21 @@ def split_to_tables(rows):
 class Table:
     """Representation of CSV table, has headers and datarows."""
 
-    # [4, 5, 12, 13, 17]
-    VALID_ROW_LENGTHS = list(splitter.FUNC_MAPPER.keys())
+#    # [4, 5, 12, 13, 17]
+#    VALID_ROW_LENGTHS = list(splitter.FUNC_MAPPER.keys())
     KNOWN = "+"
     UNKNOWN = "-"
 
     def __init__(self, headers, datarows):
-        self.varname = None
-        self.unit = None
         self.headers = headers
-        self.lines = odict((row.name, self.UNKNOWN) for row in headers)
         self.datarows = datarows
+
+        self.lines = odict((row.name, self.UNKNOWN) for row in headers)
         self.coln = max(len(row) for row in self.datarows)
         self.splitter_func = None
+       
+        self.varname = None
+        self.unit = None
 
     def set_label(self, varnames_dict, units_dict):
         for row in self.headers:
@@ -120,8 +120,8 @@ class Table:
                 self.lines[row.name] = self.KNOWN
         return self
 
-    def set_splitter(self, funcname):
-        self.splitter_func = splitter.get_splitter(funcname or self.coln)
+    def set_splitter(self, reader):
+        self.splitter_func = splitter.get_splitter(reader or self.coln)
         return self
 
     @property
@@ -152,20 +152,21 @@ class Table:
     def __repr__(self):
         return "Table(headers={},\ndatarows={})".format(repr(self.headers),
                                                         repr(self.datarows))
+
+
 def get_tables(year, month):
     from config import InterimCSV
     import csv2df.specification as spec
     import csv2df.reader as reader
-        
+
     parsed_tables = []
-    csv_path = InterimCSV(year, month).path    
+    csv_path = InterimCSV(year, month).path
     with reader.open_csv(csv_path) as csvfile:
         for csv_segment, pdef in reader.Reader(csvfile, spec.SPEC).items():
             tables = extract_tables(csv_segment, pdef)
             parsed_tables.extend(tables)
-    return parsed_tables      
-    
-    
+    return parsed_tables
+
 
 if __name__ == "__main__":
     from config import InterimCSV, LATEST_DATE
@@ -183,5 +184,5 @@ if __name__ == "__main__":
         for t in tables:
             print()
             print(t)
-            
-    tables = get_tables(year, month)        
+
+    tables = get_tables(year, month)

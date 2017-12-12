@@ -77,7 +77,7 @@ class DatapointMaker:
             return base + pd.offsets.MonthEnd()
 
     def as_dict(self):
-        # FIXME: whu do we need year, qtr and month here?
+        # FIXME: why do we need year, qtr and month here?
         basedict = dict(year=int(self.year),
                         label=self.label,
                         freq=self.freq,
@@ -90,10 +90,9 @@ class DatapointMaker:
         return basedict
 
 
-
 def import_table_values_by_frequency(tables):
     """Return lists of annual, quarterly and monthly values
-       from a list of Table() instances.    
+       from a list of Table() instances.
     """
     a = []
     q = []
@@ -104,7 +103,7 @@ def import_table_values_by_frequency(tables):
             raise ValueError('Undefined table:\n{}'.format(table))
         splitter = table.splitter_func
         for row in table.datarows:
-            factory = DatapointMaker(row.get_year(), table.label)            
+            factory = DatapointMaker(row.get_year(), table.label)
             a_value, q_values, m_values = splitter(row.data)
             if a_value:
                 a.append(factory.make('a', a_value))
@@ -116,25 +115,28 @@ def import_table_values_by_frequency(tables):
                 ms = [factory.make('m', val, t + 1)
                       for t, val in enumerate(m_values) if val]
                 m.extend(ms)
-    return a, q, m                 
-            
+    return a, q, m
+
+
 def get_duplicates(df):
     if df.empty:
         return df
     else:
-        return df[df.duplicated(keep=False)]       
+        return df[df.duplicated(keep=False)]
+
 
 class Emitter:
     """Emitter converts tables to dataframes.
-    
+
        Method:
            .get_dataframe(freq)
     """
+
     def __init__(self, tables):
         a, q, m = import_table_values_by_frequency(tables)
-        self.selector = dict(a=a, q=q, m=m)        
+        self.selector = dict(a=a, q=q, m=m)
 
-    def get_dataframe(self, freq):        
+    def get_dataframe(self, freq):
         df = pd.DataFrame(self.selector[freq])
         if df.empty:
             return pd.DataFrame()
@@ -148,7 +150,7 @@ class Emitter:
         df.columns.name = None
         # used to have a test to include it
         df.index.name = None
-        # add year 
+        # add year
         df.insert(0, "year", df.index.year)
         # add period
         if freq == "q":
@@ -159,19 +161,22 @@ class Emitter:
         if freq == "a":
             df = rename(df)
         if freq == "q":
-            df = deaccumulate_qtr(df) 
+            df = deaccumulate_qtr(df)
         if freq == "m":
-            df = deaccumulate_month(df) 
+            df = deaccumulate_month(df)
         return df
 
-# government revenue and expense transformation 
+# government revenue and expense transformation
+
 
 def rename(df):
     colname_mapper = {vn: vn.replace("_ACCUM", "") for vn in df.columns}
     return df.rename(columns=colname_mapper)
 
+
 def select_varnames(df):
     return [vn for vn in df.columns if vn.startswith('GOV') and "ACCUM" in vn]
+
 
 def deaccumulate_qtr(df):
     return deaccumulate(df, first_month=3)
@@ -183,27 +188,27 @@ def deaccumulate_month(df):
 
 def deaccumulate(df_full, first_month):
     varnames = select_varnames(df_full)
-    df = df_full[varnames] 
+    df = df_full[varnames]
     # save start of year values
     original_start_year_values = df[df.index.month == first_month].copy()
     # take a difference
     df = df.diff()
-    # write back start of year values 
+    # write back start of year values
     # (January in monthly data, March in qtr data)
     ix = original_start_year_values.index
     df.loc[ix, :] = original_start_year_values
     # rounding
     df = df.round(1)
-    # write back to original frame 
+    # write back to original frame
     df_full[varnames] = df
     return rename(df_full)
-    
 
-if __name__ == '__main__':       
+
+if __name__ == '__main__':
     from csv2df.parser import get_tables
     tables = get_tables(2017, 10)
     e = Emitter(tables)
     dfa = e.get_dataframe('a')
     dfq = e.get_dataframe('q')
     dfm = e.get_dataframe('m')
-    a, q, m = import_table_values_by_frequency(tables)    
+    a, q, m = import_table_values_by_frequency(tables)

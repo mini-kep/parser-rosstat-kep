@@ -3,7 +3,7 @@
 import pandas as pd
 
 from getter import get_dataframe
-import config 
+import config
 
 __all__ = ['save_xls']
 
@@ -25,7 +25,7 @@ def save_xls():
     filepath = config.XL_PATH
     to_xls(filepath, dfa, dfq, dfm)
     print('Saved', filepath)
-    
+
 
 if '__main__' == __name__:
     dfa = get_dataframe('a')

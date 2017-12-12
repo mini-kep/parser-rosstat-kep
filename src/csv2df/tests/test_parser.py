@@ -5,8 +5,7 @@ import pytest
 from csv2df.reader import Row
 # testing
 from csv2df.parser import Table, split_to_tables, extract_tables
-from csv2df.specification import (ParsingInstruction, Definition,
-                                  Specification)
+from csv2df.specification import (ParsingCommand, Def)
 
 from csv2df.util_row_splitter import split_row_by_year_and_qtr
 
@@ -36,13 +35,17 @@ from csv2df.util_row_splitter import split_row_by_year_and_qtr
 
 
 gdp_def = dict(varname="GDP",
-               text='Объем ВВП',
+               headers='Объем ВВП',
                required_units=['bln_rub', 'rog'])
 
 indpro_def = dict(varname="INDPRO",
-                  text='Индекс промышленного производства',
+                  headers='Индекс промышленного производства',
                   required_units='yoy')
 
+pc1 = ParsingCommand(**gdp_def)
+pc2 = ParsingCommand(**indpro_def)
+
+d1 = Def([pc1, pc2])
 
 class Spec_Sample:
 
@@ -52,21 +55,10 @@ class Spec_Sample:
                 'в % к соответствующему периоду предыдущего года': 'yoy'}
 
     def indicator(name):
-        inds = dict(GDP=ParsingInstruction(**gdp_def),
-                    INDPRO=ParsingInstruction(**indpro_def))
-        return inds[name]
+        return dict(GDP=pc1, INDPRO=pc2)[name]
 
     def pdef():
-        pdef = Definition(reader=None)
-        pdef.append(**gdp_def)
-        pdef.append(**indpro_def)
-        return pdef
-
-    def spec():
-        main = Definition()
-        main.append(**gdp_def)
-        main.append(**indpro_def)
-        return Specification(main)
+        return d1
 
 
 labels = {0: 'GDP_bln_rub',
@@ -138,7 +130,7 @@ class Test_fixtures:
                                      Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])]
 
     def test_regression_same_string_used_in_first_row_and_pdef(self):
-        assert [k for k in Sample.pdef().instr.varname_mapper][0] == \
+        assert [k for k in Sample.pdef().mapper][0] == \
             next(mock_rows()).name
 
 
@@ -191,7 +183,7 @@ class Test_Table_after_parsing:
         t = Sample.table(0)
         t.set_label(varnames_dict={'Объем ВВП': 'GDP'},
                     units_dict={'млрд.рублей': 'bln_rub'})
-        t.set_splitter(funcname=None)
+        t.set_splitter(reader=None)
         self.table_after_parsing = t
 
     def test_set_label(self):
