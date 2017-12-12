@@ -11,8 +11,6 @@
 *Collection* manipulates all datasets, released at various dates:
 
     Collection.save_all()
-    Collection.save_latest()
-    Collection.approve_latest()
     Collection.approve_all()
 """
 
@@ -55,7 +53,7 @@ class Vintage:
         csv_interim = InterimCSV(year, month)
         self.dfs = get_dataframes(csv_interim.path)
 
-    def save(self):
+    def save(self):        
         csv_processed = ProcessedCSV(self.year, self.month)
         for freq, df in self.dfs.items():
             path = csv_processed.path(freq)
@@ -95,7 +93,7 @@ if __name__ == "__main__":
     # Collection.save_all()
 
     # sample Vintage call
-    year, month = 2015, 5
+    year, month = 2017, 8
     vint = Vintage(year, month)
     vint.validate()
     dfa, dfq, dfm = [vint.dfs[freq] for freq in 'aqm']

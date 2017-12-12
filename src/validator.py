@@ -12,7 +12,8 @@
 
 
 ANNUAL = [('GDP_bln_rub', 1999, 4823.0),
-          ('GDP_yoy', 1999, 106.4)
+          ('GDP_yoy', 1999, 106.4), 
+          ('AGROPROD_yoy', 1999, 103.8),
           ]
 
 QTR = [('GDP_bln_rub', 1999, {4: 1447}),

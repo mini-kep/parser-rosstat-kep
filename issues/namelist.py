@@ -1,5 +1,3 @@
-# part of issue https://github.com/mini-kep/db/blob/master/doc/listing.md
-
 import itertools
 import fnmatch
 
@@ -52,7 +50,12 @@ NAMES = [
     "UST_7YEAR",
     "WAGE_NOMINAL_rub",
     "WAGE_REAL_rog",
-    "WAGE_REAL_yoy"]
+    "WAGE_REAL_yoy",
+    "ZZZ"]
+
+
+def get_names():
+    return NAMES
 
 def extract_varname(label):
     words = label.split('_')
@@ -63,22 +66,29 @@ def is_matched(name, pat):
     return fnmatch.fnmatch(varhead, pat)
 
 def make_namelist(patterns, names):
-    return sorted([name for pat in patterns for name in names 
-                   if is_matched(name, pat)])
+    namelist = [name for pat in patterns for name in names if is_matched(name, pat)]
+    return sorted(namelist)
+
+def find_orphans(patterns, names):
+    found = make_namelist(patterns, names)
+    return list(set(names) - set(found))
+
                 
-if __name__ == '__main__':       
-    # https://github.com/mini-kep/db/blob/master/doc/listing.md
+if __name__ == '__main__':     
     from collections import OrderedDict
-    concepts = OrderedDict()
-    concepts.update({'GDP': ['GDP*']}) 
-    concepts.update({'Output': ['IND*', 'TRANSPORT_FREIGHT']}) 
-    concepts.update({'Prices': ['CPI*']}) 
-    concepts.update({'Retail trade': ['CPI*']}) 
-    concepts.update({'Government - revenue': ['GOV_REVENUE*']}) 
-    concepts.update({'Government - spending': ['GOV_EXP*']}) 
-    concepts.update({'Government - surplus': ['GOV_SURPLUS*']}) 
-    concepts.update({'Labour': ['WAGE_*', 'UNEMPL']}) 
-    concepts.update({'Exchange rate': ['USDRUR*']}) 
-    concepts.update({'Global': ['UST*', 'BRENT']})
-    print(concepts)
+    categories = OrderedDict(gdp=['GDP*'],
+                      output=['IND*', 'TRANSPORT_FREIGHT'],
+                      i=['INVESTMENT'],
+                      xpi=['CPI*', 'PPI*'], 
+                      retail=['RETAIL_SALES*'],
+                      gov=['GOV*'],
+                      labor=['WAGE_*', 'UNEMPL'],
+                      bop=['EXPORT*', 'IMPORT*'],
+                      fx=['USDRUR*'],
+                      glob=['UST*', 'BRENT'])
+    cat2names = {key:make_namelist(categories[key], NAMES) 
+                 for key in categories.keys()}
+    patterns = [pat for patterns in categories.values() for pat in patterns]
+    orp =  find_orphans(patterns, NAMES)
+    assert orp == ['ZZZ']
 
