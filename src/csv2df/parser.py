@@ -121,10 +121,7 @@ class Table:
         return self
 
     def set_splitter(self, reader):
-        if reader:
-            self.splitter_func = reader
-        else:
-            self.splitter_func = splitter.get_splitter(self.coln)
+        self.splitter_func = splitter.get_splitter(reader or self.coln)
         return self
 
     @property

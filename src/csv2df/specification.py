@@ -250,14 +250,14 @@ class Def(object):
     def _get_reader(self, func_name: str):
         """
         Raises:
-            KeyError: if *funcname* is not valid.
+            TypeError: if *func_name* is not string.
         """
         if func_name is None:
             return None
-        try:
-            return FUNC_MAPPER[func_name]
-        except KeyError:
-            raise KeyError(f'<{func_name}> not available')
+        elif isinstance(func_name, str):
+            return func_name
+        else:
+            raise TypeError(f'<{func_name}> should be string')
 
     @property
     def mapper(self):
