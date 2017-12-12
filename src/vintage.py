@@ -21,7 +21,7 @@ from csv2df.specification import PARSING_DEFINITION
 from csv2df.reader import get_segment_with_pdef
 from csv2df.parser import extract_tables
 from csv2df.emitter import Emitter
-from validator import Validator
+from validator import validate
 
 
 __all__ = ['get_dataframes', 'Vintage', 'Collection']
@@ -64,9 +64,7 @@ class Vintage:
         return True
 
     def validate(self):
-        # FIXME: may be a function
-        checker = Validator(*[self.dfs[freq] for freq in FREQUENCIES])
-        checker.run()
+        validate(self.dfs)
         print("Test values parsed OK for", self)
         return True
 

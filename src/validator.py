@@ -10,86 +10,62 @@
 """
 
 
-__all__ = []  # TODO: (ID) Which classes/functions need to be added to __all__?
 
-
-ANNUAL = [('a', 'GDP_bln_rub', 1999, 4823.0),
-          ('a', 'GDP_yoy', 1999, 106.4)
+ANNUAL = [('GDP_bln_rub', 1999, 4823.0),
+          ('GDP_yoy', 1999, 106.4)
           ]
 
-
-QTR = [('q', 'GDP_bln_rub', 1999, {4: 1447}),
-       ('q', 'CPI_rog', 1999, {1: 116.0, 2: 107.3, 3: 105.6, 4: 103.9})
+QTR = [('GDP_bln_rub', 1999, {4: 1447}),
+       ('CPI_rog', 1999, {1: 116.0, 2: 107.3, 3: 105.6, 4: 103.9})
        ]
 
-
-MONTHLY = [('m', 'CPI_rog', 1999, {1: 108.4, 6: 101.9, 12: 101.3}),
-           ('m', 'EXPORT_GOODS_bln_usd', 1999, {12: 9.7}),
-           ('m', 'IMPORT_GOODS_bln_usd', 1999, {12: 4.0})
+MONTHLY = [('CPI_rog', 1999, {1: 108.4, 6: 101.9, 12: 101.3}),
+           ('EXPORT_GOODS_bln_usd', 1999, {12: 9.7}),
+           ('IMPORT_GOODS_bln_usd', 1999, {12: 4.0})
            ]
 
-
-def serialise(checkpoint):
-    out = dict(freq=checkpoint[0],
-               label=checkpoint[1],
-               year=checkpoint[2],
-               period=False,
-               value=False)
-    val = checkpoint[3]
-    if isinstance(val, dict):
-        for k, v in val.items():
-            cur_out = out.copy()
-            cur_out.update(dict(period=k, value=v))
-            yield cur_out
-    else:
-        out.update(dict(value=val))
-        yield out
+def includes_annual(dfa, checkpoint):
+    label = checkpoint[0]
+    year = checkpoint[1]
+    df_value = dfa[dfa.year == year][label].iloc[0]
+    return df_value == checkpoint[2]
 
 
-CHECKPOINTS = [pt for c in ANNUAL + QTR + MONTHLY for pt in serialise(c)]
+def includes_period(period_field, df, checkpoint):
+    label = checkpoint[0]
+    year = checkpoint[1]
+    flags = []
+    for p in checkpoint[2].keys():
+        ix = (df[period_field] == p)
+        df_value = df[(df.year == year) & ix][label].iloc[0]
+        flags.append(df_value == checkpoint[2][p])
+    return all(flags)
 
 
-class Validator():
+def includes_qtr(df, checkpoint):
+    return includes_period('qtr', df, checkpoint)
 
-    def __init__(self, dfa, dfq, dfm, checkpoints=False):
-        self.dfa = dfa
-        self.dfq = dfq
-        self.dfm = dfm
-        if checkpoints:
-            self.checkpoints = checkpoints
-        else:
-            self.checkpoints = CHECKPOINTS
+def includes_monthly(df, checkpoint):
+    return includes_period('month', df, checkpoint)
 
-    def get_annual_value(self, label, year):
-        return self.dfa[self.dfa.year == year][label].iloc[0]
+def not_found(dfa, dfq, dfm):
+    return [a for a in ANNUAL if not includes_annual(dfa, a)] + \
+           [q for q in QTR if not includes_qtr(dfq, q)] + \
+           [m for m in MONTHLY if not includes_monthly(dfm, m)] 
+    
 
-    def get_qtr_value(self, label, year, qtr):
-        df = self.dfq
-        return df[(df.year == year) & (df.qtr == qtr)][label].iloc[0]
+def validate(dfs):
+    nf = not_found(dfs['a'], dfs['q'], dfs['m'])
+    if nf:
+        raise ValueError("Not found in dataset: {}".format(nf)) 
+    return True         
 
-    def get_monthly_value(self, label, year, month):
-        df = self.dfm
-        return df[(df.year == year) & (df.month == month)][label].iloc[0]
-
-    def get_value(self, pt):
-        freq = pt['freq']
-        label, year = pt['label'], pt['year']
-        if freq == "a":
-            return self.get_annual_value(label, year)
-        elif freq == "q":
-            qtr = pt['period']
-            return self.get_qtr_value(label, year, qtr)
-        elif freq == "m":
-            month = pt['period']
-            return self.get_monthly_value(label, year, month)
-        else:
-            raise ValueError(freq)
-
-    def is_included(self, pt):
-        return pt['value'] == self.get_value(pt)
-
-    def run(self):
-        not_included = [p for p in self.checkpoints if not self.is_included(p)]
-        if not_included:
-            msg = "Not found in dataset: {}".format(not_included)
-            raise ValueError(msg)
+if __name__ == "__main__":    
+    for a in ANNUAL:
+        assert includes_annual(dfa, a)
+    
+    for q in QTR:
+        assert includes_qtr(dfq, q)
+        
+    for m in MONTHLY:
+        assert includes_monthly(dfm, m)           

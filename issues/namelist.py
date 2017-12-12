@@ -52,7 +52,7 @@ NAMES = [
     "UST_7YEAR",
     "WAGE_NOMINAL_rub",
     "WAGE_REAL_rog",
-    "WAGE_REAL_yoy"
+    "WAGE_REAL_yoy"]
 
 def extract_varname(label):
     words = label.split('_')

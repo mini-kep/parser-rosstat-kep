@@ -26,7 +26,7 @@
 from collections import OrderedDict as odict
 
 from csv2df.util_label import make_label
-from csv2df.util_row_splitter import FUNC_MAPPER
+
 
 
 # mapper dictionary to convert text in table headers to unit of measurement
@@ -304,6 +304,11 @@ _commands = [
     ParsingCommand("TRANSPORT_FREIGHT",
                    "Коммерческий грузооборот транспорта",
                    "bln_tkm"),
+    ParsingCommand("AGROPROD",
+                   ["Индекс производства продукции сельского хозяйства в хозяйствах всех категорий",
+                    "Продукция сельского хозяйства в хозяйствах всех категорий"],
+                   "yoy"),                   
+                   
 ]
 PARSING_DEFINITION['default'] = Def(commands=_commands) 
 
