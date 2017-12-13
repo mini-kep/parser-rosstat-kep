@@ -15,8 +15,8 @@
 """
 
 from kep.config import InterimCSV, ProcessedCSV, SUPPORTED_DATES
-from kep.definitions.segments import (DEFAULT_PARSING_DEFINITION,
-                                  SEGMENT_PARSING_DEFINITIONS)  
+from kep.definitions.definitions import (DEFAULT_PARSING_DEFINITION,
+                                         SEGMENT_PARSING_DEFINITIONS)  
 from kep.csv2df.reader import get_segment_with_pdef
 from kep.csv2df.parser import extract_tables
 from kep.csv2df.emitter import Emitter

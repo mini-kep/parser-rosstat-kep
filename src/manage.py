@@ -1,6 +1,6 @@
 from kep.download.download import RemoteFile
 from kep.word2csv.word import word2csv
-from kep.vintage import Vintage
+from kep.vintage import Vintage, Collection
 
 def run(year, month):
     #download and unpack
@@ -28,4 +28,7 @@ if '__main__' == __name__:
     vint = Vintage(year, month)
     vint.validate()
     vint.save()
+    
+    #Collection.approve_all
+    #Collection.save_all
 
