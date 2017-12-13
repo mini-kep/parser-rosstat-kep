@@ -5,7 +5,7 @@ import pytest
 
 from csv2df.reader import Row
 from csv2df.parser import Table
-from csv2df.specification import ParsingCommand, Def
+from csv2df.specification import Def
 from csv2df.reader import to_rows
 from csv2df.parser import extract_tables
 import csv2df.emitter as emitter
@@ -99,8 +99,6 @@ class Sample:
     def label(i):
         return labels[i]
 
-#-------------------------
-
 
 def test_emitter():
 
@@ -138,7 +136,7 @@ csvfile1 = io.StringIO("""Объем ВВП, млрд.рублей / Gross domes
 2000	7306	1527	1697	2038	2044""")
 
 # input instruction
-pc = ParsingCommand("GDP", "Объем ВВП", ["bln_rub"])
+pc = dict(var="GDP", header="Объем ВВП", unit=["bln_rub"])
 pdef = Def(pc, units=  {"млрд.рублей": "bln_rub"})
 
 csv_segment = to_rows(csvfile1)

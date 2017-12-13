@@ -9,43 +9,19 @@ from csv2df.specification import (ParsingCommand, Def)
 
 from csv2df.util_row_splitter import split_row_by_year_and_qtr
 
-# TODO: rename module 'rows'
 
-# FIXME: test for label handling
-#    def make_label(vn, unit, sep="_"):
-#    return vn + sep + unit
-#
-#
-# def split_label(label):
-#    return extract_varname(label), extract_unit(label)
-#
-#
-# def extract_varname(label):
-#    words = label.split('_')
-#    return '_'.join(itertools.takewhile(lambda word: word.isupper(), words))
-#
-#
-# def extract_unit(label):
-#    words = label.split('_')
-#    return '_'.join(itertools.dropwhile(lambda word: word.isupper(), words))
+gdp_def = dict(var="GDP",
+               header='Объем ВВП',
+               unit=['bln_rub', 'rog'])
 
-# FIXME: csv to rows testing
-
-# FIXME: Scope not tested
-
-
-gdp_def = dict(varname="GDP",
-               headers='Объем ВВП',
-               required_units=['bln_rub', 'rog'])
-
-indpro_def = dict(varname="INDPRO",
-                  headers='Индекс промышленного производства',
-                  required_units='yoy')
+indpro_def = dict(var="INDPRO",
+                  header='Индекс промышленного производства',
+                  unit='yoy')
 
 pc1 = ParsingCommand(**gdp_def)
 pc2 = ParsingCommand(**indpro_def)
 
-d1 = Def([pc1, pc2])
+d1 = Def([gdp_def, indpro_def])
 
 class Spec_Sample:
 

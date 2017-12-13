@@ -15,19 +15,19 @@
 """
 
 from config import InterimCSV, ProcessedCSV, SUPPORTED_DATES
-from csv2df.specification import PARSING_DEFINITION
+from definitions.segments import (DEFAULT_PARSING_DEFINITION,
+                                  SEGMENT_PARSING_DEFINITIONS)  
 from csv2df.reader import get_segment_with_pdef
 from csv2df.parser import extract_tables
 from csv2df.emitter import Emitter
 from validator import validate
 
 
-__all__ = ['get_dataframes', 'Vintage', 'Collection']
-
 FREQUENCIES = ['a', 'q', 'm']
 
 
-def get_dataframes(path, spec=PARSING_DEFINITION):
+def get_dataframes(path, pdef_default=DEFAULT_PARSING_DEFINITION,
+                         pdefs=SEGMENT_PARSING_DEFINITIONS):
     """Extract dataframes from *csvfile* using *spec* parsing instructions.
 
     Args:
@@ -38,7 +38,7 @@ def get_dataframes(path, spec=PARSING_DEFINITION):
        Three pandas dataframes at annual, qtr and monthly frequencies
        in a dictionary.
     """
-    jobs = get_segment_with_pdef(path, spec['default'], spec['segments'])
+    jobs = get_segment_with_pdef(path, pdef_default, pdefs)
     tables = [t for csv_segment, pdef in jobs
                 for t in extract_tables(csv_segment, pdef)]
     emitter = Emitter(tables)
