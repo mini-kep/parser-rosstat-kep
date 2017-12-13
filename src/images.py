@@ -4,7 +4,7 @@ import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
 
-from config import find_repo_root
+from kep.config import find_repo_root
 from urllib.parse import urljoin
 
 
@@ -237,7 +237,7 @@ if __name__ == "__main__":
           'CPI_rog',
           'WAGE_REAL_rog',
           'UNEMPL_pct',
-          'GOV_SURPLUS_ACCUM_FEDERAL_bln_rub',
+          'GOV_SURPLUS_FEDERAL_bln_rub',
           'EXPORT_GOODS_bln_usd',
           'IMPORT_GOODS_bln_usd']
     # RUR_USD_eop

@@ -1,0 +1,14 @@
+--------------------------------
+
+- [ ]  move test_df_transform.py to test_emitter.py
+
+--------------------------------
+
+- [ ] move df_check.py elsewhere outside package
+
+--------------------------------
+
+ # - may use a webhook to upload to database
+ # - can import parser code to upload to database from here
+
+--------------------------------

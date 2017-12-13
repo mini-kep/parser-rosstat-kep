@@ -1,9 +1,5 @@
 from collections import OrderedDict as odict
 
-from csv2df.util_label import make_label
-
-
-
 # mapper dictionary to convert text in table headers to unit of measurement
 UNITS = odict([  # 1. MONEY
     ('млрд.долларов', 'bln_usd'),

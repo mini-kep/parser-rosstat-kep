@@ -1,6 +1,6 @@
 import pytest
 
-from config import (find_repo_root, supported_dates,
+from ..config import (find_repo_root, supported_dates,
                     DataFolder, InterimCSV, ProcessedCSV,
                     Latest, get_latest_date)
 

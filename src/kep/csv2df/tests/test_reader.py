@@ -5,8 +5,8 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 
 
-from csv2df.reader import yield_csv_rows, to_rows, filter_csv_rows, open_csv
-from csv2df.reader import get_year, is_year, Row, RowStack
+from ..reader import yield_csv_rows, to_rows, filter_csv_rows, open_csv
+from ..reader import get_year, is_year, Row, RowStack
 
 
 @pytest.fixture

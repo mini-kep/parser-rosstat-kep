@@ -2,7 +2,7 @@ import pytest
 import pandas as pd
 from io import StringIO
 
-from validator import ValidatorAnnual, ValidatorQtr, ValidatorMonthly
+from ..validator import ValidatorAnnual, ValidatorQtr, ValidatorMonthly
 
 ANNUAL = [('GDP_bln_rub', 1999, 4823.0),
           ('GDP_yoy', 1999, 106.4), 

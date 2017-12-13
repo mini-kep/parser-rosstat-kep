@@ -5,8 +5,8 @@ from pathlib import Path
 import pandas as pd
 from io import StringIO
 
-from config import find_repo_root, InterimCSV
-from download.download import make_url
+from ..config import find_repo_root, InterimCSV
+from ..download.download import make_url
 
 
 @pytest.mark.skip(

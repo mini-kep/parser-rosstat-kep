@@ -9,8 +9,8 @@ Main call:
 from enum import Enum, unique
 from collections import OrderedDict as odict
 
-import csv2df.util_row_splitter as splitter
-from csv2df.util_label import make_label
+import kep.csv2df.util_row_splitter as splitter
+from kep.csv2df.util_label import make_label
 
 
 __all__ = ['extract_tables']

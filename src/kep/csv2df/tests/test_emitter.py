@@ -1,14 +1,14 @@
-import pandas as pd
+﻿import pandas as pd
 import io
 
 import pytest
 
-from csv2df.reader import Row
-from csv2df.parser import Table
-from csv2df.specification import Def
-from csv2df.reader import to_rows
-from csv2df.parser import extract_tables
-import csv2df.emitter as emitter
+from ..reader import Row
+from ..parser import Table
+from ..specification import Def
+from ..reader import to_rows
+from ..parser import extract_tables
+import kep.csv2df.emitter as emitter
 
 # stateless functions
 

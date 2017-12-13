@@ -14,13 +14,13 @@
     Collection.approve_all()
 """
 
-from config import InterimCSV, ProcessedCSV, SUPPORTED_DATES
-from definitions.segments import (DEFAULT_PARSING_DEFINITION,
+from kep.config import InterimCSV, ProcessedCSV, SUPPORTED_DATES
+from kep.definitions.segments import (DEFAULT_PARSING_DEFINITION,
                                   SEGMENT_PARSING_DEFINITIONS)  
-from csv2df.reader import get_segment_with_pdef
-from csv2df.parser import extract_tables
-from csv2df.emitter import Emitter
-from validator import validate
+from kep.csv2df.reader import get_segment_with_pdef
+from kep.csv2df.parser import extract_tables
+from kep.csv2df.emitter import Emitter
+from kep.validator import validate
 
 
 FREQUENCIES = ['a', 'q', 'm']

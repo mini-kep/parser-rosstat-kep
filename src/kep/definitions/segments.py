@@ -5,7 +5,7 @@
 
 """
 
-from csv2df.specification import Def
+from kep.csv2df.specification import Def
 
 # descriptions
 descriptions = dict(GDP='Валовый внутренний продукт (ВВП)')

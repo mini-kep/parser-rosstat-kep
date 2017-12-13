@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
+﻿# -*- coding: utf-8 -*-
 import pytest
 from collections import OrderedDict as odict
 
-from definitions.units import UNITS
-from csv2df.specification import as_list, ParsingCommand, Def, Scope
-
+from ..specification import as_list, ParsingCommand, Def, Scope
 
 class Test_as_list():
     def test_single_arg(self):

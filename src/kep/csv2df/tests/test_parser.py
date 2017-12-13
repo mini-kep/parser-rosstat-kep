@@ -1,13 +1,12 @@
-import itertools
+﻿import itertools
 import pytest
 
 # fixtures
-from csv2df.reader import Row
+from ..reader import Row
+from ..specification import ParsingCommand, Def
+from ..util_row_splitter import split_row_by_year_and_qtr
 # testing
-from csv2df.parser import Table, split_to_tables, extract_tables
-from csv2df.specification import (ParsingCommand, Def)
-
-from csv2df.util_row_splitter import split_row_by_year_and_qtr
+from ..parser import Table, split_to_tables, extract_tables
 
 
 gdp_def = dict(var="GDP",

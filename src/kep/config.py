@@ -12,9 +12,9 @@ FREQUENCIES = ['a', 'q', 'm']
 def find_repo_root():
     """Returns root folder for repository.
     Current file is assumed to be at:
-        <repo_root>/src/config.py
+        <repo_root>/src/kep/config.py
     """
-    levels_up = 1
+    levels_up = 2
     return Path(__file__).parents[levels_up]
 
 

@@ -2,8 +2,8 @@
 
 """
 
-from definitions.units import UNITS
-from csv2df.util_label import make_label
+from kep.definitions.units import UNITS
+from kep.csv2df.util_label import make_label
 
 
 def as_list(x):

@@ -6,7 +6,7 @@ import subprocess
 import requests
 from datetime import date
 
-import config
+from kep.config import UNPACK_RAR_EXE, LocalRarFile
 
 
 def download(url, path):
@@ -23,7 +23,7 @@ def make_url(year, month):
     return (f'http://www.gks.ru/free_doc/doc_{year}/Ind/ind{month}.rar')
 
 
-def unrar(path, folder, unrar=config.UNPACK_RAR_EXE):
+def unrar(path, folder, unrar=UNPACK_RAR_EXE):
     def mask_with_end_separator(folder):
         """UnRAR wants its folder argument with '/'
         """
@@ -41,7 +41,7 @@ class RemoteFile():
     def __init__(self, year, month):
         self.year, self.month = year, month
         self.url = make_url(year, month)
-        locfile = config.LocalRarFile(year, month)
+        locfile = LocalRarFile(year, month)
         self.path = locfile.path
         self.folder = locfile.folder
 
@@ -61,7 +61,7 @@ class RemoteFile():
 
 
 if __name__ == "__main__":
-    u = RemoteFile(2016, 12).url
-    assert u.startswith("http://www.gks.ru/free_doc/")
+    u = RemoteFile(2016, 12)
+    assert u.url.startswith("http://www.gks.ru/free_doc/")
     u.download()
     u.unrar()
