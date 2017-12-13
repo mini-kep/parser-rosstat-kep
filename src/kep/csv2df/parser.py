@@ -154,7 +154,7 @@ class Table:
                                                         repr(self.datarows))
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     from config import InterimCSV, LATEST_DATE
     import csv2df.reader as reader
     import csv2df.specification as spec
