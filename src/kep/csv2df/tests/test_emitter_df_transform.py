@@ -2,8 +2,8 @@ import pytest
 import pandas as pd
 from pandas.util.testing import assert_frame_equal
 
-from shared import dfa, dfq, dfm
-from kep.csv2df.emitter import (rename, select_varnames, deaccumulate_qtr, 
+from .shared import dfa, dfq, dfm
+from ..emitter import (rename, select_varnames, deaccumulate_qtr, 
                        deaccumulate_month)
 
 def make_df(data_dict):
