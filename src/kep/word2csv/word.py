@@ -215,9 +215,9 @@ def folder_to_csv(folder, csv_filename):
 
 
 def word2csv(year, month, force=False):
-    import config
-    raw_folder = config.DataFolder(year, month).raw
-    interim_csv = config.InterimCSV(year, month)
+    from kep.config import DataFolder, InterimCSV
+    raw_folder = DataFolder(year, month).raw
+    interim_csv = InterimCSV(year, month)
     if force or not interim_csv.exists() or len(interim_csv) == 0:
         folder_to_csv(folder=raw_folder, csv_filename=interim_csv.path)
 
