@@ -2,6 +2,8 @@ pandas
 openpyxl
 matplotlib
 
+requests
+
 # needed on Windows machine, commented due to errors on Travis
 # pypiwin32
 
