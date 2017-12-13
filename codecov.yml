@@ -3,3 +3,5 @@ ignore:
   - "*/test_*.py"     # wildcards accepted
   - "tests/*"         # wildcards accepted
   - tasks.py
+  - */usercase/*.py
+  - manage.py 
