@@ -12,12 +12,13 @@ Todo
 - concat INDPRO from two series
 - use df_check.py
 - add vintage.py integration test
+- move usercase folder
 
 Not todo
 ========
-- CPI_yoy ?
-- renaming variables after parsing?
-- smplify validator?
+- CPI_yoy /?
+- renaming variables after parsing /?
+- smplify validator /?
 
 Discuss
 =======
