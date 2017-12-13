@@ -19,6 +19,7 @@ Not todo
 - CPI_yoy /?
 - renaming variables after parsing /?
 - smplify validator /?
+- repair sphynx docs
 
 Discuss
 =======
