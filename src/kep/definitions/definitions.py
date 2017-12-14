@@ -195,19 +195,45 @@ commands=[
 PARSING_DEFINITIONS.append(Def(commands, boundaries))
 
 if __name__ == '__main__':
-    from kep.vintage import get_dataframes
+    from kep.vintage import get_dataframes, Frame
     
-    # REVIEW: quick check for parsing result
-    # the result is contained in dfa, dfq, dfm 
-    d = Def(commands, boundaries)
-    df_dict = get_dataframes(2017, 10, d)
-    dfa, dfq, dfm = [df_dict[freq] for freq in 'aqm']
+    df_dict = get_dataframes(2017, 10, Def(default_commands))    
+    dfa, dfq, dfm = (df_dict[freq] for freq in 'aqm')
+    expected = dict(a=1)    
     
-    # NOT TODO: prototype for datacheck
-    entry = commands[1]
-    x = entry['check'][3]
-    dt = entry['check'][2]
-    freq = entry['check'][1]
-    n = entry['var'] + '_' + entry['check'][0] 
-    assert dfm.loc[dt, n].iloc[0] == x  
+    ANNUAL = [
+       ('GDP_bln_rub', 1999, 4823.0),
+       ('GDP_yoy', 1999, 106.4), 
+       ('AGROPROD_yoy', 1999, 103.8),
+       ('ZZZ_abc', 1999, -1),
+    ]
+    
+    QTR = [
+       ('GDP_bln_rub', 1999, 4, 1447),
+       ('CPI_rog', 1999, 1, 116.0)
+       ]
+    
+    f = Frame(2017, 10, Def(default_commands))
+    z = f.isin('a', ANNUAL)
+    assert z == [True, True, True, False]
+    
+    y = f.isin('q', QTR)
+    assert y == [True, False] # CPI is not in default definition
+    
+    
+    
+    
+#    # REVIEW: quick check for parsing result
+#    # the result is contained in dfa, dfq, dfm 
+#    d = Def(commands, boundaries)
+#    df_dict = get_dataframes(2017, 10, d)
+#    dfa, dfq, dfm = [df_dict[freq] for freq in 'aqm']
+#    
+#    # NOT TODO: prototype for datacheck
+#    entry = commands[1]
+#    x = entry['check'][3]
+#    dt = entry['check'][2]
+#    freq = entry['check'][1]
+#    n = entry['var'] + '_' + entry['check'][0] 
+#    assert dfm.loc[dt, n].iloc[0] == x      
 

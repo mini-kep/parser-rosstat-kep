@@ -22,6 +22,53 @@ from kep.validator import validate
 
 FREQUENCIES = ['a', 'q', 'm']
 
+def from_year(year):
+    return f'{year}-12-31'
+
+def from_month(year, month):
+    return f'{year}-{month}'
+
+def from_qtr(year, qtr):
+    month = qtr * 3
+    return from_month(year, month)
+
+
+# NOTE: Frame will superseed Vintage
+
+class Frame:
+    def __init__(self, year, month, parsing_definitions=PARSING_DEFINITIONS):
+        self.dfs = get_dataframes(year, month, parsing_definitions)
+        
+    @staticmethod    
+    def to_dict(freq: str, t: tuple):
+        if freq == 'a':
+            date_picker = lambda x: from_year(x[1])
+        elif freq == 'q':
+            date_picker = lambda x: from_qtr(x[1], x[2])
+        elif freq == 'm':
+            date_picker = lambda x: from_month(x[1], x[2])
+        return dict(colname=t[0], date=date_picker(t), value=t[-1]) 
+    
+    @staticmethod
+    def is_found(df, d):
+        colname = d['colname']
+        dt = d['date']
+        try:
+            flag = df.loc[dt, colname] == d['value']
+        except KeyError:
+            flag = False
+        try:
+            #FIXME: consume a part of dataframe
+            return all(flag)
+        except TypeError:
+            return flag
+        
+    def isin(self, freq, checkpoints):
+        normalised_checkpoints = [self.to_dict(freq, t) for t in checkpoints]
+        return [self.is_found(self.dfs[freq], t) for t in normalised_checkpoints]
+    
+    def __getattr__(self, x):
+         return self.dfs[x]
 
 def get_dataframes(year, month, parsing_definitions=PARSING_DEFINITIONS):
     path = InterimCSV(year, month).path

@@ -3,10 +3,11 @@ Use hardcoded constants ANNUAL, QTR and MONTHLY to validate
 *dfa*, *dfq*, *dfm* dataframes.
 """
 
-ANNUAL = [('GDP_bln_rub', 1999, 4823.0),
-          ('GDP_yoy', 1999, 106.4), 
-          ('AGROPROD_yoy', 1999, 103.8),
-          ]
+ANNUAL = [
+   ('GDP_bln_rub', 1999, 4823.0),
+   ('GDP_yoy', 1999, 106.4), 
+   ('AGROPROD_yoy', 1999, 103.8),
+]
 
 QTR = [('GDP_bln_rub', 1999, {4: 1447}),
        ('CPI_rog', 1999, {1: 116.0, 2: 107.3, 3: 105.6, 4: 103.9})
@@ -70,12 +71,12 @@ def validate(dfs):
         raise ValueError("Not found in dataset: {}".format(nf)) 
     return True         
 
-if __name__ == "__main__":    
-    for a in ANNUAL:
-        assert includes_annual(dfa, a)
-    
-    for q in QTR:
-        assert includes_qtr(dfq, q)
-        
-    for m in MONTHLY:
-        assert includes_monthly(dfm, m)           
+#if __name__ == "__main__":    
+#    for a in ANNUAL:
+#        assert includes_annual(dfa, a)
+#    
+#    for q in QTR:
+#        assert includes_qtr(dfq, q)
+#        
+#    for m in MONTHLY:
+#        assert includes_monthly(dfm, m)           
