@@ -1,16 +1,17 @@
-"""Contains constants with parsing commands:
-    
-    - DEFAULT_PARSING_DEFINITION
-    - SEGMENT_PARSING_DEFINITIONS
+"""Constant with parsing commands:
+  
+    PARSING_DEFINITIONS
 
 """
 
 from kep.csv2df.specification import Def
 
 # descriptions
-descriptions = dict(GDP='Валовый внутренний продукт (ВВП)')
 
-# default definition
+#TODO: extend descriptions
+descriptions = dict(abbr='GDP', ru='Валовый внутренний продукт', en='')
+ 
+# default definition - applies to all CSV file
 default_commands = [
     dict(
         var='GDP',
@@ -51,8 +52,7 @@ default_commands = [
         unit='rog'),
 ]
 
-DEFAULT_PARSING_DEFINITION = Def(default_commands)
-SEGMENT_PARSING_DEFINITIONS = []
+PARSING_DEFINITIONS = [Def(default_commands)]
 
 # segment definitions
 boundaries = [
@@ -72,7 +72,7 @@ commands=[
         header=['импорт товаров – всего',
                 'Импорт товаров'],
         unit='bln_usd')]
-SEGMENT_PARSING_DEFINITIONS.append(Def(commands, boundaries))
+PARSING_DEFINITIONS.append(Def(commands, boundaries))
 
 boundaries = [
     dict(start='1.6. Инвестиции в основной капитал',
@@ -84,7 +84,7 @@ commands=[
         var='INVESTMENT',
         header=['Инвестиции в основной капитал'],
         unit=['bln_rub', 'yoy', 'rog'])]    
-SEGMENT_PARSING_DEFINITIONS.append(Def(commands, boundaries))
+PARSING_DEFINITIONS.append(Def(commands, boundaries))
 
 
 boundaries = [
@@ -113,7 +113,7 @@ commands=[
         header='алкогольные напитки',
         unit='rog'),
 ]
-SEGMENT_PARSING_DEFINITIONS.append(Def(commands, boundaries))
+PARSING_DEFINITIONS.append(Def(commands, boundaries))
 
 boundaries = [
     dict(start='1.12. Оборот розничной торговли',
@@ -133,7 +133,7 @@ commands=[
          header='непродовольственные товары',
          unit=['bln_rub', 'yoy', 'rog'])
 ]
-SEGMENT_PARSING_DEFINITIONS.append(Def(commands, boundaries))
+PARSING_DEFINITIONS.append(Def(commands, boundaries))
 
 boundaries = [
     dict(start='2.1.1. Доходы (по данным Федерального казначейства)',
@@ -148,7 +148,7 @@ commands=[
     dict(var='GOV_REVENUE_ACCUM_SUBFEDERAL',
          header='Консолидированные бюджеты субъектов Российской Федерации',
          unit='bln_rub')]
-SEGMENT_PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal'))    
+PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal'))    
 
 boundaries = [
     dict(start='2.1.2. Расходы (по данным Федерального казначейства)',
@@ -163,7 +163,7 @@ commands=[
     dict(var='GOV_EXPENSE_ACCUM_SUBFEDERAL',
          header='Консолидированные бюджеты субъектов Российской Федерации',
          unit='bln_rub')]
-SEGMENT_PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal')) 
+PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal')) 
 
 boundaries = [
     dict(start='2.1.3. Превышение доходов над расходами',
@@ -175,7 +175,7 @@ commands=[
     dict(var='GOV_SURPLUS_ACCUM_SUBFEDERAL',
          header='Консолидированные бюджеты субъектов Российской Федерации',
          unit='bln_rub')]
-SEGMENT_PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal'))
+PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal'))
 
 boundaries = [
     dict(start='2.4.2. Дебиторская задолженность',
@@ -186,8 +186,17 @@ commands=[
          unit='bln_rub'),
     dict(var='CORP_RECEIVABLE_OVERDUE',
          header='в том числе просроченная',
-         unit='bln_rub'),
-    dict(var='CORP_RECEIVABLE_OVERDUE_BUYERS',
-         header='Из просроченной дебиторской',
          unit='bln_rub')]
-SEGMENT_PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal'))
+PARSING_DEFINITIONS.append(Def(commands, boundaries))
+
+if __name__ == '__main__':
+    from kep.vintage import get_dataframes
+    
+    # quick check for parsing result
+    # the result is contained in dfa, dfq, dfm 
+    d = Def(commands, boundaries)
+    dfa, dfq, dfm = get_dataframes(2017, 10, d)
+    
+
+
+

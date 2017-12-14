@@ -5,13 +5,22 @@ import re
 from pathlib import Path
 
 
-__all__ = ['get_segment_with_pdef']
-
-
 ENC = "utf-8"
 CSV_FORMAT = dict(delimiter="\t", lineterminator="\n")
 
-def get_segment_with_pdef(path, pdef_default, pdef_segments=[]):
+
+def make_segment_definitions(pdef_list):    
+    return [pdef for pdef in pdef_list if pdef.scope]
+
+    
+def first_unbounded_definition(pdef_list):
+    try:
+        return [pdef for pdef in pdef_list if not pdef.scope][0]
+    except IndexError:
+        return None
+
+
+def get_segment_with_pdef(path, pdef_list):
     """Get CSV file segments with corresponding parsing defintions
        from CSV file and parsing specification.
 
@@ -22,7 +31,9 @@ def get_segment_with_pdef(path, pdef_default, pdef_segments=[]):
     """
     with open_csv(path) as csvfile:
         rows = to_rows(csvfile)
-        rowstack = RowStack(rows)     
+        rowstack = RowStack(rows) 
+    pdef_default = first_unbounded_definition(pdef_list)
+    pdef_segments = make_segment_definitions(pdef_list)
     return rowstack.yield_segment_with_defintion(pdef_default, pdef_segments) 
 
 
@@ -292,19 +303,20 @@ class RowStack:
             start, end = pdef.get_bounds(self.rows)
             csv_segment = self.pop(start, end)
             yield csv_segment, pdef
-        yield self.remaining_rows(), pdef_default
+        if pdef_default:            
+            yield self.remaining_rows(), pdef_default
 
 
-if __name__ == "__main__":
-    from config import InterimCSV, LATEST_DATE
-    import csv2df.specification as spec
-
-    # print all rows from csvpath
-    year, month = LATEST_DATE
-    csv_path = InterimCSV(year, month).path
-    csvfile = open_csv(csv_path)
-    reader = Reader(csvfile, spec=spec.SPEC)
-    for csv_segment, pdef in reader.items():
-        for row in csv_segment:
-            print(row)
-    csvfile.close()
+#if __name__ == "__main__":
+#    from config import InterimCSV, LATEST_DATE
+#    import csv2df.specification as spec
+#
+#    # print all rows from csvpath
+#    year, month = LATEST_DATE
+#    csv_path = InterimCSV(year, month).path
+#    csvfile = open_csv(csv_path)
+#    reader = Reader(csvfile, spec=spec.SPEC)
+#    for csv_segment, pdef in reader.items():
+#        for row in csv_segment:
+#            print(row)
+#    csvfile.close()

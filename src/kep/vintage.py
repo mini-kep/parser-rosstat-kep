@@ -1,7 +1,6 @@
 """Get pandas dataframes for a given data and month.
 
-*get_dataframes(csvfile, spec=SPEC)* is a function to get dataframes
-    from *csvfile* connection under *spec* parsing instruction.
+*get_dataframes(path, parsing_definitions)*
 
 *Vintage* class addresses dataset by year and month:
 
@@ -13,10 +12,8 @@
     Collection.save_all()
     Collection.approve_all()
 """
-
 from kep.config import InterimCSV, ProcessedCSV, SUPPORTED_DATES
-from kep.definitions.definitions import (DEFAULT_PARSING_DEFINITION,
-                                         SEGMENT_PARSING_DEFINITIONS)  
+from kep.definitions.definitions import PARSING_DEFINITIONS
 from kep.csv2df.reader import get_segment_with_pdef
 from kep.csv2df.parser import extract_tables
 from kep.csv2df.emitter import Emitter
@@ -26,19 +23,24 @@ from kep.validator import validate
 FREQUENCIES = ['a', 'q', 'm']
 
 
-def get_dataframes(path, pdef_default=DEFAULT_PARSING_DEFINITION,
-                         pdefs=SEGMENT_PARSING_DEFINITIONS):
+def get_dataframes(year, month, parsing_definitions=PARSING_DEFINITIONS):
+    path = InterimCSV(year, month).path
+    return get_dataframes_from_path(path, parsing_definitions)
+
+def get_dataframes_from_path(path, parsing_definitions):
     """Extract dataframes from *csvfile* using *spec* parsing instructions.
 
     Args:
-       csvfile (file connection or StringIO) - CSV file for parsing
-       spec (spec.Specification) - pasing instructions, defaults to spec.SPEC
+       path (str) - path to CSV file 
+       parsing_defintions - list of Def() instances
 
     Returns:
        Three pandas dataframes at annual, qtr and monthly frequencies
        in a dictionary.
-    """
-    jobs = get_segment_with_pdef(path, pdef_default, pdefs)
+    """    
+    if not isinstance(parsing_definitions, list):
+        parsing_definitions = [parsing_definitions]
+    jobs = get_segment_with_pdef(path, parsing_definitions)
     tables = [t for csv_segment, pdef in jobs
                 for t in extract_tables(csv_segment, pdef)]
     emitter = Emitter(tables)
@@ -50,8 +52,7 @@ class Vintage:
 
     def __init__(self, year, month):
         self.year, self.month = year, month
-        csv_interim = InterimCSV(year, month)
-        self.dfs = get_dataframes(csv_interim.path)
+        self.dfs = get_dataframes(year, month)
 
     def save(self):        
         csv_processed = ProcessedCSV(self.year, self.month)

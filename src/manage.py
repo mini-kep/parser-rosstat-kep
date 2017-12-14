@@ -31,4 +31,8 @@ if '__main__' == __name__:
     
     #Collection.approve_all
     #Collection.save_all
+    
+    #TODO: 
+    # - app upload method to database        
+    # - run with one variable only to check parsign result 
 

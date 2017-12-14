@@ -138,21 +138,23 @@ class Def(object):
     """
 
     def __init__(self, commands, boundaries=None, reader=None, units=UNITS):
-        self._commands = [ParsingCommand(**c) for c in as_list(commands)]
-        self._scope = Scope(boundaries)
+        self.commands = [ParsingCommand(**c) for c in as_list(commands)]
+        self.scope = None
+        if boundaries:
+            self.scope = Scope(boundaries)
         self.reader = reader
         self.units = units
 
     @property
     def mapper(self):
         d = {}
-        for c in self._commands:
+        for c in self.commands:
             d.update(c.mapper)
         return d
 
     @property
     def required(self):
-        return [r for c in self._commands for r in c.required]
+        return [r for c in self.commands for r in c.required]
 
     def get_bounds(self, rows):
-        return self._scope.get_bounds(rows)
+        return self.scope.get_bounds(rows)
