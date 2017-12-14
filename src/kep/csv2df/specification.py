@@ -87,7 +87,7 @@ class Scope():
 
 
 class ParsingCommand():
-    def __init__(self, var, header, unit):
+    def __init__(self, var, header, unit, check=None):
         """Create parsing instructions for an individual variable.
 
         Args:

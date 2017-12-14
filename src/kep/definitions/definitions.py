@@ -177,6 +177,7 @@ commands=[
          unit='bln_rub')]
 PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal'))
 
+# no quarterly or annual data for this definition
 boundaries = [
     dict(start='2.4.2. Дебиторская задолженность',
            end='2.5. Просроченная задолженность по заработной плате на начало месяца')]
@@ -186,17 +187,27 @@ commands=[
          unit='bln_rub'),
     dict(var='CORP_RECEIVABLE_OVERDUE',
          header='в том числе просроченная',
-         unit='bln_rub')]
+         unit='bln_rub',
+         # LATER: incorporate a check value    
+         check = ('bln_rub', 'm', '2017-09',  2445.8)           
+         )]
+   
 PARSING_DEFINITIONS.append(Def(commands, boundaries))
 
 if __name__ == '__main__':
     from kep.vintage import get_dataframes
     
-    # quick check for parsing result
+    # REVIEW: quick check for parsing result
     # the result is contained in dfa, dfq, dfm 
     d = Def(commands, boundaries)
-    dfa, dfq, dfm = get_dataframes(2017, 10, d)
+    df_dict = get_dataframes(2017, 10, d)
+    dfa, dfq, dfm = [df_dict[freq] for freq in 'aqm']
     
-
-
+    # NOT TODO: prototype for datacheck
+    entry = commands[1]
+    x = entry['check'][3]
+    dt = entry['check'][2]
+    freq = entry['check'][1]
+    n = entry['var'] + '_' + entry['check'][0] 
+    assert dfm.loc[dt, n].iloc[0] == x  
 
