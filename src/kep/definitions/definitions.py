@@ -11,6 +11,35 @@ from kep.csv2df.specification import Def
 #TODO: extend descriptions
 descriptions = dict(abbr='GDP', ru='Валовый внутренний продукт', en='')
  
+
+
+ANNUAL = [
+   ('GDP_bln_rub', 1999, 4823.0),
+   ('GDP_yoy', 1999, 106.4), 
+   ('AGROPROD_yoy', 1999, 103.8),
+]
+
+#ANNUAL = [
+#   ('AGROPROD_yoy',                  103.8
+#    'GDP_bln_rub',                  4823.0
+#    'GDP_yoy',                       106.4
+#    'TRANSPORT_FREIGHT_bln_tkm',    3372.0
+#    'UNEMPL_pct',                     13.0
+#    'WAGE_NOMINAL_rub',             1523.0
+#    'WAGE_REAL_yoy',                  78.0
+
+
+
+QTR = [('GDP_bln_rub', 1999, {4: 1447}),
+       ('CPI_rog', 1999, {1: 116.0, 2: 107.3, 3: 105.6, 4: 103.9})
+       ]
+          
+MONTHLY = [('CPI_rog', 1999, {1: 108.4, 6: 101.9, 12: 101.3}),
+           ('EXPORT_GOODS_bln_usd', 1999, {12: 9.7}),
+           ('IMPORT_GOODS_bln_usd', 1999, {12: 4.0})
+           ]
+
+
 # default definition - applies to all CSV file
 default_commands = [
     dict(
@@ -195,45 +224,30 @@ commands=[
 PARSING_DEFINITIONS.append(Def(commands, boundaries))
 
 if __name__ == '__main__':
-    from kep.vintage import get_dataframes, Frame
-    
-    df_dict = get_dataframes(2017, 10, Def(default_commands))    
-    dfa, dfq, dfm = (df_dict[freq] for freq in 'aqm')
-    expected = dict(a=1)    
+    from kep.vintage import Frame
     
     ANNUAL = [
-       ('GDP_bln_rub', 1999, 4823.0),
-       ('GDP_yoy', 1999, 106.4), 
-       ('AGROPROD_yoy', 1999, 103.8),
-       ('ZZZ_abc', 1999, -1),
+       dict(name='GDP_bln_rub', date='1999', value=4823.0),
+       dict(name='GDP_yoy', date='1999', value=106.4), 
+       dict(name='AGROPROD_yoy', date='1999', value=103.8),
+       dict(name='ZZZ_abc', date='1999', value=-1),
     ]
     
     QTR = [
-       ('GDP_bln_rub', 1999, 4, 1447),
-       ('CPI_rog', 1999, 1, 116.0)
+       dict(name='GDP_bln_rub', date='1999-12', value=1447),
+       dict(name='ZZZ_rog', date='1999-12', value=116.0)
        ]
     
-    f = Frame(2017, 10, Def(default_commands))
-    z = f.isin('a', ANNUAL)
-    assert z == [True, True, True, False]
+    #TODO: add some monthly values
     
-    y = f.isin('q', QTR)
-    assert y == [True, False] # CPI is not in default definition
+    frame = Frame(2017, 10, Def(default_commands))
     
+    a = frame.isin('a', ANNUAL)
+    assert a == [True, True, True, False]
     
+    q = frame.isin('q', QTR)
+    assert q == [True, False] # CPI is not in default definition
     
-    
-#    # REVIEW: quick check for parsing result
-#    # the result is contained in dfa, dfq, dfm 
-#    d = Def(commands, boundaries)
-#    df_dict = get_dataframes(2017, 10, d)
-#    dfa, dfq, dfm = [df_dict[freq] for freq in 'aqm']
-#    
-#    # NOT TODO: prototype for datacheck
-#    entry = commands[1]
-#    x = entry['check'][3]
-#    dt = entry['check'][2]
-#    freq = entry['check'][1]
-#    n = entry['var'] + '_' + entry['check'][0] 
-#    assert dfm.loc[dt, n].iloc[0] == x      
-
+    dfa = frame.annual()
+    dfq = frame.quarterly()
+    dfm = frame.monthly()

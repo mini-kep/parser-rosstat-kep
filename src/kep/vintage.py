@@ -17,64 +17,40 @@ from kep.definitions.definitions import PARSING_DEFINITIONS
 from kep.csv2df.reader import get_segment_with_pdef
 from kep.csv2df.parser import extract_tables
 from kep.csv2df.emitter import Emitter
-from kep.validator import validate
-
+from kep.checkpoints import CHECKPOINTS
 
 FREQUENCIES = ['a', 'q', 'm']
 
-def from_year(year):
-    return f'{year}-12-31'
 
-def from_month(year, month):
-    return f'{year}-{month}'
-
-def from_qtr(year, qtr):
-    month = qtr * 3
-    return from_month(year, month)
-
-
-# NOTE: Frame will superseed Vintage
+def isin(checkpoints, df):   
+     def is_found(df, d):
+        dt = d['date']
+        colname = d['name']
+        x = d['value']
+        try:
+            return df.loc[dt, colname].iloc[0] == x
+        except KeyError:
+            return False
+     return [is_found(df, c) for c in checkpoints]          
 
 class Frame:
     def __init__(self, year, month, parsing_definitions=PARSING_DEFINITIONS):
         self.dfs = get_dataframes(year, month, parsing_definitions)
         
-    @staticmethod    
-    def to_dict(freq: str, t: tuple):
-        if freq == 'a':
-            date_picker = lambda x: from_year(x[1])
-        elif freq == 'q':
-            date_picker = lambda x: from_qtr(x[1], x[2])
-        elif freq == 'm':
-            date_picker = lambda x: from_month(x[1], x[2])
-        return dict(colname=t[0], date=date_picker(t), value=t[-1]) 
+    def isin(self, freq, checkpoints):        
+        return isin(checkpoints, self.dfs[freq]) 
     
-    @staticmethod
-    def is_found(df, d):
-        colname = d['colname']
-        dt = d['date']
-        try:
-            flag = df.loc[dt, colname] == d['value']
-        except KeyError:
-            flag = False
-        try:
-            #FIXME: consume a part of dataframe
-            return all(flag)
-        except TypeError:
-            return flag
-        
-    def isin(self, freq, checkpoints):
-        normalised_checkpoints = [self.to_dict(freq, t) for t in checkpoints]
-        return [self.is_found(self.dfs[freq], t) for t in normalised_checkpoints]
-    
-    def __getattr__(self, x):
-         return self.dfs[x]
+    def annual(self):
+        return self.dfs['a']
+
+    def quarterly(self):
+        return self.dfs['q']
+
+    def monthly(self):
+        return self.dfs['m']
+
 
 def get_dataframes(year, month, parsing_definitions=PARSING_DEFINITIONS):
-    path = InterimCSV(year, month).path
-    return get_dataframes_from_path(path, parsing_definitions)
-
-def get_dataframes_from_path(path, parsing_definitions):
     """Extract dataframes from *csvfile* using *spec* parsing instructions.
 
     Args:
@@ -85,6 +61,7 @@ def get_dataframes_from_path(path, parsing_definitions):
        Three pandas dataframes at annual, qtr and monthly frequencies
        in a dictionary.
     """    
+    path = InterimCSV(year, month).path
     if not isinstance(parsing_definitions, list):
         parsing_definitions = [parsing_definitions]
     jobs = get_segment_with_pdef(path, parsing_definitions)
@@ -110,7 +87,13 @@ class Vintage:
         return True
 
     def validate(self):
-        validate(self.dfs)
+        for freq in FREQUENCIES:
+            df = self.dfs[freq]
+            checkpoints = CHECKPOINTS[freq]
+            flags = isin(checkpoints, df)
+            if not all(flags):
+                missed_points = [c for f, c in zip(flags, checkpoints) if not f]
+                raise ValueError(missed_points )
         print("Test values parsed OK for", self)
         return True
 
