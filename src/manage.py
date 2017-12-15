@@ -1,6 +1,6 @@
 from kep.download.download import RemoteFile
 from kep.word2csv.word import word2csv
-from kep.vintage import Vintage, Collection
+from kep.vintage import Vintage
 
 def run(year, month):
     #download and unpack
@@ -17,13 +17,13 @@ def run(year, month):
     vint.save()
 
 if '__main__' == __name__:
-    year, month = 2016, 7
+    year, month = 2017, 10
+    
+    remote = RemoteFile(year, month)
+    remote.download()
+    remote.unrar()
 
-    #remote = RemoteFile(year, month)
-    #remote.download()
-    #remote.unrar()
-
-    #word2csv(year, month)
+    word2csv(year, month)
 
     vint = Vintage(year, month)
     vint.validate()
@@ -35,4 +35,3 @@ if '__main__' == __name__:
     #TODO: 
     # - app upload method to database        
     # - run with one variable only to check parsign result 
-

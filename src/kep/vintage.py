@@ -141,7 +141,7 @@ if __name__ == "__main__":
     # Collection.save_all()
 
     # sample Vintage call
-    year, month = 2017, 8
+    year, month = 2017, 10
     vint = Vintage(year, month)
     vint.validate()
     dfa, dfq, dfm = [vint.dfs[freq] for freq in 'aqm']

@@ -17,7 +17,7 @@ def find_repo_root():
     levels_up = 2
     return Path(__file__).parents[levels_up]
 
-
+x = find_repo_root()
 UNPACK_RAR_EXE = str(find_repo_root() / 'bin' / 'UnRAR.exe')
 XL_PATH = str(find_repo_root() / 'output' / 'kep.xlsx')
 
