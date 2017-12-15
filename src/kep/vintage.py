@@ -96,7 +96,11 @@ class Vintage:
                 raise ValueError(missed_points )
         print("Test values parsed OK for", self)
         return True
-
+    
+    def upload(self, password):
+        # TODO: uplaod to databse
+        pass
+    
     def __repr__(self):
         return "Vintage({}, {})".format(self.year, self.month)
 
