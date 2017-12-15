@@ -1,31 +1,45 @@
 import pytest
 import pandas as pd
-from pandas.util.testing import assert_frame_equal
+from itertools import accumulate
 
-from .shared import dfa, dfq, dfm
-from ..emitter import (rename, select_varnames, deaccumulate_qtr, 
-                       deaccumulate_month)
+from kep.csv2df.emitter import deaccumulate_qtr, deaccumulate_month
 
-def make_df(data_dict):
+
+def make_df(name, values, freq):
     return pd.DataFrame(
-        data=data_dict,
+        data={name: values},
         index=pd.date_range(
             start="1999-01-01",
-            periods=8,
-            freq='Q'))
-
-from itertools import accumulate
-a = [10, 10, 10, 10]
-b = [3, 3, 3, 3]
-a1, b1 = (list(accumulate(x)) for x in (a, b))
-
-dq = make_df({'VARNAME_bln': a + b})
-dq_accum = make_df({'VARNAME_ACCUM_bln': a1 + b1})
-
+            periods=len(values),
+            freq=freq))
 
 def test_deaccumulate_qtr():
-    deacc = deaccumulate_qtr(dq_accum)
-    assert all(deacc - dq == 0)
+    #setup
+    a = [10] * 4
+    b = [2] * 4 
+    a1, b1 = (list(accumulate(x)) for x in (a, b))    
+    df0 = make_df('GOV_VARNAME_bln', a + b, 'Q')
+    df_acc = make_df('GOV_VARNAME_ACCUM_bln', a1 + b1, 'Q')
+    # call
+    result = deaccumulate_qtr(df_acc)
+    # check
+    assert (df0 - result).sum().iloc[0] == 0
+
+def test_deaccumulate_month():
+    #setup
+    a = [10] * 12
+    b = [2] * 12 
+    a1, b1 = (list(accumulate(x)) for x in (a, b))    
+    df0 = make_df('GOV_VARNAME_bln', a + b, 'M')
+    df_acc = make_df('GOV_VARNAME_ACCUM_bln', a1 + b1, 'M')
+    # call
+    result = deaccumulate_month(df_acc)
+    # check
+    assert (df0 - result).sum().iloc[0] == 0
+
+#def test_deaccumulate_qtr():
+#    deacc = deaccumulate_qtr(dq_accum)
+#    assert all(deacc - dq == 0)
 
 
 # fixtures ?
