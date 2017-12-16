@@ -159,7 +159,7 @@ class Emitter:
             df.insert(1, "month", df.index.month)
         # transform variables:
         if freq == "a":
-            df = rename(df)
+            df = rename_accum(df)
         if freq == "q":
             df = deaccumulate_qtr(df)
         if freq == "m":
@@ -178,10 +178,14 @@ def deacc_main(df, first_month):
     return df 
 
 
+def rename_accum(df):
+    return df.rename(mapper = lambda s: s.replace('_ACCUM',''), axis=1)   
+
+
 def deaccumulate(df, first_month):
     varnames = [vn for vn in df.columns if vn.startswith('GOV') and ("ACCUM" in vn)]
     df[varnames] = deacc_main(df[varnames], first_month)
-    return df.rename(mapper = lambda s: s.replace('_ACCUM',''), axis=1)   
+    return rename_accum(df)
 
 
 def deaccumulate_qtr(df):
