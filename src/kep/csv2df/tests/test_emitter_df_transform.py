@@ -1,11 +1,12 @@
 import pytest
 import pandas as pd
 from itertools import accumulate
+from random import randint
 
 from kep.csv2df.emitter import deaccumulate_qtr, deaccumulate_month
 
 
-def make_df(name, values, freq):
+def _make_df(name, values, freq):
     return pd.DataFrame(
         data={name: values},
         index=pd.date_range(
@@ -13,88 +14,31 @@ def make_df(name, values, freq):
             periods=len(values),
             freq=freq))
 
-def test_deaccumulate_qtr():
+def _rnd():
+    return randint(1,10)
+
+def create_df(freq):
+    n = dict(Q=4, M=12)[freq]
+    a_list = [_rnd()] * n
+    b_list = [_rnd()] * n
+    diff_df = _make_df('GOV_VARNAME_bln', a_list + b_list, freq)
+    a_list, b_list = (list(accumulate(x)) for x in (a_list, b_list))    
+    acc_df = _make_df('GOV_VARNAME_ACCUM_bln', a_list + b_list, freq)
+    return diff_df, acc_df
+
+@pytest.mark.parametrize("freq, defunc", [
+    ("Q", deaccumulate_qtr),
+    ("M", deaccumulate_month),
+]) 
+def test_deaccumulate_qtr_and_month(freq, defunc):
     #setup
-    a = [10] * 4
-    b = [2] * 4 
-    a1, b1 = (list(accumulate(x)) for x in (a, b))    
-    df0 = make_df('GOV_VARNAME_bln', a + b, 'Q')
-    df_acc = make_df('GOV_VARNAME_ACCUM_bln', a1 + b1, 'Q')
+    df_diff, df_acc = create_df(freq)
     # call
-    result = deaccumulate_qtr(df_acc)
+    result = defunc(df_acc)
     # check
-    assert (df0 - result).sum().iloc[0] == 0
+    assert (df_diff - result).sum().iloc[0] == 0
 
-def test_deaccumulate_month():
-    #setup
-    a = [10] * 12
-    b = [2] * 12 
-    a1, b1 = (list(accumulate(x)) for x in (a, b))    
-    df0 = make_df('GOV_VARNAME_bln', a + b, 'M')
-    df_acc = make_df('GOV_VARNAME_ACCUM_bln', a1 + b1, 'M')
-    # call
-    result = deaccumulate_month(df_acc)
-    # check
-    assert (df0 - result).sum().iloc[0] == 0
-
-#def test_deaccumulate_qtr():
-#    deacc = deaccumulate_qtr(dq_accum)
-#    assert all(deacc - dq == 0)
-
-
-# fixtures ?
-
-#varnames = df_transform.select_varnames(dfm)
-#gov_dfm = dfm[varnames]
-#gov_dfq = dfq[varnames]
-#last_month_values = gov_dfm[gov_dfm.index.month == 12]
-#
-#diff_dfm = df_transform.deaccumulate_month(gov_dfm)
-#diff_dfq = df_transform.deaccumulate_qtr(gov_dfq)
-
-
-
-# Code under test:
-
-## government revenue and expense transformation
-#
-#
-#def rename(df):
-#    colname_mapper = {vn: vn.replace("_ACCUM", "") for vn in df.columns}
-#    return df.rename(columns=colname_mapper)
-#
-#
-#def select_varnames(df):
-#    return [vn for vn in df.columns if vn.startswith('GOV') and "ACCUM" in vn]
-#
-#
-#def deaccumulate_qtr(df):
-#    return deaccumulate(df, first_month=3)
-#
-#
-#def deaccumulate_month(df):
-#    return deaccumulate(df, first_month=1)
-#
-#
-#def deaccumulate(df_full, first_month):
-#    varnames = select_varnames(df_full)
-#    df = df_full[varnames]
-#    # save start of year values
-#    original_start_year_values = df[df.index.month == first_month].copy()
-#    # take a difference
-#    df = df.diff()
-#    # write back start of year values
-#    # (January in monthly data, March in qtr data)
-#    ix = original_start_year_values.index
-#    df.loc[ix, :] = original_start_year_values
-#    # rounding
-#    df = df.round(1)
-#    # write back to original frame
-#    df_full[varnames] = df
-#    return rename(df_full)
-
-
-### TODO: tests here
+# TODO: use more tests
 
 #class Test_Deaccumulated:
 #    def test_monthly_diff_adds_to_annual(self):
