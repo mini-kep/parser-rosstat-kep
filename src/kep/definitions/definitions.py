@@ -224,7 +224,8 @@ commands=[
 PARSING_DEFINITIONS.append(Def(commands, boundaries))
 
 if __name__ == '__main__':
-    from kep.vintage import Frame
+    from kep.extractor import Frame, Extractor
+    
     
     ANNUAL = [
        dict(name='GDP_bln_rub', date='1999', value=4823.0),
@@ -251,3 +252,18 @@ if __name__ == '__main__':
     dfa = frame.annual()
     dfq = frame.quarterly()
     dfm = frame.monthly()
+    
+    # to be used in parsing debugging:
+    
+    text = """1. Сводные показатели / Aggregated indicators					
+1.1. Валовой внутренний продукт1) / Gross domestic product1)					
+Объем ВВП, млрд.рублей /GDP, bln rubles					
+1999	4823	901	1102	1373	1447
+Индекс физического объема произведенного ВВП, в % / Volume index of produced GDP, percent					
+1999	106,4	98,1	103,1	111,4	112,0"""
+    pdef = Def(default_commands[0])
+    e = Extractor(text, pdef)
+    print(e.tables[0])    
+    
+    # TODO: add above as test
+    

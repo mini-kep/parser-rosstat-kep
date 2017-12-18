@@ -150,23 +150,23 @@ class Table:
         return "\n".join(show)
 
     def __repr__(self):
-        return "Table(headers={},\ndatarows={})".format(repr(self.headers),
-                                                        repr(self.datarows))
+        return "Table(\n    headers={},\n    datarows={})" \
+               .format(repr(self.headers), repr(self.datarows))
 
 
-if __name__ == "__main__": # pragma: no cover
-    from config import InterimCSV, LATEST_DATE
-    import csv2df.reader as reader
-    import csv2df.specification as spec
-
-    year, month = LATEST_DATE
-    csv_path = InterimCSV(year, month).path
-    with reader.open_csv(csv_path) as csvfile:
-        parsed_tables = []
-        for csv_segment, pdef in reader.Reader(csvfile, spec.SPEC).items():
-            tables = extract_tables(csv_segment, pdef)
-            parsed_tables.extend(tables)
-
-        for t in tables:
-            print()
-            print(t)
+#if __name__ == "__main__": # pragma: no cover
+#    from kep.config import InterimCSV, LATEST_DATE
+#    import kep.csv2df.reader as reader
+#    import kep.csv2df.specification as spec
+#
+#    year, month = LATEST_DATE
+#    csv_path = InterimCSV(year, month).path
+#    with reader.open_csv(csv_path) as csvfile:
+#        parsed_tables = []
+#        for csv_segment, pdef in reader.Reader(csvfile, spec.SPEC).items():
+#            tables = extract_tables(csv_segment, pdef)
+#            parsed_tables.extend(tables)
+#
+#        for t in tables:
+#            print()
+#            print(t)
