@@ -30,11 +30,11 @@ def find_repo_root():
 
 class Folders:
     root = find_repo_root()
-    data = root / 'data'
-    raw = data / 'raw'
-    interim =  data / 'interim'
-    processed = data / 'processed'
-    latest = processed / latest
+    _data = root / 'data'
+    raw = _data / 'raw'
+    interim =  _data / 'interim'
+    processed = _data / 'processed'
+    latest = processed / 'latest'
 
 
 UNPACK_RAR_EXE = str(Folders.root / 'bin' / 'UnRAR.exe')
