@@ -46,7 +46,7 @@ SUPPORTED_DATES = supported_dates()
 def md(folder):
     """Create *folder* if not exists"""
     if not folder.exists():
-        folder.mkdir()
+        folder.mkdir(parents=True)
 
 
 class DataFolder:
@@ -64,12 +64,10 @@ class DataFolder:
 
     def guarantee_folders(self):
         for base in [self._raw, self._interim, self._processed]:
-            md(base)
-            md(base / str(self.year))
             md(self.year_month_folder(base))
 
-    def year_month_folder(self, which_subfolder):
-        return which_subfolder / str(self.year) / str(self.month).zfill(2)
+    def year_month_folder(self, subfolder):
+        return subfolder / str(self.year) / str(self.month).zfill(2)
 
     @property
     def raw(self):
