@@ -94,6 +94,9 @@ class File(DataFolder):
 
     def exists(self):
         return self.path.exists()
+    
+    def text(self):
+        return self.path.read_text(encoding='utf-8')
 
     def __len__(self):
         return self.path.stat().st_size

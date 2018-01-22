@@ -159,7 +159,7 @@ class Emitter:
             df.insert(1, "month", df.index.month)
         # transform variables:
         if freq == "a":
-            df = rename(df)
+            df = rename_accum(df)
         if freq == "q":
             df = deaccumulate_qtr(df)
         if freq == "m":
@@ -167,15 +167,25 @@ class Emitter:
         return df
 
 # government revenue and expense transformation
+def deacc_main(df, first_month):
+    # save start of year values
+    original_start_year_values = df[df.index.month == first_month].copy()
+    # take a difference
+    df = df.diff()
+    # write back start of year values (January in monthly data, March in qtr data)
+    ix = original_start_year_values.index
+    df.loc[ix, :] = original_start_year_values
+    return df 
 
 
-def rename(df):
-    colname_mapper = {vn: vn.replace("_ACCUM", "") for vn in df.columns}
-    return df.rename(columns=colname_mapper)
+def rename_accum(df):
+    return df.rename(mapper = lambda s: s.replace('_ACCUM',''), axis=1)   
 
 
-def select_varnames(df):
-    return [vn for vn in df.columns if vn.startswith('GOV') and "ACCUM" in vn]
+def deaccumulate(df, first_month):
+    varnames = [vn for vn in df.columns if vn.startswith('GOV') and ("ACCUM" in vn)]
+    df[varnames] = deacc_main(df[varnames], first_month)
+    return rename_accum(df)
 
 
 def deaccumulate_qtr(df):
@@ -184,24 +194,6 @@ def deaccumulate_qtr(df):
 
 def deaccumulate_month(df):
     return deaccumulate(df, first_month=1)
-
-
-def deaccumulate(df_full, first_month):
-    varnames = select_varnames(df_full)
-    df = df_full[varnames]
-    # save start of year values
-    original_start_year_values = df[df.index.month == first_month].copy()
-    # take a difference
-    df = df.diff()
-    # write back start of year values
-    # (January in monthly data, March in qtr data)
-    ix = original_start_year_values.index
-    df.loc[ix, :] = original_start_year_values
-    # rounding
-    df = df.round(1)
-    # write back to original frame
-    df_full[varnames] = df
-    return rename(df_full)
 
 
 if __name__ == '__main__':

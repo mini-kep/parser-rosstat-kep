@@ -3,6 +3,7 @@
 import csv
 import re
 from pathlib import Path
+from io import StringIO
 
 
 ENC = "utf-8"
@@ -21,6 +22,10 @@ def first_unbounded_definition(pdef_list):
 
 
 def get_segment_with_pdef(path, pdef_list):
+    text = path.read_text(encoding=ENC)
+    return get_segment_with_pdef_from_text(text, pdef_list)
+
+def get_segment_with_pdef_from_text(text, pdef_list):
     """Get CSV file segments with corresponding parsing defintions
        from CSV file and parsing specification.
 
@@ -29,16 +34,17 @@ def get_segment_with_pdef(path, pdef_list):
        Pasring specification contains segment boundaries and
        parsing defintions by segment.
     """
-    with open_csv(path) as csvfile:
-        rows = to_rows(csvfile)
-        rowstack = RowStack(rows) 
+    incoming = StringIO(text)
+    rows = to_rows(incoming)
+    rowstack = RowStack(rows) 
+    if not isinstance(pdef_list, list):
+        pdef_list = [pdef_list]
     pdef_default = first_unbounded_definition(pdef_list)
     pdef_segments = make_segment_definitions(pdef_list)
     return rowstack.yield_segment_with_defintion(pdef_default, pdef_segments) 
 
 
 # csv file access
-
 def open_csv(path):
     """
     Args:

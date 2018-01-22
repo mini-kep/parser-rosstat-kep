@@ -12,63 +12,11 @@
     Collection.save_all()
     Collection.approve_all()
 """
-from kep.config import InterimCSV, ProcessedCSV, SUPPORTED_DATES
-from kep.definitions.definitions import PARSING_DEFINITIONS
-from kep.csv2df.reader import get_segment_with_pdef
-from kep.csv2df.parser import extract_tables
-from kep.csv2df.emitter import Emitter
+from kep.config import ProcessedCSV, SUPPORTED_DATES
 from kep.checkpoints import CHECKPOINTS
+from kep.extractor import Frame, isin
 
 FREQUENCIES = ['a', 'q', 'm']
-
-
-def isin(checkpoints, df):   
-     def is_found(df, d):
-        dt = d['date']
-        colname = d['name']
-        x = d['value']
-        try:
-            return df.loc[dt, colname].iloc[0] == x
-        except KeyError:
-            return False
-     return [is_found(df, c) for c in checkpoints]          
-
-class Frame:
-    def __init__(self, year, month, parsing_definitions=PARSING_DEFINITIONS):
-        self.dfs = get_dataframes(year, month, parsing_definitions)
-        
-    def isin(self, freq, checkpoints):        
-        return isin(checkpoints, self.dfs[freq]) 
-    
-    def annual(self):
-        return self.dfs['a']
-
-    def quarterly(self):
-        return self.dfs['q']
-
-    def monthly(self):
-        return self.dfs['m']
-
-
-def get_dataframes(year, month, parsing_definitions=PARSING_DEFINITIONS):
-    """Extract dataframes from *csvfile* using *spec* parsing instructions.
-
-    Args:
-       path (str) - path to CSV file 
-       parsing_defintions - list of Def() instances
-
-    Returns:
-       Three pandas dataframes at annual, qtr and monthly frequencies
-       in a dictionary.
-    """    
-    path = InterimCSV(year, month).path
-    if not isinstance(parsing_definitions, list):
-        parsing_definitions = [parsing_definitions]
-    jobs = get_segment_with_pdef(path, parsing_definitions)
-    tables = [t for csv_segment, pdef in jobs
-                for t in extract_tables(csv_segment, pdef)]
-    emitter = Emitter(tables)
-    return {freq: emitter.get_dataframe(freq) for freq in FREQUENCIES}
 
 
 class Vintage:
@@ -76,7 +24,7 @@ class Vintage:
 
     def __init__(self, year, month):
         self.year, self.month = year, month
-        self.dfs = get_dataframes(year, month)
+        self.dfs = Frame(year, month).dfs
 
     def save(self):        
         csv_processed = ProcessedCSV(self.year, self.month)
