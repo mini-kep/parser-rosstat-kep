@@ -1,9 +1,18 @@
-"""Path and date helpers."""
+"""Path and date helpers.
+
+Constants:
+    XL_PATH 
+    UNPACK_RAR_EXE
+
+Classes:
+    DataFolder
+    InterimCSV
+    ProcessedCSV  
+    
+"""
 
 from pathlib import Path
 import pandas as pd
-
-__all__ = ['find_repo_root', 'DataFolder', 'InterimCSV', 'ProcessedCSV']
 
 
 FREQUENCIES = ['a', 'q', 'm']
@@ -17,14 +26,24 @@ def find_repo_root():
     levels_up = 2
     return Path(__file__).parents[levels_up]
 
-x = find_repo_root()
-UNPACK_RAR_EXE = str(find_repo_root() / 'bin' / 'UnRAR.exe')
-XL_PATH = str(find_repo_root() / 'output' / 'kep.xlsx')
+
+
+class Folders:
+    root = find_repo_root()
+    data = root / 'data'
+    raw = data / 'raw'
+    interim =  data / 'interim'
+    processed = data / 'processed'
+    latest = processed / latest
+
+
+UNPACK_RAR_EXE = str(Folders.root / 'bin' / 'UnRAR.exe')
+XL_PATH = str(Folders.root / 'output' / 'kep.xlsx')
 
 
 def supported_dates():
     """Get a list of (year, month) tuples starting from (2009, 4)
-       up to month before current.
+       up to a previous recent month.
 
        Excludes (2013, 11) - no archive for this month.
 
@@ -42,6 +61,12 @@ def supported_dates():
 
 SUPPORTED_DATES = supported_dates()
 
+def is_supported_date(year, month):
+     if (year, month) not in SUPPORTED_DATES:
+         raise ValueError(f'<{year}, {month}> is not a supported date.')
+     else:
+         return True
+    
 
 def md(folder):
     """Create *folder* if not exists"""
@@ -50,48 +75,43 @@ def md(folder):
 
 
 class DataFolder:
-    data_root = find_repo_root() / 'data'
-    _raw = data_root / 'raw'
-    _interim = data_root / 'interim'
-    _processed = data_root / 'processed'
-    latest = _processed / 'latest'
-
-    def __init__(self, year=None, month=None):
-        if (year, month) not in SUPPORTED_DATES:
-            raise ValueError(f'<{year}, {month}> is not a supported date.')
-        self.year, self.month = year, month
-        self.guarantee_folders()
-
-    def guarantee_folders(self):
-        for base in [self._raw, self._interim, self._processed]:
-            md(self.year_month_folder(base))
+    def __init__(self, year: int, month: int):
+        if is_supported_date(year, month):
+            self.year, self.month = year, month
 
     def year_month_folder(self, subfolder):
-        return subfolder / str(self.year) / str(self.month).zfill(2)
+        year = str(self.year) 
+        month = str(self.month).zfill(2)
+        folder = subfolder / year / month
+        md(folder)
+        return folder 
 
     @property
     def raw(self):
-        return self.year_month_folder(self._raw)
+        return self.year_month_folder(Folders.raw)
 
     @property
     def interim(self):
-        return self.year_month_folder(self._interim)
+        return self.year_month_folder(Folders.interim)
 
     @property
     def processed(self):
-        return self.year_month_folder(self._processed)
+        return self.year_month_folder(Folders.processed)
 
     def __repr__(self):
         return "{}({}, {})".format(self.__class__.__name__,
                                    self.year, self.month)
 
+class LocalRarFile:
+    def __init__(self, year: int, month: int):        
+        self.folder = DataFolder(year, month).raw
+        self.path = str(self.folder / 'ind.rar') 
 
-class File(DataFolder):
 
-    @property
-    def path(self):
-        self.data_root
-
+class FileBase:
+    # to override 
+    path = Path()
+    
     def exists(self):
         return self.path.exists()
     
@@ -102,21 +122,21 @@ class File(DataFolder):
         return self.path.stat().st_size
 
 
-class InterimCSV(File):
-
-    @property
-    def path(self):
-        return super().interim / 'tab.csv'
+class InterimCSV(FileBase):
+    def __init__(self, year: int, month: int):        
+        self.path = DataFolder(year, month).interim / 'tab.csv'
 
 
-class ProcessedCSV(File):
+class ProcessedCSV:
+    def __init__(self, year: int, month: int):        
+        self.folder = DataFolder(year, month).processed
 
     @staticmethod
     def make_filename(freq):
         return 'df{}.csv'.format(freq)
 
     def path(self, freq):
-        return super().processed / self.make_filename(freq)
+        return self.folder / self.make_filename(freq)
 
 
 class Latest:
@@ -130,14 +150,7 @@ class Latest:
         return DataFolder.latest / ProcessedCSV.make_filename(freq)
 
 
-class LocalRarFile(DataFolder):
-    @property
-    def path(self):
-        return str(self.raw / 'ind.rar')
 
-    @property
-    def folder(self):
-        return str(Path(self.path).parent)
 
 
 def get_latest_date(base_dir):
