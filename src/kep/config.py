@@ -1,13 +1,18 @@
 """Path and date helpers.
 
 Constants:
-    XL_PATH
-    UNPACK_RAR_EXE
+    FREQUENCIES
+    SUPPORTED_DATES
+
+Paths:   
+    UNPACK_RAR_EXE (path)
+    XL_PATH (path)
 
 Classes:
     DataFolder
     InterimCSV
     ProcessedCSV
+    LocalRarFile
 """
 
 from pathlib import Path
@@ -15,48 +20,7 @@ from pathlib import Path
 import pandas as pd
 
 
-def md(folder):
-    """Create *folder* if not exists"""
-    if not folder.exists():
-        folder.mkdir(parents=True)
-
-
 FREQUENCIES = ['a', 'q', 'm']
-
-
-def find_repo_root():
-    """Returns root folder for repository.
-    Current file is assumed to be at:
-        <repo_root>/src/kep/config.py
-    """
-    levels_up = 2
-    return Path(__file__).parents[levels_up]
-
-
-class Folders:
-    """Folder system for the data in project:
-
-    <repo root>
-        /data
-            /raw
-            /interim
-            /processed
-                /latest
-
-    Folder structure follows Data Science Cookiecutter template.
-    """
-    root = find_repo_root()
-    _data = root / 'data'
-    raw = _data / 'raw'
-    interim = _data / 'interim'
-    processed = _data / 'processed'
-    latest = processed / 'latest'
-    md(latest)
-
-
-UNPACK_RAR_EXE = str(Folders.root / 'bin' / 'UnRAR.exe')
-XL_PATH = str(Folders.root / 'output' / 'kep.xlsx')
-
 
 def supported_dates():
     """Get a list of (year, month) tuples starting from (2009, 4)
@@ -80,10 +44,52 @@ SUPPORTED_DATES = supported_dates()
 
 
 def is_supported_date(year, month):
-    if (year, month) not in SUPPORTED_DATES:
-        raise ValueError(f'<{year}, {month}> is not a supported date.')
-    else:
+    if (year, month) in SUPPORTED_DATES:
         return True
+    else:
+        raise ValueError(f'<{year}, {month}> is not a supported date.') 
+
+
+def md(folder):
+    """Create *folder* if not exists.
+       Also creates parent folders.
+    """
+    if not folder.exists():
+        folder.mkdir(parents=True)
+
+
+def find_repo_root():
+    """Returns root folder for repository.
+    Current file is assumed to be at:
+        <repo_root>/src/kep/config.py
+    """
+    levels_up = 2
+    return Path(__file__).parents[levels_up]
+
+
+class Folders:
+    """Folder system for the data in project:
+
+        <repo root>
+            /data
+                /raw
+                /interim
+                /processed
+                    /latest
+
+        Folder structure follows Data Science Cookiecutter template.
+    """
+    root = find_repo_root()
+    _data = root / 'data'
+    raw = _data / 'raw'
+    interim = _data / 'interim'
+    processed = _data / 'processed'
+    latest = processed / 'latest'
+    md(latest)
+
+
+UNPACK_RAR_EXE = str(Folders.root / 'bin' / 'UnRAR.exe')
+XL_PATH = str(Folders.root / 'output' / 'kep.xlsx')
 
 
 class DataFolder:
@@ -154,30 +160,5 @@ class ProcessedCSV:
     def path(self, freq):
         return self.folder / self.make_filename(freq)
 
-# FIXME: make LatestCSV.path(freq)
-
-
-class Latest:
-    url = ('https://raw.githubusercontent.com/mini-kep/parser-rosstat-kep/'
-           'master/data/processed/latest')
-
-    def csv(freq):
-        return Folders.latest / ProcessedCSV.make_filename(freq)
-
-# FIXME: where is LATEST_DATE used?
-
-
-def get_latest_date(base_dir):
-    """Return (year, month) tuple corresponding to
-       latest filled subfolder of *base_dir*.
-    """
-    def max_subdir(folder):
-        subfolders = [f.name for f in folder.iterdir() if f.is_dir()]
-        return max(map(int, subfolders))
-    year = max_subdir(base_dir)
-    month = max_subdir(base_dir / str(year))
-    return year, month
-
-
-# latest date found in interm data folder
-LATEST_DATE = get_latest_date(Folders.interim)
+if __name__ == "__main__":
+    pass

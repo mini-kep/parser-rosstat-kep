@@ -12,16 +12,25 @@ class Test_supported_dates():
     def test_supported_dates_excludes_2013_11(self):
         assert (2013, 11) not in supported_dates()
 
-    # WONTFIX: The supported_dates() finishes with the current date,
-    #          while the data in 'data/interim' is up to 10.2017.
-    #          the problem may be related to https://github.com/mini-kep/parser-rosstat-kep/issues/110
-    #          We skip the test until the problem is resolved.
-    @pytest.mark.skip(reason="The data after 10.2017 is not available")
-    def test_supported_dates_ends_with_latest_date(self):
-        base_dir = find_repo_root()
-        latest_year, latest_month = get_latest_date(
-            base_dir / 'data' / 'interim')
-        assert supported_dates()[-1] == (latest_year, latest_month)
+    def test_supported_dates_is_after_2017(self):
+        assert supported_dates()[-1][0] >= 2017
+
+# Directory creation not tested
+def test_md():
+    pass
+
+# =========================================================================================
+
+# WONTFIX: The supported_dates() finishes with the current date,
+#          while the data in 'data/interim' is up to 10.2017.
+#          the problem may be related to https://github.com/mini-kep/parser-rosstat-kep/issues/110
+#          We skip the test until the problem is resolved.
+#@pytest.mark.skip(reason="The data after 10.2017 is not available")
+# def test_supported_dates_ends_with_latest_date():
+#    base_dir = find_repo_root()
+#    latest_year, latest_month = get_latest_date(
+#        base_dir / 'data' / 'interim')
+#    assert supported_dates()[-1] == (latest_year, latest_month)
 
 
 # FIXME: make class get_latest_date
@@ -81,17 +90,12 @@ class Test_ProcessedCSV():
             assert processed_csv.name == expected_name
 
 
-class Test_Latest():
-    def test_csv_method_returns_existing_files(self):
-        for freq in 'aqm':
-            Latest_csv = Latest.csv(freq)
-            assert Latest_csv.exists()
-
-    def test_csv_method_returns_df_a_q_m_csv(self):
-        for freq in 'aqm':
-            expected_name = 'df{}.csv'.format(freq)
-            Latest_csv = Latest.csv(freq)
-            assert Latest_csv.name == expected_name
+# >>> DataFolder(2015,1).raw
+# WindowsPath('c:/Users/PogrebnyakEV/Desktop/mini-kep/kep/data/raw/2015/01')
+# >>> DataFolder(2015,1).interim
+# WindowsPath('c:/Users/PogrebnyakEV/Desktop/mini-kep/kep/data/interim/2015/01')
+# >>> DataFolder(2015,1).processed
+# WindowsPath('c:/Users/PogrebnyakEV/Desktop/mini-kep/kep/data/processed/2015/01')
 
 
 if __name__ == "__main__":
