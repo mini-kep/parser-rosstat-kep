@@ -1,11 +1,9 @@
 import pytest
 
-from ..config import (find_repo_root, supported_dates,
-                    DataFolder, InterimCSV, ProcessedCSV,
-                    Latest, get_latest_date)
+from kep.config import (DataFolder, InterimCSV, Latest, ProcessedCSV,
+                        find_repo_root, get_latest_date, supported_dates)
 
 
-# HS: tests for the supported_dates combined in a class
 class Test_supported_dates():
 
     def test_supported_dates_starts_in_2009_4(self):
@@ -14,21 +12,19 @@ class Test_supported_dates():
     def test_supported_dates_excludes_2013_11(self):
         assert (2013, 11) not in supported_dates()
 
-# WONTFIX: The supported_dates() finishes with the current date,
-#          while the data in 'data/interim' is up to 10.2017.
-#          the problem may be related to https://github.com/mini-kep/parser-rosstat-kep/issues/110
-# Skip the test until the problem is resolved.
+    # WONTFIX: The supported_dates() finishes with the current date,
+    #          while the data in 'data/interim' is up to 10.2017.
+    #          the problem may be related to https://github.com/mini-kep/parser-rosstat-kep/issues/110
+    #          We skip the test until the problem is resolved.
+    @pytest.mark.skip(reason="The data after 10.2017 is not available")
+    def test_supported_dates_ends_with_latest_date(self):
+        base_dir = find_repo_root()
+        latest_year, latest_month = get_latest_date(
+            base_dir / 'data' / 'interim')
+        assert supported_dates()[-1] == (latest_year, latest_month)
 
 
-@pytest.mark.skip(reason="The data after 10.2017 is not available")
-def test_supported_dates_ends_with_latest_date():
-    base_dir = find_repo_root()
-    latest_year, latest_month = get_latest_date(base_dir / 'data' / 'interim')
-    assert supported_dates()[-1] == (latest_year, latest_month)
-
-# EP: brought up, renamed
-
-
+# FIXME: make class get_latest_date
 def test_get_latest_date_returns_year_after_2017_and_month_in_1_12():
     base_dir = find_repo_root()
     year, month = get_latest_date(base_dir / 'data' / 'interim')
@@ -38,7 +34,7 @@ def test_get_latest_date_returns_year_after_2017_and_month_in_1_12():
 
 class Test_DataFolder():
 
-    # we assume a typical state of repo for (2015, 5)
+    # we assume for (2015, 5) all folders exist
 
     def test_repr_method_is_callable(self):
         assert repr(DataFolder(2015, 5))
@@ -62,11 +58,11 @@ class Test_DataFolder():
 
 
 class Test_InterimCSV():
-    def test_get_path_property_method_returns_existing_file(self):
+    def test_path_property_returns_existing_file(self):
         interim_csv = InterimCSV(2015, 5).path
         assert interim_csv.exists()
 
-    def test_get_path_property_method_returns_tab_csv(self):
+    def test_path_property_filename_is_tab_csv(self):
         interim_csv = InterimCSV(2015, 5).path
         expected_name = 'tab.csv'
         assert interim_csv.name == expected_name
@@ -78,7 +74,7 @@ class Test_ProcessedCSV():
             processed_csv = ProcessedCSV(2015, 5).path(freq)
             assert processed_csv.exists()
 
-    def test_path_method_returns_df_a_q_m_csv(self):
+    def test_path_method_returns_expected_filenames_df_a_q_m_csv(self):
         for freq in 'aqm':
             processed_csv = ProcessedCSV(2015, 5).path(freq)
             expected_name = 'df{}.csv'.format(freq)

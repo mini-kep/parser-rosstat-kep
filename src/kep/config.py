@@ -1,18 +1,24 @@
 """Path and date helpers.
 
 Constants:
-    XL_PATH 
+    XL_PATH
     UNPACK_RAR_EXE
 
 Classes:
     DataFolder
     InterimCSV
-    ProcessedCSV  
-    
+    ProcessedCSV
 """
 
 from pathlib import Path
+
 import pandas as pd
+
+
+def md(folder):
+    """Create *folder* if not exists"""
+    if not folder.exists():
+        folder.mkdir(parents=True)
 
 
 FREQUENCIES = ['a', 'q', 'm']
@@ -27,14 +33,25 @@ def find_repo_root():
     return Path(__file__).parents[levels_up]
 
 
-
 class Folders:
+    """Folder system for the data in project:
+
+    <repo root>
+        /data
+            /raw
+            /interim
+            /processed
+                /latest
+
+    Folder structure follows Data Science Cookiecutter template.
+    """
     root = find_repo_root()
     _data = root / 'data'
     raw = _data / 'raw'
-    interim =  _data / 'interim'
+    interim = _data / 'interim'
     processed = _data / 'processed'
     latest = processed / 'latest'
+    md(latest)
 
 
 UNPACK_RAR_EXE = str(Folders.root / 'bin' / 'UnRAR.exe')
@@ -61,17 +78,12 @@ def supported_dates():
 
 SUPPORTED_DATES = supported_dates()
 
-def is_supported_date(year, month):
-     if (year, month) not in SUPPORTED_DATES:
-         raise ValueError(f'<{year}, {month}> is not a supported date.')
-     else:
-         return True
-    
 
-def md(folder):
-    """Create *folder* if not exists"""
-    if not folder.exists():
-        folder.mkdir(parents=True)
+def is_supported_date(year, month):
+    if (year, month) not in SUPPORTED_DATES:
+        raise ValueError(f'<{year}, {month}> is not a supported date.')
+    else:
+        return True
 
 
 class DataFolder:
@@ -80,11 +92,11 @@ class DataFolder:
             self.year, self.month = year, month
 
     def year_month_folder(self, subfolder):
-        year = str(self.year) 
+        year = str(self.year)
         month = str(self.month).zfill(2)
         folder = subfolder / year / month
         md(folder)
-        return folder 
+        return folder
 
     @property
     def raw(self):
@@ -102,19 +114,14 @@ class DataFolder:
         return "{}({}, {})".format(self.__class__.__name__,
                                    self.year, self.month)
 
-class LocalRarFile:
-    def __init__(self, year: int, month: int):        
-        self.folder = DataFolder(year, month).raw
-        self.path = str(self.folder / 'ind.rar') 
-
 
 class FileBase:
-    # to override 
+    # to override
     path = Path()
-    
+
     def exists(self):
         return self.path.exists()
-    
+
     def text(self):
         return self.path.read_text(encoding='utf-8')
 
@@ -122,35 +129,42 @@ class FileBase:
         return self.path.stat().st_size
 
 
+class LocalRarFile(FileBase):
+    def __init__(self, year: int, month: int):
+        self.folder = DataFolder(year, month).raw
+        self.path = str(self.folder / 'ind.rar')
+
+
 class InterimCSV(FileBase):
-    def __init__(self, year: int, month: int):        
+    def __init__(self, year: int, month: int):
         self.path = DataFolder(year, month).interim / 'tab.csv'
 
 
 class ProcessedCSV:
-    def __init__(self, year: int, month: int):        
+    def __init__(self, year: int, month: int):
         self.folder = DataFolder(year, month).processed
 
     @staticmethod
     def make_filename(freq):
-        return 'df{}.csv'.format(freq)
+        if freq in FREQUENCIES:
+            return 'df{}.csv'.format(freq)
+        else:
+            raise ValueError(freq)
 
     def path(self, freq):
         return self.folder / self.make_filename(freq)
 
+# FIXME: make LatestCSV.path(freq)
+
 
 class Latest:
-
-    md(DataFolder.latest)
-
     url = ('https://raw.githubusercontent.com/mini-kep/parser-rosstat-kep/'
            'master/data/processed/latest')
 
     def csv(freq):
-        return DataFolder.latest / ProcessedCSV.make_filename(freq)
+        return Folders.latest / ProcessedCSV.make_filename(freq)
 
-
-
+# FIXME: where is LATEST_DATE used?
 
 
 def get_latest_date(base_dir):
@@ -166,4 +180,4 @@ def get_latest_date(base_dir):
 
 
 # latest date found in interm data folder
-LATEST_DATE = get_latest_date(DataFolder._interim)
+LATEST_DATE = get_latest_date(Folders.interim)
