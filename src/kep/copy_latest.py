@@ -29,22 +29,22 @@ LATEST_DATE = get_latest_date(config.Folders.interim)
 
 # FIXME: vulnerable to proper date, attempts working in empty directory
 
-def copy_latest():
-    """Copy csv files from folder like
-           *processed/2017/04*
-       to
-           *processed/latest* folder.
-    """
-    year, month = LATEST_DATE
-    csv_file = config.ProcessedCSV(year, month)
+# def copy_latest():
+#     """Copy csv files from folder like
+#            *processed/2017/04*
+#        to
+#            *processed/latest* folder.
+#     """
+#     year, month = LATEST_DATE
+#     csv_file = config.ProcessedCSV(year, month)
 
-    # ERROR: will not work here
-    latest = config.Latest
-    for freq in config.FREQUENCIES:
-        src = csv_file.path(freq)
-        dst = latest.csv(freq)
-        shutil.copyfile(src, dst)
-        print('Copied', src)
+#     # ERROR: will not work here
+#     latest = config.Latest
+#     for freq in config.FREQUENCIES:
+#         src = csv_file.path(freq)
+#         dst = latest.csv(freq)
+#         shutil.copyfile(src, dst)
+#         print('Copied', src)
 
 
 # class Test_Latest():
