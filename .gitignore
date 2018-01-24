@@ -3,6 +3,7 @@
 *.rar
 doc/html/
 doc2/
+.vscode/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

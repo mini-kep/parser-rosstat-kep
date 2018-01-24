@@ -1,6 +1,6 @@
 import pytest
 
-from kep.config import (DataFolder, InterimCSV, ProcessedCSV,
+from kep.config import (DataFolder, InterimCSV, ProcessedCSV, LocalRarFile,
                         find_repo_root, supported_dates)
 
 
@@ -15,10 +15,11 @@ class Test_supported_dates():
     def test_supported_dates_is_after_2017(self):
         assert supported_dates()[-1][0] >= 2017
 
-# Directory creation not tested
+# directory creation not tested
 def test_md():
     pass
 
+# TODO: randomise test with a random pair from supported dates 
 
 class Test_DataFolder():
 
@@ -27,7 +28,13 @@ class Test_DataFolder():
     def test_repr_method_is_callable(self):
         assert repr(DataFolder(2015, 5))
 
-    # WONTFIX: three tests below be parametrised
+    # FIXME: three tests below can be parametrised using the property names
+    # >>> DataFolder(2015,1).raw
+    # WindowsPath('c:/Users/PogrebnyakEV/Desktop/mini-kep/kep/data/raw/2015/01')
+    # >>> DataFolder(2015,1).interim
+    # WindowsPath('c:/Users/PogrebnyakEV/Desktop/mini-kep/kep/data/interim/2015/01')
+    # >>> DataFolder(2015,1).processed
+    # WindowsPath('c:/Users/PogrebnyakEV/Desktop/mini-kep/kep/data/processed/2015/01')
     def test_get_raw_property_method_returns_existing_folder(self):
         raw_folder = DataFolder(2015, 5).raw
         assert raw_folder.exists()
@@ -68,14 +75,17 @@ class Test_ProcessedCSV():
             expected_name = 'df{}.csv'.format(freq)
             assert processed_csv.name == expected_name
 
+    def test_path_method_fails_on_literal_outside_aqm(self):
+        with pytest.raises(ValueError):
+            ProcessedCSV(2015, 5).path('x')
 
-# >>> DataFolder(2015,1).raw
-# WindowsPath('c:/Users/PogrebnyakEV/Desktop/mini-kep/kep/data/raw/2015/01')
-# >>> DataFolder(2015,1).interim
-# WindowsPath('c:/Users/PogrebnyakEV/Desktop/mini-kep/kep/data/interim/2015/01')
-# >>> DataFolder(2015,1).processed
-# WindowsPath('c:/Users/PogrebnyakEV/Desktop/mini-kep/kep/data/processed/2015/01')
+class Test_LocalRarFile():
+    path = LocalRarFile(2015, 5).path
 
+    def test_on_init_path_property_is_Path_class_instance(self):
+        assert isinstance(self.path, str)
+    def test_on_init_path_name_is_as_expected(self):
+        assert self.path.endswith('ind.rar')
 
 if __name__ == "__main__":
     pytest.main([__file__])
