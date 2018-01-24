@@ -1,7 +1,7 @@
 import pytest
 
-from kep.config import (DataFolder, InterimCSV, Latest, ProcessedCSV,
-                        find_repo_root, get_latest_date, supported_dates)
+from kep.config import (DataFolder, InterimCSV, ProcessedCSV,
+                        find_repo_root, supported_dates)
 
 
 class Test_supported_dates():
@@ -18,27 +18,6 @@ class Test_supported_dates():
 # Directory creation not tested
 def test_md():
     pass
-
-# =========================================================================================
-
-# WONTFIX: The supported_dates() finishes with the current date,
-#          while the data in 'data/interim' is up to 10.2017.
-#          the problem may be related to https://github.com/mini-kep/parser-rosstat-kep/issues/110
-#          We skip the test until the problem is resolved.
-#@pytest.mark.skip(reason="The data after 10.2017 is not available")
-# def test_supported_dates_ends_with_latest_date():
-#    base_dir = find_repo_root()
-#    latest_year, latest_month = get_latest_date(
-#        base_dir / 'data' / 'interim')
-#    assert supported_dates()[-1] == (latest_year, latest_month)
-
-
-# FIXME: make class get_latest_date
-def test_get_latest_date_returns_year_after_2017_and_month_in_1_12():
-    base_dir = find_repo_root()
-    year, month = get_latest_date(base_dir / 'data' / 'interim')
-    assert year >= 2017
-    assert 1 <= month <= 12
 
 
 class Test_DataFolder():

@@ -34,5 +34,5 @@ if '__main__' == __name__:
     vint.save()
 
     # TODO:
-    # - add sys.argv[] parameters 
+    # - add sys.argv[] parameters
     # - upload method to database

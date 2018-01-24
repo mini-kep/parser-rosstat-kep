@@ -1,8 +1,10 @@
-# TODO: this is a separate functionality - desired behaviour is copying all files from latest porcessed folder 
+# TODO: this is a separate functionality - desired behaviour is copying all files from latest porcessed folder
 
 import shutil
 
 import kep.config as config
+
+
 
 
 def get_latest_date(base_dir):
@@ -15,6 +17,7 @@ def get_latest_date(base_dir):
     year = max_subdir(base_dir)
     month = max_subdir(base_dir / str(year))
     return year, month
+
 
 # latest date found in interm data folder
 LATEST_DATE = get_latest_date(config.Folders.interim)
@@ -58,3 +61,23 @@ LATEST_DATE = get_latest_date(config.Folders.interim)
 #             expected_name = 'df{}.csv'.format(freq)
 #             Latest_csv = Latest.csv(freq)
 #             assert Latest_csv.name == expected_name
+
+
+# WONTFIX: The supported_dates() finishes with the current date,
+#          while the data in 'data/interim' is up to 10.2017.
+#          the problem may be related to https://github.com/mini-kep/parser-rosstat-kep/issues/110
+#          We skip the test until the problem is resolved.
+#@pytest.mark.skip(reason="The data after 10.2017 is not available")
+# def test_supported_dates_ends_with_latest_date():
+#    base_dir = find_repo_root()
+#    latest_year, latest_month = get_latest_date(
+#        base_dir / 'data' / 'interim')
+#    assert supported_dates()[-1] == (latest_year, latest_month)
+
+
+# # FIXME: make class get_latest_date
+# def test_get_latest_date_returns_year_after_2017_and_month_in_1_12():
+#     base_dir = find_repo_root()
+#     year, month = get_latest_date(base_dir / 'data' / 'interim')
+#     assert year >= 2017
+#     assert 1 <= month <= 12
