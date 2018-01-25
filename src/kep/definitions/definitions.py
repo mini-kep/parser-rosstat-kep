@@ -4,7 +4,7 @@
 
 """
 
-from kep.csv2df.specification import Def, Definiton
+from kep.csv2df.specification import Definiton
 
 
 #TODO: extend descriptions

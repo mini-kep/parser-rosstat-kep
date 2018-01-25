@@ -35,7 +35,6 @@ def is_valid(df, checkpoints):
     return True    
 
 def extract_frames(csv_text, parsing_definition):
-    csv_text = InterimCSV(year, month).text()
     parsing_definition = parsing_definition.attach_data(csv_text)
     emitter = Emitter(parsing_definition.tables)
     return {freq: emitter.get_dataframe(freq) for freq in FREQUENCIES}

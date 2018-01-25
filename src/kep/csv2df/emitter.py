@@ -204,10 +204,14 @@ if __name__ == '__main__':
 
     tables = tables(2016, 10)
     a, q, m = import_table_values_by_frequency(tables)
+    # Missing data is a:
+    #[{'date': '1999', 'name': 'INVESTMENT_yoy', 'value': 105.3}, {'date': '1999', 'name': 'RETAIL_SALES_FOOD_yoy', 'value': 93.6}, {'date': '1999', 'name': 'RETAIL_SALES_NONFOOD_yoy', 'value': 94.7}, {'date': '1999', 'name': 'RETAIL_SALES_yoy', 'value': 94.2}]
+    
     e = Emitter(tables)
     dfa = e.get_dataframe('a')
     dfq = e.get_dataframe('q')
     dfm = e.get_dataframe('m')
+    
 
     from kep.csv2df.rowstack import text_to_rows 
     from kep.csv2df.parser import extract_tables, split_to_tables
