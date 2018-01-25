@@ -89,3 +89,12 @@ for t in tables:
 # ERROR: the problem is in parse_tables - the variable name does not 
 #        go down from first to second and third tables, as it shoud from here: 
 # https://github.com/mini-kep/parser-rosstat-kep/blob/dev/src/kep/csv2df/parser.py#L34-L41   
+
+
+for prev_table, table in zip(tables, tables[1:]):
+    print(table.has_unknown_lines())
+    if table.varname is None and not table.has_unknown_lines():
+        table.varname = prev_table.varname
+        
+print(tables[1].headers)
+

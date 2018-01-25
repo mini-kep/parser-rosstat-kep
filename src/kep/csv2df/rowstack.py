@@ -34,7 +34,7 @@ def is_valid_row(row):
     """
     try:
         return (len(row)>0 
-                and row[0] is not None 
+                and row[0]  
                 and not row[0].startswith("___")
                 )
     except IndexError:
