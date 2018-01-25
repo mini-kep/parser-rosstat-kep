@@ -42,7 +42,8 @@ VS CODE QUESTIONS
    
 7. Why not save files before running a test? There should be an option for that.
 
-8. Runner had a putton to run, Python only has a menu item. 
+8. Extenstion 'Runner' had a button to run, 'Python' extenstion only has a mouse-menu item. 
+   Should runner still be used?
 
 9. Run files with relative imports - getting an error:
 
