@@ -1,69 +1,8 @@
 import pytest
 from collections import OrderedDict as odict
-import io
-from pathlib import Path
-from tempfile import NamedTemporaryFile
 
-
-from ..reader import yield_csv_rows, to_rows, filter_csv_rows, open_csv
-from ..reader import get_year, is_year, Row, RowStack
-
-
-@pytest.fixture
-def temp_path():
-    with NamedTemporaryFile() as f:
-        abspath = f.name
-    p = Path(abspath)
-    p.write_text("abc\n123")
-    return p
-
-
-class Test_open_csv:
-
-    def test_on_string_argument_raises_TypeError(self):
-        path_string = "abc.csv"
-        with pytest.raises(TypeError):
-            open_csv(path_string)
-
-    def test_on_Path_runs_with_no_error(self, temp_path):
-        assert open_csv(temp_path)
-
-    def test_on_Path_provides_readable_input(self, temp_path):
-        with open_csv(temp_path) as f:
-            assert f.readlines() == ["abc\n", "123"]
-
-
-junk_string = "________\n\n\t\t\t"
-content_string = "Объем ВВП\n1999\t4823\n2000\t7306"
-full_string = "\n".join([junk_string, content_string])
-
-
-def test_yield_csv_rows():
-    csvfile = io.StringIO(content_string)
-    rows = list(yield_csv_rows(csvfile))
-    assert rows[0] == ["Объем ВВП"]
-    assert rows[1] == ["1999", "4823"]
-    assert rows[2] == ["2000", "7306"]
-
-
-def test_filter_csv_rows():
-    bad_rows_iter = iter([
-        [],
-        [None, 1],
-        ["___"],
-        ["abc"]
-    ])
-    gen = filter_csv_rows(bad_rows_iter)
-    assert next(gen) == ["abc"]
-
-
-def test_to_rows():
-    csvfile = io.StringIO(full_string)
-    rows = list(to_rows(csvfile))
-    assert rows[0] == Row(["Объем ВВП"])
-    assert rows[1] == Row(["1999", "4823"])
-    assert rows[2] == Row(["2000", "7306"])
-
+# FIXME: rename reader to 'row_view' 
+from ..reader import get_year, is_year, Row
 
 class Test_get_year():
     def test_get_year(self):

@@ -158,6 +158,8 @@ class Emitter:
 
     def get_dataframe(self, freq):
         df = self._get_raw_dataframe(freq)
+        if df.empty:
+            return pd.DataFrame()
         # transform variables:
         if freq == "a":
             df = rename_accum(df)

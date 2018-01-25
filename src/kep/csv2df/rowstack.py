@@ -6,9 +6,7 @@
 """
 
 import csv
-import re
 from io import StringIO
-from pathlib import Path
 
 from kep.csv2df.reader import Row
 
@@ -35,7 +33,10 @@ def is_valid_row(row):
        - first element does not start with underscore ____
     """
     try:
-        return row and row[0] and not row[0].startswith("___")
+        return (len(row)>0 
+                and row[0] is not None 
+                and not row[0].startswith("___")
+                )
     except IndexError:
         return False
 
@@ -114,7 +115,9 @@ class RowStack:
         return segment  
 
 if __name__ == "__main__":
-    csv_segment = text_to_rows("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
-    1999	4823	901	1102	1373	1447
-    2000	7306	1527	1697	2038	2044""")    
+    rows = text_to_rows("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
+1999	4823	901	1102	1373	1447
+2000	7306	1527	1697	2038	2044""")    
+    assert len(rows) == 3 
+    
   
