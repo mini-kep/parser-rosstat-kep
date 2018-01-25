@@ -131,6 +131,7 @@ class FileBase:
     def exists(self):
         return self.path.exists()
 
+    # FIXME: can be a property
     def text(self):
         return self.path.read_text(encoding='utf-8')
 

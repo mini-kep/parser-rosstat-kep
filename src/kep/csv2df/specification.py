@@ -172,8 +172,8 @@ class Definiton:
         self.default = Def(default_commands)
         self.segments = []
 
-    def append(self, commands, boundaries):        
-        self.segments.append(Def(commands, boundaries))
+    def append(self, *args, **kwargs):        
+        self.segments.append(Def(*args, **kwargs))
 
     def attach_data(self, csv_text):
         """Yield CSV segments and corresponding parsing definitons.
@@ -194,6 +194,7 @@ class Definiton:
         self.default.csv_segment = stack.remaining_rows()
         return self
 
+    @property
     def tables(self):           
         pdefs = [self.default] + self.segments 
         return [t for pdef in pdefs for t in pdef.tables]

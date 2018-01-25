@@ -53,6 +53,7 @@ def text_to_rows(csv_text):
     csv_rows = filter(is_valid_row, yield_csv_rows(filelike))
     return list(map(Row, csv_rows))
 
+
 class RowStack:
     """Stack for CSV rows.
 
@@ -111,4 +112,9 @@ class RowStack:
                 # else is very important, indexing goes wrong without it
                 i += 1
         return segment  
+
+if __name__ == "__main__":
+    csv_segment = text_to_rows("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
+    1999	4823	901	1102	1373	1447
+    2000	7306	1527	1697	2038	2044""")    
   

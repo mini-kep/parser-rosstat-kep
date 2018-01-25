@@ -1,7 +1,5 @@
 """Get pandas dataframes for a given data and month from a processed CSV file.
 
-*get_dataframes(path, parsing_definitions)*
-
 *Vintage* class addresses dataset for a given month:
 
     Vintage(year, month).save()
@@ -11,42 +9,72 @@
 
     Collection.save_all()
     Collection.approve_all()
+
 """
-from kep.config import ProcessedCSV, SUPPORTED_DATES, FREQUENCIES
+
+from kep.config import FREQUENCIES, InterimCSV, ProcessedCSV, SUPPORTED_DATES
+from kep.csv2df.emitter import Emitter
+from kep.definitions.definitions import DEFINITION
 from kep.checkpoints import CHECKPOINTS
-from kep.extractor import Frame, isin
+
+
+def is_found(df, d):
+    dt = d['date']
+    colname = d['name']
+    x = d['value']
+    try:
+        return df.loc[dt, colname].iloc[0] == x
+    except KeyError:
+        return False
+
+def is_valid(df, checkpoints):
+    flags = [is_found(df, c) for c in checkpoints]
+    if not all(flags):
+        missed_points = [c for f, c in zip(flags, checkpoints) if not f]
+        raise ValueError(missed_points)
+    return True    
+
+def extract_frames(csv_text, parsing_definition):
+    csv_text = InterimCSV(year, month).text()
+    parsing_definition = parsing_definition.attach_data(csv_text)
+    emitter = Emitter(parsing_definition.tables)
+    return {freq: emitter.get_dataframe(freq) for freq in FREQUENCIES}
+
+def emitter(year, month, parsing_definition=DEFINITION):
+    csv_text = InterimCSV(year, month).text()
+    parsing_definition = parsing_definition.attach_data(csv_text)
+    return Emitter(parsing_definition.tables)    
 
 
 class Vintage:
     """Represents dataset release for a given year and month."""
-
-    def __init__(self, year, month):
+    def __init__(self, year: int, month: int, parsing_definition=DEFINITION):
         self.year, self.month = year, month
-        self.dfs = Frame(year, month).dfs
+        csv_text = InterimCSV(year, month).text()
+        self.dfs = extract_frames(csv_text, parsing_definition)
 
-    def save(self):        
+    def save(self):
         csv_processed = ProcessedCSV(self.year, self.month)
         for freq, df in self.dfs.items():
             path = csv_processed.path(freq)
             df.to_csv(path)
             print("Saved dataframe to", path)
-        return True
 
     def validate(self):
         for freq in FREQUENCIES:
             df = self.dfs[freq]
             checkpoints = CHECKPOINTS[freq]
-            flags = isin(checkpoints, df)
+            flags = [is_found(df, c) for c in checkpoints]
             if not all(flags):
-                missed_points = [c for f, c in zip(flags, checkpoints) if not f]
-                raise ValueError(missed_points )
+                missed_points = [c for f, c in zip(
+                    flags, checkpoints) if not f]
+                raise ValueError(missed_points)
         print("Test values parsed OK for", self)
-        return True
-    
+
     def upload(self, password):
         # TODO: upload to databse
         pass
-    
+
     def __repr__(self):
         return "Vintage({}, {})".format(self.year, self.month)
 

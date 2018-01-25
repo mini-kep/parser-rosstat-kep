@@ -3,11 +3,11 @@ import io
 
 import pytest
 
-from ..reader import Row
-from ..parser import Table
-from ..specification import Def
-from ..reader import to_rows
-from ..parser import extract_tables
+from kep.csv2df.reader import Row
+from kep.csv2df.parser import Table
+from kep.csv2df.specification import Def
+from kep.csv2df.reader import to_rows
+from kep.csv2df.parser import extract_tables
 import kep.csv2df.emitter as emitter
 
 # stateless functions
@@ -136,15 +136,15 @@ csvfile1 = io.StringIO("""Объем ВВП, млрд.рублей / Gross domes
 2000	7306	1527	1697	2038	2044""")
 
 # input instruction
-pc = dict(var="GDP", header="Объем ВВП", unit=["bln_rub"])
-pdef = Def(pc, units=  {"млрд.рублей": "bln_rub"})
+commands = dict(var="GDP", header="Объем ВВП", unit=["bln_rub"])
+pdef = Def(commands, units=  {"млрд.рублей": "bln_rub"})
 
 csv_segment = to_rows(csvfile1)
 tables = extract_tables(csv_segment, pdef)
-etr = emitter.Emitter(tables)
-dfa = etr.get_dataframe(freq='a')
-dfq = etr.get_dataframe(freq='q')
-dfm = etr.get_dataframe(freq='m')
+e = emitter.Emitter(tables)
+dfa = e.get_dataframe(freq='a')
+dfq = e.get_dataframe(freq='q')
+dfm = e.get_dataframe(freq='m')
 
 
 def test_resulting_dataframes():

@@ -213,6 +213,7 @@ class Row:
         return "Row({})".format([self.name] + self.data)
 
 
+# FIXME: add anywhitespace or non-digits to start
 YEAR_CATCHER = re.compile("(\d{4}).*")
 
 
