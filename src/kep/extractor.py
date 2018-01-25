@@ -4,7 +4,7 @@ from kep.config import FREQUENCIES, InterimCSV
 from kep.csv2df.emitter import Emitter
 from kep.csv2df.parser import extract_tables
 from kep.csv2df.reader import get_segment_with_pdef_from_text
-from kep.definitions.definitions import PARSING_DEFINITIONS, DEFINITION, CHECKPOINTS
+from kep.definitions.definitions import PARSING_DEFINITIONS, DEFINITION #, CHECKPOINTS
 
 
 def isin(checkpoints, df):   
