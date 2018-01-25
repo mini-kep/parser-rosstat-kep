@@ -1,15 +1,14 @@
-"""Constant with parsing commands:
+"""Constant with parsing configuration:
   
-    PARSING_DEFINITIONS
+    DEFINITION
 
 """
 
-from kep.csv2df.specification import Def
+from kep.csv2df.specification import Def, Definiton
 
-# descriptions
 
 #TODO: extend descriptions
-descriptions = dict(abbr='GDP', ru='Валовый внутренний продукт', en='')
+descriptions = dict(abbr='GDP', ru='Валовый внутренний продукт', en='Gross domestic product')
  
 
 
@@ -81,16 +80,6 @@ default_commands = [
         unit='rog'),
 ]
 
-PARSING_DEFINITIONS = [Def(default_commands)]
-
-class Definiton:
-    def __init__(self, default_commands):
-        self.default = Def(default_commands)
-        self.segments = []
-
-    def append(self, commands, boundaries):        
-        self.segments.append(Def(commands, boundaries))
-
 DEFINITION = Definiton(default_commands)        
 
 # segment definitions
@@ -111,7 +100,6 @@ commands = [
         header=['импорт товаров – всего',
                 'Импорт товаров'],
         unit='bln_usd')]
-PARSING_DEFINITIONS.append(Def(commands, boundaries))
 DEFINITION.append(commands, boundaries)
 
 
@@ -125,7 +113,6 @@ commands = [
         var='INVESTMENT',
         header=['Инвестиции в основной капитал'],
         unit=['bln_rub', 'yoy', 'rog'])]    
-PARSING_DEFINITIONS.append(Def(commands, boundaries))
 DEFINITION.append(commands, boundaries)
 
 boundaries = [
@@ -154,7 +141,6 @@ commands = [
         header='алкогольные напитки',
         unit='rog'),
 ]
-PARSING_DEFINITIONS.append(Def(commands, boundaries))
 DEFINITION.append(commands, boundaries)
 
 boundaries = [
@@ -175,7 +161,6 @@ commands = [
          header='непродовольственные товары',
          unit=['bln_rub', 'yoy', 'rog'])
 ]
-PARSING_DEFINITIONS.append(Def(commands, boundaries))
 DEFINITION.append(commands, boundaries)
 
 boundaries = [
@@ -191,8 +176,7 @@ commands = [
     dict(var='GOV_REVENUE_ACCUM_SUBFEDERAL',
          header='Консолидированные бюджеты субъектов Российской Федерации',
          unit='bln_rub')]
-PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal'))    
-DEFINITION.append(commands, boundaries)
+DEFINITION.append(commands, boundaries, reader='fiscal')
 
 boundaries = [
     dict(start='2.1.2. Расходы (по данным Федерального казначейства)',
@@ -207,8 +191,7 @@ commands = [
     dict(var='GOV_EXPENSE_ACCUM_SUBFEDERAL',
          header='Консолидированные бюджеты субъектов Российской Федерации',
          unit='bln_rub')]
-PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal')) 
-DEFINITION.append(commands, boundaries)
+DEFINITION.append(commands, boundaries, reader='fiscal')
 
 boundaries = [
     dict(start='2.1.3. Превышение доходов над расходами',
@@ -220,8 +203,7 @@ commands = [
     dict(var='GOV_SURPLUS_ACCUM_SUBFEDERAL',
          header='Консолидированные бюджеты субъектов Российской Федерации',
          unit='bln_rub')]
-PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal'))
-DEFINITION.append(commands, boundaries)
+DEFINITION.append(commands, boundaries, reader='fiscal')
 
 # no quarterly or annual data for this definition
 boundaries = [
@@ -237,50 +219,49 @@ commands = [
          # LATER: incorporate a check value    
          check = ('bln_rub', 'm', '2017-09',  2445.8)           
          )]
-PARSING_DEFINITIONS.append(Def(commands, boundaries))
 DEFINITION.append(commands, boundaries)
 
-if __name__ == '__main__':
-    from kep.extractor import Frame, Extractor
+# if __name__ == '__main__':
+#     from kep.extractor import Frame, Extractor
     
     
-    ANNUAL = [
-       dict(name='GDP_bln_rub', date='1999', value=4823.0),
-       dict(name='GDP_yoy', date='1999', value=106.4), 
-       dict(name='AGROPROD_yoy', date='1999', value=103.8),
-       dict(name='ZZZ_abc', date='1999', value=-1),
-    ]
+#     ANNUAL = [
+#        dict(name='GDP_bln_rub', date='1999', value=4823.0),
+#        dict(name='GDP_yoy', date='1999', value=106.4), 
+#        dict(name='AGROPROD_yoy', date='1999', value=103.8),
+#        dict(name='ZZZ_abc', date='1999', value=-1),
+#     ]
     
-    QTR = [
-       dict(name='GDP_bln_rub', date='1999-12', value=1447),
-       dict(name='ZZZ_rog', date='1999-12', value=116.0)
-       ]
+#     QTR = [
+#        dict(name='GDP_bln_rub', date='1999-12', value=1447),
+#        dict(name='ZZZ_rog', date='1999-12', value=116.0)
+#        ]
     
-    #TODO: add some monthly values
+#     #TODO: add some monthly values
     
-    frame = Frame(2017, 10, Def(default_commands))
+#     frame = Frame(2017, 10, Def(default_commands))
     
-    a = frame.isin('a', ANNUAL)
-    assert a == [True, True, True, False]
+#     a = frame.isin('a', ANNUAL)
+#     assert a == [True, True, True, False]
     
-    q = frame.isin('q', QTR)
-    assert q == [True, False] # CPI is not in default definition
+#     q = frame.isin('q', QTR)
+#     assert q == [True, False] # CPI is not in default definition
     
-    dfa = frame.annual()
-    dfq = frame.quarterly()
-    dfm = frame.monthly()
+#     dfa = frame.annual()
+#     dfq = frame.quarterly()
+#     dfm = frame.monthly()
     
-    # to be used in parsing debugging:
+#     # to be used in parsing debugging:
     
-    text = """1. Сводные показатели / Aggregated indicators					
-1.1. Валовой внутренний продукт1) / Gross domestic product1)					
-Объем ВВП, млрд.рублей /GDP, bln rubles					
-1999	4823	901	1102	1373	1447
-Индекс физического объема произведенного ВВП, в % / Volume index of produced GDP, percent					
-1999	106,4	98,1	103,1	111,4	112,0"""
-    pdef = Def(default_commands[0])
-    e = Extractor(text, pdef)
-    print(e.tables[0])    
+#     text = """1. Сводные показатели / Aggregated indicators					
+# 1.1. Валовой внутренний продукт1) / Gross domestic product1)					
+# Объем ВВП, млрд.рублей /GDP, bln rubles					
+# 1999	4823	901	1102	1373	1447
+# Индекс физического объема произведенного ВВП, в % / Volume index of produced GDP, percent					
+# 1999	106,4	98,1	103,1	111,4	112,0"""
+#     pdef = Def(default_commands[0])
+#     e = Extractor(text, pdef)
+#     print(e.tables[0])    
     
-    # TODO: add above as test
+#     # TODO: add above as test
     

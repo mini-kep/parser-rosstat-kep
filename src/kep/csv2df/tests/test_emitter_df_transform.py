@@ -3,7 +3,7 @@ import pandas as pd
 from itertools import accumulate
 from random import randint
 
-from kep.csv2df.emitter import deaccumulate_qtr, deaccumulate_month
+from kep.csv2df.emitter import deaccumulate
 
 
 def _make_df(name, values, freq):
@@ -26,15 +26,15 @@ def create_df(freq):
     acc_df = _make_df('GOV_VARNAME_ACCUM_bln', a_list + b_list, freq)
     return diff_df, acc_df
 
-@pytest.mark.parametrize("freq, defunc", [
-    ("Q", deaccumulate_qtr),
-    ("M", deaccumulate_month),
+@pytest.mark.parametrize("freq, start_month", [
+    ("Q", 3),
+    ("M", 1),
 ]) 
-def test_deaccumulate_qtr_and_month(freq, defunc):
+def test_deaccumulate_qtr_and_month(freq, start_month):
     #setup
     df_diff, df_acc = create_df(freq)
     # call
-    result = defunc(df_acc)
+    result = deaccumulate(df_acc, start_month)
     # check
     assert (df_diff - result).sum().iloc[0] == 0
 

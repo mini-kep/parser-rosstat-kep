@@ -94,9 +94,7 @@ def import_table_values_by_frequency(tables):
     """Return lists of annual, quarterly and monthly values
        from a list of Table() instances.
     """
-    a = []
-    q = []
-    m = []
+    a, q, m = [], [], []
     for table in tables:
         # safeguard - all tables must be definaed at this point
         if not table.is_defined():
@@ -136,7 +134,7 @@ class Emitter:
         a, q, m = import_table_values_by_frequency(tables)
         self.selector = dict(a=a, q=q, m=m)
 
-    def get_dataframe(self, freq):
+    def _get_raw_dataframe(self, freq):
         df = pd.DataFrame(self.selector[freq])
         if df.empty:
             return pd.DataFrame()
@@ -148,7 +146,6 @@ class Emitter:
         df = df.pivot(columns='label', values='value', index='time_index')
         # delete some internals for better view
         df.columns.name = None
-        # used to have a test to include it
         df.index.name = None
         # add year
         df.insert(0, "year", df.index.year)
@@ -156,17 +153,26 @@ class Emitter:
         if freq == "q":
             df.insert(1, "qtr", df.index.quarter)
         if freq == "m":
-            df.insert(1, "month", df.index.month)
+            df.insert(1, "month", df.index.month)    
+        return df    
+
+    def get_dataframe(self, freq):
+        df = self._get_raw_dataframe(freq)
+        if df.empty:
+            return pd.DataFrame()
         # transform variables:
         if freq == "a":
             df = rename_accum(df)
         if freq == "q":
-            df = deaccumulate_qtr(df)
+            df = deaccumulate(df, first_month=3)
         if freq == "m":
-            df = deaccumulate_month(df)
+            df = deaccumulate(df, first_month=1)
         return df
 
 # government revenue and expense transformation
+def rename_accum(df):
+    return df.rename(mapper = lambda s: s.replace('_ACCUM',''), axis=1)   
+
 def deacc_main(df, first_month):
     # save start of year values
     original_start_year_values = df[df.index.month == first_month].copy()
@@ -177,30 +183,49 @@ def deacc_main(df, first_month):
     df.loc[ix, :] = original_start_year_values
     return df 
 
-
-def rename_accum(df):
-    return df.rename(mapper = lambda s: s.replace('_ACCUM',''), axis=1)   
-
-
 def deaccumulate(df, first_month):
     varnames = [vn for vn in df.columns if vn.startswith('GOV') and ("ACCUM" in vn)]
     df[varnames] = deacc_main(df[varnames], first_month)
     return rename_accum(df)
 
+# def deaccumulate_qtr(df):
+#     return deaccumulate(df, first_month=3)
 
-def deaccumulate_qtr(df):
-    return deaccumulate(df, first_month=3)
+# def deaccumulate_month(df):
+#     return deaccumulate(df, first_month=1)
 
+if __name__ == '__main__':    
+    from kep.config import InterimCSV
+    from kep.definitions.definitions import DEFINITION
 
-def deaccumulate_month(df):
-    return deaccumulate(df, first_month=1)
+    def tables(year, month, parsing_definition=DEFINITION):
+        csv_text = InterimCSV(year, month).text()
+        return parsing_definition.attach_data(csv_text).tables
 
-
-if __name__ == '__main__':
-    from csv2df.parser import get_tables
-    tables = get_tables(2017, 10)
+    tables = tables(2016, 10)
+    a, q, m = import_table_values_by_frequency(tables)
     e = Emitter(tables)
     dfa = e.get_dataframe('a')
     dfq = e.get_dataframe('q')
     dfm = e.get_dataframe('m')
-    a, q, m = import_table_values_by_frequency(tables)
+
+    from kep.csv2df.rowstack import text_to_rows 
+    from kep.csv2df.parser import extract_tables, split_to_tables
+    from kep.csv2df.specification import Def
+    # input data
+    csv_segment = text_to_rows("""Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
+    1999	4823	901	1102	1373	1447
+    2000	7306	1527	1697	2038	2044""")
+    
+
+    # input instruction
+    commands = dict(var="GDP", header="Объем ВВП", unit=["bln_rub"])
+    pdef = Def(commands, units={"млрд.рублей": "bln_rub"})
+
+    tables2 = split_to_tables(csv_segment) #, pdef)
+    #e2 = Emitter(tables2)
+    #dfa2 = e2.get_dataframe(freq='a')
+    #dfq2 = e2.get_dataframe(freq='q')
+    #dfm2 = e2.get_dataframe(freq='m')
+
+

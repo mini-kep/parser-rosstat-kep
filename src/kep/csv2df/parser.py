@@ -22,19 +22,18 @@ def extract_tables(csv_segment, pdef):
     """
     tables = split_to_tables(csv_segment)
     tables = parse_tables(tables, pdef)
-    verify_tables(tables, pdef)
+    #verify_tables(tables, pdef)
     return [t for t in tables if t.label in pdef.required]
 
 
 def parse_tables(tables, pdef):
     # assign reader function    
-    tables = [t.set_splitter(pdef.reader) for t in tables]
-    
+    tables = [t.set_splitter(pdef.reader) for t in tables]    
     # parse tables to obtain labels - set label and splitter
     tables = [t.set_label(pdef.mapper, pdef.units) for t in tables]    
     # assign trailing units
     def fix_multitable_units(tables):
-        """For tables without *varname* -> copy *varname* from previous table.
+        """For tables without *varname* - copy *varname* from previous table.
            Applies to tables where all rows are known rows.
         """
         for prev_table, table in zip(tables, tables[1:]):
@@ -48,8 +47,6 @@ def verify_tables(tables, pdef):
     labels_in_tables = [t.label for t in tables]
     labels_missed = [x for x in pdef.required if x not in labels_in_tables]
     if labels_missed:
-        #mport pdb
-        #pdb.set_trace()
         raise ValueError("Missed labels: {}".format(labels_missed))
 
 
@@ -154,7 +151,16 @@ class Table:
                .format(repr(self.headers), repr(self.datarows))
 
 
-#if __name__ == "__main__": # pragma: no cover
+if __name__ == "__main__": # pragma: no cover
+    from kep.csv2df.reader import Row
+    rows = [
+        Row(['Объем ВВП, млрд.рублей / Gross domestic product, bln rubles']), 
+        Row(['1999', '4823', '901', '1102', '1373', '1447']), 
+        Row(['2000', '7306', '1527', '1697', '2038', '2044'])
+    ]
+    t = list(split_to_tables(rows))
+
+
 #    from kep.config import InterimCSV, LATEST_DATE
 #    import kep.csv2df.reader as reader
 #    import kep.csv2df.specification as spec
