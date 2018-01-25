@@ -4,6 +4,8 @@
 
 from kep.definitions.units import UNITS
 from kep.csv2df.util_label import make_label
+from kep.csv2df.rowstack import RowStack
+from kep.csv2df.parser import extract_tables
 
 
 def as_list(x):
@@ -158,3 +160,41 @@ class Def(object):
 
     def get_bounds(self, rows):
         return self.scope.get_bounds(rows)
+
+    @property 
+    def tables(self):
+        return extract_tables(self.csv_segment, self)
+
+
+
+class Definiton:
+    def __init__(self, default_commands):
+        self.default = Def(default_commands)
+        self.segments = []
+
+    def append(self, commands, boundaries):        
+        self.segments.append(Def(commands, boundaries))
+
+    def attach_data(self, csv_text):
+        """Yield CSV segments and corresponding parsing definitons.
+
+        Yield CSV segments as Row() instances and corresponding
+        parsing definitons based on *spec* parsing specification.
+
+        Args:
+            spec: parsing specification as spec.Specification() instance
+
+        Yields:
+            Parsing definiton with a *csv_segment* assigned. 
+        """
+        stack = RowStack(csv_text) 
+        for pdef in self.segments:
+            start, end = pdef.get_bounds(stack.rows)
+            pdef.csv_segment = stack.pop(start, end) 
+        self.default.csv_segment = stack.remaining_rows()
+        return self
+
+    def tables(self):           
+        pdefs = [self.default] + self.segments 
+        return [t for pdef in pdefs for t in pdef.tables]
+    

@@ -1,3 +1,10 @@
+"""
+1. Instance of Defintions() class has default and segment parsing defintions
+2. InterimCSV(year, month).text has CSV as string
+3. DEFINITION.attach_data
+
+"""
+
 import csv
 import re
 from io import StringIO
@@ -46,22 +53,23 @@ def text_to_rows(csv_text):
     csv_rows = filter(is_valid_row, yield_csv_rows(filelike))
     return list(map(Row, csv_rows))
 
-class Rows:
+class RowStack:
     """Stack for CSV rows.
 
       Encapsulates a list of Row class instances. Used to obtain segments of
-      CSV file w2ith corresponding parsing instructions.
+      CSV file w2ith corresponding to parsing instructions.
 
-      Extracts segments of CSV file by methods self.pop() and self.remaining_rows().
+      Internal methods:
+        
+        self.pop(start, end) and self.remaining_rows() - extracts segments of CSV file
 
       Public method:
 
-          .yield_segment_with_defintion(spec)
+          yield_populated_defintions()
     """
 
-    def __init__(self, csv_text, parsing_defintion):
+    def __init__(self, csv_text):
         self.rows = text_to_rows(csv_text)
-        self.parsing_defintion = parsing_defintion
 
     def remaining_rows(self):
         """Pops a list of Row() instances that remain in this RowStack"""
@@ -102,25 +110,5 @@ class Rows:
             else:
                 # else is very important, indexing goes wrong without it
                 i += 1
-        return segment
-
-    def yield_populated_defintions(self):
-        """Yield CSV segments and corresponding parsing definitons.
-
-        Yield CSV segments as Row() instances and corresponding
-        parsing definitons based on *spec* parsing specification.
-
-        Args:
-            spec: parsing specification as spec.Specification() instance
-
-        Yields:
-            Parsing definiton with a *csv_segment* assigned. 
-        """
-        for pdef in self.parsing_defintion.segments:
-            start, end = pdef.get_bounds(self.rows)
-            pdef.csv_segment = self.pop(start, end) 
-            yield pdef
-        pdef = self.parsing_defintion.default    
-        pdef.csv_segment = self.remaining_rows()
-        yield pdef
+        return segment  
   

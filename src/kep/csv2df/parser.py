@@ -28,13 +28,12 @@ def extract_tables(csv_segment, pdef):
 
 def parse_tables(tables, pdef):
     # assign reader function    
-    tables = [t.set_splitter(pdef.reader) for t in tables]
-    
+    tables = [t.set_splitter(pdef.reader) for t in tables]    
     # parse tables to obtain labels - set label and splitter
     tables = [t.set_label(pdef.mapper, pdef.units) for t in tables]    
     # assign trailing units
     def fix_multitable_units(tables):
-        """For tables without *varname* -> copy *varname* from previous table.
+        """For tables without *varname* - copy *varname* from previous table.
            Applies to tables where all rows are known rows.
         """
         for prev_table, table in zip(tables, tables[1:]):
@@ -48,8 +47,6 @@ def verify_tables(tables, pdef):
     labels_in_tables = [t.label for t in tables]
     labels_missed = [x for x in pdef.required if x not in labels_in_tables]
     if labels_missed:
-        #mport pdb
-        #pdb.set_trace()
         raise ValueError("Missed labels: {}".format(labels_missed))
 
 

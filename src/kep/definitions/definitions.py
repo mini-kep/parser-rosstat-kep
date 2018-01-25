@@ -4,12 +4,11 @@
 
 """
 
-from kep.csv2df.specification import Def
+from kep.csv2df.specification import Def, Definiton
 
-# descriptions
 
 #TODO: extend descriptions
-descriptions = dict(abbr='GDP', ru='Валовый внутренний продукт', en='')
+descriptions = dict(abbr='GDP', ru='Валовый внутренний продукт', en='Gross domestic product')
  
 
 
@@ -82,14 +81,6 @@ default_commands = [
 ]
 
 PARSING_DEFINITIONS = [Def(default_commands)]
-
-class Definiton:
-    def __init__(self, default_commands):
-        self.default = Def(default_commands)
-        self.segments = []
-
-    def append(self, commands, boundaries):        
-        self.segments.append(Def(commands, boundaries))
 
 DEFINITION = Definiton(default_commands)        
 
