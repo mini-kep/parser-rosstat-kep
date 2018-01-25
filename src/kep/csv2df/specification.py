@@ -134,7 +134,6 @@ class Def(object):
 
        Public method:
             - get_bounds()
-
     """
 
     def __init__(self, commands, boundaries=None, reader=None, units=UNITS):
@@ -144,6 +143,7 @@ class Def(object):
             self.scope = Scope(boundaries)
         self.reader = reader
         self.units = units
+        self.csv_segment = ''
 
     @property
     def mapper(self):

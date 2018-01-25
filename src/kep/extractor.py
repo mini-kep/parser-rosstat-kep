@@ -1,12 +1,9 @@
 """Extract dataframes."""
-from kep.config import InterimCSV
+from kep.config import InterimCSV, FREQUENCIES
 from kep.definitions.definitions import PARSING_DEFINITIONS
 from kep.csv2df.reader import get_segment_with_pdef_from_text
 from kep.csv2df.parser import extract_tables
 from kep.csv2df.emitter import Emitter
-
-
-FREQUENCIES = ['a', 'q', 'm']
 
 
 def isin(checkpoints, df):   
@@ -27,12 +24,14 @@ class Extractor:
         self.pdef_list = parsing_definitions
         self.dfs = self.get_dataframes(text, parsing_definitions)
         
-    def get_dataframes(self, text, parsing_definitions):
-        self.jobs = get_segment_with_pdef_from_text(text, parsing_definitions)
+    def get_dataframes(self, csv_text, parsing_definitions):
+        # FIXME: maybe a parsing definition should contain a CSV text segment 
+        #        that is a part from CSV text. CSV can be bound to pdef. 
+        self.jobs = get_segment_with_pdef_from_text(csv_text, parsing_definitions)
         self.tables = [t for csv_segment, pdef in self.jobs
                          for t in extract_tables(csv_segment, pdef)]
-        self.emitter = Emitter(self.tables)
-        return {freq: self.emitter.get_dataframe(freq) for freq in FREQUENCIES}
+        emitter = Emitter(self.tables)
+        return {freq: emitter.get_dataframe(freq) for freq in FREQUENCIES}
         
     def isin(self, freq, checkpoints):        
         return isin(checkpoints, self.dfs[freq]) 

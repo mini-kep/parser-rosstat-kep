@@ -83,6 +83,16 @@ default_commands = [
 
 PARSING_DEFINITIONS = [Def(default_commands)]
 
+class Definiton:
+    def __init__(self, default_commands):
+        self.default = Def(default_commands)
+        self.segments = []
+
+    def append(self, commands, boundaries):        
+        self.segments.append(Def(commands, boundaries))
+
+DEFINITION = Definiton(default_commands)        
+
 # segment definitions
 boundaries = [
     dict(start='1.9. Внешнеторговый оборот – всего',
@@ -91,7 +101,7 @@ boundaries = [
            end='1.10.1. Внешнеторговый оборот со странами дальнего зарубежья'),
     dict(start='1.10. Внешнеторговый оборот – всего',
            end='1.10.1.Внешнеторговый оборот со странами дальнего зарубежья')]    
-commands=[
+commands = [
     dict(        
         var='EXPORT_GOODS',
         header=['экспорт товаров – всего', 'Экспорт товаров'],
@@ -102,24 +112,26 @@ commands=[
                 'Импорт товаров'],
         unit='bln_usd')]
 PARSING_DEFINITIONS.append(Def(commands, boundaries))
+DEFINITION.append(commands, boundaries)
+
 
 boundaries = [
     dict(start='1.6. Инвестиции в основной капитал',
            end='1.6.1. Инвестиции в основной капитал организаций'),
     dict(start='1.7. Инвестиции в основной капитал',
            end='1.7.1. Инвестиции в основной капитал организаций')]
-commands=[
+commands = [
     dict(        
         var='INVESTMENT',
         header=['Инвестиции в основной капитал'],
         unit=['bln_rub', 'yoy', 'rog'])]    
 PARSING_DEFINITIONS.append(Def(commands, boundaries))
-
+DEFINITION.append(commands, boundaries)
 
 boundaries = [
     dict(start='3.5. Индекс потребительских цен',
            end='4. Социальная сфера')]
-commands=[
+commands = [
     dict(
         var='CPI',
         header='Индекс потребительских цен',
@@ -143,13 +155,14 @@ commands=[
         unit='rog'),
 ]
 PARSING_DEFINITIONS.append(Def(commands, boundaries))
+DEFINITION.append(commands, boundaries)
 
 boundaries = [
     dict(start='1.12. Оборот розничной торговли',
            end='1.12.1. Оборот общественного питания'),
     dict(start='1.13. Оборот розничной торговли',
            end='1.13.1. Оборот общественного питания')]
-commands=[
+commands = [
     dict(var='RETAIL_SALES',
          header='Оборот розничной торговли',
          unit=['bln_rub', 'yoy', 'rog']),
@@ -163,11 +176,12 @@ commands=[
          unit=['bln_rub', 'yoy', 'rog'])
 ]
 PARSING_DEFINITIONS.append(Def(commands, boundaries))
+DEFINITION.append(commands, boundaries)
 
 boundaries = [
     dict(start='2.1.1. Доходы (по данным Федерального казначейства)',
            end='2.1.2. Расходы (по данным Федерального казначейства)')]
-commands=[
+commands = [
     dict(var='GOV_REVENUE_ACCUM_CONSOLIDATED',
          header='Консолидированный бюджет',
          unit='bln_rub'),
@@ -178,11 +192,12 @@ commands=[
          header='Консолидированные бюджеты субъектов Российской Федерации',
          unit='bln_rub')]
 PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal'))    
+DEFINITION.append(commands, boundaries)
 
 boundaries = [
     dict(start='2.1.2. Расходы (по данным Федерального казначейства)',
            end='2.1.3. Превышение доходов над расходами')]
-commands=[
+commands = [
     dict(var='GOV_EXPENSE_ACCUM_CONSOLIDATED',
          header='Консолидированный бюджет',
          unit='bln_rub'),
@@ -193,11 +208,12 @@ commands=[
          header='Консолидированные бюджеты субъектов Российской Федерации',
          unit='bln_rub')]
 PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal')) 
+DEFINITION.append(commands, boundaries)
 
 boundaries = [
     dict(start='2.1.3. Превышение доходов над расходами',
            end='2.2. Сальдированный финансовый результат')]
-commands=[
+commands = [
     dict(var='GOV_SURPLUS_ACCUM_FEDERAL',
          header='Федеральный бюджет',
          unit='bln_rub'),
@@ -205,12 +221,13 @@ commands=[
          header='Консолидированные бюджеты субъектов Российской Федерации',
          unit='bln_rub')]
 PARSING_DEFINITIONS.append(Def(commands, boundaries, reader='fiscal'))
+DEFINITION.append(commands, boundaries)
 
 # no quarterly or annual data for this definition
 boundaries = [
     dict(start='2.4.2. Дебиторская задолженность',
            end='2.5. Просроченная задолженность по заработной плате на начало месяца')]
-commands=[
+commands = [
     dict(var='CORP_RECEIVABLE',
          header='Дебиторская задолженность',
          unit='bln_rub'),
@@ -220,8 +237,8 @@ commands=[
          # LATER: incorporate a check value    
          check = ('bln_rub', 'm', '2017-09',  2445.8)           
          )]
-   
 PARSING_DEFINITIONS.append(Def(commands, boundaries))
+DEFINITION.append(commands, boundaries)
 
 if __name__ == '__main__':
     from kep.extractor import Frame, Extractor

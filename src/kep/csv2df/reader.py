@@ -2,18 +2,17 @@
 
 import csv
 import re
-from pathlib import Path
 from io import StringIO
-
+from pathlib import Path
 
 ENC = "utf-8"
 CSV_FORMAT = dict(delimiter="\t", lineterminator="\n")
 
 
-def make_segment_definitions(pdef_list):    
+def make_segment_definitions(pdef_list):
     return [pdef for pdef in pdef_list if pdef.scope]
 
-    
+
 def first_unbounded_definition(pdef_list):
     try:
         return [pdef for pdef in pdef_list if not pdef.scope][0]
@@ -24,6 +23,7 @@ def first_unbounded_definition(pdef_list):
 def get_segment_with_pdef(path, pdef_list):
     text = path.read_text(encoding=ENC)
     return get_segment_with_pdef_from_text(text, pdef_list)
+
 
 def get_segment_with_pdef_from_text(text, pdef_list):
     """Get CSV file segments with corresponding parsing defintions
@@ -36,12 +36,12 @@ def get_segment_with_pdef_from_text(text, pdef_list):
     """
     incoming = StringIO(text)
     rows = to_rows(incoming)
-    rowstack = RowStack(rows) 
+    rowstack = RowStack(rows)
     if not isinstance(pdef_list, list):
         pdef_list = [pdef_list]
     pdef_default = first_unbounded_definition(pdef_list)
     pdef_segments = make_segment_definitions(pdef_list)
-    return rowstack.yield_segment_with_defintion(pdef_default, pdef_segments) 
+    return rowstack.yield_segment_with_defintion(pdef_default, pdef_segments)
 
 
 # csv file access
@@ -52,9 +52,8 @@ def open_csv(path):
     """
     if isinstance(path, Path):
         return path.open(encoding=ENC)
-    else:  
+    else:
         raise TypeError(f'<{path}> should be pathlib.Path() instance')
-    
 
 
 def yield_csv_rows(csvfile, fmt=CSV_FORMAT):
@@ -272,8 +271,8 @@ class RowStack:
                 "1.6.1. Инвестиции в основной капитал организаций"
 
         Returns:
-            A list of Row() instances between [start, end).
-            that are taken out of RowStack.
+            A list of Row() instances between [start, end) that 
+            are taken out of RowStack.
         """
         we_are_in_segment = False
         segment = []
@@ -292,6 +291,26 @@ class RowStack:
                 i += 1
         return segment
 
+    def yield_populated_defintions(self, pdef_default, pdef_segments):
+        """Yield CSV segments and corresponding parsing definitons.
+
+        Yield CSV segments as Row() instances and corresponding
+        parsing definitons based on *spec* parsing specification.
+
+        Args:
+            spec: parsing specification as spec.Specification() instance
+
+        Yields:
+            Parsing definiton with a *csv_segment* assigned. 
+        """
+        for pdef in pdef_segments:
+            start, end = pdef.get_bounds(self.rows)
+            pdef.csv_segment = self.pop(start, end)            
+            yield pdef
+        if pdef_default:
+            pdef_default.csv_segment = self.remaining_rows()
+            yield pdef_default
+
     def yield_segment_with_defintion(self, pdef_default, pdef_segments):
         """Yield CSV segments and corresponding parsing definitons.
 
@@ -309,11 +328,11 @@ class RowStack:
             start, end = pdef.get_bounds(self.rows)
             csv_segment = self.pop(start, end)
             yield csv_segment, pdef
-        if pdef_default:            
-            yield self.remaining_rows(), pdef_default
+        if pdef_default:
+            yield self.remaining_rows(), pdef_default        
 
 
-#if __name__ == "__main__":
+# if __name__ == "__main__":
 #    from config import InterimCSV, LATEST_DATE
 #    import csv2df.specification as spec
 #

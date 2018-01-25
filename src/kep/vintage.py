@@ -1,22 +1,20 @@
-"""Get pandas dataframes for a given data and month.
+"""Get pandas dataframes for a given data and month from a processed CSV file.
 
 *get_dataframes(path, parsing_definitions)*
 
-*Vintage* class addresses dataset by year and month:
+*Vintage* class addresses dataset for a given month:
 
     Vintage(year, month).save()
     Vintage(year, month).validate()
 
-*Collection* manipulates all datasets, released at various dates:
+*Collection* manipulates datasets for all available months:
 
     Collection.save_all()
     Collection.approve_all()
 """
-from kep.config import ProcessedCSV, SUPPORTED_DATES
+from kep.config import ProcessedCSV, SUPPORTED_DATES, FREQUENCIES
 from kep.checkpoints import CHECKPOINTS
 from kep.extractor import Frame, isin
-
-FREQUENCIES = ['a', 'q', 'm']
 
 
 class Vintage:
@@ -46,7 +44,7 @@ class Vintage:
         return True
     
     def upload(self, password):
-        # TODO: uplaod to databse
+        # TODO: upload to databse
         pass
     
     def __repr__(self):
