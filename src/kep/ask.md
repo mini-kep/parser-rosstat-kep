@@ -23,8 +23,9 @@ VS CODE QUESTIONS
      Spyder is a lot like RStudio / Matlab - it has an interpreter open for you 
      to experiment and trail and see things quickly. 
      
-   - It also feels like VS Code is good to work with mature codebase / test,
-     not really to experiment with parts of coce much.
+   - It also feels like VS Code is good to work with mature codebase and tests,
+     and it is not greatly suited to experiment with parts of code and writing new code 
+     from scratch quiclky.     
 
 2. Can I quickly disable specific lint errors in the IDE, not a config file? 
 
