@@ -2,7 +2,6 @@
 
 """
 
-from kep.definitions.units import UNITS
 from kep.csv2df.util_label import make_label
 from kep.csv2df.row_stack import RowStack
 from kep.csv2df.parser import extract_tables
@@ -138,14 +137,18 @@ class Def(object):
             - get_bounds()
     """
 
-    def __init__(self, commands, boundaries=None, reader=None, units=UNITS):
+    def __init__(self, commands, units, boundaries=None, reader=None):
+        # FIXME: 
+        #if not commands or not units:
+        #    raise ValueError
         self.commands = [ParsingCommand(**c) for c in as_list(commands)]
-        self.scope = None
-        if boundaries:
-            self.scope = Scope(boundaries)
-        self.reader = reader
         self.units = units
         self.csv_segment = ''
+        if boundaries:
+            self.scope = Scope(boundaries)
+        else:
+            self.scope = None
+        self.reader = reader
 
     @property
     def mapper(self):
@@ -166,14 +169,15 @@ class Def(object):
         return extract_tables(self.csv_segment, self)
 
 
-
-class Definiton:
-    def __init__(self, default_commands):
-        self.default = Def(default_commands)
+class Definition:
+    def __init__(self, commands, units):
+        self.default = Def(commands=commands, units=units)
         self.segments = []
+        self.units = units
 
-    def append(self, *args, **kwargs):        
-        self.segments.append(Def(*args, **kwargs))
+    def append(self, commands, **kwargs):         
+        pdef = Def(commands, self.units, **kwargs) 
+        self.segments.append(pdef)
 
     def attach_data(self, csv_text):
         """Yield CSV segments and corresponding parsing definitons.
@@ -198,4 +202,3 @@ class Definiton:
     def tables(self):           
         pdefs = [self.default] + self.segments 
         return [t for pdef in pdefs for t in pdef.tables]
-    

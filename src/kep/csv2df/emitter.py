@@ -195,10 +195,10 @@ def deaccumulate(df, first_month):
 #     return deaccumulate(df, first_month=1)
 
 if __name__ == '__main__':    
-    from kep.config import InterimCSV
-    from kep.definitions.definitions import DEFINITION
+    from kep.helper.path import InterimCSV
+    from kep.parsing_definition import PARSING_DEFINITION
 
-    def tables(year, month, parsing_definition=DEFINITION):
+    def tables(year, month, parsing_definition=PARSING_DEFINITION):
         csv_text = InterimCSV(year, month).text()
         return parsing_definition.attach_data(csv_text).tables
 

@@ -2,6 +2,7 @@
 
 import re
 
+
 class Row:
     """CSV row representation.
 
@@ -93,7 +94,7 @@ class Row:
             return False
 
     def get_unit(self, units_mapper_dict):
-        """Returns units measurement for this row.
+        """Returns unit of measurement for this row.
 
         Args:
             units_mapper_dict: dictionary of valid units of measurement,

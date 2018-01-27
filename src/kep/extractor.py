@@ -3,7 +3,7 @@
 from kep import FREQUENCIES
 from kep.helper.path import InterimCSV, ProcessedCSV
 from kep.csv2df.emitter import Emitter
-from kep.definitions.definitions import DEFINITION
+from kep.parsing_definition import PARSING_DEFINITION
 from kep.checkpoints import CHECKPOINTS
 
 
@@ -19,7 +19,7 @@ def is_found(df, d):
 class Vintage:
     """Represents dataset release for a given year and month."""
 
-    def __init__(self, year: int, month: int, parsing_definition=DEFINITION):
+    def __init__(self, year: int, month: int, parsing_definition=PARSING_DEFINITION):
         self.year, self.month = year, month
         csv_text = InterimCSV(year, month).text()
         parsing_definition.attach_data(csv_text)

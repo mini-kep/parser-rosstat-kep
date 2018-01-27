@@ -5,6 +5,8 @@ import pytest
 from ..row_model import Row
 from ..specification import ParsingCommand, Def
 from ..util_row_splitter import split_row_by_year_and_qtr
+from ...parsing_definition.units import UNITS
+
 # testing
 from ..parser import Table, split_to_tables, extract_tables
 
@@ -20,7 +22,7 @@ indpro_def = dict(var="INDPRO",
 pc1 = ParsingCommand(**gdp_def)
 pc2 = ParsingCommand(**indpro_def)
 
-d1 = Def([gdp_def, indpro_def])
+d1 = Def([gdp_def, indpro_def], units=UNITS)
 
 class Spec_Sample:
 
