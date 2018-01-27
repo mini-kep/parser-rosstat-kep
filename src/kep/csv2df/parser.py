@@ -22,7 +22,7 @@ def extract_tables(csv_segment, pdef):
     """
     tables = split_to_tables(csv_segment)
     tables = parse_tables(tables, pdef)
-    #verify_tables(tables, pdef)
+    verify_tables(tables, pdef)
     return [t for t in tables if t.label in pdef.required]
 
 
@@ -152,7 +152,7 @@ class Table:
 
 
 if __name__ == "__main__": # pragma: no cover
-    from kep.csv2df.reader import Row
+    from kep.csv2df.row_model import Row
     rows = [
         Row(['Объем ВВП, млрд.рублей / Gross domestic product, bln rubles']), 
         Row(['1999', '4823', '901', '1102', '1373', '1447']), 
@@ -160,19 +160,3 @@ if __name__ == "__main__": # pragma: no cover
     ]
     t = list(split_to_tables(rows))
 
-
-#    from kep.config import InterimCSV, LATEST_DATE
-#    import kep.csv2df.reader as reader
-#    import kep.csv2df.specification as spec
-#
-#    year, month = LATEST_DATE
-#    csv_path = InterimCSV(year, month).path
-#    with reader.open_csv(csv_path) as csvfile:
-#        parsed_tables = []
-#        for csv_segment, pdef in reader.Reader(csvfile, spec.SPEC).items():
-#            tables = extract_tables(csv_segment, pdef)
-#            parsed_tables.extend(tables)
-#
-#        for t in tables:
-#            print()
-#            print(t)

@@ -2,7 +2,7 @@
 import pytest
 
 # fixtures
-from ..reader import Row
+from ..row_model import Row
 from ..specification import ParsingCommand, Def
 from ..util_row_splitter import split_row_by_year_and_qtr
 # testing

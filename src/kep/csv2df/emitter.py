@@ -213,7 +213,7 @@ if __name__ == '__main__':
     dfm = e.get_dataframe('m')
     
 
-    from kep.csv2df.rowstack import text_to_rows 
+    from kep.csv2df.row_stack import text_to_rows
     from kep.csv2df.parser import extract_tables, split_to_tables
     from kep.csv2df.specification import Def
     # input data

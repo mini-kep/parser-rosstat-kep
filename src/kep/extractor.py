@@ -1,6 +1,7 @@
 """Extract dataframes."""
 
-from kep.config import FREQUENCIES, InterimCSV, ProcessedCSV
+from kep import FREQUENCIES
+from kep.helper.path import InterimCSV, ProcessedCSV
 from kep.csv2df.emitter import Emitter
 from kep.definitions.definitions import DEFINITION
 from kep.checkpoints import CHECKPOINTS

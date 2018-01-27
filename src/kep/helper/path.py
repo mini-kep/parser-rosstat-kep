@@ -28,7 +28,7 @@ def md(folder):
 def find_repo_root():
     """Returns root folder for repository.
     Current file is assumed to be:
-        <repo_root>/src/kep/helper/files.py
+        <repo_root>/src/kep/helper/<this file>.py
     """
     levels_up = 3
     return Path(__file__).parents[levels_up]

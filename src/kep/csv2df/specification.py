@@ -4,7 +4,7 @@
 
 from kep.definitions.units import UNITS
 from kep.csv2df.util_label import make_label
-from kep.csv2df.rowstack import RowStack
+from kep.csv2df.row_stack import RowStack
 from kep.csv2df.parser import extract_tables
 
 

@@ -60,7 +60,7 @@ csv_text = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.
 2015		35,2	152,1	108,9	160,4	20,7	129,1	116,4	104,2	123,0	118,2	87,8	105,3	103,6	134,3	92,9	163,0
 2016		36,9	147,1	119,2"""
 
-from kep.csv2df.rowstack import text_to_rows
+from kep.csv2df.row_stack import text_to_rows
 from kep.csv2df.specification import Def
 from kep.csv2df.parser import split_to_tables, parse_tables
 
