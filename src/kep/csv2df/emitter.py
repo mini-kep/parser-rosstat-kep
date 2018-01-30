@@ -188,11 +188,6 @@ def deaccumulate(df, first_month):
     df[varnames] = deacc_main(df[varnames], first_month)
     return rename_accum(df)
 
-# def deaccumulate_qtr(df):
-#     return deaccumulate(df, first_month=3)
-
-# def deaccumulate_month(df):
-#     return deaccumulate(df, first_month=1)
 
 if __name__ == '__main__':    
     from kep.helper.path import InterimCSV

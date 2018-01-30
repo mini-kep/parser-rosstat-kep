@@ -4,7 +4,7 @@ from kep import FREQUENCIES
 from kep.helper.path import InterimCSV, ProcessedCSV
 from kep.csv2df.emitter import Emitter
 from kep.parsing_definition import PARSING_DEFINITION
-from kep.checkpoints import CHECKPOINTS
+from kep.parsing_definition.checkpoints import CHECKPOINTS
 
 
 def is_found(df, d):
@@ -49,3 +49,7 @@ class Vintage:
     
     def __repr__(self):
         return "Vintage({}, {})".format(self.year, self.month)
+
+if __name__ == "__main__":
+    Vintage(2016, 10).validate()
+    # Test values parsed OK for Vintage(2016, 10)
