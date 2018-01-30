@@ -2,6 +2,8 @@
 
 import pandas as pd
 
+# TODO: use tests from emitter.py
+#       + delete emitter.py
 
 def get_duplicates(df):
     if df.empty:

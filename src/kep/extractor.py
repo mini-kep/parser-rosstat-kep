@@ -2,6 +2,7 @@
 
 from kep import FREQUENCIES
 from kep.helper.path import InterimCSV, ProcessedCSV
+# TODO: change Emitter to DataFrameMaker
 from kep.csv2df.emitter import Emitter
 from kep.parsing_definition import PARSING_DEFINITION
 from kep.parsing_definition.checkpoints import CHECKPOINTS
