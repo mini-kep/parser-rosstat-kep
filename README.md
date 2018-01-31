@@ -5,11 +5,7 @@
 Concept
 -------
 
-Russian statistics agency Rosstat publishes macroeconomic time series as MS Word files - sad, but true (see [Rosstat KEP publication][Rosstat]). 
-
-In this repo we extract time series as pandas dataframes and save them as [CSV files][backend]. 
-
-This machine-readable data can make time series analysis reproducible and encourage wider use of python/R tools for it. 
+Russian statistics agency Rosstat publishes macroeconomic time series as MS Word files (see [Rosstat KEP publication][Rosstat]). In this repo we extract time series as pandas dataframes and save them as [CSV files][backend]. This machine-readable data can make time series analysis reproducible and encourage wider use of python/R and econometrics tools for it. 
 
 This code replaces a predecessor repo, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
 
