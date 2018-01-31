@@ -2,8 +2,7 @@
 
 from kep import FREQUENCIES
 from kep.helper.path import InterimCSV, ProcessedCSV
-# TODO: change Emitter to DataFrameMaker
-from kep.csv2df.emitter import Emitter
+from kep.csv2df.dataframe_maker import Datapoints
 from kep.parsing_definition import PARSING_DEFINITION
 from kep.parsing_definition.checkpoints import CHECKPOINTS
 
@@ -24,7 +23,7 @@ class Vintage:
         self.year, self.month = year, month
         csv_text = InterimCSV(year, month).text()
         parsing_definition.attach_data(csv_text)
-        emitter = Emitter(parsing_definition.tables)
+        emitter = Datapoints(parsing_definition.tables)
         self.dfs = {freq: emitter.get_dataframe(freq) for freq in FREQUENCIES}
 
     def save(self):        
@@ -52,5 +51,11 @@ class Vintage:
         return "Vintage({}, {})".format(self.year, self.month)
 
 if __name__ == "__main__":
-    Vintage(2016, 10).validate()
+    v = Vintage(2016, 10)
+    v.validate()
     # Test values parsed OK for Vintage(2016, 10)
+    
+    csv_text = InterimCSV(2016, 10).text()
+    PARSING_DEFINITION.attach_data(csv_text)
+    emitter = Datapoints(PARSING_DEFINITION.tables)
+    

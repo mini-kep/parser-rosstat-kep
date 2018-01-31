@@ -1,11 +1,10 @@
-"""Parse [(csv_segment, pdef)... ] inputs into Table() instances using
-   parsing specification.
+"""Parse CSV text *csv_segment* using parsing de
 
-Main call:
-   tables = get_tables(rows, SPEC)
+   extract_tables(csv_segment, pdef)
 
 """
 
+import re
 from enum import Enum, unique
 from collections import OrderedDict as odict
 
@@ -16,9 +15,15 @@ from kep.csv2df.util_label import make_label
 __all__ = ['extract_tables']
 
 
-def extract_tables(csv_segment, pdef):
-    """Extract tables from *csv_segment* list Rows instances using
-       *pdef* parsing defintion.
+def extract_tables(csv_segment: str, pdef):
+    """Extract tables from *csv_segment* string using *pdef* parsing defintion.
+    
+    Args:
+        csv_segment(str): CSV text
+        pdef: parsing defintions with search strings for header and unit
+        
+    Retruns:
+        list of Table() instances    
     """
     tables = split_to_tables(csv_segment)
     tables = parse_tables(tables, pdef)
@@ -89,22 +94,24 @@ def split_to_tables(rows):
 class Table:
     """Representation of CSV table, has headers and datarows."""
 
-#    # [4, 5, 12, 13, 17]
-#    VALID_ROW_LENGTHS = list(splitter.FUNC_MAPPER.keys())
     KNOWN = "+"
     UNKNOWN = "-"    
 
     def __init__(self, headers, datarows):
         self.headers = headers
         self.datarows = datarows
-
-        self.lines = odict((row.name, self.UNKNOWN) for row in headers)
-        self.coln = max(len(row) for row in self.datarows)
+        # parsing 
         self.splitter_func = None
-       
         self.varname = None
         self.unit = None
         self.datapoints = []
+        # header indicator
+        self.lines = odict((row.name, self.UNKNOWN) for row in headers)
+
+    @property
+    def coln(self):
+        """Number of columns in table."""
+        return max(len(row) for row in self.datarows)
 
     def set_label(self, varnames_dict, units_dict):
         for row in self.headers:
@@ -157,30 +164,24 @@ class Table:
                     time_index = time_stamp, 
                     freq=freq)
                
-    def as_annual(self, year, value):
-        time_stamp = timestamp_annual(year)
-        return self.make_datapoint(value, time_stamp, 'a')
-
-    def as_quarter(self, year, quarter, value):
-        time_stamp = timestamp_quarter(year, quarter)
-        return self.make_datapoint(value, time_stamp, 'q')
-        
-    def as_month(self, year, month, value):
-        time_stamp = timestamp_month(year, month)
-        return self.make_datapoint(value, time_stamp, 'm')
-               
     def extract_values(self):
+        """Yield dictionaries with variable name, frequency, time_index 
+           and value.
+        """
         for row in self.datarows:
             year=row.get_year()
             a_value, q_values, m_values = self.splitter_func(row.data)
             if a_value:
-                yield self.as_annual(year, a_value)
+                time_stamp = timestamp_annual(year)
+                yield self.make_datapoint(a_value, time_stamp, 'a')
             if q_values:
                 for t, val in enumerate(q_values):
-                    yield self.as_quarter(year, t + 1, val)
+                    time_stamp = timestamp_quarter(year,  t + 1)
+                    yield self.make_datapoint(val, time_stamp, 'q')
             if m_values:
                 for t, val in enumerate(m_values):
-                    yield self.as_month(year, t + 1, val)
+                    time_stamp = timestamp_month(year,  t + 1)
+                    yield self.make_datapoint(val, time_stamp, 'm')
 
 import pandas as pd 
 def timestamp_annual(year):
@@ -188,13 +189,15 @@ def timestamp_annual(year):
 
 def timestamp_quarter(year, quarter):
     month = quarter * 3
-    return timestamp_month(year, month) + pd.offsets.QuarterEnd()
+    return timestamp_month(year, month)
 
 def timestamp_month(year, month):
     return pd.Timestamp(year, month, 1) + pd.offsets.MonthEnd()
 
+# TODO: move to test
+assert timestamp_quarter(1999, 1) == pd.Timestamp('1999-03-31')
 
-import re
+
 COMMENT_CATCHER = re.compile("\D*(\d+[.,]?\d*)\s*(?=\d\))")
 
 def to_float(text: str, i=0):
@@ -224,7 +227,7 @@ def to_float(text: str, i=0):
             return to_float(text[:-1], i)
         return False
 
-# TODO: move test from emitter.py here
+# TODO: move test from emitter.py 
 
 if __name__ == "__main__": # pragma: no cover
     from kep.csv2df.row_model import Row
@@ -237,27 +240,24 @@ if __name__ == "__main__": # pragma: no cover
     t.set_splitter(None)
     t.varname = 'GDP'
     t.unit = 'bln_rub'
-    datapoints = list(t.extract_values())
-    assert datapoints == \
-    [{'freq': 'a',
+    datapoints = list(t.extract_values())    
+    assert datapoints[0] == {'freq': 'a',
       'label': 'GDP_bln_rub',
       'time_index': pd.Timestamp('1999-12-31'),
-      'value': 4823},
-     {'freq': 'q',
+      'value': 4823}
+    assert datapoints[1] == {'freq': 'q',
+      'label': 'GDP_bln_rub',
+      'time_index': pd.Timestamp('1999-03-31'),
+      'value': 901}
+    assert datapoints[2] == {'freq': 'q',
       'label': 'GDP_bln_rub',
       'time_index': pd.Timestamp('1999-06-30'),
-      'value': 901},
-     {'freq': 'q',
+      'value': 1102}
+    assert datapoints[3] == {'freq': 'q',
       'label': 'GDP_bln_rub',
       'time_index': pd.Timestamp('1999-09-30'),
-      'value': 1102},
-     {'freq': 'q',
+      'value': 1373}
+    assert datapoints[4] == {'freq': 'q',
       'label': 'GDP_bln_rub',
       'time_index': pd.Timestamp('1999-12-31'),
-      'value': 1373},
-     {'freq': 'q',
-      'label': 'GDP_bln_rub',
-      'time_index': pd.Timestamp('2000-03-31'),
-      'value': 1447}]
-    
-
+      'value': 1447}
