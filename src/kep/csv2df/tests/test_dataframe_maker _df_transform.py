@@ -3,7 +3,7 @@ import pandas as pd
 from itertools import accumulate
 from random import randint
 
-from kep.csv2df.emitter import deaccumulate
+from kep.csv2df.dataframe_maker import deaccumulate
 
 
 def _make_df(name, values, freq):
