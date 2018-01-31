@@ -5,12 +5,12 @@
 Concept
 -------
 
-The task is to extract pandas dataframes from MS Word files from [Rosstat KEP publication][Rosstat] and save these
-dataframes as [CSV files][backend]. 
+Russian statistics agency Rosstat publishes macroeconomic time series as MS Word files (see [Rosstat KEP publication][Rosstat]).
+We extract time series as pandas dataframes from `.doc` files and save these dataframes as [CSV files][backend]. 
 
 This code replaces a predecessor repo, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
 
-*NOTE:* Windows and MS Word are required to create interim text files text dumps from MS Word files. Оnce these text files are created, they can be parsed on a linux machine.
+*NOTE:* Windows and MS Word are required to create interim text dumps from MS Word files. Оnce these text files are created, they can be parsed on a linux machine.
 
 Interface 
 ---------
