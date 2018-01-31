@@ -1,9 +1,9 @@
 import io
 import pytest
 
-from kep.csv2df.reader import Row
-from kep.csv2df.rowstack import (RowStack, is_valid_row, yield_csv_rows,
-                                 text_to_rows)   
+from kep.csv2df.row_model import Row
+from kep.csv2df.row_stack import (RowStack, is_valid_row, yield_csv_rows,
+                                  text_to_rows)   
 
 
 junk_string = "________\n\n\t\t\t"
@@ -22,6 +22,7 @@ def test_yield_csv_rows():
 def test_is_valid_row():
     bad_rows = [
         [],
+        ['', 'abc'],
         [None, 1],
         ["___"]
     ]

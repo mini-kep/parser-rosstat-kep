@@ -2,9 +2,8 @@
 
 import pandas as pd
 
-
-from kep.getter import get_dataframe
-import kep.config as config
+from kep.experimental.getter import get_dataframe
+from kep.helper.path import XL_PATH
 
 
 def to_xls(filepath, dfa, dfq, dfm):
@@ -21,9 +20,8 @@ def save_xls():
     dfa = get_dataframe('a')
     dfq = get_dataframe('q')
     dfm = get_dataframe('m')
-    filepath = config.XL_PATH
-    to_xls(filepath, dfa, dfq, dfm)
-    print('Saved', filepath)
+    to_xls(XL_PATH, dfa, dfq, dfm)
+    print('Saved', XL_PATH)
 
 
 if '__main__' == __name__:

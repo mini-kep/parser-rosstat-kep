@@ -1,10 +1,6 @@
-"""Path and date helpers.
+"""Folder and file paths for the project.
 
-Constants:
-    FREQUENCIES
-    SUPPORTED_DATES
-
-Paths as strings:   
+Paths as strings:
     UNPACK_RAR_EXE
     XL_PATH
 
@@ -17,33 +13,8 @@ Classes:
 
 from pathlib import Path
 
-import pandas as pd
-
-FREQUENCIES = ['a', 'q', 'm']
-
-def supported_dates(start_date = '2009-04', exclude_dates = ['2013-11']):
-    """Get a list of (year, month) tuples starting from (2009, 4)
-       up to a previous recent month.
-
-       Excludes (2013, 11) - no archive for this month.
-
-    Returns:
-        List of (year, month) tuples.
-    """
-    end_date = pd.to_datetime('today') - pd.offsets.MonthEnd()
-    dates = pd.date_range(start_date, end_date, freq='MS')
-    exclude = map(pd.to_datetime, exclude_dates)
-    return [(date.year, date.month) for date in dates.drop(exclude)]
-
-
-SUPPORTED_DATES = supported_dates()
-
-
-def is_supported_date(year, month):
-    if (year, month) in SUPPORTED_DATES:
-        return True
-    else:
-        raise ValueError(f'<{year}, {month}> is not a supported date.') 
+from kep import FREQUENCIES
+from kep.helper.date import is_supported_date
 
 
 def md(folder):
@@ -56,10 +27,10 @@ def md(folder):
 
 def find_repo_root():
     """Returns root folder for repository.
-    Current file is assumed to be at:
-        <repo_root>/src/kep/config.py
+    Current file is assumed to be:
+        <repo_root>/src/kep/helper/<this file>.py
     """
-    levels_up = 2
+    levels_up = 3
     return Path(__file__).parents[levels_up]
 
 
@@ -124,14 +95,15 @@ class LocalRarFile:
 
 
 class FileBase:
-    """Prototype for file handler classes. Has file properties."""
+    """Prototype for file handler classes.
+       Has file methods and properties.
+    """
     # to override
     path = Path()
 
     def exists(self):
         return self.path.exists()
 
-    # FIXME: can be a property
     def text(self):
         return self.path.read_text(encoding='utf-8')
 
@@ -157,6 +129,7 @@ class ProcessedCSV:
 
     def path(self, freq: str):
         return self.folder / self.make_filename(freq)
+
 
 if __name__ == "__main__":
     pass

@@ -8,10 +8,14 @@
 import csv
 from io import StringIO
 
-from kep.csv2df.reader import Row
+from kep.csv2df.row_model import Row
 
-ENC = "utf-8"
 CSV_FORMAT = dict(delimiter="\t", lineterminator="\n")
+
+
+def yield_csv_rows_from_string(csv_text):
+    return yield_csv_rows(StringIO(csv_text))
+
 
 def yield_csv_rows(csvfile, fmt=CSV_FORMAT):
     """Yield CSV rows from *csvfile*.
@@ -28,16 +32,16 @@ def yield_csv_rows(csvfile, fmt=CSV_FORMAT):
 
 def is_valid_row(row):
     """Check conditions:
-       - *row* listis not empty
-       - first element in list is not empty
+       - *row* list is not empty
+       - first element in list is not empty and is not None
        - first element does not start with underscore ____
     """
-    try:
-        return (len(row)>0 
-                and row[0]  
-                and not row[0].startswith("___")
-                )
-    except IndexError:
+    if row:
+        x = row[0]
+        return x is not None and  \
+               x != '' and \
+               not x.startswith("___")
+    else:
         return False
 
 
@@ -50,8 +54,7 @@ def text_to_rows(csv_text):
     Retruns:
         list of Row() instances
     """
-    filelike = StringIO(csv_text)
-    csv_rows = filter(is_valid_row, yield_csv_rows(filelike))
+    csv_rows = filter(is_valid_row, yield_csv_rows_from_string(csv_text))
     return list(map(Row, csv_rows))
 
 

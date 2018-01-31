@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from kep.config import Folders, ProcessedCSV
+from kep.helper.path import Folders, ProcessedCSV
 
 
 def read_csv(source):

@@ -1,10 +1,11 @@
-import pytest
-import tempfile
 import os
-import pandas as pd
+import tempfile
 
-from ..finaliser import to_xls
-from ..getter import get_dataframe
+import pandas as pd
+import pytest
+
+from kep.experimental.finaliser import to_xls
+from kep.experimental.getter import get_dataframe
 
 
 def test_get_dataframe():
@@ -14,10 +15,10 @@ def test_get_dataframe():
 
 
 def test_write_xls_writes_some_xlsx_file():
-    fn = os.path.join(tempfile.gettempdir(), '123.xlsx')
+    temp_filename = os.path.join(tempfile.gettempdir(), '123.xlsx')
     df = pd.DataFrame()
-    to_xls(fn, df, df, df)
-    os.remove(fn)
+    to_xls(temp_filename, df, df, df)
+    os.remove(temp_filename)
 
 
 if __name__ == "__main__":

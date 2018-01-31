@@ -3,10 +3,10 @@ import io
 
 import pytest
 
-from kep.csv2df.reader import Row
+from kep.csv2df.row_model import Row
 from kep.csv2df.parser import Table
 from kep.csv2df.specification import Def
-from kep.csv2df.rowstack import text_to_rows 
+from kep.csv2df.row_stack import text_to_rows 
 from kep.csv2df.parser import extract_tables
 import kep.csv2df.emitter as emitter
 

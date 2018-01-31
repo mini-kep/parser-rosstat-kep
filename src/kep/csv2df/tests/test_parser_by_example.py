@@ -58,9 +58,11 @@ csv_text = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.
 2013		38,1	152,8	114,4	151,9	21,1	125,8	114,9	104,3	127,1	116,6	90,7	107,9	103,5	120,2	99,8	162,1
 2014		36,5	158,0	113,9	148,1	21,4	130,3	115,7	105,8	128,7	115,7	91,8	104,4	105,9	120,1	94,4	166,2
 2015		35,2	152,1	108,9	160,4	20,7	129,1	116,4	104,2	123,0	118,2	87,8	105,3	103,6	134,3	92,9	163,0
-2016		36,9	147,1	119,2"""
+2016		36,9	147,1	119,2
+1.7.1. Инвестиции в основной капитал организаций"""
 
-from kep.csv2df.rowstack import text_to_rows
+from collections import OrderedDict as odict
+from kep.csv2df.row_stack import text_to_rows
 from kep.csv2df.specification import Def
 from kep.csv2df.parser import split_to_tables, parse_tables
 
@@ -74,27 +76,33 @@ commands = [
     dict(        
         var='INVESTMENT',
         header=['Инвестиции в основной капитал'],
-        unit=['bln_rub', 'yoy', 'rog'])]    
-pdef = Def(commands, boundaries)
+        unit=['bln_rub', 'yoy', 'rog'])] 
+# mapper dictionary to convert text in table headers to units of measurement
+units = odict([  # 1. MONEY
+    ('млрд.рублей', 'bln_rub'),
+    ('млрд. рублей', 'bln_rub'),
+    # 2. RATES OF CHANGE
+    ('в % к прошлому периоду', 'rog'),
+    ('в % к предыдущему месяцу', 'rog'),
+    ('в % к предыдущему периоду', 'rog'),
+    ('в % к соответствующему периоду предыдущего года', 'yoy'),
+    ('в % к соответствующему месяцу предыдущего года', 'yoy')
+])
+pdef = Def(commands, units, boundaries)
 
 # actions
 csv_segment = text_to_rows(csv_text)
 tables = split_to_tables(csv_segment)
 tables = parse_tables(tables, pdef)
 
+# TODO: convert this to test
+# checks
+def test_convert_to_several_tests_and_rename(): 
+    assert len(tables) == 3
+    assert all([t.has_unknown_lines() for t in tables]) is False
+    assert [t.varname for t in tables] == ['INVESTMENT'] * 3
+    assert [t.unit for t in tables] == ['bln_rub', 'yoy', 'rog']
+
 # result
 for t in tables:
     print(t.varname, t.unit)
-
-# ERROR: the problem is in parse_tables - the variable name does not 
-#        go down from first to second and third tables, as it shoud from here: 
-# https://github.com/mini-kep/parser-rosstat-kep/blob/dev/src/kep/csv2df/parser.py#L34-L41   
-
-
-for prev_table, table in zip(tables, tables[1:]):
-    print(table.has_unknown_lines())
-    if table.varname is None and not table.has_unknown_lines():
-        table.varname = prev_table.varname
-        
-print(tables[1].headers)
-

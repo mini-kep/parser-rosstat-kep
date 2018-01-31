@@ -2,9 +2,7 @@
 
 import shutil
 
-import kep.config as config
-
-
+from kep.helper.path import Folders
 
 
 def get_latest_date(base_dir):
@@ -20,7 +18,7 @@ def get_latest_date(base_dir):
 
 
 # latest date found in interm data folder
-LATEST_DATE = get_latest_date(config.Folders.interim)
+LATEST_DATE = get_latest_date(Folders.interim)
 
 
 # class Latest:

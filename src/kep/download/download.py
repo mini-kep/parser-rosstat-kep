@@ -6,7 +6,7 @@ import subprocess
 import requests
 from datetime import date
 
-from kep.config import UNPACK_RAR_EXE, LocalRarFile
+from kep.helper.path import UNPACK_RAR_EXE, LocalRarFile
 
 
 def download(url, path):

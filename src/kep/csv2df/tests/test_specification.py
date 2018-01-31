@@ -1,8 +1,9 @@
-﻿# -*- coding: utf-8 -*-
-import pytest
-from collections import OrderedDict as odict
+﻿from collections import OrderedDict as odict
 
-from ..specification import as_list, ParsingCommand, Def, Scope
+import pytest
+
+from ..specification import Def, ParsingCommand, Scope, as_list
+
 
 class Test_as_list():
     def test_single_arg(self):
@@ -67,7 +68,7 @@ class Test_ParsingCommmand:
         assert self.pc.units == ['bln_rub', 'yoy']
 
 
-class Test_Parsing_Definition:
+class Test_Def:
     commands = [dict(
         var='GDP',
         header=[
@@ -81,8 +82,9 @@ class Test_Parsing_Definition:
          var="INDPRO",
          header="Индекс промышленного производства",
          unit=["yoy", "rog"])]
+    units = odict()
     boundaries = dict(start="Header 1", end="Header 2")
-    pd = Def(commands, boundaries, reader='fiscal')
+    pd = Def(commands, units, boundaries, reader='fiscal')
 
     def test_mapper_property(self):
         assert self.pd.mapper == \
@@ -106,7 +108,6 @@ class Test_Parsing_Definition:
 
     def test_get_bounds(self):
         assert callable(self.pd.get_bounds)
-
 
 if __name__ == "__main__":
     pytest.main([__file__])

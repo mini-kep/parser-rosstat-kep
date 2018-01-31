@@ -1,9 +1,11 @@
 """Extract dataframes."""
 
-from kep.config import FREQUENCIES, InterimCSV, ProcessedCSV
+from kep import FREQUENCIES
+from kep.helper.path import InterimCSV, ProcessedCSV
+# TODO: change Emitter to DataFrameMaker
 from kep.csv2df.emitter import Emitter
-from kep.definitions.definitions import DEFINITION
-from kep.checkpoints import CHECKPOINTS
+from kep.parsing_definition import PARSING_DEFINITION
+from kep.parsing_definition.checkpoints import CHECKPOINTS
 
 
 def is_found(df, d):
@@ -18,7 +20,7 @@ def is_found(df, d):
 class Vintage:
     """Represents dataset release for a given year and month."""
 
-    def __init__(self, year: int, month: int, parsing_definition=DEFINITION):
+    def __init__(self, year: int, month: int, parsing_definition=PARSING_DEFINITION):
         self.year, self.month = year, month
         csv_text = InterimCSV(year, month).text()
         parsing_definition.attach_data(csv_text)
@@ -48,3 +50,7 @@ class Vintage:
     
     def __repr__(self):
         return "Vintage({}, {})".format(self.year, self.month)
+
+if __name__ == "__main__":
+    Vintage(2016, 10).validate()
+    # Test values parsed OK for Vintage(2016, 10)

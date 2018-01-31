@@ -2,7 +2,7 @@ import pytest
 from collections import OrderedDict as odict
 
 # FIXME: rename reader to 'row_view' 
-from ..reader import get_year, is_year, Row
+from ..row_model import get_year, is_year, Row
 
 class Test_get_year():
     def test_get_year(self):
