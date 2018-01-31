@@ -60,6 +60,7 @@ class Datapoints:
         return df
 
 # government revenue and expense time series transformation
+
 def rename_accum(df):
     return df.rename(mapper = lambda s: s.replace('_ACCUM',''), axis=1)   
 

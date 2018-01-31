@@ -62,9 +62,12 @@ csv_text = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.
 1.7.1. Инвестиции в основной капитал организаций"""
 
 from collections import OrderedDict as odict
+import pandas as pd
+
 from kep.csv2df.row_stack import text_to_rows
 from kep.csv2df.specification import Def
 from kep.csv2df.parser import split_to_tables, parse_tables
+from kep.csv2df.row_model import Row
 
 # settings
 boundaries = [
@@ -95,14 +98,45 @@ csv_segment = text_to_rows(csv_text)
 tables = split_to_tables(csv_segment)
 tables = parse_tables(tables, pdef)
 
-# TODO: convert this to test
-# checks
 def test_convert_to_several_tests_and_rename(): 
     assert len(tables) == 3
     assert all([t.has_unknown_lines() for t in tables]) is False
     assert [t.varname for t in tables] == ['INVESTMENT'] * 3
     assert [t.unit for t in tables] == ['bln_rub', 'yoy', 'rog']
 
-# result
-for t in tables:
-    print(t.varname, t.unit)
+
+def test_Table_class_extract_values_method(): 
+    rows = [
+        Row(['Объем ВВП, млрд.рублей / Gross domestic product, bln rubles']), 
+        Row(['1999', '4823', '901', '1102', '1373', '1447'])
+    ]
+    tables = list(split_to_tables(rows))
+    t = tables[0]
+    t.set_splitter(None)
+    t.varname = 'GDP'
+    t.unit = 'bln_rub'
+    datapoints = list(t.extract_values())    
+    assert datapoints[0] == {'freq': 'a',
+      'label': 'GDP_bln_rub',
+      'time_index': pd.Timestamp('1999-12-31'),
+      'value': 4823}
+    assert datapoints[1] == {'freq': 'q',
+      'label': 'GDP_bln_rub',
+      'time_index': pd.Timestamp('1999-03-31'),
+      'value': 901}
+    assert datapoints[2] == {'freq': 'q',
+      'label': 'GDP_bln_rub',
+      'time_index': pd.Timestamp('1999-06-30'),
+      'value': 1102}
+    assert datapoints[3] == {'freq': 'q',
+      'label': 'GDP_bln_rub',
+      'time_index': pd.Timestamp('1999-09-30'),
+      'value': 1373}
+    assert datapoints[4] == {'freq': 'q',
+      'label': 'GDP_bln_rub',
+      'time_index': pd.Timestamp('1999-12-31'),
+      'value': 1447}
+
+if __name__ == "__main__": # pragma: no cover
+    for t in tables:
+        print(t.varname, t.unit)

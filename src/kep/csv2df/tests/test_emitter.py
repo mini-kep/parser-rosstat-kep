@@ -12,29 +12,6 @@ import kep.csv2df.emitter as emitter
 
 # stateless functions
 
-class Test_Function_to_float_on_values:
-    # risk area: may be None instead of False, to discuss
-    def test_on_invalid_characters_returns_False(self):
-        for x in [None, "", " ", "…", "-", "a", "ab", " - "]:
-            assert emitter.to_float(x) is False
-
-    def test_on_single_value_returns_float(self):
-        assert emitter.to_float('5.678,') == 5.678
-        assert emitter.to_float('5.678,,') == 5.678
-        assert emitter.to_float("5.6") == 5.6
-        assert emitter.to_float("5,6") == 5.6
-        assert emitter.to_float("5,67") == 5.67
-        assert emitter.to_float("5,67,") == 5.67
-
-    def test_on_comments_returns_float(self):
-        assert emitter.to_float('123,0 4561)') == 123
-        assert emitter.to_float('6762,31)2)') == 6762.3
-        assert emitter.to_float('1734.4 1788.42)') == 1734.4
-
-    def test_on_max_recursion_depth_throws_exception(self):
-        with pytest.raises(ValueError):
-            emitter.to_float("1.2,,,,,")
-
 
 def test_DatapointMaker():
     d = emitter.DatapointMaker('2000', 'abc')

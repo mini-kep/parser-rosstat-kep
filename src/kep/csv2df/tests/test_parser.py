@@ -1,5 +1,6 @@
 ﻿import itertools
 import pytest
+import pandas as pd
 
 # fixtures
 from ..row_model import Row
@@ -211,6 +212,19 @@ class Test_extract_tables_function:
 #        for i, t in enumerate(gen):
 #            assert t == Sample.table(i)
 #            assert t.label == Sample.label(i)
+
+
+
+from kep.csv2df.parser import timestamp_quarter, timestamp_month, timestamp_annual
+
+def test_timestamp_quarter():
+    assert timestamp_quarter(1999, 1) == pd.Timestamp('1999-03-31')            
+
+def test_timestamp_month():
+    assert timestamp_month(1999, 1) == pd.Timestamp('1999-01-31')     
+
+def test_timestamp_annual():
+    assert timestamp_annual(1999) == pd.Timestamp('1999-12-31')     
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-"""Parse CSV text *csv_segment* using parsing de
+"""Parse CSV text *csv_segment* using parsing definition *pdef*:
 
    extract_tables(csv_segment, pdef)
 
@@ -10,6 +10,7 @@ from collections import OrderedDict as odict
 
 import kep.csv2df.util_row_splitter as splitter
 from kep.csv2df.util_label import make_label
+from kep.csv2df.util_to_float import to_float
 
 
 __all__ = ['extract_tables']
@@ -22,7 +23,7 @@ def extract_tables(csv_segment: str, pdef):
         csv_segment(str): CSV text
         pdef: parsing defintions with search strings for header and unit
         
-    Retruns:
+    Returns:
         list of Table() instances    
     """
     tables = split_to_tables(csv_segment)
@@ -194,40 +195,6 @@ def timestamp_quarter(year, quarter):
 def timestamp_month(year, month):
     return pd.Timestamp(year, month, 1) + pd.offsets.MonthEnd()
 
-# TODO: move to test
-assert timestamp_quarter(1999, 1) == pd.Timestamp('1999-03-31')
-
-
-COMMENT_CATCHER = re.compile("\D*(\d+[.,]?\d*)\s*(?=\d\))")
-
-def to_float(text: str, i=0):
-    """Convert *text* to float() type.
-
-    Returns:
-        Float value, or False if not successful.
-    """
-    i += 1
-    if i > 5:
-        raise ValueError("Max recursion depth exceeded on '{}'".format(text))
-    if not text:
-        return False
-    text = text.replace(",", ".")
-    try:
-        return float(text)
-    except ValueError:
-        # note: order of checks important
-        if " " in text.strip():  # get first value '542,0 5881)'
-            return to_float(text.strip().split(" ")[0], i)
-        if ")" in text:  # catch '542,01)'
-            match_result = COMMENT_CATCHER.match(text)
-            if match_result:
-                text = match_result.group(0)
-                return to_float(text, i)
-        if text.endswith(".") or text.endswith(","):  # catch 97.1,
-            return to_float(text[:-1], i)
-        return False
-
-# TODO: move test from emitter.py 
 
 if __name__ == "__main__": # pragma: no cover
     from kep.csv2df.row_model import Row
