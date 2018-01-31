@@ -6,6 +6,7 @@ doc2/
 
 src/.idea
 src/.vscode
+src/.cache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
