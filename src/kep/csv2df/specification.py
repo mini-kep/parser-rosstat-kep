@@ -175,8 +175,8 @@ class Definition:
         self.segments = []
         self.units = units
 
-    def append(self, commands, **kwargs):         
-        pdef = Def(commands, self.units, **kwargs) 
+    def append(self, commands, boundaries, reader=None):         
+        pdef = Def(commands, self.units, boundaries, reader) 
         self.segments.append(pdef)
 
     def attach_data(self, csv_text):

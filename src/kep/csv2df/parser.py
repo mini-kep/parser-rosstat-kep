@@ -4,7 +4,6 @@
 
 """
 
-import re
 from enum import Enum, unique
 from collections import OrderedDict as odict
 
@@ -21,7 +20,7 @@ def extract_tables(csv_segment: str, pdef):
     
     Args:
         csv_segment(str): CSV text
-        pdef: parsing defintions with search strings for header and unit
+        pdef: parsing defintion with search strings for header and unit
         
     Returns:
         list of Table() instances    
