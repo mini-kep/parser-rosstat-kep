@@ -1,4 +1,5 @@
 import re
+
 COMMENT_CATCHER = re.compile("\D*(\d+[.,]?\d*)\s*(?=\d\))")
 
 def to_float(text: str, i=0):
@@ -27,5 +28,3 @@ def to_float(text: str, i=0):
         if text.endswith(".") or text.endswith(","):  # catch 97.1,
             return to_float(text[:-1], i)
         return False
-
-# TODO: move test from emitter.py 

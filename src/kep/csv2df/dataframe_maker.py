@@ -2,8 +2,6 @@
 
 import pandas as pd
 
-# TODO: use tests from emitter.py
-#       + delete emitter.py
 
 def get_duplicates(df):
     if df.empty:
@@ -94,12 +92,12 @@ if __name__ == '__main__':
     dfm = e.get_dataframe('m')
     
 
-    from kep.csv2df.row_stack import text_to_rows
+    from kep.csv2df.row_stack import text_to_list
     from kep.csv2df.parser import extract_tables
     from kep.csv2df.specification import Def
     
     # input data
-    csv_segment = text_to_rows(
+    csv_segment = text_to_list(
 """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447
 2000	7306	1527	1697	2038	2044""")   

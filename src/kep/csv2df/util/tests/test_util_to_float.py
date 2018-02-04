@@ -1,6 +1,7 @@
 import pytest
-from kep.csv2df.util_to_float import to_float
-import pandas as pd
+
+from kep.csv2df.util.to_float import to_float
+
 
 class Test_to_float:
     def test_on_invalid_characters_returns_False(self):

@@ -1,16 +1,15 @@
 ﻿import itertools
-import pytest
-import pandas as pd
 
+import pandas as pd
+import pytest
+
+from kep.csv2df.util.row_splitter import split_row_by_year_and_qtr
+# testing
+from ..parser import Table, split_to_tables, extract_tables
 # fixtures
 from ..row_model import Row
 from ..specification import ParsingCommand, Def
-from ..util_row_splitter import split_row_by_year_and_qtr
 from ...parsing_definition.units import UNITS
-
-# testing
-from ..parser import Table, split_to_tables, extract_tables
-
 
 gdp_def = dict(var="GDP",
                header='Объем ВВП',
