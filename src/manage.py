@@ -3,6 +3,7 @@
 from kep.extractor import Vintage
 from kep.download.download import RemoteFile
 from kep.word2csv.word import word2csv
+from kep.helper.path import copy_to_latest_folder
 
 
 def run(year, month):
@@ -26,7 +27,7 @@ if '__main__' == __name__:
     year, month = (int(sys.argv[i]) for i in (2,3))
     
     if command == 'download':
-        # FIXME: when no data, must not download file 
+        # FIXME: when no data available, must not download file (currently in is a #k html error message) 
         remote = RemoteFile(year, month)
         remote.download()
         remote.unrar()
@@ -39,8 +40,11 @@ if '__main__' == __name__:
         vint.validate()
         vint.save()
 
+    if command == 'latest':
+        copy_to_latest_folder(year, month)
+        
     if command == 'upload':
-        # TODO: upload method to database
+        # TODO: upload latest data to database
         raise NotImplementedError        
 
     if command == 'all':
