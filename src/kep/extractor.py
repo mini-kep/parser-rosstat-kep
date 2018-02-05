@@ -51,11 +51,17 @@ class Vintage:
         return "Vintage({}, {})".format(self.year, self.month)
 
 if __name__ == "__main__":
-    v = Vintage(2016, 10)
-    v.validate()
+    # v = Vintage(2016, 10)
+    # v.validate()
     # Test values parsed OK for Vintage(2016, 10)
     
-    csv_text = InterimCSV(2016, 10).text()
-    PARSING_DEFINITION.attach_data(csv_text)
-    emitter = Datapoints(PARSING_DEFINITION.tables)
+    #csv_text = InterimCSV(2016, 10).text()
+    #PARSING_DEFINITION.attach_data(csv_text)
+    #emitter = Datapoints(PARSING_DEFINITION.tables)
+    import sys
+    print (sys.argv)
+
+    download
+    
+
     
