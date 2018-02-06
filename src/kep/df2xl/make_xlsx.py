@@ -2,7 +2,7 @@
 
 import pandas as pd
 
-from kep.experimental.getter import get_dataframe
+from kep.access import get_dataframe
 from kep.helper.path import XL_PATH
 
 

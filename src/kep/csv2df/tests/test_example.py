@@ -62,7 +62,7 @@ csv_text = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.
 1.7.1. Инвестиции в основной капитал организаций"""
 
 from collections import OrderedDict as odict
-from kep.csv2df.row_stack import text_to_list
+from kep.csv2df.reader import text_to_list
 from kep.csv2df.specification import Def
 from kep.csv2df.parser import split_to_tables, parse_tables
 

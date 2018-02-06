@@ -1,10 +1,22 @@
+Recent issues
+=============
+
+- relative imports in package
+- restoring tests
+- upload method
+- checkpoints
+- variable name descriptions
+
+Outdated
+========
+
 Issues
-=======
+------
 - add more parsing definitions
 - add variable name descriptions
 
 Todo
-====
+----
 - make Excel + add new sheet 
 - revisions case
 - finish variable grouping
@@ -15,13 +27,14 @@ Todo
 - move usercase folder
 
 Not todo
-========
+--------
 - CPI_yoy /?
 - renaming variables after parsing /?
 - smplify validator /?
 - repair sphynx docs
 
+
 Discuss
-=======
+-------
 - may use a webhook to upload to database
 - add uploader code
