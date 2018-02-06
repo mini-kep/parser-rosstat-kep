@@ -1,22 +1,22 @@
-import io
 import pytest
 
-from kep.csv2df.row_model import Row
-from kep.csv2df.row_stack import (RowStack, is_valid_row, yield_csv_rows,
-                                  text_to_rows)   
+from kep.csv2df.reader import is_valid_row, yield_csv_rows, text_to_list, Popper
 
+DOC = """__________
+\t\t\t
+Объем ВВП
+1999\t4823
+2000\t7306"""
 
-junk_string = "________\n\n\t\t\t"
-content_string = "Объем ВВП\n1999\t4823\n2000\t7306"
-full_string = "\n".join([junk_string, content_string])
+ROWS = [['__________'],
+ ['', '', '', ''],
+ ['Объем ВВП'],
+ ['1999', '4823'],
+ ['2000', '7306']]
 
-
-def test_yield_csv_rows():
-    filelike = io.StringIO(content_string)
-    rows = list(yield_csv_rows(filelike))
-    assert rows[0] == ["Объем ВВП"]
-    assert rows[1] == ["1999", "4823"]
-    assert rows[2] == ["2000", "7306"]
+CLEAN_ROWS = [['Объем ВВП'],
+ ['1999', '4823'],
+ ['2000', '7306']]
 
 
 def test_is_valid_row():
@@ -30,14 +30,14 @@ def test_is_valid_row():
         assert is_valid_row(row) is False
     assert is_valid_row(['abc'])
 
+def test_yield_csv_rows():
+    assert list(yield_csv_rows(DOC)) == ROWS
 
 def test_text_to_rows():
-    rows = list(text_to_rows(content_string))
-    assert rows[0] == Row(["Объем ВВП"])
-    assert rows[1] == Row(["1999", "4823"])
-    assert rows[2] == Row(["2000", "7306"])
-    
+    assert text_to_list(DOC) == CLEAN_ROWS 
 
+    
+# Test Popper class    
 def mock_rows():
     yield ["apt extra text", "1", "2"]
     yield ["bat aa...ah", "1", "2"]
@@ -49,27 +49,30 @@ def mock_rows():
 csv_rows = '\n'.join(['\t'.join(row) for row in mock_rows()])
 
 @pytest.fixture
-def rowstack():   
-    return RowStack(csv_rows)
+def popper():   
+    return Popper(csv_rows)
 
 
-class Test_Rowstack:
+class Test_Popper:
 
-    def test_init(self, rowstack):
-        assert isinstance(rowstack.rows, list)
-        assert len(rowstack.rows) == 6
+    def test_init(self, popper):
+        assert isinstance(popper.rows, list)
+        assert len(popper.rows) == 6
+        assert isinstance(popper.rows[0], list) 
+        assert popper.rows[0][0] == "apt extra text"
 
-    def test_pop(self, rowstack):
-        a = rowstack.pop("bat", "dot")
-        assert a == [Row(["bat aa...ah", "1", "2"]),
-                     Row(["can extra text", "1", "2"])]
 
-    def test_pop_segment_and_remaining_rows_behaviour(self, rowstack):
-        b = rowstack.pop("apt", "wed")
+    def test_pop(self, popper):
+        a = popper.pop("bat", "dot")
+        assert a == [["bat aa...ah", "1", "2"],
+                     ["can extra text", "1", "2"]]
+
+    def test_pop_segment_and_remaining_rows_behaviour(self, popper):
+        b = popper.pop("apt", "wed")
         assert len(b) == 4
-        c = rowstack.remaining_rows()
-        assert c[0] == Row(["wed more text", "1", "2"])
-        assert c[1] == Row(["zed some text"])        
+        c = popper.remaining_rows()
+        assert c[0] == ["wed more text", "1", "2"]
+        assert c[1] == ["zed some text"]        
 
 if __name__ == "__main__":
     pytest.main([__file__])

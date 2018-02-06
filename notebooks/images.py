@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+from urllib.parse import urljoin
+
 import matplotlib.pyplot as plt
 import pandas as pd
-
 from kep.config import find_repo_root
-from urllib.parse import urljoin
 
 
 def get_pix_folder(subfolder):
@@ -200,7 +200,7 @@ def save_all_series(df):
 
 
 def plot_all_dataframes():
-    dfa, dfq, dfm = (getter.get_dataframe(freq) for freq in 'aqm')
+    dfa, dfq, dfm = (access.get_dataframe(freq) for freq in 'aqm')
     save_all_series(dfa)
     save_all_series(dfq)
     save_all_series(dfm)
@@ -208,8 +208,9 @@ def plot_all_dataframes():
 
 if __name__ == "__main__":
 
-    import getter
-    dfa, dfq, dfm = (getter.get_dataframe(freq) for freq in 'aqm')
+    from kep import access
+
+    dfa, dfq, dfm = (access.get_dataframe(freq) for freq in 'aqm')
 
     ts = dfm.CPI_rog
     s = Spline(ts)

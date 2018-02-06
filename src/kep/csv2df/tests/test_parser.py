@@ -1,16 +1,15 @@
 ﻿import itertools
-import pytest
+
 import pandas as pd
+import pytest
 
-# fixtures
-from ..row_model import Row
-from ..specification import ParsingCommand, Def
-from ..util_row_splitter import split_row_by_year_and_qtr
-from ...parsing_definition.units import UNITS
-
+from kep.csv2df.util.row_splitter import split_row_by_year_and_qtr
 # testing
 from ..parser import Table, split_to_tables, extract_tables
-
+# fixtures
+#from ..row_model import Row
+from ..specification import ParsingCommand, Def
+from ...parsing_definition.units import UNITS
 
 gdp_def = dict(var="GDP",
                header='Объем ВВП',
@@ -51,16 +50,16 @@ parsed_units = {0: 'bln_rub',
                 1: 'rog',
                 2: 'yoy'}
 
-headers = {0: [Row(['Объем ВВП', '', '', '', '']),
-               Row(['млрд.рублей', '', '', '', ''])],
-           1: [Row(['Индекс ВВП, в % к прошлому периоду/ GDP index, percent'])],
-           2: [Row(['Индекс промышленного производства']),
-               Row(['в % к соответствующему периоду предыдущего года'])]
+headers = {0: [['Объем ВВП', '', '', '', ''],
+               ['млрд.рублей', '', '', '', '']],
+           1: [['Индекс ВВП, в % к прошлому периоду/ GDP index, percent']],
+           2: [['Индекс промышленного производства'],
+               ['в % к соответствующему периоду предыдущего года']]
            }
 
-data_items = {0: [Row(["1991", "4823", "901", "1102", "1373", "1447"])],
-              1: [Row(['1999', '106,4', '98,1', '103,1', '111,4', '112,0'])],
-              2: [Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])]
+data_items = {0: [["1991", "4823", "901", "1102", "1373", "1447"]],
+              1: [['1999', '106,4', '98,1', '103,1', '111,4', '112,0']],
+              2: [['1991', '102,7', '101,1', '102,2', '103,3', '104,4']]
               }
 
 
@@ -98,14 +97,14 @@ def mock_rows():
 class Test_fixtures:
 
     def test_mock_rows(self):
-        assert list(mock_rows()) == [Row(['Объем ВВП', '', '', '', '']),
-                                     Row(['млрд.рублей', '', '', '', '']),
-                                     Row(['1991', '4823', '901', '1102', '1373', '1447']),
-                                     Row(['Индекс ВВП, в % к прошлому периоду/ GDP index, percent']),
-                                     Row(['1999', '106,4', '98,1', '103,1', '111,4', '112,0']),
-                                     Row(['Индекс промышленного производства']),
-                                     Row(['в % к соответствующему периоду предыдущего года']),
-                                     Row(['1991', '102,7', '101,1', '102,2', '103,3', '104,4'])]
+        assert list(mock_rows()) == [['Объем ВВП', '', '', '', ''],
+                                     ['млрд.рублей', '', '', '', ''],
+                                     ['1991', '4823', '901', '1102', '1373', '1447'),
+                                     ['Индекс ВВП, в % к прошлому периоду/ GDP index, percent'],
+                                     ['1999', '106,4', '98,1', '103,1', '111,4', '112,0'],
+                                     ['Индекс промышленного производства'],
+                                     ['в % к соответствующему периоду предыдущего года'],
+                                     ['1991', '102,7', '101,1', '102,2', '103,3', '104,4']]
 
     def test_regression_same_string_used_in_first_row_and_pdef(self):
         assert [k for k in Sample.pdef().mapper][0] == \

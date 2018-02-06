@@ -1,6 +1,6 @@
 import pytest
 
-from kep.extractor import Vintage
+from kep.vintage import Vintage
 
 # TODO: implement tests
 @pytest.mark.skip("Only a sceleton.")
