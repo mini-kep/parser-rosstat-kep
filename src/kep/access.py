@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from kep.helper.path import Folders, ProcessedCSV
+from kep.helper.path import get_path_in_latest_folder
 
 
 def read_csv(source):
@@ -31,14 +31,9 @@ def proxy(path):
     return StringIO(content)
 
 
-def get_csv_path(freq):
-    filename = ProcessedCSV.make_filename(freq)
-    return str(Folders.latest / filename) 
-
-
-def get_dataframe(freq, get_csv_file_helper=get_csv_path):
+def get_dataframe(freq):
     """Read dataframe from local folder"""
-    path = get_csv_file_helper(freq)
+    path = get_path_in_latest_folder(freq)
     filelike = proxy(path)
     return read_csv(filelike)
 

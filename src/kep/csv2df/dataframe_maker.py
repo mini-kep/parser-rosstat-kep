@@ -92,7 +92,7 @@ if __name__ == '__main__':
     dfm = e.get_dataframe('m')
     
 
-    from kep.csv2df.row_stack import text_to_list
+    from kep.csv2df.reader import text_to_list
     from kep.csv2df.parser import extract_tables
     from kep.csv2df.specification import Def
     

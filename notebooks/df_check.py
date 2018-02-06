@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import pandas as pd
-from collections import defaultdict
+
 
 # TODO <https://github.com/epogrebnyak/mini-kep/issues/61>
 
@@ -125,7 +125,7 @@ def get_unique_varnames(df_list):
 
 if __name__ == "__main__":
 
-    from getter import dfa, dfm, dfq
+    from kep.access import dfa, dfm, dfq
 
     all_setups = []
 

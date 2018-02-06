@@ -4,7 +4,7 @@
 
 from kep.csv2df.parser import extract_tables
 from kep.csv2df.row_model import Row
-from kep.csv2df.row_stack import Popper
+from kep.csv2df.reader import Popper
 from kep.csv2df.util.label import make_label
 
 

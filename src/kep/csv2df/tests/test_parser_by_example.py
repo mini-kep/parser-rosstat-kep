@@ -64,7 +64,7 @@ csv_text = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.
 from collections import OrderedDict as odict
 import pandas as pd
 
-from kep.csv2df.row_stack import text_to_list
+from kep.csv2df.reader import text_to_list
 from kep.csv2df.specification import Def
 from kep.csv2df.parser import split_to_tables, parse_tables
 from kep.csv2df.row_model import Row

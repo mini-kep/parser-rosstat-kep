@@ -1,6 +1,6 @@
 """Run full cycle of data processing from download to saving dataframe."""
 
-from kep.extractor import Vintage
+from kep.vintage import Vintage
 from kep.download.download import RemoteFile
 from kep.word2csv.word import word2csv
 from kep.helper.path import copy_to_latest_folder
