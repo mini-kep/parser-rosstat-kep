@@ -55,7 +55,9 @@ if __name__ == "__main__":
     v.validate()
     # Test values parsed OK for Vintage(2016, 10)
     
-    csv_text = InterimCSV(2016, 10).text()
-    PARSING_DEFINITION.attach_data(csv_text)
-    emitter = Datapoints(PARSING_DEFINITION.tables)
+    #csv_text = InterimCSV(2016, 10).text()
+    #PARSING_DEFINITION.attach_data(csv_text)
+    #emitter = Datapoints(PARSING_DEFINITION.tables)
+
+
     

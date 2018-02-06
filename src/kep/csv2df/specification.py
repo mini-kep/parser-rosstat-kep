@@ -52,8 +52,7 @@ class Scope():
             e = marker['end']
             if self._is_found(s, rows) and self._is_found(e, rows):
                 return s, e
-        msg = self._error_message(rows)
-        raise ValueError(msg)
+        self._error_message(rows)
 
     @staticmethod
     def _is_found(line, rows):
@@ -80,7 +79,7 @@ class Scope():
             e = marker['end']
             msg.append('is_found: {} <{}>'.format(self._is_found(s, rows), s))
             msg.append('is_found: {} <{}>'.format(self._is_found(e, rows), e))
-        return '\n'.join(msg)
+        raise ValueError('\n'.join(msg))
 
     def __str__(self):  # possible misuse of special method consider using __str__
         s = self.__markers[0]['start'][:10]

@@ -12,6 +12,7 @@ Classes:
 """
 
 from pathlib import Path
+import shutil
 
 from kep import FREQUENCIES
 from kep.helper.date import is_supported_date
@@ -129,6 +130,24 @@ class ProcessedCSV:
 
     def path(self, freq: str):
         return self.folder / self.make_filename(freq)
+
+
+def get_path_in_latest_folder(freq: str):
+    return Folders.latest / ProcessedCSV.make_filename(freq)
+
+
+def copy_to_latest_folder(year: int, month: int):
+    """Copy csv files from folder like
+            *processed/2017/04*
+        to
+           *processed/latest* folder.
+    """
+    csv_file = ProcessedCSV(year, month)
+    for freq in FREQUENCIES:
+        src = str(csv_file.path(freq))
+        dst = str(get_path_in_latest_folder(freq))
+        shutil.copyfile(src, dst)
+        print("Updated", dst)
 
 
 if __name__ == "__main__":
