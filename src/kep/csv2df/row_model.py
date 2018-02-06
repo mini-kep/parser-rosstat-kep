@@ -1,6 +1,25 @@
-"""Read CSV file and represent it as a list of Row class instances."""
+"""Operations on CSV file row as Row class."""
 
 import re
+
+YEAR_CATCHER = re.compile("\D*(\d{4}).*")
+
+
+def get_year(string: str, rx=YEAR_CATCHER):
+    """Extracts year from *string* using *rx* regex.
+
+       Returns:
+           Year as integer
+           False if year is not valid or not in plausible range."""
+    match = re.match(rx, string)
+    if match:
+        year = int(match.group(1))
+        if year >= 1991 and year <= 2050:
+            return year
+    return False
+
+def is_year(string: str) -> bool:
+    return get_year(string) is not False
 
 
 class Row:
@@ -54,7 +73,8 @@ class Row:
         rx = r"\b{}".format(pat)
         return bool(re.search(rx, self.name))
 
-    def get_year(self):
+    @property
+    def year(self):
         """Extract year as integer from *self.name*
 
         If *self.name* cannot be parsed as a year, False is returned
@@ -117,33 +137,7 @@ class Row:
         return bool(self.name == x.name and self.data == x.data)
 
     def __str__(self):
-        if "".join(self.data):
-            return "<{} | {}>".format(self.name, " ".join(self.data))
-        else:
-            return "<{}>".format(self.name)
+        return "<{} | {}>".format(self.name, " ".join(self.data))
 
     def __repr__(self):
         return "Row({})".format([self.name] + self.data)
-
-
-# TODO: add anywhitespace or non-digits to start
-YEAR_CATCHER = re.compile("(\d{4}).*")
-
-
-def get_year(string: str, rx=YEAR_CATCHER):
-    """Extracts year from *string* using *rx* regex.
-
-       Returns:
-           Year as integer
-           False if year is not valid or not in plausible range."""
-    match = re.match(rx, string)
-    if match:
-        year = int(match.group(1))
-        if year >= 1991 and year <= 2050:
-            return year
-    return False
-
-
-def is_year(string: str) -> bool:
-    return get_year(string) is not False
-

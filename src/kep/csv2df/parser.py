@@ -4,25 +4,25 @@
 
 """
 
-import re
-from enum import Enum, unique
 from collections import OrderedDict as odict
+from enum import Enum, unique
 
-import kep.csv2df.util_row_splitter as splitter
-from kep.csv2df.util_label import make_label
-from kep.csv2df.util_to_float import to_float
-
+import kep.csv2df.util.row_splitter as splitter
+from kep.csv2df.row_model import Row
+from kep.csv2df.row_stack import text_to_list
+from kep.csv2df.util.label import make_label
+from kep.csv2df.util.to_float import to_float
 
 __all__ = ['extract_tables']
 
 
 def extract_tables(csv_segment: str, pdef):
     """Extract tables from *csv_segment* string using *pdef* parsing defintion.
-    
+
     Args:
         csv_segment(str): CSV text
-        pdef: parsing defintions with search strings for header and unit
-        
+        pdef: parsing defintion with search strings for header and unit
+
     Returns:
         list of Table() instances    
     """
@@ -33,11 +33,12 @@ def extract_tables(csv_segment: str, pdef):
 
 
 def parse_tables(tables, pdef):
-    # assign reader function    
-    tables = [t.set_splitter(pdef.reader) for t in tables]    
+    # assign reader function
+    tables = [t.set_splitter(pdef.reader) for t in tables]
     # parse tables to obtain labels - set label and splitter
-    tables = [t.set_label(pdef.mapper, pdef.units) for t in tables]    
+    tables = [t.set_label(pdef.mapper, pdef.units) for t in tables]
     # assign trailing units
+
     def fix_multitable_units(tables):
         """For tables without *varname* - copy *varname* from previous table.
            Applies to tables where all rows are known rows.
@@ -77,7 +78,8 @@ def split_to_tables(rows):
     headers = []
     state = State.INIT
     for row in rows:
-        if row.is_datarow():
+        r = Row(row)
+        if r.is_datarow():
             datarows.append(row)
             state = State.DATA
         else:
@@ -96,34 +98,35 @@ class Table:
     """Representation of CSV table, has headers and datarows."""
 
     KNOWN = "+"
-    UNKNOWN = "-"    
+    UNKNOWN = "-"
 
     def __init__(self, headers, datarows):
         self.headers = headers
         self.datarows = datarows
-        # parsing 
+        # parsing
         self.splitter_func = None
         self.varname = None
         self.unit = None
         self.datapoints = []
         # header indicator
-        self.lines = odict((row.name, self.UNKNOWN) for row in headers)
+        self.lines = odict((Row(row).name, self.UNKNOWN) for row in headers)
 
     @property
     def coln(self):
         """Number of columns in table."""
-        return max(len(row) for row in self.datarows)
+        return max(len(Row(row)) for row in self.datarows)
 
     def set_label(self, varnames_dict, units_dict):
         for row in self.headers:
-            varname = row.get_varname(varnames_dict)
+            r = Row(row)
+            varname = r.get_varname(varnames_dict)
             if varname:
                 self.varname = varname
-                self.lines[row.name] = self.KNOWN
-            unit = row.get_unit(units_dict)
+                self.lines[Row(row).name] = self.KNOWN
+            unit = r.get_unit(units_dict)
             if unit:
                 self.unit = unit
-                self.lines[row.name] = self.KNOWN
+                self.lines[Row(row).name] = self.KNOWN
         return self
 
     def set_splitter(self, reader):
@@ -150,28 +153,30 @@ class Table:
 
     def __str__(self):
         show = ["Table {} ({} columns)".format(self.label, self.coln),
-                '\n'.join(["{} <{}>".format(v, k) for k, v in self.lines.items()]),
+                '\n'.join(["{} <{}>".format(v, k)
+                           for k, v in self.lines.items()]),
                 '\n'.join([str(row) for row in self.datarows])
-                ]
+               ]
         return "\n".join(show)
 
     def __repr__(self):
         return "Table(\n    headers={},\n    datarows={})" \
                .format(repr(self.headers), repr(self.datarows))
-               
+
     def make_datapoint(self, value: str, time_stamp, freq):
-        return dict(label=self.label, 
-                    value=to_float(value), 
-                    time_index = time_stamp, 
+        return dict(label=self.label,
+                    value=to_float(value),
+                    time_index=time_stamp,
                     freq=freq)
-               
+
     def extract_values(self):
         """Yield dictionaries with variable name, frequency, time_index 
            and value.
         """
         for row in self.datarows:
-            year=row.get_year()
-            a_value, q_values, m_values = self.splitter_func(row.data)
+            year = Row(row).year
+            data = Row(row).data
+            a_value, q_values, m_values = self.splitter_func(data)
             if a_value:
                 time_stamp = timestamp_annual(year)
                 yield self.make_datapoint(a_value, time_stamp, 'a')
@@ -184,47 +189,64 @@ class Table:
                     time_stamp = timestamp_month(year,  t + 1)
                     yield self.make_datapoint(val, time_stamp, 'm')
 
-import pandas as pd 
+
+import pandas as pd
+
+
 def timestamp_annual(year):
     return pd.Timestamp(year, 12, 31)
+
 
 def timestamp_quarter(year, quarter):
     month = quarter * 3
     return timestamp_month(year, month)
 
+
 def timestamp_month(year, month):
     return pd.Timestamp(year, month, 1) + pd.offsets.MonthEnd()
 
 
-if __name__ == "__main__": # pragma: no cover
-    from kep.csv2df.row_model import Row
-    rows = [
-        Row(['Объем ВВП, млрд.рублей / Gross domestic product, bln rubles']), 
-        Row(['1999', '4823', '901', '1102', '1373', '1447'])
-    ]
+if __name__ == "__main__":  # pragma: no cover
+    DOC = """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
+1999	4823	901	1102	1373	1447
+2000	7306	1527	1697	2038	2044"""
+    rows = text_to_list(DOC)
     tables = list(split_to_tables(rows))
     t = tables[0]
     t.set_splitter(None)
     t.varname = 'GDP'
     t.unit = 'bln_rub'
-    datapoints = list(t.extract_values())    
+    datapoints = list(t.extract_values())
     assert datapoints[0] == {'freq': 'a',
-      'label': 'GDP_bln_rub',
-      'time_index': pd.Timestamp('1999-12-31'),
-      'value': 4823}
+                             'label': 'GDP_bln_rub',
+                             'time_index': pd.Timestamp('1999-12-31'),
+                             'value': 4823}
     assert datapoints[1] == {'freq': 'q',
-      'label': 'GDP_bln_rub',
-      'time_index': pd.Timestamp('1999-03-31'),
-      'value': 901}
+                             'label': 'GDP_bln_rub',
+                             'time_index': pd.Timestamp('1999-03-31'),
+                             'value': 901}
     assert datapoints[2] == {'freq': 'q',
-      'label': 'GDP_bln_rub',
-      'time_index': pd.Timestamp('1999-06-30'),
-      'value': 1102}
+                             'label': 'GDP_bln_rub',
+                             'time_index': pd.Timestamp('1999-06-30'),
+                             'value': 1102}
     assert datapoints[3] == {'freq': 'q',
-      'label': 'GDP_bln_rub',
-      'time_index': pd.Timestamp('1999-09-30'),
-      'value': 1373}
+                             'label': 'GDP_bln_rub',
+                             'time_index': pd.Timestamp('1999-09-30'),
+                             'value': 1373}
     assert datapoints[4] == {'freq': 'q',
-      'label': 'GDP_bln_rub',
-      'time_index': pd.Timestamp('1999-12-31'),
-      'value': 1447}
+                             'label': 'GDP_bln_rub',
+                             'time_index': pd.Timestamp('1999-12-31'),
+                             'value': 1447}
+#    [['1. Сводные показатели / Aggregated indicators', '', '', '', '', ''],
+# ['1.1. Валовой внутренний продукт1) / Gross domestic product1)',
+#  '',
+#  '',
+#  '',
+#  '',
+#  ''],
+# ['1.1.1. Объем ВВП, млрд.рублей /GDP, bln rubles', '', '', '', '', ''],
+# ['1999', '4823', '901', '1102', '1373', '1447'],
+# ['2000', '7306', '1527', '1697', '2038', '2044'],
+# ['2001', '8944', '1901', '2105', '2488', '2450'],
+# ['2002', '10831', '2262', '2529', '3013', '3027'],]
+    

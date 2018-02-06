@@ -2,9 +2,10 @@
 
 """
 
-from kep.csv2df.util_label import make_label
-from kep.csv2df.row_stack import RowStack
 from kep.csv2df.parser import extract_tables
+from kep.csv2df.row_model import Row
+from kep.csv2df.row_stack import Popper
+from kep.csv2df.util.label import make_label
 
 
 def as_list(x):
@@ -60,8 +61,8 @@ class Scope():
            True, if *line* found at start of some entry in *rows*
            False otherwise
         """
-        for r in rows:
-            if r.startswith(line):
+        for row in rows:
+            if Row(row).startswith(line):
                 return True
         return False
 
@@ -174,8 +175,8 @@ class Definition:
         self.segments = []
         self.units = units
 
-    def append(self, commands, **kwargs):         
-        pdef = Def(commands, self.units, **kwargs) 
+    def append(self, commands, boundaries, reader=None):         
+        pdef = Def(commands, self.units, boundaries, reader) 
         self.segments.append(pdef)
 
     def attach_data(self, csv_text):
@@ -190,7 +191,7 @@ class Definition:
         Yields:
             Parsing definiton with a *csv_segment* assigned. 
         """
-        stack = RowStack(csv_text) 
+        stack = Popper(csv_text) 
         for pdef in self.segments:
             start, end = pdef.get_bounds(stack.rows)
             pdef.csv_segment = stack.pop(start, end) 

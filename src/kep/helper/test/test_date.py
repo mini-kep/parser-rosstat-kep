@@ -1,4 +1,5 @@
 import pytest
+import arrow
 
 from kep.helper.path import (UNPACK_RAR_EXE, XL_PATH,
                              DataFolder, 
@@ -40,7 +41,8 @@ class Test_DataFolder():
 
     def test_out_of_range_year_does_raises_error(self):
         with pytest.raises(ValueError):
-            DataFolder(2018, 1)
+            year  = arrow.now().year + 1
+            DataFolder(year, 1)
 
 class Test_LocalRarFile():
     path = LocalRarFile(2015, 5).path
