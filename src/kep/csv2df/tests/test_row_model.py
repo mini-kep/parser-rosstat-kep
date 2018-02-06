@@ -1,8 +1,7 @@
 import pytest
 from collections import OrderedDict as odict
 
-# FIXME: rename reader to 'row_view' 
-from ..row_model import get_year, is_year, Row
+from kep.csv2df.row_model import get_year, is_year, Row
 
 class Test_get_year():
     def test_get_year(self):
@@ -64,7 +63,7 @@ class Test_Row_Methods(Test_Row):
             assert eval(repr(row)) == row
 
     def test_str_method(self):
-        assert str(self.row1) == "<Объем ВВП>"
+        assert str(self.row1).startswith("<Объем ВВП")
         assert str(self.row2) == "<1991 1) | 4823 901 1102 1373 1447>"
         assert str(self.row3)  # just checking it is callable
 

@@ -11,7 +11,7 @@ In this repo we extract time series as pandas dataframes and save them as [CSV f
 
 This code replaces a predecessor repo, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
 
-*NOTE:* Windows and MS Word are required to create interim text dumps from MS Word files. Оnce these text files are created, they can be parsed on a linux machine.
+*NOTE:* Windows and MS Word are required_labels to create interim text dumps from MS Word files. Оnce these text files are created, they can be parsed on a linux machine.
 
 Interface 
 ---------
@@ -111,6 +111,6 @@ All historic raw data available on internet?
 - [ ] Yes
 - [x] No (data prior to 2016-12 is in this repo only)  
 
-Is scrapper automated (can download required information from internet  without manual operations)? 
+Is scrapper automated (can download required_labels information from internet  without manual operations)?
 - [x] Yes
 - [ ] No 

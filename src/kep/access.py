@@ -1,4 +1,5 @@
 """Read canonical dataset from *latest* folder."""
+
 from io import StringIO
 from pathlib import Path
 

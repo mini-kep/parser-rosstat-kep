@@ -1,5 +1,11 @@
 """
 
+*Definition* class holds main and segment parsing instructions. 
+
+*Instruction* holds csv segment boundaries, parsing commands, units of measurement and optional name of a reader function.    
+ 
+Definition().tables property uses csv2df.parser.extract_tables() function.
+
 """
 
 from kep.csv2df.parser import extract_tables
@@ -98,7 +104,7 @@ class ParsingCommand():
                 header string(s) associated with variable names
                 ex: 'Oбъем ВВП' or ['Oбъем ВВП', 'Индекс физического объема произведенного ВВП']
             units (str or list):
-                required unit(s) of measurement
+                required_labels unit(s) of measurement
                 ex: 'bln_usd' or ['rog', 'rub']
         """
         self._varname = var
@@ -107,19 +113,17 @@ class ParsingCommand():
 
     @property
     def mapper(self):
-        return {hs: self._varname for hs in self._header_strings}
+        return {_header_string: self._varname for _header_string in self._header_strings}
 
-    # FIXME: rename to required_labels
     @property
-    def required(self):
+    def required_labels(self):
         return [make_label(self._varname, unit) for unit in self._required_units]
 
     @property
     def units(self):
         return self._required_units
 
-# FIXME: naming 'definition' + 'specification'?
-class Def(object):
+class Definition(object):
     """Holds together:
         - parsing commands
         - units dictionary
@@ -128,7 +132,7 @@ class Def(object):
 
        Properties:
            - mapper (dict)
-           - required (list)
+           - required_labels (list)
            - units (dict)
            - reader (str)
            - scope(Scope)
@@ -138,9 +142,6 @@ class Def(object):
     """
 
     def __init__(self, commands, units, boundaries=None, reader=None):
-        # FIXME: 
-        #if not commands or not units:
-        #    raise ValueError
         self.commands = [ParsingCommand(**c) for c in as_list(commands)]
         self.units = units
         self.csv_segment = ''
@@ -158,8 +159,8 @@ class Def(object):
         return d
 
     @property
-    def required(self):
-        return [r for c in self.commands for r in c.required]
+    def required_labels(self):
+        return [r for c in self.commands for r in c.required_labels]
 
     def get_bounds(self, rows):
         return self.scope.get_bounds(rows)
@@ -168,16 +169,23 @@ class Def(object):
     def tables(self):
         return extract_tables(self.csv_segment, self)
 
-
-class Definition:
+    @property
+    def values(self):
+        return [dp for t in self.tables for dp in t.extract_values()]
+    
+    
+class Specification:
+    """
+    Hold main parsing instruction and instructions by segment.    
+    """
     def __init__(self, commands, units):
-        self.default = Def(commands=commands, units=units)
+        self.default = Definition(commands=commands, units=units)
         self.segments = []
         # these units will be used in all of the parsing
         self.units = units
 
     def append(self, commands, boundaries, reader=None):         
-        pdef = Def(commands=commands, units=self.units, boundaries=boundaries, reader=reader) 
+        pdef = Definition(commands=commands, units=self.units, boundaries=boundaries, reader=reader)
         self.segments.append(pdef)
 
     def attach_data(self, csv_text: str):
@@ -192,3 +200,8 @@ class Definition:
     def tables(self):           
         all_definitions = [self.default] + self.segments 
         return [t for pdef in all_definitions for t in pdef.tables]
+
+    @property
+    def values(self):
+        return [dp for t in self.tables for dp in t.extract_values()]
+    

@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     from kep.csv2df.reader import text_to_list
     from kep.csv2df.parser import extract_tables
-    from kep.csv2df.specification import Def
+    from kep.csv2df.specification import Definition
     
     # input data
     csv_segment = text_to_list(
@@ -104,7 +104,7 @@ if __name__ == '__main__':
 
     # input instruction
     commands = dict(var="GDP", header="Объем ВВП", unit=["bln_rub"])
-    pdef = Def(commands, units={"млрд.рублей": "bln_rub"})
+    pdef = Definition(commands, units={"млрд.рублей": "bln_rub"})
 
     # execution
     tables2 = extract_tables(csv_segment, pdef)

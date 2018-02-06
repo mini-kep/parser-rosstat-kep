@@ -29,8 +29,8 @@ def extract_tables(csv_segment: str, pdef):
     tables = split_to_tables(csv_segment)
     tables = parse_tables(tables, pdef)
     verify_tables(tables, pdef)
-    # there can be more tables than required, occasionally
-    return [t for t in tables if t.label in pdef.required]
+    # there can be more tables than required_labels, occasionally
+    return [t for t in tables if t.label in pdef.required_labels]
 
 
 def parse_tables(tables, pdef):
@@ -50,7 +50,7 @@ def parse_tables(tables, pdef):
 
 def verify_tables(tables, pdef):
     labels_in_tables = [t.label for t in tables]
-    labels_missed = [x for x in pdef.required if x not in labels_in_tables]
+    labels_missed = [x for x in pdef.required_labels if x not in labels_in_tables]
     if labels_missed:
         raise ValueError("Missed labels: {}".format(labels_missed))
 
@@ -221,7 +221,6 @@ def timestamp_month(year, month):
 
 if __name__ == "__main__":  # pragma: no cover
     # example 1
-
     DOC = """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447
 2000	7306	1527	1697	2038	2044"""
@@ -318,7 +317,7 @@ if __name__ == "__main__":  # pragma: no cover
 1.7.1. Инвестиции в основной капитал организаций"""
 
     from kep.csv2df.reader import text_to_list
-    from kep.csv2df.specification import Def
+    from kep.csv2df.specification import Definition
     
     # settings
     boundaries = [
@@ -342,7 +341,7 @@ if __name__ == "__main__":  # pragma: no cover
         ('в % к соответствующему периоду предыдущего года', 'yoy'),
         ('в % к соответствующему месяцу предыдущего года', 'yoy')
     ])
-    pdef = Def(commands, units, boundaries)
+    pdef = Definition(commands, units, boundaries)
     
     # actions
     csv_segment = text_to_list(DOC)

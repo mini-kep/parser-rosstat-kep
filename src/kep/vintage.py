@@ -1,10 +1,9 @@
 """Extract dataframes."""
 
-from kep import FREQUENCIES
+from kep import FREQUENCIES, PARSING_DEFINITION
+from kep.parsing_definition.checkpoints import CHECKPOINTS
 from kep.helper.path import InterimCSV, ProcessedCSV
 from kep.csv2df.dataframe_maker import Datapoints
-from kep.parsing_definition import PARSING_DEFINITION
-from kep.parsing_definition.checkpoints import CHECKPOINTS
 
 
 def is_found(df, d):

@@ -3,13 +3,14 @@
 import pandas as pd
 import pytest
 
-from kep.csv2df.util.row_splitter import split_row_by_year_and_qtr
 # testing
-from ..parser import Table, split_to_tables, extract_tables
+from kep.csv2df.parser import Table, split_to_tables, extract_tables
+
+
 # fixtures
-#from ..row_model import Row
-from ..specification import ParsingCommand, Def
-from ...parsing_definition.units import UNITS
+from kep.csv2df.util.row_splitter import split_row_by_year_and_qtr
+from kep.csv2df.specification import ParsingCommand, Definition
+from kep.parsing_definition.units import UNITS
 
 gdp_def = dict(var="GDP",
                header='Объем ВВП',
@@ -22,7 +23,7 @@ indpro_def = dict(var="INDPRO",
 pc1 = ParsingCommand(**gdp_def)
 pc2 = ParsingCommand(**indpro_def)
 
-d1 = Def([gdp_def, indpro_def], units=UNITS)
+d1 = Definition([gdp_def, indpro_def], units=UNITS)
 
 class Spec_Sample:
 
@@ -99,7 +100,7 @@ class Test_fixtures:
     def test_mock_rows(self):
         assert list(mock_rows()) == [['Объем ВВП', '', '', '', ''],
                                      ['млрд.рублей', '', '', '', ''],
-                                     ['1991', '4823', '901', '1102', '1373', '1447'),
+                                     ['1991', '4823', '901', '1102', '1373', '1447'],
                                      ['Индекс ВВП, в % к прошлому периоду/ GDP index, percent'],
                                      ['1999', '106,4', '98,1', '103,1', '111,4', '112,0'],
                                      ['Индекс промышленного производства'],

@@ -2,7 +2,7 @@
 
 import pytest
 
-from ..specification import Def, ParsingCommand, Scope, as_list
+from ..specification import Definition, ParsingCommand, Scope, as_list
 
 
 class Test_as_list():
@@ -62,7 +62,7 @@ class Test_ParsingCommmand:
                 'Индекс физического объема произведенного ВВП, в %': 'GDP'}
 
     def test_required_property_on_init_is_expected_list_of_strings(self):
-        assert self.pc.required == ['GDP_bln_rub', 'GDP_yoy']
+        assert self.pc.required_labels == ['GDP_bln_rub', 'GDP_yoy']
 
     def test_units_property_is_expected_list_of_strings(self):
         assert self.pc.units == ['bln_rub', 'yoy']
@@ -84,7 +84,7 @@ class Test_Def:
          unit=["yoy", "rog"])]
     units = odict()
     boundaries = dict(start="Header 1", end="Header 2")
-    pd = Def(commands, units, boundaries, reader='fiscal')
+    pd = Definition(commands, units, boundaries, reader='fiscal')
 
     def test_mapper_property(self):
         assert self.pd.mapper == \

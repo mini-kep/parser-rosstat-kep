@@ -1,4 +1,16 @@
-csv_text = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.			
+from collections import OrderedDict as odict
+import pandas as pd
+
+from kep.csv2df.reader import text_to_list
+from kep.csv2df.specification import Definition, Specification
+from kep.csv2df.parser import split_to_tables, parse_tables, extract_tables
+
+
+DOC = """
+Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
+1999	4823	901	1102	1373	1447
+2000	7306	1527	1697	2038	2044
+	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.			
 		I	II	III	IV												
 1.7. Инвестиции в основной капитал1), млрд. рублей / Fixed capital investments1), bln rubles																	
 1999	670,4	96,8	131,1	185,6	256,9	28,5	31,8	36,5	36,9	41,4	52,8	56,2	61,8	67,6	66,5	72,0	118,4
@@ -61,13 +73,6 @@ csv_text = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.
 2016		36,9	147,1	119,2
 1.7.1. Инвестиции в основной капитал организаций"""
 
-from collections import OrderedDict as odict
-import pandas as pd
-
-from kep.csv2df.reader import text_to_list
-from kep.csv2df.specification import Def
-from kep.csv2df.parser import split_to_tables, parse_tables
-from kep.csv2df.row_model import Row
 
 # settings
 boundaries = [
@@ -91,10 +96,10 @@ units = odict([  # 1. MONEY
     ('в % к соответствующему периоду предыдущего года', 'yoy'),
     ('в % к соответствующему месяцу предыдущего года', 'yoy')
 ])
-pdef = Def(commands, units, boundaries)
+pdef = Definition(commands, units, boundaries)
 
 # actions
-csv_segment = text_to_list(csv_text)
+csv_segment = text_to_list(DOC)
 tables = split_to_tables(csv_segment)
 tables = parse_tables(tables, pdef)
 
@@ -107,8 +112,8 @@ def test_convert_to_several_tests_and_rename():
 
 def test_Table_class_extract_values_method(): 
     rows = [
-        Row(['Объем ВВП, млрд.рублей / Gross domestic product, bln rubles']), 
-        Row(['1999', '4823', '901', '1102', '1373', '1447'])
+        ['Объем ВВП, млрд.рублей / Gross domestic product, bln rubles'], 
+        ['1999', '4823', '901', '1102', '1373', '1447']
     ]
     tables = list(split_to_tables(rows))
     t = tables[0]
@@ -138,5 +143,4 @@ def test_Table_class_extract_values_method():
       'value': 1447}
 
 if __name__ == "__main__": # pragma: no cover
-    for t in tables:
-        print(t.varname, t.unit)
+    pytest.main([__file__])

@@ -184,7 +184,8 @@ PARSING_DEFINITION_BY_SEGMENT = [
 
 import json
 import pathlib
-from kep.csv2df.specification import Definition
+
+from kep.csv2df.specification import Specification
 from kep.parsing_definition.units import UNITS
 
 def dump(what, filename):
@@ -197,7 +198,7 @@ def read(filname):
 def make_parsing_definition(default=DEFAULT_COMMANDS,
                             by_segment=PARSING_DEFINITION_BY_SEGMENT,
                             units=UNITS):
-    pdef = Definition(default, units)
+    pdef = Specification(default, units)
     for seg in by_segment:
          pdef.append(**seg)
     return pdef

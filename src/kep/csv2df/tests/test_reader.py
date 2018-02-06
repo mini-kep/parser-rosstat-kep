@@ -18,17 +18,18 @@ CLEAN_ROWS = [['Объем ВВП'],
  ['1999', '4823'],
  ['2000', '7306']]
 
-
-def test_is_valid_row():
-    bad_rows = [
-        [],
-        ['', 'abc'],
-        [None, 1],
-        ["___"]
-    ]
-    for row in bad_rows:
-        assert is_valid_row(row) is False
-    assert is_valid_row(['abc'])
+class Test_is_valid_row:  
+    def test_returns_false(self):
+        bad_rows = [
+            [],
+            ['', 'abc'],
+            [None, 1],
+            ["___"]
+        ]
+        for row in bad_rows:
+            assert is_valid_row(row) is False
+    def test_returns_true(self):
+        assert is_valid_row(['abc'])
 
 def test_yield_csv_rows():
     assert list(yield_csv_rows(DOC)) == ROWS

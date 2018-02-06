@@ -1,7 +1,9 @@
 """
-1. Instance of Defintions() class has default and segment parsing defintions
-2. InterimCSV(year, month).text has CSV as string
-3. DEFINITION.attach_data
+
+Read a text string with CSV data as list of lists with:
+    text_to_list()
+    
+Use Popper class as a stack to split CSV data.
 
 """
 
@@ -41,7 +43,8 @@ def is_valid_row(row):
     else:
         return False
 
-def text_to_list(csv_text):
+
+def text_to_list(csv_text: str):
     csv_rows = filter(is_valid_row, yield_csv_rows(csv_text))
     return list(csv_rows)
 
@@ -61,7 +64,7 @@ class Popper:
           yield_populated_defintions()
     """
 
-    def __init__(self, csv_text):
+    def __init__(self, csv_text: str):
         self.rows = text_to_list(csv_text)
 
     def remaining_rows(self):

@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Download and unpack Word files from Rosstat web site."""
 
 import os
@@ -37,7 +36,6 @@ def unrar(path, folder, unrar=UNPACK_RAR_EXE):
 
 
 class RemoteFile():
-
     def __init__(self, year, month):
         self.year, self.month = year, month
         self.url = make_url(year, month)
