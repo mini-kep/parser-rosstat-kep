@@ -109,16 +109,16 @@ class ParsingCommand():
     def mapper(self):
         return {hs: self._varname for hs in self._header_strings}
 
+    # FIXME: rename to required_labels
     @property
     def required(self):
-        return list(make_label(self._varname, unit)
-                    for unit in self._required_units)
+        return [make_label(self._varname, unit) for unit in self._required_units]
 
     @property
     def units(self):
         return self._required_units
 
-
+# FIXME: naming 'definition' + 'specification'?
 class Def(object):
     """Holds together:
         - parsing commands
@@ -173,32 +173,22 @@ class Definition:
     def __init__(self, commands, units):
         self.default = Def(commands=commands, units=units)
         self.segments = []
+        # these units will be used in all of the parsing
         self.units = units
 
     def append(self, commands, boundaries, reader=None):         
-        pdef = Def(commands, self.units, boundaries, reader) 
+        pdef = Def(commands=commands, units=self.units, boundaries=boundaries, reader=reader) 
         self.segments.append(pdef)
 
-    def attach_data(self, csv_text):
-        """Yield CSV segments and corresponding parsing definitons.
-
-        Yield CSV segments as Row() instances and corresponding
-        parsing definitons based on *spec* parsing specification.
-
-        Args:
-            spec: parsing specification as spec.Specification() instance
-
-        Yields:
-            Parsing definiton with a *csv_segment* assigned. 
-        """
+    def attach_data(self, csv_text: str):
+        """Break *csv_text* into segments using self.segments boundaries."""
         stack = Popper(csv_text) 
         for pdef in self.segments:
             start, end = pdef.get_bounds(stack.rows)
             pdef.csv_segment = stack.pop(start, end) 
         self.default.csv_segment = stack.remaining_rows()
-        return self
 
     @property
     def tables(self):           
-        pdefs = [self.default] + self.segments 
-        return [t for pdef in pdefs for t in pdef.tables]
+        all_definitions = [self.default] + self.segments 
+        return [t for pdef in all_definitions for t in pdef.tables]

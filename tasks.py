@@ -49,6 +49,7 @@ def clean(ctx):
     for f in find_all(".pyc"):
         print("Removing", f)
         f.unlink()
+    # TODO: delete __pycache__ folders    
 
 
 @task

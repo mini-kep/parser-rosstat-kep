@@ -41,6 +41,7 @@ if '__main__' == __name__:
         vint.save()
 
     if command == 'latest':
+        # FIXME: need a safeguard in last 2 SUPPORTED_DATES
         copy_to_latest_folder(year, month)
         
     if command == 'upload':
