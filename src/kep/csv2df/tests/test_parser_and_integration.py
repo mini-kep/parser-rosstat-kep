@@ -1,14 +1,8 @@
 import pytest
 import pandas as pd
-
 from collections import OrderedDict as odict
 
-import kep.csv2df.util.row_splitter as splitter
 from kep.csv2df.specification import Definition, Specification
-    
-from kep.csv2df.util.label import make_label
-from kep.csv2df.util.to_float import to_float
-
 from kep.csv2df.reader import text_to_list
 from kep.csv2df.parser import split_to_tables, parse_tables, Table
 
@@ -22,7 +16,7 @@ def create_table():
     tables = list(split_to_tables(rows))
     return tables[0]
 
-def test_create_table():
+def test_split_to_tables():
     assert create_table() == \
         Table(headers=[['Объем ВВП, млрд.рублей / Gross domestic product, bln rubles']],
               datarows=[['1999', '4823', '901', '1102', '1373', '1447'], 
@@ -87,6 +81,7 @@ UNITS = odict([  # 1. MONEY
     ('в % к соответствующему месяцу предыдущего года', 'yoy')
 ])
 
+
 def make_definition():    
     boundaries = [
         dict(start='1.6. Инвестиции в основной капитал',
@@ -106,6 +101,7 @@ def make_definition():
 def create_tables():  
     csv_segment = text_to_list(DOC2)
     return split_to_tables(csv_segment)
+
    
 class Test_parse_tables:    
     pdef = make_definition()
@@ -172,6 +168,7 @@ def test_specification_with_2_segments_on_valid_csv_data():
     # check
     for d in control_values:
         assert d in values
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

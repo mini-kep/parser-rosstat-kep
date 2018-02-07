@@ -40,7 +40,7 @@ class Scope():
 
     """
     def __init__(self, boundaries):
-        self.__markers = as_list(boundaries)
+        self._markers = as_list(boundaries)
 
     def get_bounds(self, rows):
         """Get start and end line, which can be found in *rows*.
@@ -53,26 +53,29 @@ class Scope():
 
         """
         rows = list(rows)
-        for marker in self.__markers:
+        for marker in self._markers:
             s = marker['start']
             e = marker['end']
             if self._is_found(s, rows) and self._is_found(e, rows):
                 return s, e
-        self._error_message(rows)
+        self._raise_error(rows)
 
     @staticmethod
-    def _is_found(line, rows):
+    def _is_found(line: str, rows: list):
         """
         Return:
-           True, if *line* found at start of some entry in *rows*
+           True, if *line* found at start of *rows[0]*
            False otherwise
         """
+        if not isinstance(rows, list):
+            raise TypeError(rows)
         for row in rows:
-            if Row(row).startswith(line):
+            r = Row(row)
+            if r.startswith(line):
                 return True
         return False
 
-    def _error_message(self, rows):
+    def _raise_error(self, rows):
         """Prepare error message with diagnostics.
 
         Returns:
@@ -80,7 +83,7 @@ class Scope():
         """
         msg = []
         msg.append('start or end line marker not found')
-        for marker in self.__markers:
+        for marker in self._markers:
             s = marker['start']
             e = marker['end']
             msg.append('is_found: {} <{}>'.format(self._is_found(s, rows), s))

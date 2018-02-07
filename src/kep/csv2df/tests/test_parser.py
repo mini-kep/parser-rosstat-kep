@@ -5,12 +5,13 @@ import pytest
 
 # testing
 from kep.csv2df.parser import Table, split_to_tables, extract_tables
-
+from kep.csv2df.parser import timestamp_quarter, timestamp_month, timestamp_annual
 
 # fixtures
 from kep.csv2df.util.row_splitter import split_row_by_year_and_qtr
 from kep.csv2df.specification import ParsingCommand, Definition
 from kep.parsing_definition.units import UNITS
+
 
 gdp_def = dict(var="GDP",
                header='Объем ВВП',
@@ -23,20 +24,7 @@ indpro_def = dict(var="INDPRO",
 pc1 = ParsingCommand(**gdp_def)
 pc2 = ParsingCommand(**indpro_def)
 
-d1 = Definition([gdp_def, indpro_def], units=UNITS)
-
-class Spec_Sample:
-
-    def units():
-        return {'млрд.рублей': 'bln_rub',
-                'в % к прошлому периоду': 'rog',
-                'в % к соответствующему периоду предыдущего года': 'yoy'}
-
-    def indicator(name):
-        return dict(GDP=pc1, INDPRO=pc2)[name]
-
-    def pdef():
-        return d1
+d1 = Definition(commands=[gdp_def, indpro_def], units=UNITS)
 
 
 labels = {0: 'GDP_bln_rub',
@@ -64,7 +52,19 @@ data_items = {0: [["1991", "4823", "901", "1102", "1373", "1447"]],
               }
 
 
-class Sample(Spec_Sample):
+class Sample():
+  
+    def units():
+        return {'млрд.рублей': 'bln_rub',
+                'в % к прошлому периоду': 'rog',
+                'в % к соответствующему периоду предыдущего года': 'yoy'}
+
+    def indicator(name):
+        return dict(GDP=pc1, INDPRO=pc2)[name]
+
+    def pdef():
+        return d1
+    
     """Fixtures for testing"""
     def rows(i):
         return headers[i] + data_items[i]
@@ -95,22 +95,15 @@ def mock_rows():
     return itertools.chain.from_iterable(gen)
 
 
-class Test_fixtures:
-
-    def test_mock_rows(self):
-        assert list(mock_rows()) == [['Объем ВВП', '', '', '', ''],
-                                     ['млрд.рублей', '', '', '', ''],
-                                     ['1991', '4823', '901', '1102', '1373', '1447'],
-                                     ['Индекс ВВП, в % к прошлому периоду/ GDP index, percent'],
-                                     ['1999', '106,4', '98,1', '103,1', '111,4', '112,0'],
-                                     ['Индекс промышленного производства'],
-                                     ['в % к соответствующему периоду предыдущего года'],
-                                     ['1991', '102,7', '101,1', '102,2', '103,3', '104,4']]
-
-    def test_regression_same_string_used_in_first_row_and_pdef(self):
-        assert [k for k in Sample.pdef().mapper][0] == \
-            next(mock_rows()).name
-
+def test_mock_rows(mock_rows):
+    assert list(mock_rows) == [['Объем ВВП', '', '', '', ''],
+                                 ['млрд.рублей', '', '', '', ''],
+                                 ['1991', '4823', '901', '1102', '1373', '1447'],
+                                 ['Индекс ВВП, в % к прошлому периоду/ GDP index, percent'],
+                                 ['1999', '106,4', '98,1', '103,1', '111,4', '112,0'],
+                                 ['Индекс промышленного производства'],
+                                 ['в % к соответствующему периоду предыдущего года'],
+                                 ['1991', '102,7', '101,1', '102,2', '103,3', '104,4']]
 
 class Test_split_to_tables():
 
@@ -127,10 +120,6 @@ class Test_Table_on_creation:
     def setup_method(self):
         self.table = Sample.table(0)
 
-    def test_KNOWN_UNKNOWN_sanity(self):
-        # actual error before class constants were introduced
-        assert self.table.KNOWN != self.table.UNKNOWN
-
     def test_on_creation_varname_and_unit_and_splitter_are_none(self):
         assert self.table.varname is None
         assert self.table.unit is None
@@ -144,8 +133,8 @@ class Test_Table_on_creation:
         self.table.datarows = Sample.data_items(0)
 
     def test_on_creation_lines_is_unknown(self):
-        assert self.table.lines['Объем ВВП'] == self.table.UNKNOWN
-        assert self.table.lines['млрд.рублей'] == self.table.UNKNOWN
+        assert self.table.progress.is_line_parsed('Объем ВВП') is False
+        assert self.table.progress.is_line_parsed('млрд.рублей') is False
 
     def test_on_creation_has_unknown_lines(self):
         assert self.table.has_unknown_lines() is True
@@ -168,9 +157,9 @@ class Test_Table_after_parsing:
         table = Sample.table(0)
         table.set_label({'Объем ВВП': 'GDP'}, {'млрд.рублей': 'bln_rub'})
         assert table.varname == 'GDP'
-        assert table.lines['Объем ВВП'] == table.KNOWN
+        assert table.progress.is_line_parsed('Объем ВВП') is True
         assert table.unit == 'bln_rub'
-        assert table.lines['млрд.рублей'] == table.KNOWN
+        assert table.progress.is_line_parsed('млрд.рублей') is True
 
     def test_set_splitter(self):
         table = Sample.table(0)
@@ -189,8 +178,6 @@ class Test_extract_tables_function:
 
     tables = extract_tables(csv_segment=mock_rows(), pdef=Sample.pdef())
 
-    # FIXME:  more functions in extract_tables other than split tables
-
     def test_returns_list(self):
         assert isinstance(self.tables, list)
 
@@ -204,18 +191,6 @@ class Test_extract_tables_function:
         t0.set_label(varnames_dict={'Объем ВВП': 'GDP'},
                      units_dict={'млрд.рублей': 'bln_rub'})
         assert t0.label == 'GDP_bln_rub'
-
-
-# FIXME:
-#    def test_yield_tables(self, ts=Sample.tables()):
-#        gen = ts.yield_tables()
-#        for i, t in enumerate(gen):
-#            assert t == Sample.table(i)
-#            assert t.label == Sample.label(i)
-
-
-
-from kep.csv2df.parser import timestamp_quarter, timestamp_month, timestamp_annual
 
 def test_timestamp_quarter():
     assert timestamp_quarter(1999, 1) == pd.Timestamp('1999-03-31')            

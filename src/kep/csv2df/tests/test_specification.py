@@ -2,7 +2,7 @@
 
 import pytest
 
-from ..specification import Definition, ParsingCommand, Scope, as_list
+from kep.csv2df.specification import Definition, ParsingCommand, Scope, as_list
 
 
 class Test_as_list():
@@ -24,16 +24,16 @@ class Test_Scope:
                   dict(start="A bit rotten Header 1", 
                          end="Curved Header 2.")]
     sc = Scope(boundaries)
-    good_rows = ['Header 1',
-                 'more lines here',
-                 'more lines here',
-                 'more lines here',
-                 'Header 2']
-    bad_rows = ['zzz',
-                'more lines here',
-                'more lines here',
-                'more lines here',
-                'yyy']
+    good_rows = [['Header 1'],
+                 ['more lines here'],
+                 ['more lines here'],
+                 ['more lines here'],
+                 ['Header 2']]
+    bad_rows = [['zzz'],
+                ['more lines here'],
+                ['more lines here'],
+                ['more lines here'],
+                ['yyy']]
 
     def test_repr(self):
         assert repr(self.sc)
@@ -94,7 +94,7 @@ class Test_Def:
              'Индекс физического объема произведенного ВВП, в %': 'GDP'}
 
     def test_required_property(self):
-        assert self.pd.required == [
+        assert self.pd.required_labels == [
             'GDP_bln_rub',
             'GDP_yoy',
             'INDPRO_yoy',

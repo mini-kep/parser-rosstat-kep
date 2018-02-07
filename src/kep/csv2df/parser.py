@@ -92,6 +92,9 @@ class HeaderParsingProgress:
     def set_as_known(self, line):
         self.is_known[line] = True     
 
+    def is_line_parsed(self, line):
+        return self.is_known[line]        
+    
     def is_parsed(self):
         return all(self.is_known.values())
     
