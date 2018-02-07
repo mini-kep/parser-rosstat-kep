@@ -77,7 +77,7 @@ def deaccumulate(df, first_month):
     df[varnames] = deacc_main(df[varnames], first_month)
     return rename_accum(df)
 
-if __name__ == '__main__':    
+if __name__ == '__main__':  # pragma: no cover  
     from kep.helper.path import InterimCSV
     from kep.parsing_definition import PARSING_DEFINITION
 
