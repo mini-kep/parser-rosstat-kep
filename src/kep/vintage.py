@@ -51,13 +51,13 @@ class Vintage:
 
     def upload(self, password):
         # TODO: upload to databse
-        pass
+        raise NotImplementedError
 
     def __repr__(self):
         return "Vintage({}, {})".format(self.year, self.month)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": # pragma: no cover
     v = Vintage(2016, 10)
     v.validate()
     # Test values parsed OK for Vintage(2016, 10)

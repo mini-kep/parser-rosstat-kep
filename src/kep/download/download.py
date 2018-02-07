@@ -58,7 +58,7 @@ class RemoteFile():
             print('UnRARed', self.path)
 
 
-if __name__ == "__main__":
+if __name__ == "__main__": #pragma: no cover
     u = RemoteFile(2016, 12)
     assert u.url.startswith("http://www.gks.ru/free_doc/")
     u.download()

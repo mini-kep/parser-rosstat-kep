@@ -209,6 +209,7 @@ def make_parsing_definition(default=DEFAULT_COMMANDS,
 
 PARSING_DEFINITION = make_parsing_definition()
 
-if __name__ == '__main__':
+
+if __name__ == '__main__': # pragma: no cover
     dump(DEFAULT_COMMANDS, 'default.json')
     dump(PARSING_DEFINITION_BY_SEGMENT, 'by_segment.json')
