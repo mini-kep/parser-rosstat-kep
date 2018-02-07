@@ -26,9 +26,3 @@ Not todo
 - CPI_yoy /?
 - smplify validator /?
 - repair sphynx docs
-
-
-Discuss
--------
-- may use a webhook to upload to database
-- add uploader code
