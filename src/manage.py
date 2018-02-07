@@ -6,7 +6,7 @@ from kep.word2csv.word import word2csv
 from kep.helper.path import copy_to_latest_folder
 
 
-def run(year, month):
+def run(year, month): # pragma: no cover
     #download and unpack
     remote = RemoteFile(year, month)
     remote.download()
@@ -21,7 +21,7 @@ def run(year, month):
     vint.save()
 
 
-if '__main__' == __name__:
+if '__main__' == __name__: # pragma: no cover
     import sys
     command = sys.argv[1]
     year, month = (int(sys.argv[i]) for i in (2, 3))
