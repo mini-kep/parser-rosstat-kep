@@ -5,11 +5,11 @@
 Concept
 -------
 
-Russian statistics agency Rosstat publishes macroeconomic time series as MS Word files (see [Rosstat KEP publication][Rosstat]). 
+Russian statistics agency Rosstat publishes macroeconomic time series as MS Word files. In this repo we extract these time series as pandas dataframes and save them as CSV files. This is a machine-readable dataset, ready to use with python/R and econometrics tools for it. 
 
-In this repo we extract time series as pandas dataframes and save them as [CSV files][backend]. This machine-readable data can make analysis reproducible and encourage wider use of python/R and econometrics tools for it. 
+Basically, our source is this [Rosstat publication][Rosstat] (KEP - "Краткосрочные экономические показатели") and output are [these CSV files][backend].
 
-This code replaces a predecessor repo, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
+This code replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
 
 *NOTE:* Windows and MS Word are required_labels to create interim text dumps from MS Word files. Оnce these text files are created, they can be parsed on a linux machine.
 
@@ -35,7 +35,7 @@ directory structure.
    - **download**: download and unpack rar files from Rosstat website
    - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
    - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
-   - **finaliser.py** 
+   - **df2xl**: make Excel file with three worksheets for annual, quarterly and monthly data 
 
 [Processed data folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed)
 has datasets by year and month (vintages).
@@ -43,7 +43,7 @@ has datasets by year and month (vintages).
 
 # Access to parsing result
 
-[getter.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/getter.py) 
+[access.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/access.py) 
 is an entry point to get parsed data.
 
 ```python
