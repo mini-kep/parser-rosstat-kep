@@ -1,4 +1,4 @@
-"""Operations on CSV file row as Row class."""
+"""Operations on CSV file row in Row class."""
 
 import re
 

@@ -1,4 +1,4 @@
-"""
+"""Parsing parameters used to extract variables from raw CSV. 
 
 *Definition* class holds main and segment parsing instructions. 
 

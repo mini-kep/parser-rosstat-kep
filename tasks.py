@@ -141,20 +141,6 @@ class PathContext():
         sys.path.remove(self.path)
 
 
-@task
-def latest(ctx):
-    _latest()
-
-
-def _latest():
-    """Copy to latest CSVs and make Excel file."""
-    with PathContext():
-        # TODO: check the date seems to be latest
-        from finaliser import copy_latest
-        copy_latest()
-        from finaliser import save_xls
-        save_xls()
-
 
 ns = Collection()
 for t in [ls, clean,
@@ -162,7 +148,7 @@ for t in [ls, clean,
           test, cov,
           doc, rst,
           find,
-          add, latest]:
+          add]:
     ns.add_task(t)
 
 

@@ -2,11 +2,10 @@ Recent issues
 =============
 
 - relative imports in package
-- restoring tests
-- upload method
-- checkpoints
+- upload to database method
+- checkpoints / simplify validator
 - variable name descriptions
-- does acces.py belong 
+- does access.py belong to kep package or elsewhere?
 
 Outdated
 ========
@@ -23,6 +22,5 @@ Issues
 
 Not todo
 --------
-- CPI_yoy /?
-- smplify validator /?
+- add CPI_yoy variable
 - repair sphynx docs

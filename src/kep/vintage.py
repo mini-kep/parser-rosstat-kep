@@ -1,4 +1,4 @@
-"""Extract dataframes."""
+"""Extract dataframes by year and month."""
 
 from kep import FREQUENCIES, PARSING_DEFINITION
 from kep.parsing_definition.checkpoints import CHECKPOINTS
