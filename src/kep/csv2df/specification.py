@@ -1,9 +1,9 @@
-"""Parsing parameters used to extract variables from raw CSV. 
+"""Parsing parameters used to extract variables from raw CSV.
 
-*Definition* class holds main and segment parsing instructions. 
+*Definition* class holds main and segment parsing instructions.
 
-*Instruction* holds csv segment boundaries, parsing commands, units of measurement and optional name of a reader function.    
- 
+*Instruction* holds csv segment boundaries, parsing commands, units of measurement and optional name of a reader function.
+
 Definition().tables property uses csv2df.parser.extract_tables() function.
 
 """
@@ -33,12 +33,13 @@ class Scope():
 
        Holds several versions of start and end line, returns applicable lines
        for a particular CSV. This solves problem of different
-       headers for same table at various data releases.       
-           
+       headers for same table at various data releases.
+
        #We parse CSV file by segment, because some table headers repeat themselves in
        #CSV file. Extracting a piece out of CSV file gives a good isolated input for parsing.
 
     """
+
     def __init__(self, boundaries):
         self._markers = as_list(boundaries)
 
@@ -116,22 +117,25 @@ class ParsingCommand():
 
     @property
     def mapper(self):
-        return {_header_string: self._varname for _header_string in self._header_strings}
+        return {
+            _header_string: self._varname for _header_string in self._header_strings}
 
     @property
     def required_labels(self):
-        return [make_label(self._varname, unit) for unit in self._required_units]
+        return [make_label(self._varname, unit)
+                for unit in self._required_units]
 
     @property
     def units(self):
         return self._required_units
+
 
 class Definition(object):
     """Holds together:
         - parsing commands
         - units dictionary
         - (optional) defintion scope
-        - (optional) custom reader function name        
+        - (optional) custom reader function name
 
        Properties:
            - mapper (dict)
@@ -168,43 +172,47 @@ class Definition(object):
     def get_bounds(self, rows):
         return self.scope.get_bounds(rows)
 
-    @property 
+    @property
     def tables(self):
         return extract_tables(self.csv_segment, self)
 
     @property
     def values(self):
         return [dp for t in self.tables for dp in t.extract_values()]
-    
-    
+
+
 class Specification:
     """
-    Hold main parsing instruction and instructions by segment.    
+    Hold main parsing instruction and instructions by segment.
     """
+
     def __init__(self, commands, units):
         self.default = Definition(commands=commands, units=units)
         self.segments = []
         # these units will be used in all of the parsing
         self.units = units
 
-    def append(self, commands, boundaries, reader=None):         
-        pdef = Definition(commands=commands, units=self.units, boundaries=boundaries, reader=reader)
+    def append(self, commands, boundaries, reader=None):
+        pdef = Definition(
+            commands=commands,
+            units=self.units,
+            boundaries=boundaries,
+            reader=reader)
         self.segments.append(pdef)
 
     def attach_data(self, csv_text: str):
         """Break *csv_text* into segments using self.segments boundaries."""
-        stack = Popper(csv_text) 
+        stack = Popper(csv_text)
         for pdef in self.segments:
             start, end = pdef.get_bounds(stack.rows)
-            pdef.csv_segment = stack.pop(start, end) 
+            pdef.csv_segment = stack.pop(start, end)
         self.default.csv_segment = stack.remaining_rows()
 
     @property
-    def tables(self):           
-        all_definitions = [self.default] + self.segments 
+    def tables(self):
+        all_definitions = [self.default] + self.segments
         return [t for pdef in all_definitions for t in pdef.tables]
 
     @property
     def values(self):
         return [dp for t in self.tables for dp in t.extract_values()]
-    

@@ -2,17 +2,18 @@ import pytest
 import arrow
 
 from kep.helper.path import (UNPACK_RAR_EXE, XL_PATH,
-                             DataFolder, 
-                             InterimCSV, ProcessedCSV, 
-                             LocalRarFile, 
+                             DataFolder,
+                             InterimCSV, ProcessedCSV,
+                             LocalRarFile,
                              )
+
 
 def test_constants():
     assert isinstance(UNPACK_RAR_EXE, str)
     assert isinstance(XL_PATH, str)
 
 
-# TODO: randomise test with a random pair from supported dates 
+# TODO: randomise test with a random pair from supported dates
 class Test_DataFolder():
 
     # we assume for (2015, 5) all folders exist
@@ -41,15 +42,19 @@ class Test_DataFolder():
 
     def test_out_of_range_year_does_raises_error(self):
         with pytest.raises(ValueError):
-            year  = arrow.now().year + 1
+            year = arrow.now().year + 1
             DataFolder(year, 1)
+
 
 class Test_LocalRarFile():
     path = LocalRarFile(2015, 5).path
+
     def test_on_init_path_property_is_Path_class_instance(self):
         assert isinstance(self.path, str)
+
     def test_on_init_path_name_is_as_expected(self):
         assert self.path.endswith('ind.rar')
+
 
 class Test_InterimCSV():
     def test_path_property_returns_existing_file(self):
@@ -60,6 +65,7 @@ class Test_InterimCSV():
         interim_csv = InterimCSV(2015, 5).path
         expected_name = 'tab.csv'
         assert interim_csv.name == expected_name
+
 
 class Test_ProcessedCSV():
     def test_path_method_returns_existing_files(self):
@@ -76,6 +82,7 @@ class Test_ProcessedCSV():
     def test_path_method_fails_on_literal_outside_aqm(self):
         with pytest.raises(ValueError):
             ProcessedCSV(2015, 5).path('x')
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

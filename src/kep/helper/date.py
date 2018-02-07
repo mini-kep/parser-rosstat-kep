@@ -9,7 +9,8 @@ Method:
 
 import pandas as pd
 
-def supported_dates(start_date = '2009-04', exclude_dates = ['2013-11']):
+
+def supported_dates(start_date='2009-04', exclude_dates=['2013-11']):
     """Get a list of (year, month) tuples starting from (2009, 4)
        up to a previous recent month.
 

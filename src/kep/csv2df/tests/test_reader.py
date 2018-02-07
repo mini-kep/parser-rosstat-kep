@@ -9,16 +9,17 @@ DOC = """__________
 2000\t7306"""
 
 ROWS = [['__________'],
- ['', '', '', ''],
- ['Объем ВВП'],
- ['1999', '4823'],
- ['2000', '7306']]
+        ['', '', '', ''],
+        ['Объем ВВП'],
+        ['1999', '4823'],
+        ['2000', '7306']]
 
 CLEAN_ROWS = [['Объем ВВП'],
- ['1999', '4823'],
- ['2000', '7306']]
+              ['1999', '4823'],
+              ['2000', '7306']]
 
-class Test_is_valid_row:  
+
+class Test_is_valid_row:
     def test_returns_false(self):
         bad_rows = [
             [],
@@ -28,17 +29,20 @@ class Test_is_valid_row:
         ]
         for row in bad_rows:
             assert is_valid_row(row) is False
+
     def test_returns_true(self):
         assert is_valid_row(['abc'])
+
 
 def test_yield_csv_rows():
     assert list(yield_csv_rows(DOC)) == ROWS
 
-def test_text_to_rows():
-    assert text_to_list(DOC) == CLEAN_ROWS 
 
-    
-# Test Popper class    
+def test_text_to_rows():
+    assert text_to_list(DOC) == CLEAN_ROWS
+
+
+# Test Popper class
 def mock_rows():
     yield ["apt extra text", "1", "2"]
     yield ["bat aa...ah", "1", "2"]
@@ -47,10 +51,12 @@ def mock_rows():
     yield ["wed more text", "1", "2"]
     yield ["zed some text"]
 
+
 csv_rows = '\n'.join(['\t'.join(row) for row in mock_rows()])
 
+
 @pytest.fixture
-def popper():   
+def popper():
     return Popper(csv_rows)
 
 
@@ -59,9 +65,8 @@ class Test_Popper:
     def test_init(self, popper):
         assert isinstance(popper.rows, list)
         assert len(popper.rows) == 6
-        assert isinstance(popper.rows[0], list) 
+        assert isinstance(popper.rows[0], list)
         assert popper.rows[0][0] == "apt extra text"
-
 
     def test_pop(self, popper):
         a = popper.pop("bat", "dot")
@@ -73,8 +78,8 @@ class Test_Popper:
         assert len(b) == 4
         c = popper.remaining_rows()
         assert c[0] == ["wed more text", "1", "2"]
-        assert c[1] == ["zed some text"]        
+        assert c[1] == ["zed some text"]
+
 
 if __name__ == "__main__":
     pytest.main([__file__])
-    

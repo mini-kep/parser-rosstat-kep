@@ -31,5 +31,3 @@ Such input will result in two dataframes, with annual and quarterly frequency:
   2000-12-31  2000    4       2044.0
 
 """
-
-

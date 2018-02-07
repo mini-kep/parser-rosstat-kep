@@ -3,6 +3,8 @@ import pytest
 from kep.vintage import Vintage
 
 # TODO: implement tests
+
+
 @pytest.mark.skip("Only a sceleton.")
 def test_vintage():
     assert 0

@@ -24,5 +24,3 @@ class Test_to_float:
     def test_on_max_recursion_depth_throws_exception(self):
         with pytest.raises(ValueError):
             to_float("1.2,,,,,")
-
-

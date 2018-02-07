@@ -24,10 +24,11 @@ def run(year, month):
 if '__main__' == __name__:
     import sys
     command = sys.argv[1]
-    year, month = (int(sys.argv[i]) for i in (2,3))
-    
+    year, month = (int(sys.argv[i]) for i in (2, 3))
+
     if command == 'download':
-        # FIXME: when no data available, must not download file (currently in is a #k html error message) 
+        # FIXME: when no data available, must not download file (currently in
+        # is a #k html error message)
         remote = RemoteFile(year, month)
         remote.download()
         remote.unrar()
@@ -43,10 +44,10 @@ if '__main__' == __name__:
     if command == 'latest':
         # FIXME: need a safeguard in last 2 SUPPORTED_DATES
         copy_to_latest_folder(year, month)
-        
+
     if command == 'upload':
         # TODO: upload latest data to database
-        raise NotImplementedError        
+        raise NotImplementedError
 
     if command == 'all':
         run(year, month)

@@ -2,7 +2,7 @@
 
 Read a text string with CSV data as list of lists with:
     text_to_list()
-    
+
 Use Popper class as a stack to split CSV data.
 
 """
@@ -38,8 +38,8 @@ def is_valid_row(row):
     if row:
         x = row[0]
         return x is not None and  \
-               x != '' and \
-               not x.startswith("___")
+            x != '' and \
+            not x.startswith("___")
     else:
         return False
 
@@ -56,7 +56,7 @@ class Popper:
       CSV file w2ith corresponding to parsing instructions.
 
       Internal methods:
-        
+
         self.pop(start, end) and self.remaining_rows() - extracts segments of CSV file
 
       Public method:
@@ -72,11 +72,11 @@ class Popper:
         remaining = self.rows
         self.rows = []
         return remaining
-    
+
     @staticmethod
     def startswith(row, text):
         return Row(row).startswith(text)
-        
+
     def pop(self, start, end):
         """Pops elements of *self.rows* between [start, end).
 
@@ -92,7 +92,7 @@ class Popper:
                 "1.6.1. Инвестиции в основной капитал организаций"
 
         Returns:
-            A list of rows instances between [start, end) that 
+            A list of rows instances between [start, end) that
             are taken out of the stack.
         """
         we_are_in_segment = False
@@ -111,16 +111,15 @@ class Popper:
             else:
                 # else is very important, indexing goes wrong without it
                 i += 1
-        return segment 
+        return segment
 
 
 if __name__ == "__main__":
     DOC = """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447
 2000	7306	1527	1697	2038	2044"""
-    rows = text_to_list(DOC)    
-    assert len(rows) == 3     
+    rows = text_to_list(DOC)
+    assert len(rows) == 3
     p = Popper(DOC)
     p.remaining_rows()
     p.pop('a', 'b')
-  

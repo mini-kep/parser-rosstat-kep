@@ -1,6 +1,6 @@
 # NOT IMPLEMENTED:
 #    - he have no coverage metrics - how many of the variables parsed are listed in checkpoints?
-#    - checking time series not present in 1999 (INDPRO, PPI, some others) or discontinued ts 
+#    - checking time series not present in 1999 (INDPRO, PPI, some others) or discontinued ts
 
 ANNUAL_STR = """
 year                                1999.0
@@ -81,7 +81,7 @@ WAGE_REAL_rog                         80.9
 WAGE_REAL_yoy                         60.7"""
 
 
-MONTHLY_STR="""
+MONTHLY_STR = """
 year                                1999.0
 month                                  1.0
 AGROPROD_yoy                          96.5
@@ -122,28 +122,33 @@ WAGE_REAL_yoy                         58.6
 """
 from numpy import isnan
 
-def from_year(year):    
+
+def from_year(year):
     return str(int(year))
 
+
 def from_month(year, month):
-    year, month = int(year), int(month) 
+    year, month = int(year), int(month)
     return f'{year}-{month}'
+
 
 def from_qtr(year, qtr):
     month = qtr * 3
     return from_month(year, month)
 
+
 def as_dict(s):
     result = {}
     for row in s.strip().split('\n'):
-        d = [x for x in row.split(' ') if x] 
+        d = [x for x in row.split(' ') if x]
         val = float(d[-1])
         if not isnan(val):
             result[d[0]] = val
     return result
 
+
 def extract_date(d):
-    year = int(d.pop('year'))    
+    year = int(d.pop('year'))
     if 'month' in d.keys():
         month = int(d.pop('month'))
         return from_month(year, month)
@@ -151,18 +156,19 @@ def extract_date(d):
         qtr = int(d.pop('qtr'))
         return from_qtr(year, qtr)
     else:
-        return from_year(year) 
-    
+        return from_year(year)
+
+
 def as_checkpoints(text):
     d = as_dict(text)
     dt_str = extract_date(d)
-    return [dict(date=dt_str, 
-                 name=name, 
+    return [dict(date=dt_str,
+                 name=name,
                  value=d[name]) for name in d.keys()]
 
-CHECKPOINTS = dict(   
-    a = as_checkpoints(ANNUAL_STR),
-    q = as_checkpoints(QTR_STR),
-    m = as_checkpoints(MONTHLY_STR)  
+
+CHECKPOINTS = dict(
+    a=as_checkpoints(ANNUAL_STR),
+    q=as_checkpoints(QTR_STR),
+    m=as_checkpoints(MONTHLY_STR)
 )
-        

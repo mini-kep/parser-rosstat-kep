@@ -18,6 +18,7 @@ def get_year(string: str, rx=YEAR_CATCHER):
             return year
     return False
 
+
 def is_year(string: str) -> bool:
     return get_year(string) is not False
 

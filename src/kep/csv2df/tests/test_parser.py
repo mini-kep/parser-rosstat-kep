@@ -53,7 +53,7 @@ data_items = {0: [["1991", "4823", "901", "1102", "1373", "1447"]],
 
 
 class Sample():
-  
+
     def units():
         return {'млрд.рублей': 'bln_rub',
                 'в % к прошлому периоду': 'rog',
@@ -64,7 +64,7 @@ class Sample():
 
     def pdef():
         return d1
-    
+
     """Fixtures for testing"""
     def rows(i):
         return headers[i] + data_items[i]
@@ -97,13 +97,14 @@ def mock_rows():
 
 def test_mock_rows(mock_rows):
     assert list(mock_rows) == [['Объем ВВП', '', '', '', ''],
-                                 ['млрд.рублей', '', '', '', ''],
-                                 ['1991', '4823', '901', '1102', '1373', '1447'],
-                                 ['Индекс ВВП, в % к прошлому периоду/ GDP index, percent'],
-                                 ['1999', '106,4', '98,1', '103,1', '111,4', '112,0'],
-                                 ['Индекс промышленного производства'],
-                                 ['в % к соответствующему периоду предыдущего года'],
-                                 ['1991', '102,7', '101,1', '102,2', '103,3', '104,4']]
+                               ['млрд.рублей', '', '', '', ''],
+                               ['1991', '4823', '901', '1102', '1373', '1447'],
+                               ['Индекс ВВП, в % к прошлому периоду/ GDP index, percent'],
+                               ['1999', '106,4', '98,1', '103,1', '111,4', '112,0'],
+                               ['Индекс промышленного производства'],
+                               ['в % к соответствующему периоду предыдущего года'],
+                               ['1991', '102,7', '101,1', '102,2', '103,3', '104,4']]
+
 
 class Test_split_to_tables():
 
@@ -192,14 +193,17 @@ class Test_extract_tables_function:
                      units_dict={'млрд.рублей': 'bln_rub'})
         assert t0.label == 'GDP_bln_rub'
 
+
 def test_timestamp_quarter():
-    assert timestamp_quarter(1999, 1) == pd.Timestamp('1999-03-31')            
+    assert timestamp_quarter(1999, 1) == pd.Timestamp('1999-03-31')
+
 
 def test_timestamp_month():
-    assert timestamp_month(1999, 1) == pd.Timestamp('1999-01-31')     
+    assert timestamp_month(1999, 1) == pd.Timestamp('1999-01-31')
+
 
 def test_timestamp_annual():
-    assert timestamp_annual(1999) == pd.Timestamp('1999-12-31')     
+    assert timestamp_annual(1999) == pd.Timestamp('1999-12-31')
 
 
 if __name__ == "__main__":

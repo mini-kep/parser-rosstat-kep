@@ -24,7 +24,7 @@ def extract_tables(csv_segment: str, pdef):
         pdef: parsing defintion with search strings for header and unit
 
     Returns:
-        list of Table() instances    
+        list of Table() instances
     """
     tables = split_to_tables(csv_segment)
     tables = parse_tables(tables, pdef)
@@ -36,10 +36,10 @@ def extract_tables(csv_segment: str, pdef):
 def parse_tables(tables, pdef):
     tables = list(tables)
     # assign reader function
-    # parse tables to obtain labels - set label and splitter    
+    # parse tables to obtain labels - set label and splitter
     for t in tables:
         t.set_splitter(pdef.reader)
-        t.set_label(pdef.mapper, pdef.units)        
+        t.set_label(pdef.mapper, pdef.units)
     # assign trailing units
     # for tables without *varname* - copy *varname* from previous table.
     for prev_table, table in zip(tables, tables[1:]):
@@ -50,9 +50,11 @@ def parse_tables(tables, pdef):
 
 def verify_tables(tables, pdef):
     labels_in_tables = [t.label for t in tables]
-    labels_missed = [x for x in pdef.required_labels if x not in labels_in_tables]
+    labels_missed = [
+        x for x in pdef.required_labels if x not in labels_in_tables]
     if labels_missed:
         raise ValueError("Missed labels: {}".format(labels_missed))
+
 
 @unique
 class State(Enum):
@@ -72,7 +74,7 @@ def split_to_tables(rows):
             datarows.append(row)
             state = State.DATA
         else:
-            if state == State.DATA:  
+            if state == State.DATA:
                 # table ended, emit it
                 yield Table(headers, datarows)
                 headers = []
@@ -90,29 +92,29 @@ class HeaderParsingProgress:
         self.is_known = {line: False for line in self.lines}
 
     def set_as_known(self, line):
-        self.is_known[line] = True     
+        self.is_known[line] = True
 
     def is_line_parsed(self, line):
-        return self.is_known[line]        
-    
+        return self.is_known[line]
+
     def is_parsed(self):
         return all(self.is_known.values())
-    
+
     @property
     def printable(self):
         def sym(line):
-            return {True: "+", False: "-"}[self.is_known[line]] 
+            return {True: "+", False: "-"}[self.is_known[line]]
         return ['{} <{}>'.format(sym(line), line) for line in self.lines]
-        
-    def __str__(self):    
+
+    def __str__(self):
         return '\n'.join(self.printable)
 
 
-# TODO: convert to unit test    
+# TODO: convert to unit test
 progress = HeaderParsingProgress([['abc', 'zzz'], ['def', '...']])
 assert progress.is_parsed() is False
-progress.set_as_known('abc') 
-progress.set_as_known('def') 
+progress.set_as_known('abc')
+progress.set_as_known('def')
 assert progress.is_parsed() is True
 assert '<abc>' in str(progress)
 
@@ -189,7 +191,7 @@ class Table:
                     freq=freq)
 
     def extract_values(self):
-        """Yield dictionaries with variable name, frequency, time_index 
+        """Yield dictionaries with variable name, frequency, time_index
            and value.
         """
         for row in self.datarows:
@@ -201,11 +203,11 @@ class Table:
                 yield self.make_datapoint(a_value, time_stamp, 'a')
             if q_values:
                 for t, val in enumerate(q_values):
-                    time_stamp = timestamp_quarter(year,  t + 1)
+                    time_stamp = timestamp_quarter(year, t + 1)
                     yield self.make_datapoint(val, time_stamp, 'q')
             if m_values:
                 for t, val in enumerate(m_values):
-                    time_stamp = timestamp_month(year,  t + 1)
+                    time_stamp = timestamp_month(year, t + 1)
                     yield self.make_datapoint(val, time_stamp, 'm')
 
 
@@ -254,11 +256,11 @@ if __name__ == "__main__":  # pragma: no cover
                              'label': 'GDP_bln_rub',
                              'time_index': pd.Timestamp('1999-12-31'),
                              'value': 1447}
-   
+
     # example 2
-    DOC = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.			
-		I	II	III	IV												
-1.7. Инвестиции в основной капитал1), млрд. рублей / Fixed capital investments1), bln rubles																	
+    DOC = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.
+		I	II	III	IV
+1.7. Инвестиции в основной капитал1), млрд. рублей / Fixed capital investments1), bln rubles
 1999	670,4	96,8	131,1	185,6	256,9	28,5	31,8	36,5	36,9	41,4	52,8	56,2	61,8	67,6	66,5	72,0	118,4
 2000	1165,2	165,8	236,0	330,2	433,2	46,1	55,8	63,9	64,5	75,8	95,7	99,1	112,9	118,3	114,6	123,0	195,5
 2001	1504,7	230,3	318,8	421,1	534,5	66,7	77,4	86,2	87,9	106,1	124,8	127,7	144,2	149,2	144,7	150,2	239,6
@@ -276,10 +278,10 @@ if __name__ == "__main__":  # pragma: no cover
 2013	13450,3	1905,4	2918,7	3402,9	5223,3	511,4	652,5	741,5	771,6	987,0	1160,1	1053,2	1147,2	1202,5	1449,9	1431,9	2341,5
 2014	13902,6	1884,1	2985,0	3493,2	5540,3	492,2	650,2	741,7	779,4	1010,4	1195,2	1082,1	1178,8	1232,3	1507,8	1460,8	2571,7
 2015	14555,9	1969,7	3020,8	3560,2	6005,2	516,9	680,7	772,1	812,8	1004,2	1203,8	1078,4	1209,1	1272,7	1703,9	1592,7	2708,6
-20162)		2149,4	3153,3	3813,4													
-	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.			
-		I	II	III	IV												
-в % к соответствующему периоду предыдущего года / percent of corresponding period of previous year																	
+20162)		2149,4	3153,3	3813,4
+	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.
+		I	II	III	IV
+в % к соответствующему периоду предыдущего года / percent of corresponding period of previous year
 1999	105,3	93,8	99,2	105,0	117,4	92,2	93,8	95,1	94,7	99,2	102,9	102,1	101,9	111,1	114,8	112,1	122,6
 2000	117,4	113,5	119,6	119,7	116,1	107,9	116,1	115,7	116,5	122,1	120,0	116,9	122,5	119,6	118,2	118,5	113,4
 2001	111,7	107,0	109,5	109,9	111,9	109,4	106,6	105,6	108,4	112,8	107,7	109,1	109,7	110,8	112,4	110,2	112,8
@@ -297,8 +299,8 @@ if __name__ == "__main__":  # pragma: no cover
 2013	100,8	102,5	100,2	99,7	101,1	104,0	101,1	102,8	101,7	99,4	99,9	102,0	98,8	98,5	99,8	104,7	99,8
 2014	98,5	96,9	100,2	99,8	97,3	94,1	97,6	98,2	99,6	100,9	100,1	101,3	98,0	100,2	100,1	94,7	97,1
 2015	91,6	95,2	91,2	87,0	93,6	95,9	94,4	95,4	93,8	90,1	90,4	88,3	86,6	86,3	96,3	93,5	91,9
-2016		95,2	96,1	100,3													
-в % к предыдущему периоду / percent of previous period																	
+2016		95,2	96,1	100,3
+в % к предыдущему периоду / percent of previous period
 1999						42,5	108,4	111,2	97,2	109,2	124,3	102,6	106,2	104,1	95,1	104,3	161,3
 2000						37,4	116,6	110,8	97,9	114,4	122,1	100,0	111,2	101,7	94,0	104,6	154,3
 2001						35,7	113,6	109,8	100,5	119,1	116,5	101,3	111,8	102,7	95,3	102,5	158,0
@@ -321,19 +323,20 @@ if __name__ == "__main__":  # pragma: no cover
 
     from kep.csv2df.reader import text_to_list
     from kep.csv2df.specification import Definition
-    
+
     # settings
     boundaries = [
         dict(start='1.6. Инвестиции в основной капитал',
-               end='1.6.1. Инвестиции в основной капитал организаций'),
+             end='1.6.1. Инвестиции в основной капитал организаций'),
         dict(start='1.7. Инвестиции в основной капитал',
-               end='1.7.1. Инвестиции в основной капитал организаций')]
+             end='1.7.1. Инвестиции в основной капитал организаций')]
     commands = [
-        dict(        
+        dict(
             var='INVESTMENT',
             header=['Инвестиции в основной капитал'],
-            unit=['bln_rub', 'yoy', 'rog'])] 
-    # mapper dictionary to convert text in table headers to units of measurement
+            unit=['bln_rub', 'yoy', 'rog'])]
+    # mapper dictionary to convert text in table headers to units of
+    # measurement
     units = odict([  # 1. MONEY
         ('млрд.рублей', 'bln_rub'),
         ('млрд. рублей', 'bln_rub'),
@@ -345,18 +348,18 @@ if __name__ == "__main__":  # pragma: no cover
         ('в % к соответствующему месяцу предыдущего года', 'yoy')
     ])
     pdef = Definition(commands, units, boundaries)
-    
+
     # actions
     csv_segment = text_to_list(DOC)
     tables = split_to_tables(csv_segment)
     tables = parse_tables(tables, pdef)
-    
+
     # checks
     assert len(tables) == 3
     assert all([t.has_unknown_lines() for t in tables]) is False
     assert [t.varname for t in tables] == ['INVESTMENT'] * 3
     assert [t.unit for t in tables] == ['bln_rub', 'yoy', 'rog']
-    
+
     # result
     for t in tables:
         assert t.varname == 'INVESTMENT'

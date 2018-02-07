@@ -38,6 +38,7 @@ def get_dataframe(freq):
     filelike = proxy(path)
     return read_csv(filelike)
 
+
 dfa, dfq, dfm = (get_dataframe(freq) for freq in 'aqm')
 
 if '__main__' == __name__:

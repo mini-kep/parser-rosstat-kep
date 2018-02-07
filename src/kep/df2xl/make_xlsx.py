@@ -24,7 +24,7 @@ def save_xls():
     print('Saved', XL_PATH)
 
 
-if '__main__' == __name__:
+if '__main__' == __name__:  # pragma: no cover
     dfa = get_dataframe('a')
     dfq = get_dataframe('q')
     dfm = get_dataframe('m')

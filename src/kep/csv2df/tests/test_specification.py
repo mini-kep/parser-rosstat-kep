@@ -21,8 +21,8 @@ class Test_as_list():
 
 class Test_Scope:
     boundaries = [dict(start="Header 1", end="Header 2"),
-                  dict(start="A bit rotten Header 1", 
-                         end="Curved Header 2.")]
+                  dict(start="A bit rotten Header 1",
+                       end="Curved Header 2.")]
     sc = Scope(boundaries)
     good_rows = [['Header 1'],
                  ['more lines here'],
@@ -51,8 +51,8 @@ class Test_ParsingCommmand:
     pc = ParsingCommand(
         "GDP",
         header=["Oбъем ВВП",
-                 "Индекс физического объема произведенного ВВП, в %",
-                 "Валовой внутренний продукт"],
+                "Индекс физического объема произведенного ВВП, в %",
+                "Валовой внутренний продукт"],
         unit=["bln_rub", "yoy"])
 
     def test_mapper_property_on_init_is_expected_dict(self):
@@ -77,11 +77,11 @@ class Test_Def:
             "Валовой внутренний продукт"],
         unit=[
             "bln_rub",
-            "yoy"]), 
-                dict(    
-         var="INDPRO",
-         header="Индекс промышленного производства",
-         unit=["yoy", "rog"])]
+            "yoy"]),
+        dict(
+        var="INDPRO",
+        header="Индекс промышленного производства",
+        unit=["yoy", "rog"])]
     units = odict()
     boundaries = dict(start="Header 1", end="Header 2")
     pd = Definition(commands, units, boundaries, reader='fiscal')
@@ -103,11 +103,12 @@ class Test_Def:
     def test_units_property(self):
         assert isinstance(self.pd.units, odict)
 
-    def test_reader_property(self):        
+    def test_reader_property(self):
         assert isinstance(self.pd.reader, str)
 
     def test_get_bounds(self):
         assert callable(self.pd.get_bounds)
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

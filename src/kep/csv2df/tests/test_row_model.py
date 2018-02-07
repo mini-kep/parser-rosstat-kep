@@ -3,6 +3,7 @@ from collections import OrderedDict as odict
 
 from kep.csv2df.row_model import get_year, is_year, Row
 
+
 class Test_get_year():
     def test_get_year(self):
         assert get_year("19991)") == 1999
