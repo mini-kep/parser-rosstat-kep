@@ -3,6 +3,7 @@ openpyxl
 matplotlib
 
 requests
+arrow
 
 # needed on Windows machine, commented due to errors on Travis
 # pypiwin32
