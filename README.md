@@ -5,13 +5,16 @@
 Concept
 -------
 
-Russian statistics agency Rosstat publishes macroeconomic time series as MS Word files. In this repo we extract these time series as pandas dataframes and save them as CSV files. This is a machine-readable dataset, ready to use with python/R and econometrics tools for it. 
-
-Basically, our source is this [Rosstat publication][Rosstat] (KEP - "Краткосрочные экономические показатели") and output are [these CSV files][backend].
+Russian statistics agency Rosstat publishes macroeconomic time series as [MS Word files][Rosstat]. In this repo we extract these time series as pandas dataframes and save them as [CSV files][backend]. This is a machine-readable dataset, ready to use with python/R and econometrics tools. 
 
 This code replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
 
-*NOTE:* Windows and MS Word are required_labels to create interim text dumps from MS Word files. Оnce these text files are created, they can be parsed on a linux machine.
+Quick links
+-----------
+
+- Source:  Short-term Economic Indicators (KEP) monthly Rosstat publication[Rosstat]
+- Parsing result: Three CSV files at annual, quarterly and monthly frequencies][backend]
+
 
 Interface 
 ---------
@@ -37,9 +40,10 @@ directory structure.
    - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
    - **df2xl**: make Excel file with three worksheets for annual, quarterly and monthly data 
 
+*NOTE:* Windows and MS Word are required to create interim text dumps from MS Word files. Оnce these text files are created, they can be parsed on a linux machine.
+
 [Processed data folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed)
 has datasets by year and month (vintages).
-
 
 # Access to parsing result
 
