@@ -8,6 +8,11 @@ from kep.helper.path import (UNPACK_RAR_EXE, XL_PATH,
                              )
 
 
+def test_csv_has_no_null_byte():
+    csv_path = InterimCSV(2015, 2).path
+    z = csv_path.read_text(encoding='utf-8')
+    assert "\0" not in z
+
 def test_constants():
     assert isinstance(UNPACK_RAR_EXE, str)
     assert isinstance(XL_PATH, str)
