@@ -9,12 +9,10 @@ Russian statistics agency Rosstat publishes macroeconomic time series as [MS Wor
 
 This code replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
 
-Quick links
------------
 
-Source:  [Short-term Economic Indicators (KEP) monthly Rosstat publication][Rosstat]
+Data source:  [Short-term Economic Indicators (KEP) monthly Rosstat publication][Rosstat]
 
-Parsing result: [Three CSV files at annual, quarterly and monthly frequencies][backend]
+Parsing result: [three CSV files at annual, quarterly and monthly frequencies][backend]
 
 
 Interface 
