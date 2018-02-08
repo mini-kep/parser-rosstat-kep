@@ -5,4 +5,4 @@ ignore:
   - */usercase/*.py
   - tasks.py
   - src/manage.py 
-  - src/word2csv/word.py
+  - src/kep/word2csv/word.py

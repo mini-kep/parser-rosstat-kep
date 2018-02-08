@@ -16,7 +16,7 @@ def to_xls(filepath, dfa, dfq, dfm):
         #self.df_vars().to_excel(writer, sheet_name='variables')
 
 
-def save_xls():
+def save_xls(): # pragma: no cover
     dfa = get_dataframe('a')
     dfq = get_dataframe('q')
     dfm = get_dataframe('m')
