@@ -2,6 +2,7 @@
 ignore:
   - "*/test_*.py"     # wildcards accepted
   - "tests/*"         # wildcards accepted
-  - tasks.py
   - */usercase/*.py
-  - manage.py 
+  - tasks.py
+  - src/manage.py 
+  - src/word2csv/word.py
