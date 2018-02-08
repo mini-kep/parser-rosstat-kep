@@ -1,20 +1,9 @@
 """Extract dataframes by year and month."""
 
 from kep import FREQUENCIES, PARSING_DEFINITION
-from kep.parsing_definition.checkpoints import CHECKPOINTS
+from kep.parsing_definition.checkpoints import CHECKPOINTS, validate
 from kep.helper.path import InterimCSV, ProcessedCSV
 from kep.csv2df.dataframe_maker import Datapoints
-
-
-def is_found(df, d):
-    dt = d['date']
-    colname = d['name']
-    x = d['value']
-    try:
-        return df.loc[dt, colname].iloc[0] == x
-    except KeyError:
-        return False
-
 
 class Vintage:
     """Represents dataset release for a given year and month."""
@@ -41,12 +30,7 @@ class Vintage:
         for freq in FREQUENCIES:
             df = self.dfs[freq]
             checkpoints = CHECKPOINTS[freq]
-            flags = [is_found(df, c) for c in checkpoints]
-            if not all(flags):
-                missed_points = [
-                    c for f, c in zip(
-                        flags, checkpoints) if not f]
-                raise ValueError(missed_points)
+            validate(df, checkpoints)
         print("Test values parsed OK for", self)
 
     def upload(self, password):

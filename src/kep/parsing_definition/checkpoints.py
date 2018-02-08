@@ -172,3 +172,27 @@ CHECKPOINTS = dict(
     q=as_checkpoints(QTR_STR),
     m=as_checkpoints(MONTHLY_STR)
 )
+
+
+def is_found(df, d):
+    """Retrun true if dictionary *d* value
+       if found in dataframe *df*.
+    """
+    dt = d['date']
+    colname = d['name']
+    x = d['value']
+    try:
+        return df.loc[dt, colname].iloc[0] == x
+    except KeyError:
+        return False
+
+def validate(df, checkpoints):
+    """Validate dataframe *df* with list of dictionaries
+       *checkpoints*.
+    """
+    flags = [is_found(df, c) for c in checkpoints]
+    if not all(flags):
+        missed_points = [
+            c for f, c in zip(
+                flags, checkpoints) if not f]
+        raise ValueError(missed_points)
