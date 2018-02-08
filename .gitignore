@@ -1,8 +1,12 @@
-.idea/*
+*/.idea/*
 *.doc
 *.rar
 doc/html/
 doc2/
+
+src/.idea
+src/.vscode
+src/.cache
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -106,3 +110,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+.idea/kep.iml
+.idea/misc.xml
+.idea/modules.xml
+.idea/workspace.xml
+.idea/vcs.xml
+.idea/vcs.xml

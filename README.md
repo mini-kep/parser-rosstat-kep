@@ -1,16 +1,19 @@
 [![Build Status](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=master)](https://travis-ci.org/mini-kep/parser-rosstat-kep)
 [![Coverage badge](https://codecov.io/gh/mini-kep/parser-rosstat-kep/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parser-rosstat-kep)
-[![Codacy Badge](https://api.codacy.com/project/badge/Grade/8a467743314641b4a22b66b327834367)](https://www.codacy.com/app/epogrebnyak/mini-kep?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=epogrebnyak/mini-kep&amp;utm_campaign=Badge_Grade)
 
 
 Concept
 -------
 
-The task is to extract pandas dataframes from MS Word files from [Rosstat KEP publication][Rosstat] and save them as [CSV files][backend]. 
+Russian statistics agency Rosstat publishes macroeconomic time series as [MS Word files][Rosstat]. In this repo we extract these time series as pandas dataframes and save them as [CSV files][backend]. This is a machine-readable dataset, ready to use with python/R and econometrics tools. 
 
-This code replaces a predecessor repo, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
+This code replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
 
-Windows and Word are required to create table dumps from .doc files, but once done CSV files can be parsed on a linux machine.   
+
+Data source:  [Short-term Economic Indicators (KEP) monthly Rosstat publication][Rosstat]
+
+Parsing result: [three CSV files at annual, quarterly and monthly frequencies][backend]
+
 
 Interface 
 ---------
@@ -34,15 +37,16 @@ directory structure.
    - **download**: download and unpack rar files from Rosstat website
    - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
    - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
-   - **finaliser.py** 
+   - **df2xl**: make Excel file with three worksheets for annual, quarterly and monthly data 
+
+*NOTE:* Windows and MS Word are required to create interim text dumps from MS Word files. Оnce these text files are created, they can be parsed on a linux machine.
 
 [Processed data folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed)
 has datasets by year and month (vintages).
 
-
 # Access to parsing result
 
-[getter.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/getter.py) 
+[access.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/access.py) 
 is an entry point to get parsed data.
 
 ```python
@@ -110,6 +114,6 @@ All historic raw data available on internet?
 - [ ] Yes
 - [x] No (data prior to 2016-12 is in this repo only)  
 
-Is scrapper automated (can download required information from internet  without manual operations)? 
+Is scrapper automated (can download required_labels information from internet  without manual operations)?
 - [x] Yes
 - [ ] No 
