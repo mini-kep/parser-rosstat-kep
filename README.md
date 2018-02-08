@@ -12,8 +12,9 @@ This code replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebn
 Quick links
 -----------
 
-- Source:  [Short-term Economic Indicators (KEP) monthly Rosstat publication][Rosstat]
-- Parsing result: [Three CSV files at annual, quarterly and monthly frequencies][backend]
+Source:  [Short-term Economic Indicators (KEP) monthly Rosstat publication][Rosstat]
+
+Parsing result: [Three CSV files at annual, quarterly and monthly frequencies][backend]
 
 
 Interface 
