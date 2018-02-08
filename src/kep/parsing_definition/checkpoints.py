@@ -2,6 +2,21 @@
 #    - he have no coverage metrics - how many of the variables parsed are listed in checkpoints?
 #    - checking time series not present in 1999 (INDPRO, PPI, some others) or discontinued ts
 
+
+# ------------------------------------------------------------
+#
+# TODO
+#
+# Setting:
+# - Validate(year, month).dfs has three dataframes with parsing results ('dataframes')
+# - we check them with validate() using CHECKPOINTS
+#
+# Task: can we calculate the following?
+#  - are all columns dataframes covered by CHECKPOINTS?
+#  - what are values in CHECKPOINTS that are not in dataframes?
+#
+# ------------------------------------------------------------
+
 ANNUAL_STR = """
 year                                1999.0
 AGROPROD_yoy                         103.8
