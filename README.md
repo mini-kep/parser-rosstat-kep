@@ -5,9 +5,12 @@
 In brief
 --------
 
-Data source:  [Short-term Economic Indicators (KEP) monthly Rosstat publication][Rosstat] as MS Word files.
+Source/result   |                       KEP    
+----------------|-------------------------------------------------------------------------------------------------
+Data source     | [KEP* monthly Rosstat publication][Rosstat] as MS Word files.
+Parsing result  | [Three CSV files at annual, quarterly and monthly frequencies][backend]
 
-Parsing result: [three CSV files at annual, quarterly and monthly frequencies][backend]
+KEP stands for "Short-term Economic Indicators"
 
 
 Concept
