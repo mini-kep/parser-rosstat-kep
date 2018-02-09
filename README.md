@@ -13,11 +13,11 @@ Parsing result: [three CSV files at annual, quarterly and monthly frequencies][b
 Concept
 -------
 
-We make a machine-readable dataset of Russian macroeconomic time series, ready to use with python, R or econometrics tools (eg gretl). 
+We make a machine-readable dataset of Russian macroeconomic time series, ready to use with python pandas, R or econometrics tools. 
 
-Russian statistics agency Rosstat publishes macroeconomic time series as [MS Word files][Rosstat]. In this repo we extract these time series as pandas dataframes and save them as [CSV files][backend]. 
+Russian statistics agency Rosstat publishes macroeconomic time series as [MS Word files][Rosstat]. In this repo we extract the time series as pandas dataframes and save them as [CSV files][backend]. 
 
-This repo replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
+This repo replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. In this repo we keep track of macroeconomic data releases since April 2009. 
 
 
 Interface 
