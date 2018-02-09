@@ -35,9 +35,14 @@ class Vintage:
             validate(df, checkpoints)
         print("Test values parsed OK for", self)
 
-    def upload(self, password):
-        # TODO: upload to database
-        raise NotImplementedError
+    def upload(self, password: str):
+        #protect from uploading old realeses of data to database
+        if is_latest_date(self.year, self.month):
+            # TODO: upload to database
+            raise NotImplementedError
+        else:
+            print(f"Date {self.year}, {self.month} is too old, it cannot be uploaded. Use newer date.")
+
 
     def __repr__(self):
         return "Vintage({}, {})".format(self.year, self.month)
