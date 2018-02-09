@@ -33,3 +33,8 @@ def is_supported_date(year, month):
         return True
     else:
         raise ValueError(f'<{year}, {month}> is not a supported date.')
+
+
+def is_latest_date(year, month):
+    return (year, month) in SUPPORTED_DATES[-2:]
+         
