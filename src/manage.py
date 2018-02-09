@@ -42,9 +42,11 @@ if '__main__' == __name__: # pragma: no cover
         vint.validate()
         vint.save()
 
-    if command == 'latest':
-        # FIXME: need a safeguard in last 2 SUPPORTED_DATES
+    if command == 'latest':        
         Latest(year, month).save()
+
+    if command == 'xls':        
+        Latest(year, month).to_excel()
 
     if command == 'upload':
         # TODO: upload latest data to database

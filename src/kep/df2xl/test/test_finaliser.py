@@ -5,7 +5,7 @@ import pandas as pd
 import pytest
 
 from kep.access import get_dataframe
-from kep.df2xl.make_xlsx import to_xls
+from kep.df2xl.to_excel import to_xls
 
 
 def test_get_dataframe():

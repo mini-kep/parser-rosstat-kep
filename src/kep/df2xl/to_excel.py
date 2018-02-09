@@ -15,6 +15,8 @@ def to_xls(filepath, dfa, dfq, dfm):
         # TODO: add variable names
         #self.df_vars().to_excel(writer, sheet_name='variables')
 
+# ERROR: the excel file treats decimal separators badly
+
 
 def save_xls(): # pragma: no cover
     dfa = get_dataframe('a')

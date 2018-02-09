@@ -5,6 +5,7 @@ from kep.parsing_definition.checkpoints import CHECKPOINTS, validate
 from kep.helper.path import InterimCSV, ProcessedCSV
 from kep.helper.date import Date
 from kep.csv2df.dataframe_maker import Datapoints
+from kep.df2xl.to_excel import save_xls
 
 class Vintage:
     """Represents dataset release for a given year and month.
@@ -51,9 +52,8 @@ class Latest(Vintage):
     def save(self, folder=None):
         ProcessedCSV(self.year, self.month).to_latest()
 
-    def to_xls(self, folder=None):
-        # TODO: upload to database
-        raise NotImplementedError
+    def to_excel(self):
+        save_xls()
 
 
 if __name__ == "__main__": # pragma: no cover
