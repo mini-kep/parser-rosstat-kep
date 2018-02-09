@@ -1,21 +1,42 @@
-# NOT IMPLEMENTED:
-#    - he have no coverage metrics - how many of the variables parsed are listed in checkpoints?
-#    - checking time series not present in 1999 (INDPRO, PPI, some others) or discontinued ts
-
-
-# ------------------------------------------------------------
+# ----------------------------------------------------------------------------------------
 #
-# TODO
+# TODO - coverage of resulting frames by checkpoints 
+# https://github.com/mini-kep/parser-rosstat-kep/issues/151
+# 
+# Setting (specification - dataframes - checkpoints):
 #
-# Setting:
+# - specification has requited labals for parsing, it is guaranteed that parsing results ('dataframes')
+#   have this set of labels 
 # - Validate(year, month).dfs has three dataframes with parsing results ('dataframes')
-# - we check them with validate() using CHECKPOINTS
-#
-# Task: can we calculate the following?
-#  - are all columns dataframes covered by CHECKPOINTS?
-#  - what are values in CHECKPOINTS that are not in dataframes?
-#
-# ------------------------------------------------------------
+# - we check them with checkpoints.validate() function using CHECKPOINTS datapoints
+
+# How CHECKPOINTS are constructed?
+#  -  a checkpoint is basically a frequency-label--date-value dictionary
+#  -  there are several ways to define uch dictionaries, most explcicit is just a hardcoded constant
+#     (in fact that was tried in some branches of repo)
+#  -  we need a lot of chekpoints and some rather visual way of editing them
+#  -  given this the checkpoints.CHECKPOINTS are constructued manually just using a printout (repr) of dataframes 
+#     while this may not be the best way to construct a checkpoint, it is rather verbose.
+#  -  the problem I see is that the variables that do not have a 1999 value, which start observationlater (eg INDPRO, PPI, some others)
+#  -  another problem is that we just copy an occasional parsing result to CHEKCPOINTS, not really looking at CSV file 
+#     is it is really the value in original data source
+  
+# Risks:
+# - dataframes may have parsing results not covered by checkpoints
+# - not all indicators start in 1999, they need other checkpoints 
+# - checkpoints not strictly related to interim CSV values
+# - we employ just one control datapoint per time series to ensure data interity, may not be enough to stay sure
+
+# Immediate tasks:
+#  - are all columns in dataframes covered by CHECKPOINTS? (uncovered time series / columns names) - moe important
+#  - what are values in CHECKPOINTS that are not in dataframes? (unused checkpoints) - less important
+
+
+# ----------------------------------------------------------------------------------------
+# Related issues:
+#  - how many variables are parsed, how many time sseries are there is the dataset in total, by ferequncy
+#  - should speciifation include control datapoints?#
+# ----------------------------------------------------------------------------------------
 
 ANNUAL_STR = """
 year                                1999.0

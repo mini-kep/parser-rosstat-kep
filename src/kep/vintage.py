@@ -6,7 +6,9 @@ from kep.helper.path import InterimCSV, ProcessedCSV
 from kep.csv2df.dataframe_maker import Datapoints
 
 class Vintage:
-    """Represents dataset release for a given year and month."""
+    """Represents dataset release for a given year and month.
+    Performs interim CSV file parsing on init.*
+    """
 
     def __init__(
             self,
@@ -34,7 +36,7 @@ class Vintage:
         print("Test values parsed OK for", self)
 
     def upload(self, password):
-        # TODO: upload to databse
+        # TODO: upload to database
         raise NotImplementedError
 
     def __repr__(self):
@@ -45,7 +47,3 @@ if __name__ == "__main__": # pragma: no cover
     v = Vintage(2016, 10)
     v.validate()
     # Test values parsed OK for Vintage(2016, 10)
-
-    #csv_text = InterimCSV(2016, 10).text()
-    # PARSING_DEFINITION.attach_data(csv_text)
-    #emitter = Datapoints(PARSING_DEFINITION.tables)
