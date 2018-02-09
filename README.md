@@ -9,7 +9,7 @@ Source/result   |                       KEP
 ----------------|-------------------------------------------------------------------------------------------------
 Data source     | [KEP monthly Rosstat publication][Rosstat] as MS Word files.
 Parsing result  | [Three CSV files with time series at annual, quarterly and monthly frequencies][backend]
-Schedule        | for [2018][schedule]
+Schedule        | [2018][schedule]
 
 Note: KEP stands for "Short-term Economic Indicators" (*"Краткосрочные экономические показатели"*).
 
