@@ -21,8 +21,8 @@ class Vintage:
         emitter = Datapoints(parsing_definition.tables)
         self.dfs = {freq: emitter.get_dataframe(freq) for freq in FREQUENCIES}
 
-    def save(self):
-        csv_processed = ProcessedCSV(self.year, self.month)
+    def save(self, root_folder=None):
+        csv_processed = ProcessedCSV(self.year, self.month, root_folder)
         for freq, df in self.dfs.items():
             path = csv_processed.path(freq)
             df.to_csv(path)
