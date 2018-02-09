@@ -7,11 +7,10 @@ In brief
 
 Source/result   |                       KEP    
 ----------------|-------------------------------------------------------------------------------------------------
-Data source     | [KEP* monthly Rosstat publication][Rosstat] as MS Word files.
-Parsing result  | [Three CSV files at annual, quarterly and monthly frequencies][backend]
+Data source     | [KEP monthly Rosstat publication][Rosstat] as MS Word files.
+Parsing result  | [Three CSV files with time series at annual, quarterly and monthly frequencies][backend]
 
-KEP stands for "Short-term Economic Indicators"
-
+Note: KEP stands for "Short-term Economic Indicators" (*"Краткосрочные экономические показатели"*).
 
 Concept
 -------
@@ -75,7 +74,6 @@ dfa = get_dataframe_from_web('a')
 dfq = get_dataframe_from_web('q')
 dfm = get_dataframe_from_web('m')
 ```
-
  
 # Repo management
 
@@ -95,8 +93,8 @@ This command:
 - transforms some variables (eg. deaccumulates government expenditures)
 - validates parsing result
 - saves dataframes as processed CSV files
-- saves csv for latest date
-- saves an Excel file for latest date.
+- saves csv for latest date (todo)
+- saves an Excel file for latest date (todo).
 
 Same job can be done by [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py)
 
