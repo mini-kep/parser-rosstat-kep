@@ -39,8 +39,8 @@ class Vintage:
 class Latest(Vintage):
     """Operations on most recent data release."""
 
-    def __init__(self, year: int, month: int, parsing_definition=PARSING_DEFINITION):
-        super().__init__(year, month, parsing_definition)
+    def __init__(self, year: int, month: int):
+        super().__init__(year, month)
         # protect from using old realeses of data 
         Date(year, month).assert_latest()
 
