@@ -2,17 +2,22 @@
 [![Coverage badge](https://codecov.io/gh/mini-kep/parser-rosstat-kep/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parser-rosstat-kep)
 
 
+In brief
+--------
+
+Data source:  [Short-term Economic Indicators (KEP) monthly Rosstat publication][Rosstat] as MS Word files.
+
+Parsing result: [three CSV files at annual, quarterly and monthly frequencies][backend]
+
+
 Concept
 -------
 
-Russian statistics agency Rosstat publishes macroeconomic time series as [MS Word files][Rosstat]. In this repo we extract these time series as pandas dataframes and save them as [CSV files][backend]. This is a machine-readable dataset, ready to use with python/R and econometrics tools. 
+We make a machine-readable dataset of Russian macroeconomic time series, ready to use with python, R or econometrics tools (eg gretl). 
 
-This code replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
+Russian statistics agency Rosstat publishes macroeconomic time series as [MS Word files][Rosstat]. In this repo we extract these time series as pandas dataframes and save them as [CSV files][backend]. 
 
-
-Data source:  [Short-term Economic Indicators (KEP) monthly Rosstat publication][Rosstat]
-
-Parsing result: [three CSV files at annual, quarterly and monthly frequencies][backend]
+This repo replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
 
 
 Interface 
