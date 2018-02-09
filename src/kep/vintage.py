@@ -48,7 +48,7 @@ class Latest(Vintage):
         # TODO: upload to database
         raise NotImplementedError
 
-    def to_latest(self, folder=None):
+    def save(self, folder=None):
         ProcessedCSV(self.year, self.month).to_latest()
 
     def to_xls(self, folder=None):

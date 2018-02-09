@@ -1,13 +1,12 @@
 """Run full cycle of data processing from download to saving dataframe."""
 
-from kep.vintage import Vintage
+from kep.vintage import Vintage, Latest
 from kep.download.download import RemoteFile
 from kep.word2csv.word import word2csv
-from kep.helper.path import copy_to_latest_folder
 
 # TODO: make xls file
 
-def run(year, month): # pragma: no cover
+def kep_run(year, month): # pragma: no cover
     #download and unpack
     remote = RemoteFile(year, month)
     remote.download()
@@ -29,7 +28,8 @@ if '__main__' == __name__: # pragma: no cover
 
     if command == 'download':
         # FIXME: when no data available, must not download file (currently in
-        # is a #k html error message)
+        # is a 3k html error message, which is saved as rar file, causes error
+        # elsewhere in a program
         remote = RemoteFile(year, month)
         remote.download()
         remote.unrar()
@@ -44,11 +44,11 @@ if '__main__' == __name__: # pragma: no cover
 
     if command == 'latest':
         # FIXME: need a safeguard in last 2 SUPPORTED_DATES
-        copy_to_latest_folder(year, month)
+        Latest(year, month).save()
 
     if command == 'upload':
         # TODO: upload latest data to database
         raise NotImplementedError
 
     if command == 'all':
-        run(year, month)
+        kep_run(year, month)
