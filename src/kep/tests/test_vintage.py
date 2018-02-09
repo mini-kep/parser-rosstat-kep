@@ -1,7 +1,6 @@
 import pytest
 import pandas as pd
 import tempfile
-import os
 from pathlib import Path
 
 
@@ -39,7 +38,7 @@ class Test_Vintage():
         temp_folder = Path(tempfile.tempdir)
         v = Vintage(year, month)
         # call
-        # EP: we now have an option to infect a directory to .save()
+        # EP: we now have an option to inject a directory to .save()
         v.save(folder = temp_folder)
         # check
         filenames = [f'df{freq}.csv' for freq in FREQUENCIES]
@@ -50,19 +49,5 @@ class Test_Vintage():
             assert f.stat().st_size > 0
             # cleanup
             f.unlink() 
-    
 
-
-    # def test_save_files_exist(self):
-    #     path_ = (Folders.processed / "2017" / "10")
-    #     if path_.exists():
-    #         shutil.rmtree(str(path_))
-
-    #     year, month = 2017, 10
-    #     vintage = Vintage(year, month)
-    #     vintage.save()
-
-    #     assert path_.exists()
-    #     for freq in FREQUENCIES:
-    #         assert ((path_ / "df{}.csv".format(freq)).exists())
 
