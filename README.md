@@ -35,19 +35,24 @@ Interface
 
 # Directory structure
 
-[kep] follows [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
+We follow [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
 directory structure. 
 
-[Source code (src) folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/src):
+#### Data
+[Processed data folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed)
+has datasets by year and month (vintages).
+
+[kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true) has is the latest data in Excel (but use of csv is still encouraged). 
+
+#### Code
+
+[kep package](https://github.com/mini-kep/parser-rosstat-kep/tree/master/src/kep) has follwoing subpackages:
    - **download**: download and unpack rar files from Rosstat website
    - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
    - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
    - **df2xl**: make Excel file with three worksheets for annual, quarterly and monthly data 
 
 *NOTE:* Windows and MS Word are required to create interim text dumps from MS Word files. Оnce these text files are created, they can be parsed on a linux machine.
-
-[Processed data folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed)
-has datasets by year and month (vintages).
 
 # Access to parsing result
 
@@ -68,12 +73,7 @@ dfq = get_dataframe_from_web('q')
 dfm = get_dataframe_from_web('m')
 ```
 
-# Data in Excel
-
- Here is the latest data in Excel (but use of csv is still encouraged): 
  
- - [kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true)
-  
 # Repo management
 
 Around [this schedule](http://www.gks.ru/gis/images/graf-oper2017.htm) on a Windows machine I run:   
@@ -82,20 +82,20 @@ Around [this schedule](http://www.gks.ru/gis/images/graf-oper2017.htm) on a Wind
 invoke add <year> <month>
 ```
 
-and commit to this repo.
+and commit changes to this repo.
 
 This command:
 - downloads a rar file from Rosstat, 
 - unpacks MS Word files, 
 - dumps all tables from MS Word files to an interim CSV file, 
 - parses interim CSV file to three dataframes by frequency 
-- validates parsing result
 - transforms some variables (eg. deaccumulates government expenditures)
+- validates parsing result
 - saves dataframes as processed CSV files
 - saves csv for latest date
 - saves an Excel file for latest date.
 
-Same job is done by [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py)
+Same job can be done by [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py)
 
 # Parcer summary
 
