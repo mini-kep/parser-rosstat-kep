@@ -4,18 +4,18 @@ Constant:
     SUPPORTED_DATES
 
 Method:
-    is_supported_date()
+    assert_supported_date(), assert_latest_date()
 """
 
 import pandas as pd
 
 
 def supported_dates(start_date='2009-04', exclude_dates=['2013-11']):
-    """Get a list of (year, month) tuples starting from (2009, 4)
-       up to a previous recent month.
+    """Get a list of (year, month) tuples starting from (2009, 4) up to 
+       a previous recent month. This a 'supported date list'.
 
        Excludes (2013, 11) - no archive for this month.
-
+       
     Returns:
         List of (year, month) tuples.
     """
@@ -25,16 +25,46 @@ def supported_dates(start_date='2009-04', exclude_dates=['2013-11']):
     return [(date.year, date.month) for date in dates.drop(exclude)]
 
 
-SUPPORTED_DATES = supported_dates()
+class Date:
+    
+    supported = supported_dates()
+    random_valid_date = supported[0]
+    
+    def __init__(self, year: int, month: int):
+        self.year, self.month = year, month
+        
+    def is_supported(self):
+        return (self.year, self.month) in self.supported
 
+    def is_latest(self):    
+        return (self.year, self.month) in self.latest
 
-def is_supported_date(year, month):
-    if (year, month) in SUPPORTED_DATES:
-        return True
-    else:
-        raise ValueError(f'<{year}, {month}> is not a supported date.')
+    @property
+    def latest(self):
+        """
+        Publication KEP for month x is released on end of month x+1 
+        or start of month x+2. For more precise schedule see:
+            <http://www.gks.ru/gis/images/graf-oper2018.htm>
+        
+        Assumption: we allow to look for latest date in last two recent months.       
+        """
+        return self.supported[-2:]
 
-
-def is_latest_date(year, month):
-    return (year, month) in SUPPORTED_DATES[-2:]
+    def assert_supported(self):
+        """Raise ValueError if date is not in supported list."""
+        if not self.is_supported():
+            raise ValueError(f'{self} is not a supported date.')    
+    
+    def assert_latest(self):
+        """Raise ValueError if date is not recent."""    
+        if not self.is_latest():
+            msg = (f'Operation cannot be completed on date: {self}\n'
+                   f'Use use newer date: {self.latest}')
+            raise ValueError(msg)
+            
+    def __repr__(self):
+        return f'Date(year={self.year}, month={self.month})'
+    
+             
+            
          
