@@ -9,6 +9,7 @@ Source/result   |                       KEP
 ----------------|-------------------------------------------------------------------------------------------------
 Data source     | [KEP monthly Rosstat publication][Rosstat] as MS Word files.
 Parsing result  | [Three CSV files with time series at annual, quarterly and monthly frequencies][backend]
+Schedule        | [2018][schedule]
 
 Note: KEP stands for "Short-term Economic Indicators" (*"Краткосрочные экономические показатели"*).
 
@@ -33,7 +34,7 @@ Interface
 [kep]: https://github.com/mini-kep/parser-rosstat-kep
 [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
 [backend]: https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest
-
+[schedule]: http://www.gks.ru/gis/images/graf-oper2018.htm
 
 # Directory structure
 
@@ -77,7 +78,7 @@ dfm = get_dataframe_from_web('m')
  
 # Repo management
 
-Around [this schedule](http://www.gks.ru/gis/images/graf-oper2017.htm) on a Windows machine I run:   
+Around [this schedule][schedule] on a Windows machine I run:   
 
 ```
 invoke add <year> <month>
