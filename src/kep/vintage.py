@@ -28,7 +28,10 @@ class Vintage:
         csv_processed = ProcessedCSV(self.year, self.month, folder)
         for freq, df in self.dfs.items():
             path = csv_processed.path(freq)
-            df.to_csv(path)
+            # Convert 1524.3999999999996 back to 1524.40
+            # Deaccumulation procedure in parser.py responsible  
+            # for float number generation.   
+            df.to_csv(path, float_format='%.2f')
             print("Saved dataframe to", path)
 
     def validate(self):
@@ -70,5 +73,10 @@ class Latest(Vintage):
 if __name__ == "__main__": # pragma: no cover
     v = Vintage(2016, 10)
     v.validate()
-    # Expected:
+    # Expected output:
     # Test values parsed OK for Vintage(2016, 10)
+
+    import pandas as pd
+    # TODO: convert to test for to_csv(), hitting deaccumulation procedure
+    assert pd.DataFrame([{'a': 1}]).to_csv(float_format='%.2f') == ',a\n0,1\n'
+    assert pd.DataFrame([{'a': 1.0005}]).to_csv(float_format='%.2f') == ',a\n0,1.00\n'
