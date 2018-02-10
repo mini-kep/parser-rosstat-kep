@@ -5,7 +5,7 @@
 In brief
 --------
 
-Source/result   |                       KEP    
+Parser          |                       KEP    
 ----------------|-------------------------------------------------------------------------------------------------
 Data source     | ["Short-term Economic Indicators" (KEP) monthly Rosstat publication][Rosstat].
 Parsing result  | [Three CSV files with time series at annual, quarterly and monthly frequencies][backend]
