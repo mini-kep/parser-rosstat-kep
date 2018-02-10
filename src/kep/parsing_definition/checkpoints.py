@@ -213,7 +213,7 @@ CHECKPOINTS = dict(
 
 
 def is_found(df, d):
-    """Retrun true if dictionary *d* value
+    """Return true if dictionary *d* value
        if found in dataframe *df*.
     """
     dt = d['date']
@@ -223,6 +223,7 @@ def is_found(df, d):
         return df.loc[dt, colname].iloc[0] == x
     except KeyError:
         return False
+
 
 def validate(df, checkpoints):
     """Validate dataframe *df* with list of dictionaries
@@ -234,3 +235,15 @@ def validate(df, checkpoints):
             c for f, c in zip(
                 flags, checkpoints) if not f]
         raise ValueError(missed_points)
+
+
+def find_uncovered_column_names(df, checkpoints):
+    checkpoint_column_names = {c["name"] for c in checkpoints}
+    df_column_names = set()
+
+    d = df.to_dict('index')
+    for dt in d.keys():
+        for name, value in d[dt].items():
+            df_column_names.add(name)
+
+    return df_column_names.difference(checkpoint_column_names)
