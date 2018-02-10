@@ -2,12 +2,9 @@
 [![Coverage badge](https://codecov.io/gh/mini-kep/parser-rosstat-kep/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parser-rosstat-kep)
 
 
-In brief
---------
-
 Parser          |                       KEP    
 ----------------|-------------------------------------------------------------------------------------------------
-Data source     | ["Short-term Economic Indicators" (KEP) monthly Rosstat publication][Rosstat].
+Data source     | ["Short-term Economic Indicators" (KEP) monthly Rosstat publication][Rosstat]
 Parsing result  | [Three CSV files with time series at annual, quarterly and monthly frequencies][backend]
 Schedule        | [2018][schedule]
 
