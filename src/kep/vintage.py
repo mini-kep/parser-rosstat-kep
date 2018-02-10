@@ -31,8 +31,9 @@ class Vintage:
             # Convert 1524.3999999999996 back to 1524.4
             # Deaccumulation procedure in parser.py responsible  
             # for float number generation. 
-            # FIXME: the risk is loss of data for exchange rate, 
-            #        may need fomatter by column
+            # WONTFIX: the risk is loss of data for exchange rate, 
+            #          may need fomatter by column. annual values can be
+            #          a guidance for a number of decimal positions.
             df.to_csv(path, float_format='%.2f')
             print("Saved dataframe to", path)
 
@@ -62,7 +63,6 @@ class Latest(Vintage):
         #        format compared to what Uploader() expects
         #           (a) date format   
         #           (b) extra keys in dictionary
-        #           (c) may be part of 
         Uploader(self.datapoints).post()
 
     def save(self, folder=None):
