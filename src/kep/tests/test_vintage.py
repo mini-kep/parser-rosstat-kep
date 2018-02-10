@@ -49,7 +49,7 @@ class Test_Latest:
     # WARNING: the test will fail if no current pasring took place 
     #          and files for recent month were not created 
     def test_init_on_recent_date_creates_instance(self):
-        year, month = Date.latest[0]
+        year, month = Date.latest_dates[0]
         assert Latest(year, month)
 
 if __name__ == "__main__":
