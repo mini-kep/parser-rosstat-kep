@@ -22,6 +22,7 @@ class Vintage:
         parsing_definition.attach_data(csv_text)
         emitter = Datapoints(parsing_definition.tables)
         self.dfs = {freq: emitter.get_dataframe(freq) for freq in FREQUENCIES}
+        self.datapoints = emitter.datapoints
 
     def save(self, folder=None):
         csv_processed = ProcessedCSV(self.year, self.month, folder)
@@ -50,11 +51,8 @@ class Latest(Vintage):
         super().__init__(year, month)
 
     def upload(self):
-        data = []
-        for freq, df in self.dfs.items():
-            data.extend(yield_all_dicts(df, freq))
-
-        Uploader(data).post()
+        self.validate()
+        Uploader(self.datapoints).post()
 
     def save(self, folder=None):
         ProcessedCSV(self.year, self.month).to_latest()
