@@ -4,7 +4,8 @@ import tempfile
 from pathlib import Path
 
 from kep import FREQUENCIES
-from kep.vintage import Vintage
+from kep.vintage import Vintage, Latest
+from kep.helper.date import supported_dates
 
 
 def test_Vintage():
@@ -52,6 +53,17 @@ class Test_Vintage_save:
     def teardown(self):
         for f in self.files:
             f.unlink()
+
+
+def test_latest_vintage_raises_exception_on_too_old_date():
+    year, month = 2017, 10
+    with pytest.raises(ValueError, match=r'Operation cannot be completed .*'):
+        Latest(year, month)
+
+
+def test_latest_vintage_creation_with_recent_date():
+    year, month = supported_dates()[-2]
+    assert Latest(year, month)
 
 
 if __name__ == "__main__":
