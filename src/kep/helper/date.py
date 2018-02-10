@@ -29,7 +29,15 @@ class Date:
     
     supported = supported_dates()
     random_valid_date = supported[0]
+    """
+    Publication KEP for month x is released on end of month x+1 
+    or start of month x+2. For more precise schedule see:
+        <http://www.gks.ru/gis/images/graf-oper2018.htm>
     
+    Assumption: we allow to look for latest date in last two recent months.       
+    """
+    latest = supported[-2:]
+
     def __init__(self, year: int, month: int):
         self.year, self.month = year, month
         
@@ -39,16 +47,9 @@ class Date:
     def is_latest(self):    
         return (self.year, self.month) in self.latest
 
-    @property
-    def latest(self):
-        """
-        Publication KEP for month x is released on end of month x+1 
-        or start of month x+2. For more precise schedule see:
-            <http://www.gks.ru/gis/images/graf-oper2018.htm>
-        
-        Assumption: we allow to look for latest date in last two recent months.       
-        """
-        return self.supported[-2:]
+#    @property
+#    def latest(self):
+#        return self.supported[-2:]
 
     def assert_supported(self):
         """Raise ValueError if date is not in supported list."""

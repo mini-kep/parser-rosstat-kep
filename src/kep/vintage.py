@@ -1,7 +1,5 @@
 """Extract dataframes by year and month."""
 
-from parsers.mover.uploader import Uploader
-
 from kep import FREQUENCIES, PARSING_DEFINITION
 from kep.parsing_definition.checkpoints import CHECKPOINTS, validate
 from kep.helper.path import InterimCSV, ProcessedCSV
@@ -19,9 +17,12 @@ class Vintage:
         self.year, self.month = year, month
         csv_text = InterimCSV(year, month).text()
         parsing_definition.attach_data(csv_text)
-        emitter = Datapoints(parsing_definition.tables)
-        self.dfs = {freq: emitter.get_dataframe(freq) for freq in FREQUENCIES}
-        self.datapoints = emitter.datapoints
+        self.emitter = Datapoints(parsing_definition.tables)
+        self.dfs = {freq: self.emitter.get_dataframe(freq) for freq in FREQUENCIES}
+
+    @property
+    def datapoints(self):        
+        return self.emitter.datapoints
 
     def save(self, folder=None):
         csv_processed = ProcessedCSV(self.year, self.month, folder)
@@ -50,7 +51,13 @@ class Latest(Vintage):
         super().__init__(year, month)
 
     def upload(self):
-        self.validate()
+        from parsers.mover.uploader import Uploader
+        self.validate()        
+        # FIXME: possible risk - *self.datapoints* may have different serialisation 
+        #        format compared to what Uploader() expects
+        #        (a) date format   
+        #        (b) extra keys in dictionary
+        #        (c) may be part of 
         Uploader(self.datapoints).post()
 
     def save(self, folder=None):

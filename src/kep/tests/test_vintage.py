@@ -5,7 +5,7 @@ from pathlib import Path
 
 from kep import FREQUENCIES
 from kep.vintage import Vintage, Latest
-from kep.helper.date import supported_dates
+from kep.helper.date import Date
 
 
 class Test_Vintage:
@@ -40,16 +40,17 @@ class Test_Vintage:
             if f.exists():
                 f.unlink()
 
-def test_latest_vintage_raises_exception_on_too_old_date():
-    year, month = 2017, 10
-    with pytest.raises(ValueError, match=r'Operation cannot be completed .*'):
-        Latest(year, month)
+class Test_Latest:
+    def test_init_on_very_old_date_raises_exception(self):
+        year, month = 2017, 10
+        with pytest.raises(ValueError, match=r'Operation cannot be completed .*'):
+            Latest(year, month)
 
-
-def test_latest_vintage_creation_with_recent_date():
-    year, month = supported_dates()[-2]
-    assert Latest(year, month)
-
+    # WARNING: the test will fail if no current pasring took place 
+    #          and files for recent month were not created 
+    def test_init_on_recent_date_creates_instance(self):
+        year, month = Date.latest[0]
+        assert Latest(year, month)
 
 if __name__ == "__main__":
     pytest.main([__file__])
