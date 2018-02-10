@@ -49,8 +49,7 @@ if '__main__' == __name__: # pragma: no cover
         Latest(year, month).to_excel()
 
     if command == 'upload':
-        # TODO: upload latest data to database
-        raise NotImplementedError
+        Latest(year, month).upload()
 
     if command == 'all':
         kep_run(year, month)

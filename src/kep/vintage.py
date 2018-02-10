@@ -1,11 +1,15 @@
 """Extract dataframes by year and month."""
 
+from parsers.mover.uploader import Uploader
+from parsers.getter.kep import yield_all_dicts
+
 from kep import FREQUENCIES, PARSING_DEFINITION
 from kep.parsing_definition.checkpoints import CHECKPOINTS, validate
 from kep.helper.path import InterimCSV, ProcessedCSV
 from kep.helper.date import Date
 from kep.csv2df.dataframe_maker import Datapoints
 from kep.df2xl.to_excel import save_xls
+
 
 class Vintage:
     """Represents dataset release for a given year and month.
@@ -42,12 +46,14 @@ class Latest(Vintage):
 
     def __init__(self, year: int, month: int):
         super().__init__(year, month)
-        # protect from using old realeses of data 
+        # protect from using old releases of data
         Date(year, month).assert_latest()
 
-    def upload(self, password: str):        
-        # TODO: upload to database
-        raise NotImplementedError
+    def upload(self):
+        data = []
+        for freq, df in self.dfs.items():
+            data += list(yield_all_dicts(df, freq))
+        Uploader(data).post()
 
     def save(self, folder=None):
         ProcessedCSV(self.year, self.month).to_latest()
