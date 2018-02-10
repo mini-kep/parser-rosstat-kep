@@ -28,9 +28,11 @@ class Vintage:
         csv_processed = ProcessedCSV(self.year, self.month, folder)
         for freq, df in self.dfs.items():
             path = csv_processed.path(freq)
-            # Convert 1524.3999999999996 back to 1524.40
+            # Convert 1524.3999999999996 back to 1524.4
             # Deaccumulation procedure in parser.py responsible  
-            # for float number generation.   
+            # for float number generation. 
+            # FIXME: the risk is loss of data for exchange rate, 
+            #        may need fomatter by column
             df.to_csv(path, float_format='%.2f')
             print("Saved dataframe to", path)
 
@@ -58,9 +60,9 @@ class Latest(Vintage):
         self.validate()        
         # FIXME: possible risk - *self.datapoints* may have different serialisation 
         #        format compared to what Uploader() expects
-        #        (a) date format   
-        #        (b) extra keys in dictionary
-        #        (c) may be part of 
+        #           (a) date format   
+        #           (b) extra keys in dictionary
+        #           (c) may be part of 
         Uploader(self.datapoints).post()
 
     def save(self, folder=None):
