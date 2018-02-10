@@ -190,7 +190,16 @@ class Table:
                     time_index=time_stamp,
                     freq=freq)
 
+    # TODO: need a test on really a minimal setup for method below
+    #       write test setting and asserts in this file before test  
     def extract_values(self):
+        """Use ._extract_values() stream and filter None values from it.
+        """
+        def has_value(d):
+            return d['value'] is not None
+        return filter(has_value, self._extract_values())    
+
+    def _extract_values(self):
         """Yield dictionaries with variable name, frequency, time_index
            and value.
         """
