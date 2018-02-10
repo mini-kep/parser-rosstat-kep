@@ -71,8 +71,9 @@ class Latest(Vintage):
 
 
 if __name__ == "__main__": # pragma: no cover
-    v = Vintage(2016, 10)
+    v = Vintage(2017, 12)
     v.validate()
+    v.save()
     # Expected output:
     # Test values parsed OK for Vintage(2016, 10)
 
