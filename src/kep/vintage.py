@@ -52,7 +52,8 @@ class Latest(Vintage):
     def upload(self):
         data = []
         for freq, df in self.dfs.items():
-            data += list(yield_all_dicts(df, freq))
+            data.extend(yield_all_dicts(df, freq))
+
         Uploader(data).post()
 
     def save(self, folder=None):
