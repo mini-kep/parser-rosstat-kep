@@ -1,7 +1,6 @@
 """Extract dataframes by year and month."""
 
 from parsers.mover.uploader import Uploader
-from parsers.getter.kep import yield_all_dicts
 
 from kep import FREQUENCIES, PARSING_DEFINITION
 from kep.parsing_definition.checkpoints import CHECKPOINTS, validate
