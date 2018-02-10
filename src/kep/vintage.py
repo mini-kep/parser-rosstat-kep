@@ -45,9 +45,9 @@ class Latest(Vintage):
     """Operations on most recent data release."""
 
     def __init__(self, year: int, month: int):
-        super().__init__(year, month)
         # protect from using old releases of data
         Date(year, month).assert_latest()
+        super().__init__(year, month)
 
     def upload(self):
         data = []
