@@ -2,16 +2,11 @@
 [![Coverage badge](https://codecov.io/gh/mini-kep/parser-rosstat-kep/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parser-rosstat-kep)
 
 
-In brief
---------
-
-Source/result   |                       KEP    
+Parser          |                       KEP    
 ----------------|-------------------------------------------------------------------------------------------------
-Data source     | [KEP monthly Rosstat publication][Rosstat] as MS Word files.
+Data source     | ["Short-term Economic Indicators" (KEP) monthly Rosstat publication][Rosstat]
 Parsing result  | [Three CSV files with time series at annual, quarterly and monthly frequencies][backend]
 Schedule        | [2018][schedule]
-
-Note: KEP stands for "Short-term Economic Indicators" (*"Краткосрочные экономические показатели"*).
 
 Concept
 -------
@@ -25,6 +20,7 @@ This repo replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebn
 
 Interface 
 ---------
+
 [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py) does the following job:
 - download and unpack MS Word files from Rosstat
 - extract tables from Word files and assigns variable names
@@ -36,7 +32,8 @@ Interface
 [backend]: https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest
 [schedule]: http://www.gks.ru/gis/images/graf-oper2018.htm
 
-# Directory structure
+Directory structure
+-------------------
 
 We follow [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
 directory structure. 
@@ -57,7 +54,8 @@ has datasets by year and month (vintages).
 
 *NOTE:* Windows and MS Word are required to create interim text dumps from MS Word files. Оnce these text files are created, they can be parsed on a linux machine.
 
-# Access to parsing result
+Access to parsing result
+------------------------
 
 [access.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/access.py) 
 is an entry point to get parsed data.
@@ -76,7 +74,8 @@ dfq = get_dataframe_from_web('q')
 dfm = get_dataframe_from_web('m')
 ```
  
-# Repo management
+Repo management
+---------------
 
 Around [this schedule][schedule] on a Windows machine I run:   
 
@@ -99,7 +98,8 @@ This command:
 
 Same job can be done by [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py)
 
-# Parcer summary
+Parcer summary
+--------------
 
 Parcer              |  mini-kep 
 --------------------|----------------------------------------

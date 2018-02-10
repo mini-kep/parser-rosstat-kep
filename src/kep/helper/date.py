@@ -27,28 +27,29 @@ def supported_dates(start_date='2009-04', exclude_dates=['2013-11']):
 
 class Date:
     
-    supported = supported_dates()
-    random_valid_date = supported[0]
+    supported_dates = supported_dates()
+    random_valid_date = supported_dates[0]
+    """
+    Publication KEP for month x is released on end of month x+1 
+    or start of month x+2. For more precise schedule see:
+        <http://www.gks.ru/gis/images/graf-oper2018.htm>
     
+    Assumption: we allow to look for latest date in last two recent months.       
+    """
+    latest_dates = supported_dates[-2:]
+
     def __init__(self, year: int, month: int):
         self.year, self.month = year, month
         
     def is_supported(self):
-        return (self.year, self.month) in self.supported
+        return (self.year, self.month) in self.supported_dates
 
     def is_latest(self):    
-        return (self.year, self.month) in self.latest
+        return (self.year, self.month) in self.latest_dates
 
-    @property
-    def latest(self):
-        """
-        Publication KEP for month x is released on end of month x+1 
-        or start of month x+2. For more precise schedule see:
-            <http://www.gks.ru/gis/images/graf-oper2018.htm>
-        
-        Assumption: we allow to look for latest date in last two recent months.       
-        """
-        return self.supported[-2:]
+#    @property
+#    def latest(self):
+#        return self.supported[-2:]
 
     def assert_supported(self):
         """Raise ValueError if date is not in supported list."""
@@ -59,7 +60,7 @@ class Date:
         """Raise ValueError if date is not recent."""    
         if not self.is_latest():
             msg = (f'Operation cannot be completed on date: {self}\n'
-                   f'Use use newer date: {self.latest}')
+                   f'Use use newer date: {self.latest_dates}')
             raise ValueError(msg)
             
     def __repr__(self):

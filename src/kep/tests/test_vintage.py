@@ -4,55 +4,53 @@ import tempfile
 from pathlib import Path
 
 from kep import FREQUENCIES
-from kep.vintage import Vintage
+from kep.vintage import Vintage, Latest
+from kep.helper.date import Date
 
 
-def test_Vintage():
-    year, month = 2017, 10
-    vint = Vintage(year, month)
-    vint.validate()
-    vint.save()
+class Test_Vintage:
+    
+    def setup(self):
+        self.vintage = Vintage(2017, 10)
+        self.temp_folder = Path(tempfile.tempdir)
+        def make_path(freq: str, year: str, month: str, root = self.temp_folder):
+            return root / 'processed' / year / month / f'df{freq}.csv' 
+        self.paths = [make_path(freq, '2017', '10') for freq in FREQUENCIES]
+        # may have temp files form previous run, clean them up 
+        self.teardown() 
 
-
-class Test_Vintage():
-    year, month = 2017, 10
-    vintage = Vintage(year, month)
-
-    # EP: on init Vintage does a great deal of work of creating dataframes
-    #     this is a VERY important part to check!
-    def test_init_results_in_dataframe(self):
+    def test_init_results_in_dataframes_in_dfs_property(self):
         for freq in FREQUENCIES:
             df = self.vintage.dfs[freq]
             assert isinstance(df, pd.DataFrame)
 
     def test_repr_is_callable_and_returns_a_string(self):
-        # EP: just make sure it is callable + type check
-        #     is there is an error in repr it ususally fails very silently
         assert isinstance(repr(self.vintage), str)
 
-
-class Test_Vintage_save:
-    def setup(self):
-        self.temp_folder = Path(tempfile.tempdir)
-        filenames = [f'df{freq}.csv' for freq in FREQUENCIES]
-        folder = self.temp_folder / 'processed' / '2017' / '10'
-        self.files = [folder / fn for fn in filenames]
-
-    def test_save(self):
-        year, month = 2017, 10
-        v = Vintage(year, month)
+    def test_save_writes_files_to_folder(self):
         # call
-        # EP: we now have an option to inject a directory to .save()
-        v.save(folder=self.temp_folder)
+        self.vintage.save(folder=self.temp_folder)
         # check
-        for f in self.files:
+        for f in self.paths:
             assert f.exists()
             assert f.stat().st_size > 0
 
     def teardown(self):
-        for f in self.files:
-            f.unlink()
+        for f in self.paths:
+            if f.exists():
+                f.unlink()
 
+class Test_Latest:
+    def test_init_on_very_old_date_raises_exception(self):
+        year, month = 2017, 10
+        with pytest.raises(ValueError, match=r'Operation cannot be completed .*'):
+            Latest(year, month)
+
+    # WARNING: the test will fail if no current pasring took place 
+    #          and files for recent month were not created 
+    def test_init_on_recent_date_creates_instance(self):
+        year, month = Date.latest_dates[0]
+        assert Latest(year, month)
 
 if __name__ == "__main__":
     pytest.main([__file__])
