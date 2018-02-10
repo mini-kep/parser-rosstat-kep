@@ -7,6 +7,7 @@ from kep.helper.date import Date
 from kep.csv2df.dataframe_maker import Datapoints
 from kep.df2xl.to_excel import save_xls
 
+
 class Vintage:
     """Represents dataset release for a given year and month.
         Performs interim CSV file parsing on construction and obtains 
@@ -16,8 +17,12 @@ class Vintage:
         self.year, self.month = year, month
         csv_text = InterimCSV(year, month).text()
         parsing_definition.attach_data(csv_text)
-        emitter = Datapoints(parsing_definition.tables)
-        self.dfs = {freq: emitter.get_dataframe(freq) for freq in FREQUENCIES}
+        self.emitter = Datapoints(parsing_definition.tables)
+        self.dfs = {freq: self.emitter.get_dataframe(freq) for freq in FREQUENCIES}
+
+    @property
+    def datapoints(self):        
+        return self.emitter.datapoints
 
     def save(self, folder=None):
         csv_processed = ProcessedCSV(self.year, self.month, folder)
@@ -41,13 +46,19 @@ class Latest(Vintage):
     """Operations on most recent data release."""
 
     def __init__(self, year: int, month: int):
-        super().__init__(year, month)
-        # protect from using old realeses of data 
+        # protect from using old releases of data
         Date(year, month).assert_latest()
+        super().__init__(year, month)
 
-    def upload(self, password: str):        
-        # TODO: upload to database
-        raise NotImplementedError
+    def upload(self):
+        from parsers.mover.uploader import Uploader
+        self.validate()        
+        # FIXME: possible risk - *self.datapoints* may have different serialisation 
+        #        format compared to what Uploader() expects
+        #        (a) date format   
+        #        (b) extra keys in dictionary
+        #        (c) may be part of 
+        Uploader(self.datapoints).post()
 
     def save(self, folder=None):
         ProcessedCSV(self.year, self.month).to_latest()

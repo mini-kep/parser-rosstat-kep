@@ -28,12 +28,12 @@ class Test_Date():
             assert Date(1960, 12).assert_supported()
 
     def test_is_latest_date(self):
-        year, month = Date.supported[-1]
+        year, month = Date.supported_dates[-1]
         year -= 1
         assert Date(year, month).is_latest() is False
 
     def test_assert_latest_date(self):
-        year, month = Date.supported[-1]
+        year, month = Date.supported_dates[-1]
         year -= 1
         with pytest.raises(ValueError):
             Date(year, month).assert_latest()
