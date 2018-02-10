@@ -14,3 +14,5 @@ m2r
 
 # for task orgainisation in tasks.py - https://pypi.python.org/pypi/invoke/0.15.0
 invoke
+
+git+https://github.com/mini-kep/parsers.git#egg=mini-kep-parsers
