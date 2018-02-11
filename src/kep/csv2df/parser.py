@@ -104,19 +104,11 @@ class HeaderParsingProgress:
     def printable(self):
         def sym(line):
             return {True: "+", False: "-"}[self.is_known[line]]
+
         return ['{} <{}>'.format(sym(line), line) for line in self.lines]
 
     def __str__(self):
         return '\n'.join(self.printable)
-
-
-# TODO: convert to unit test
-progress = HeaderParsingProgress([['abc', 'zzz'], ['def', '...']])
-assert progress.is_parsed() is False
-progress.set_as_known('abc')
-progress.set_as_known('def')
-assert progress.is_parsed() is True
-assert '<abc>' in str(progress)
 
 
 class Table:
@@ -175,6 +167,7 @@ class Table:
     def __str__(self):
         def join(items):
             return '\n'.join([str(x) for x in items])
+
         _title = "Table {} ({} columns)".format(self.label, self.coln)
         _header = join(self.progress.printable)
         _data = join(self.datarows)
@@ -182,7 +175,7 @@ class Table:
 
     def __repr__(self):
         return "Table(\n    headers={},\n    datarows={})" \
-               .format(repr(self.headers), repr(self.datarows))
+            .format(repr(self.headers), repr(self.datarows))
 
     def make_datapoint(self, value: str, time_stamp, freq):
         return dict(label=self.label,
@@ -195,9 +188,11 @@ class Table:
     def extract_values(self):
         """Use ._extract_values() stream and filter None values from it.
         """
+
         def has_value(d):
             return d['value'] is not None
-        return filter(has_value, self._extract_values())    
+
+        return filter(has_value, self._extract_values())
 
     def _extract_values(self):
         """Yield dictionaries with variable name, frequency, time_index

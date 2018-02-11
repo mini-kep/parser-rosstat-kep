@@ -4,14 +4,13 @@ import pandas as pd
 import pytest
 
 # testing
-from kep.csv2df.parser import Table, split_to_tables, extract_tables
+from kep.csv2df.parser import Table, split_to_tables, extract_tables, HeaderParsingProgress
 from kep.csv2df.parser import timestamp_quarter, timestamp_month, timestamp_annual
 
 # fixtures
 from kep.csv2df.util.row_splitter import split_row_by_year_and_qtr
 from kep.csv2df.specification import ParsingCommand, Definition
 from kep.parsing_definition.units import UNITS
-
 
 gdp_def = dict(var="GDP",
                header='Объем ВВП',
@@ -25,7 +24,6 @@ pc1 = ParsingCommand(**gdp_def)
 pc2 = ParsingCommand(**indpro_def)
 
 d1 = Definition(commands=[gdp_def, indpro_def], units=UNITS)
-
 
 labels = {0: 'GDP_bln_rub',
           1: 'GDP_rog',
@@ -66,6 +64,7 @@ class Sample():
         return d1
 
     """Fixtures for testing"""
+
     def rows(i):
         return headers[i] + data_items[i]
 
@@ -176,7 +175,6 @@ class Test_Table_after_parsing:
 
 
 class Test_extract_tables_function:
-
     tables = extract_tables(csv_segment=mock_rows(), pdef=Sample.pdef())
 
     def test_returns_list(self):
@@ -204,6 +202,29 @@ def test_timestamp_month():
 
 def test_timestamp_annual():
     assert timestamp_annual(1999) == pd.Timestamp('1999-12-31')
+
+
+class Test_HeaderParsingProgress:
+    def setup(self):
+        self.progress = HeaderParsingProgress([['abc', 'zzz'], ['def', '...']])
+
+    def test_is_parsed_return_false(self):
+        assert self.progress.is_parsed() is False
+
+    def test_str_abc_not_in_return(self):
+        assert "- <abc>" in str(self.progress)
+
+    def test_str_abc_in_return(self):
+        self.progress.set_as_known('abc')
+        assert "+ <abc>" in str(self.progress)
+
+    def test_is_parsed_return_true(self):
+        self.progress.set_as_known('abc')
+        self.progress.set_as_known('def')
+        assert self.progress.is_parsed() is True
+
+    def test_str(self):
+        assert '<abc>' in str(self.progress) and '<def>' in str(self.progress)
 
 
 if __name__ == "__main__":
