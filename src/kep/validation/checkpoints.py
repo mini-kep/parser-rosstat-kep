@@ -76,6 +76,13 @@ INDPRO_yoy                             NaN
 PPI_rog                                NaN
 """
 
+ANNUAL_STR_2016 = """
+safe_to_skip                           1.0
+year                                2016.0
+INDPRO_yoy                           101.3
+PPI_rog                              107.5
+"""
+
 QTR_STR = """
 year                                1999.0
 qtr                                    1.0
@@ -197,16 +204,26 @@ def extract_date(d):
         return from_year(year)
 
 
-def as_checkpoints(text):
-    d = as_dict(text)
-    dt_str = extract_date(d)
-    return [dict(date=dt_str,
-                 name=name,
-                 value=d[name]) for name in d.keys()]
+def as_checkpoints(*texts):
+    checkpoints = []
+
+    for text in texts:
+        d = as_dict(text)
+        safe_to_skip = bool(d.pop("safe_to_skip", 0))
+        dt_str = extract_date(d)
+
+        checkpoints.extend(dict(
+            date=dt_str,
+            name=name,
+            value=value,
+            safe_to_skip=safe_to_skip,
+        ) for name, value in d.items())
+
+    return checkpoints
 
 
 CHECKPOINTS = dict(
-    a=as_checkpoints(ANNUAL_STR),
+    a=as_checkpoints(ANNUAL_STR, ANNUAL_STR_2016),
     q=as_checkpoints(QTR_STR),
     m=as_checkpoints(MONTHLY_STR)
 )
@@ -219,8 +236,14 @@ def is_found(df, d):
     dt = d['date']
     colname = d['name']
     x = d['value']
+
     try:
-        return df.loc[dt, colname].iloc[0] == x
+        row_by_date = df.loc[dt]
+    except KeyError:
+        return d["safe_to_skip"]
+
+    try:
+        return row_by_date[colname].iloc[0] == x
     except KeyError:
         return False
 
@@ -229,10 +252,6 @@ def validate(df, checkpoints):
     """Validate dataframe *df* with list of dictionaries
        *checkpoints*.
     """
-    uncovered = find_uncovered_column_names(df, checkpoints)
-    if len(uncovered) > 0:
-        raise ValueError(f"Found dataframe variables uncovered by checkpoints: {uncovered}")
-
     flags = [is_found(df, c) for c in checkpoints]
     if not all(flags):
         missed_points = [
@@ -240,8 +259,20 @@ def validate(df, checkpoints):
                 flags, checkpoints) if not f]
         raise ValueError(missed_points)
 
+    uncovered = find_uncovered_column_names(df, checkpoints)
+    if len(uncovered) > 0:
+        raise ValueError(f"Found dataframe variables uncovered by checkpoints: {uncovered}")
+
 
 def find_uncovered_column_names(df, checkpoints):
+    """
+    This function is looking for column names in dataframe
+    that is uncovered by passed checkpoints.
+
+    :param df: Pandas dataframe
+    :param checkpoints: list of checkpoints
+    :return: set of column names from `df` uncovered by `checkpoints`
+    """
     checkpoint_column_names = {c["name"] for c in checkpoints}
     df_column_names = set(df.columns)
 
