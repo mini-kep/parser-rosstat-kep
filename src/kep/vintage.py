@@ -35,7 +35,12 @@ class Vintage:
         for freq in FREQUENCIES:
             df = self.dfs[freq]
             checkpoints = CHECKPOINTS[freq]
-            validate(df, checkpoints)
+
+            try:
+                validate(df, checkpoints)
+            except ValueError as err:
+                raise ValueError(f"{err}\nValidated frequency: '{freq}'")
+
         print("Test values parsed OK for", self)
 
     def __repr__(self):
