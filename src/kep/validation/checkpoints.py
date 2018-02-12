@@ -186,12 +186,12 @@ def as_dict(s):
 
 
 def extract_date(d):
-    year = int(d.pop('year'))
+    year = int(d.get('year'))
     if 'month' in d.keys():
-        month = int(d.pop('month'))
+        month = int(d.get('month'))
         return from_month(year, month)
     elif 'qtr' in d.keys():
-        qtr = int(d.pop('qtr'))
+        qtr = int(d.get('qtr'))
         return from_qtr(year, qtr)
     else:
         return from_year(year)
@@ -229,6 +229,10 @@ def validate(df, checkpoints):
     """Validate dataframe *df* with list of dictionaries
        *checkpoints*.
     """
+    uncovered = find_uncovered_column_names(df, checkpoints)
+    if len(uncovered) > 0:
+        raise ValueError(f"Found dataframe variables uncovered by checkpoints: {uncovered}")
+
     flags = [is_found(df, c) for c in checkpoints]
     if not all(flags):
         missed_points = [
@@ -239,11 +243,6 @@ def validate(df, checkpoints):
 
 def find_uncovered_column_names(df, checkpoints):
     checkpoint_column_names = {c["name"] for c in checkpoints}
-    df_column_names = set()
-
-    d = df.to_dict('index')
-    for dt in d.keys():
-        for name, value in d[dt].items():
-            df_column_names.add(name)
+    df_column_names = set(df.columns)
 
     return df_column_names.difference(checkpoint_column_names)
