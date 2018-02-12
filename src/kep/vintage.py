@@ -39,7 +39,7 @@ class Vintage:
             try:
                 validate(df, checkpoints)
             except ValueError as err:
-                raise ValueError(f"{err}\nValidated frequency: '{freq}'")
+                raise ValueError(f"Validated frequency: '{freq}'") from err
 
         print("Test values parsed OK for", self)
 
