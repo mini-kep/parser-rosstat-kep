@@ -183,8 +183,6 @@ class Table:
                     time_index=time_stamp,
                     freq=freq)
 
-    # TODO: need a test on really a minimal setup for method below
-    #       write test setting and asserts in this file before test  
     def extract_values(self):
         """Use ._extract_values() stream and filter None values from it.
         """
@@ -368,3 +366,25 @@ if __name__ == "__main__":  # pragma: no cover
     for t in tables:
         assert t.varname == 'INVESTMENT'
         assert t.unit in units.values()
+
+if __name__ == "__main__":
+    # Test case
+    my_headers = [['Объем ВВП', '', '', '', ''],
+                  ['млрд.рублей', '', '', '', '']]
+    my_dataitems = [["1991", "", "901", "1102", "1373", "1447"]]
+    t = Table(my_headers, my_dataitems)
+    t.set_label(varnames_dict={'Объем ВВП': 'GDP'},
+                units_dict={'млрд.рублей': 'bln_rub'})
+    t.set_splitter(reader=None)
+
+    assert len(list(t.extract_values())) == 4
+    t.datarows = [["1997", "", None, "-5", "1373", "1447"]]
+
+    # TODO: Add support for any incoming type to to_float() function
+    # t.datarows = [["1997", "", None, -1, "1373", "1447"]]
+    # assert len(list(t.extract_values())) == 2
+    assert len(list(t.extract_values())) == 3
+
+    # TODO: Create checker for year and tests for that
+    # t.datarows = [["", "1997", "901", "1102", "1373", "1447"]]
+    # list(t.extract_values())
