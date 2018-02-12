@@ -367,24 +367,29 @@ if __name__ == "__main__":  # pragma: no cover
         assert t.varname == 'INVESTMENT'
         assert t.unit in units.values()
 
-if __name__ == "__main__":
-    # Test case
-    my_headers = [['Объем ВВП', '', '', '', ''],
+
+    # Testing extract_values work with missing values
+    # setup
+    test_headers = [['Объем ВВП', '', '', '', ''],
                   ['млрд.рублей', '', '', '', '']]
-    my_dataitems = [["1991", "", "901", "1102", "1373", "1447"]]
-    t = Table(my_headers, my_dataitems)
+    test_dataitems = [["1991", "", "901", "1102", "1373", "1447"]]
+
+    t = Table(test_headers, test_dataitems)
     t.set_label(varnames_dict={'Объем ВВП': 'GDP'},
                 units_dict={'млрд.рублей': 'bln_rub'})
     t.set_splitter(reader=None)
 
+    # test missing last value
     assert len(list(t.extract_values())) == 4
-    t.datarows = [["1997", "", None, "-5", "1373", "1447"]]
 
-    # TODO: Add support for any incoming type to to_float() function
-    # t.datarows = [["1997", "", None, -1, "1373", "1447"]]
-    # assert len(list(t.extract_values())) == 2
+    # test missing several values
+    t.datarows = [["1997", "1998", "123", "55", "", ""]]
     assert len(list(t.extract_values())) == 3
 
+    # TODO: Add support for any incoming type to to_float() function
+    #   only str is type is supported by to_float, but actually Python
+    #   don't care if there would be float for example
+
     # TODO: Create checker for year and tests for that
-    # t.datarows = [["", "1997", "901", "1102", "1373", "1447"]]
-    # list(t.extract_values())
+    #   The missing of the year is not checked
+
