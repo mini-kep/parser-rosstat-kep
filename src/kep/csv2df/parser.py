@@ -102,12 +102,33 @@ class HeaderParsingProgress:
 
     @property
     def printable(self):
-        def sym(line):
+        def symbolize(line):
             return {True: "+", False: "-"}[self.is_known[line]]
-        return ['{} <{}>'.format(sym(line), line) for line in self.lines]
+        return ['{} <{}>'.format(symbolize(line), line) for line in self.lines]
 
     def __str__(self):
         return '\n'.join(self.printable)
+
+
+class HeaderParser:
+    def __init__(self, headers):
+        self.lines = [Row(line).name for line in headers]
+        self.is_known = {line: False for line in self.lines}
+
+    def make_line_as_parsed(self, line):
+        self.is_known[line] = True
+
+    def is_line_parsed(self, line):
+        return self.is_known[line]
+
+    def is_parsed(self):
+        return all(self.is_known.values())
+
+    def __str__(self):
+        def symbolize(line):
+            return {True: "+", False: "-"}[self.is_known[line]]
+        msg = ['{} <{}>'.format(symbolize(line), line) for line in self.lines]
+        return '\n'.join(msg)
 
 
 # TODO: convert to unit test
@@ -117,6 +138,50 @@ progress.set_as_known('abc')
 progress.set_as_known('def')
 assert progress.is_parsed() is True
 assert '<abc>' in str(progress)
+
+
+class DataBlock:
+    def __init__(self, datarows, label, splitter_func):
+        self.datarows = datarows
+        self.label = label
+        self.splitter_func = splitter_func
+
+    @property
+    def coln(self):
+        """Number of columns in table."""
+        return max(len(Row(row)) for row in self.datarows)
+        
+    def make_datapoint(self, value: str, time_stamp, freq):
+        return dict(label=self.label,
+                    value=to_float(value),
+                    time_index=time_stamp,
+                    freq=freq)
+
+    def extract_values(self):
+        """Filter out None values from ._extract_values() stream."""
+        def has_value(d):
+            return d['value'] is not None
+        return filter(has_value, self._extract_values())    
+
+    def _extract_values(self):
+        """Yield dictionaries with variable name, frequency, time_index
+           and value. May yield a dictionary where d['value'] is None.
+        """
+        for row in self.datarows:
+            year = Row(row).year
+            data = Row(row).data
+            a_value, q_values, m_values = self.splitter_func(data)
+            if a_value:
+                time_stamp = timestamp_annual(year)
+                yield self.make_datapoint(a_value, time_stamp, 'a')
+            if q_values:
+                for t, val in enumerate(q_values):
+                    time_stamp = timestamp_quarter(year, t + 1)
+                    yield self.make_datapoint(val, time_stamp, 'q')
+            if m_values:
+                for t, val in enumerate(m_values):
+                    time_stamp = timestamp_month(year, t + 1)
+                    yield self.make_datapoint(val, time_stamp, 'm')
 
 
 class Table:
