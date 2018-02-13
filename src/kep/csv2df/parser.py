@@ -85,7 +85,7 @@ def split_to_tables(rows):
     if len(headers) > 0 and len(datarows) > 0:
         yield Table(headers, datarows)
 
-
+# TODO: depreciate in favour of HeaderParser + move tests to HeaderParser
 class HeaderParsingProgress:
     def __init__(self, headers):
         self.lines = [Row(line).name for line in headers]
@@ -112,44 +112,50 @@ class HeaderParsingProgress:
 
 class HeaderParser:
     def __init__(self, headers):
-        self.lines = [Row(line).name for line in headers]
-        self.is_known = {line: False for line in self.lines}
+        self.rows = [Row(line) for line in headers]
+        self.varname = None
+        self.unit = None
 
-    def make_line_as_parsed(self, line):
-        self.is_known[line] = True
-
-    def is_line_parsed(self, line):
-        return self.is_known[line]
+    def set_label(self, varnames_dict, units_dict):
+        for i, row in enumerate(self.rows):            
+            varname = row.get_varname(varnames_dict)
+            if varname:
+                self.varname = varname
+                self.rows[i].is_parsed = True
+            unit = row.get_unit(units_dict)
+            if unit:
+                self.unit = unit
+                self.rows[i].is_parsed = True 
+        return self.varname, self.unit        
 
     def is_parsed(self):
-        return all(self.is_known.values())
+        return all(row.is_parsed for row in self.rows)
+
+    def printable(self):
+        def symbolize(flag):
+            return {True: "+", False: "-"}[flag]
+        def as_string(row):    
+            return '{} <{}>'.format(symbolize(row.is_parsed), row.name)
+        return [as_string(row) for row in self.rows]    
 
     def __str__(self):
-        def symbolize(line):
-            return {True: "+", False: "-"}[self.is_known[line]]
-        msg = ['{} <{}>'.format(symbolize(line), line) for line in self.lines]
-        return '\n'.join(msg)
-
-
-# TODO: convert to unit test
-progress = HeaderParsingProgress([['abc', 'zzz'], ['def', '...']])
-assert progress.is_parsed() is False
-progress.set_as_known('abc')
-progress.set_as_known('def')
-assert progress.is_parsed() is True
-assert '<abc>' in str(progress)
+        return '\n'.join(self.printable())
 
 
 class DataBlock:
-    def __init__(self, datarows, label, splitter_func):
+    def __init__(self, datarows):
         self.datarows = datarows
-        self.label = label
-        self.splitter_func = splitter_func
-
+        self.label = None
+        self.splitter_func = None
+                    
     @property
     def coln(self):
         """Number of columns in table."""
-        return max(len(Row(row)) for row in self.datarows)
+        return max(len(row) for row in map(Row, self.datarows))
+
+    def set_splitter(self, reader=None):
+        key = reader or self.coln
+        self.splitter_func = splitter.get_splitter(key)    
         
     def make_datapoint(self, value: str, time_stamp, freq):
         return dict(label=self.label,
@@ -182,6 +188,47 @@ class DataBlock:
                 for t, val in enumerate(m_values):
                     time_stamp = timestamp_month(year, t + 1)
                     yield self.make_datapoint(val, time_stamp, 'm')
+
+#TODO 1: Table 2 should be renamed Table and replace existing Table class
+#TODO 2: some of Table class tests should go to HeaderParser and DataBlock classes
+class Table2:
+    """Representation of CSV table, has headers and datarows.
+    
+       Depends on HeaderParser and DataBlock classes.
+       
+    """
+
+    def __init__(self, headers, datarows):
+        self.header = HeaderParser(headers)
+        self.datablock = DataBlock(datarows)        
+        self.splitter_func = None
+        self.label = None        
+
+    def set_label(self, varnames_dict, units_dict):
+        varname, unit = self.header.set_label(varnames_dict, units_dict)
+        self.label = make_label(varname, unit)
+        self.datablock.label = self.label
+
+    def set_splitter(self, reader):
+        self.datablock.set_splitter(reader)
+
+    def is_defined(self):
+        return bool(self.label and self.datablock.splitter_func)
+
+    def has_unknown_lines(self):
+        return not self.header.is_parsed
+
+    def __eq__(self, x):
+        #FIXME: need __eq__ methods in classes
+        return self.header == x.header and self.datablock == x.datablock
+
+    def __str__(self):
+        def join(items):
+            return '\n'.join([str(x) for x in items])
+        _title = "Table {} ({} columns)".format(self.label, self.datablock.coln)
+        _header = join(self.header.printable())
+        _data = join(self.datablock)
+        return join([_title, _header, _data])
 
 
 class Table:
