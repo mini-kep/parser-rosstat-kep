@@ -264,13 +264,14 @@ def validate2(df, default_checkpoints, optional_checkpoints):
     missed_optional = find_missed_checkpoints(df, optional_checkpoints)
 
     # ensure a variable in dataframe is covered by at least one checkpoint
-    missed = missed_required.intersection(missed_optional)
-    if missed:
-        raise ValueError(f"Required checkpoints not found in dataframe: {missed}")
+    if missed_required:
+        raise ValueError(f"Required checkpoints not found in dataframe: {missed_required}")
 
     uncovered_required = find_uncovered_column_names(df, default_checkpoints)
     uncovered_optional = find_uncovered_column_names(df, optional_checkpoints)
 
+    # onkery: `intersection` here because we need to find columns which
+    # are not covered by both required AND optional checkpoints.
     uncovered = uncovered_required.intersection(uncovered_optional)
 
     if uncovered:
