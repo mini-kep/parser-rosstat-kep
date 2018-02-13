@@ -8,7 +8,7 @@ Definition().tables property uses csv2df.parser.extract_tables() function.
 
 """
 
-from kep.csv2df.parser import extract_tables
+from kep.csv2df.parser import Segment
 from kep.csv2df.row_model import Row
 from kep.csv2df.reader import Popper
 from kep.csv2df.util.label import make_label
@@ -174,7 +174,7 @@ class Definition(object):
 
     @property
     def tables(self):
-        return extract_tables(self.csv_segment, self)
+        return Segment(self.csv_segment, self)
 
     @property
     def values(self):

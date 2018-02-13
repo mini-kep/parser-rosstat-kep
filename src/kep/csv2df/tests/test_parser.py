@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 
 # testing
-from kep.csv2df.parser import Table, split_to_tables, extract_tables, HeaderParsingProgress
+from kep.csv2df.parser import Table, split_to_tables, parse_tables, extract_tables, HeaderParsingProgress
 from kep.csv2df.parser import timestamp_quarter, timestamp_month, timestamp_annual
 
 # fixtures

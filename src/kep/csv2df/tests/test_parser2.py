@@ -1,9 +1,13 @@
 import pytest
 import pandas as pd
 
-from kep.csv2df.parser import Table
+from kep.csv2df.parser import Table, Segment, DataBlock, HeaderParser
+from kep.csv2df.parser import timestamp_quarter, timestamp_month, timestamp_annual
+
 from kep.csv2df.util.row_splitter import split_row_by_year_and_qtr
 from kep.parsing_definition.units import UNITS
+from kep.csv2df.specification import Definition
+
 
 @pytest.fixture
 def table():
@@ -24,10 +28,12 @@ class Test_Table:
 
     def test_on_creation_pasring_attributes_are_unknown(self, table):
         assert table.label is None 
-        assert table.datablock.splitter_func is None
-        assert table.header.is_parsed() is False        
+        assert table.splitter_func is None
+        assert table.varname is None
+        assert table.unit is None
+        assert table.header.is_parsed is False        
         
-    def test_on_creation_has_unknown_lines(self):
+    def test_on_creation_has_unknown_lines(self, table):
         assert table.has_unknown_lines() is True
 
     def test_str_repr(self, table):
@@ -44,7 +50,7 @@ class Test_Table:
         
     def test_set_splitter(self, table):
         table.set_splitter(None)
-        assert table.datablock.splitter_func == split_row_by_year_and_qtr    
+        assert table.splitter_func == split_row_by_year_and_qtr    
         
     def test_values_property_on_parsed_table(self, parsed_table):
         values = parsed_table.values
@@ -61,12 +67,13 @@ class Test_Table:
 def mock_rows():
     return [['Объем ВВП', '', '', '', ''],
                ['млрд.рублей', '', '', '', ''],
-               ['1991', '4823', '901', '1102', '1373', '1447'],
+               ['1999', '4823', '901', '1102', '1373', '1447'],
                ['Индекс ВВП, в % к прошлому периоду/ GDP index, percent'],
                ['1999', '106,4', '98,1', '103,1', '111,4', '112,0'],
                ['Индекс промышленного производства'],
                ['в % к соответствующему периоду предыдущего года'],
-               ['1991', '102,7', '101,1', '102,2', '103,3', '104,4']]
+               ['1999', '102,7', '101,1', '102,2', '103,3', '104,4']]
+
 
 def parsing_definition():
     gdp_def = dict(var="GDP",
@@ -78,29 +85,62 @@ def parsing_definition():
     return Definition(commands=[gdp_def, indpro_def], units=UNITS)
 
 
-class Test_extract_tables_function:
-    # FIXME: must accept a string
-    tables = extract_tables(csv_segment=mock_rows(), pdef=parsing_definition())
+def test_extract_tables():
+    seg = Segment(mock_rows(), parsing_definition())
+    tables = seg.extract_tables()
+    assert isinstance(tables, list)
+    assert len(tables) == 3 
+    assert isinstance(tables[0], Table)
+    
+    
+class Test_HeaderParser:
+    def setup(self):
+        self.progress = HeaderParser([['abc', 'zzz'], ['def', 'yyy']])
 
-    def test_returns_list(self):
-        assert isinstance(self.tables, list)
+    def test_on_init_is_parsed_returns_false(self):
+        assert self.progress.is_parsed is False
+         
+    def test_set_label(self):
+        a, b = self.progress.set_label({'abc': 1}, {'def':2})
+        assert a == 1
+        assert b == 2
+        assert self.progress.is_parsed is True
+        
+    def test_str(self):
+        assert str(self.progress)    
 
-    def test_table0_is_table_instance(self):
-        t0 = self.tables[0]
-        assert isinstance(t0, Table)
-        assert t0 == Sample.table(0)
+class Test_DataBlock:    
+    def test_extract_values_on_complete_row_returns_5_dictionaries(self):
+        datablock = DataBlock(datarows=[['1999', '4823', '901', 
+                                     '1102', '1373', '1447']],
+                              label='GDP_bln_rub',
+                              splitter_func = split_row_by_year_and_qtr)        
+        values = list(datablock.extract_values())
+        assert len(values) == 5
 
-    def test_table0_can_be_parsed_with_label_GDP_bln_rub(self):
-        t0 = self.tables[0]
-        t0.set_label(varnames_dict={'Объем ВВП': 'GDP'},
-                     units_dict={'млрд.рублей': 'bln_rub'})
-        assert t0.label == 'GDP_bln_rub'
+    def test_extract_values_on_incomplete_row_returns_less_dictionaries(self):
+        datablock = DataBlock(datarows=[['1999', '', '901', 
+                                     '1102', '', '']],
+                              label='GDP_bln_rub',
+                              splitter_func = split_row_by_year_and_qtr) 
+        values = list(datablock.extract_values())
+        assert len(values) == 2
 
 
+def test_timestamp_quarter():
+    assert timestamp_quarter(1999, 1) == pd.Timestamp('1999-03-31')
+
+
+def test_timestamp_month():
+    assert timestamp_month(1999, 1) == pd.Timestamp('1999-01-31')
+
+
+def test_timestamp_annual():
+    assert timestamp_annual(1999) == pd.Timestamp('1999-12-31')
+    
 
 if __name__ == "__main__":
     pytest.main([__file__])
     
-t = parsed_table()
-print(t.values)
+
     
