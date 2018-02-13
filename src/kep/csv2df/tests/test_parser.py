@@ -118,11 +118,13 @@ class Test_split_to_tables():
 class Test_Table_on_creation:
 
     def setup_method(self):
-        self.table = Sample.table(0)
+        self.table = Table(headers = [['Объем ВВП', '', '', '', ''],
+                                      ['млрд.рублей', '', '', '', '']],
+                           datarows = [['1991', '4823', '901', '1102', '1373', '1447']]
+                           ) 
 
     def test_on_creation_varname_and_unit_and_splitter_are_none(self):
-        assert self.table.varname is None
-        assert self.table.unit is None
+        assert self.table.label is None        
         assert self.table.splitter_func is None
 
     def test_on_creation_coln(self):

@@ -194,11 +194,15 @@ class DataBlock:
                 for t, val in enumerate(m_values):
                     time_stamp = timestamp_month(year, t + 1)
                     yield self.make_datapoint(val, time_stamp, 'm')
+                    
+    def __str__(self):
+        #FIXME
+        return str(self.datarows)                    
 
 
 # TODO 1: Table 2 should be renamed Table and replace existing Table class
 # TODO 2: some of Table class tests should go to HeaderParser and DataBlock classes
-class Table2:
+class Table:
     """Representation of CSV table, has headers and datarows.
     
        Depends on HeaderParser and DataBlock classes.
@@ -208,12 +212,11 @@ class Table2:
     def __init__(self, headers, datarows):
         self.header = HeaderParser(headers)
         self.datablock = DataBlock(datarows)
-        self.splitter_func = None
         self.label = None
 
     def set_label(self, varnames_dict, units_dict):
-        varname, unit = self.header.set_label(varnames_dict, units_dict)
-        self.label = make_label(varname, unit)
+        self.varname, self.unit = self.header.set_label(varnames_dict, units_dict)
+        self.label = make_label(self.varname, self.unit)
         self.datablock.label = self.label
 
     def set_splitter(self, reader):
@@ -223,7 +226,11 @@ class Table2:
         return bool(self.label and self.datablock.splitter_func)
 
     def has_unknown_lines(self):
-        return not self.header.is_parsed
+        return not self.header.is_parsed()
+    
+    @property
+    def values(self):
+        return list(self.datablock.extract_values())
 
     def __eq__(self, x):
         # FIXME: need __eq__ methods in classes
@@ -232,113 +239,112 @@ class Table2:
     def __str__(self):
         def join(items):
             return '\n'.join([str(x) for x in items])
-
         _title = "Table {} ({} columns)".format(self.label, self.datablock.coln)
         _header = join(self.header.printable())
-        _data = join(self.datablock)
+        _data = str(self.datablock)
         return join([_title, _header, _data])
 
 
-class Table:
-    """Representation of CSV table, has headers and datarows."""
+# class Table:
+#     """Representation of CSV table, has headers and datarows."""
 
-    def __init__(self, headers, datarows):
-        self.headers = headers
-        self.datarows = datarows
-        # parsing
-        self.splitter_func = None
-        self.varname = None
-        self.unit = None
-        self.datapoints = []
-        # prasing progress indicator
-        self.progress = HeaderParsingProgress(headers)
+#     def __init__(self, headers, datarows):
+#         self.headers = headers
+#         self.datarows = datarows
+#         # parsing
+#         self.splitter_func = None
+#         self.varname = None
+#         self.unit = None
+#         self.datapoints = []
+#         # prasing progress indicator
+#         self.progress = HeaderParsingProgress(headers)
 
-    @property
-    def coln(self):
-        """Number of columns in table."""
-        return max(len(Row(row)) for row in self.datarows)
+#     @property
+#     def coln(self):
+#         """Number of columns in table."""
+#         return max(len(Row(row)) for row in self.datarows)
 
-    def set_label(self, varnames_dict, units_dict):
-        for row in self.headers:
-            r = Row(row)
-            varname = r.get_varname(varnames_dict)
-            if varname:
-                self.varname = varname
-                self.progress.set_as_known(r.name)
-            unit = r.get_unit(units_dict)
-            if unit:
-                self.unit = unit
-                self.progress.set_as_known(r.name)
+#     def set_label(self, varnames_dict, units_dict):
+#         for row in self.headers:
+#             r = Row(row)
+#             varname = r.get_varname(varnames_dict)
+#             if varname:
+#                 self.varname = varname
+#                 self.progress.set_as_known(r.name)
+#             unit = r.get_unit(units_dict)
+#             if unit:
+#                 self.unit = unit
+#                 self.progress.set_as_known(r.name)
 
-    def set_splitter(self, reader):
-        key = reader or self.coln
-        self.splitter_func = splitter.get_splitter(key)
+#     def set_splitter(self, reader):
+#         key = reader or self.coln
+#         self.splitter_func = splitter.get_splitter(key)
 
-    @property
-    def label(self):
-        vn = self.varname
-        u = self.unit
-        if vn and u:
-            return make_label(vn, u)
-        else:
-            return None
+#     @property
+#     def label(self):
+#         vn = self.varname
+#         u = self.unit
+#         if vn and u:
+#             return make_label(vn, u)
+#         else:
+#             return None
 
-    def is_defined(self):
-        return bool(self.label and self.splitter_func)
+#     def is_defined(self):
+#         return bool(self.label and self.splitter_func)
 
-    def has_unknown_lines(self):
-        return not self.progress.is_parsed()
+#     def has_unknown_lines(self):
+#         return not self.progress.is_parsed()
 
-    def __eq__(self, x):
-        return self.headers == x.headers and self.datarows == x.datarows
+#     def __eq__(self, x):
+#         return self.headers == x.headers and self.datarows == x.datarows
 
-    def __str__(self):
-        def join(items):
-            return '\n'.join([str(x) for x in items])
+#     def __str__(self):
+#         def join(items):
+#             return '\n'.join([str(x) for x in items])
 
-        _title = "Table {} ({} columns)".format(self.label, self.coln)
-        _header = join(self.progress.printable)
-        _data = join(self.datarows)
-        return join([_title, _header, _data])
+#         _title = "Table {} ({} columns)".format(self.label, self.coln)
+#         _header = join(self.progress.printable)
+#         _data = join(self.datarows)
+#         return join([_title, _header, _data])
 
-    def __repr__(self):
-        return "Table(\n    headers={},\n    datarows={})" \
-            .format(repr(self.headers), repr(self.datarows))
+#     def __repr__(self):
+#         return "Table(\n    headers={},\n    datarows={})" \
+#             .format(repr(self.headers), repr(self.datarows))
 
-    def make_datapoint(self, value: str, time_stamp, freq):
-        return dict(label=self.label,
-                    value=to_float(value),
-                    time_index=time_stamp,
-                    freq=freq)
+#     def make_datapoint(self, value: str, time_stamp, freq):
+#         return dict(label=self.label,
+#                     value=to_float(value),
+#                     time_index=time_stamp,
+#                     freq=freq)
 
-    def extract_values(self):
-        """Use ._extract_values() stream and filter None values from it.
-        """
+#     def extract_values(self):
+#         """Use ._extract_values() stream and filter None values from it.
+#         """
 
-        def has_value(d):
-            return d['value'] is not None
+#         def has_value(d):
+#             return d['value'] is not None
 
-        return filter(has_value, self._extract_values())
+#         return filter(has_value, self._extract_values())
 
-    def _extract_values(self):
-        """Yield dictionaries with variable name, frequency, time_index
-           and value.
-        """
-        for row in self.datarows:
-            year = Row(row).year
-            data = Row(row).data
-            a_value, q_values, m_values = self.splitter_func(data)
-            if a_value:
-                time_stamp = timestamp_annual(year)
-                yield self.make_datapoint(a_value, time_stamp, 'a')
-            if q_values:
-                for t, val in enumerate(q_values):
-                    time_stamp = timestamp_quarter(year, t + 1)
-                    yield self.make_datapoint(val, time_stamp, 'q')
-            if m_values:
-                for t, val in enumerate(m_values):
-                    time_stamp = timestamp_month(year, t + 1)
-                    yield self.make_datapoint(val, time_stamp, 'm')
+#     def _extract_values(self):
+#         """Yield dictionaries with variable name, frequency, time_index
+#            and value.
+#         """
+#         for row in self.datarows:
+#             year = Row(row).year
+#             data = Row(row).data
+#             a_value, q_values, m_values = self.splitter_func(data)
+#             if a_value:
+#                 time_stamp = timestamp_annual(year)
+#                 yield self.make_datapoint(a_value, time_stamp, 'a')
+#             if q_values:
+#                 for t, val in enumerate(q_values):
+#                     time_stamp = timestamp_quarter(year, t + 1)
+#                     yield self.make_datapoint(val, time_stamp, 'q')
+#             if m_values:
+#                 for t, val in enumerate(m_values):
+#                     time_stamp = timestamp_month(year, t + 1)
+#                     yield self.make_datapoint(val, time_stamp, 'm')
 
 
 def timestamp_annual(year):
