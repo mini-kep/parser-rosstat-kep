@@ -192,6 +192,8 @@ def as_dict(s):
 
 
 def extract_date(d):
+    # onkery: Using `get` instead of `pop` to avoid false
+    # positives during validation.
     year = int(d.get('year'))
     if 'month' in d.keys():
         month = int(d.get('month'))
@@ -219,6 +221,9 @@ CHECKPOINTS = dict(
     m=as_checkpoints(MONTHLY_STR)
 )
 
+
+# onkery: Using stub values for now-absent optional checkpoints to
+# avoid awkward calls outside.
 OPTIONAL_CHECKPOINTS = dict(
     a=as_checkpoints(ANNUAL_STR_2016),
     q=[],
