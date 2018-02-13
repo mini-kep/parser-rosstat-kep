@@ -104,19 +104,11 @@ class HeaderParsingProgress:
     def printable(self):
         def sym(line):
             return {True: "+", False: "-"}[self.is_known[line]]
+
         return ['{} <{}>'.format(sym(line), line) for line in self.lines]
 
     def __str__(self):
         return '\n'.join(self.printable)
-
-
-# TODO: convert to unit test
-progress = HeaderParsingProgress([['abc', 'zzz'], ['def', '...']])
-assert progress.is_parsed() is False
-progress.set_as_known('abc')
-progress.set_as_known('def')
-assert progress.is_parsed() is True
-assert '<abc>' in str(progress)
 
 
 class Table:
@@ -175,6 +167,7 @@ class Table:
     def __str__(self):
         def join(items):
             return '\n'.join([str(x) for x in items])
+
         _title = "Table {} ({} columns)".format(self.label, self.coln)
         _header = join(self.progress.printable)
         _data = join(self.datarows)
@@ -182,7 +175,7 @@ class Table:
 
     def __repr__(self):
         return "Table(\n    headers={},\n    datarows={})" \
-               .format(repr(self.headers), repr(self.datarows))
+            .format(repr(self.headers), repr(self.datarows))
 
     def make_datapoint(self, value: str, time_stamp, freq):
         return dict(label=self.label,
@@ -190,14 +183,14 @@ class Table:
                     time_index=time_stamp,
                     freq=freq)
 
-    # TODO: need a test on really a minimal setup for method below
-    #       write test setting and asserts in this file before test  
     def extract_values(self):
         """Use ._extract_values() stream and filter None values from it.
         """
+
         def has_value(d):
             return d['value'] is not None
-        return filter(has_value, self._extract_values())    
+
+        return filter(has_value, self._extract_values())
 
     def _extract_values(self):
         """Yield dictionaries with variable name, frequency, time_index
@@ -373,3 +366,30 @@ if __name__ == "__main__":  # pragma: no cover
     for t in tables:
         assert t.varname == 'INVESTMENT'
         assert t.unit in units.values()
+
+
+    # Testing extract_values work with missing values
+    # setup
+    test_headers = [['Объем ВВП', '', '', '', ''],
+                  ['млрд.рублей', '', '', '', '']]
+    test_dataitems = [["1991", "", "901", "1102", "1373", "1447"]]
+
+    t = Table(test_headers, test_dataitems)
+    t.set_label(varnames_dict={'Объем ВВП': 'GDP'},
+                units_dict={'млрд.рублей': 'bln_rub'})
+    t.set_splitter(reader=None)
+
+    # test missing last value
+    assert len(list(t.extract_values())) == 4
+
+    # test missing several values
+    t.datarows = [["1997", "1998", "123", "55", "", ""]]
+    assert len(list(t.extract_values())) == 3
+
+    # TODO: Add support for any incoming type to to_float() function
+    #   only str is type is supported by to_float, but actually Python
+    #   don't care if there would be float for example
+
+    # TODO: Create checker for year and tests for that
+    #   The missing of the year is not checked
+
