@@ -1,7 +1,7 @@
 """Extract dataframes by year and month."""
 
-from kep import FREQUENCIES, PARSING_DEFINITION
-from kep.csv2df.dataframe_maker import Datapoints
+from kep import FREQUENCIES, PARSING_SPECIFICATION
+from kep.csv2df.dataframe_maker import create_dataframe
 from kep.df2xl.to_excel import save_xls
 from kep.helper.date import Date
 from kep.helper.path import InterimCSV, ProcessedCSV
@@ -18,12 +18,12 @@ class Vintage:
         Performs interim CSV file parsing on construction and obtains 
         resulting dataframes.
     """
-    def __init__(self, year: int, month: int, parsing_definition=PARSING_DEFINITION):
+    def __init__(self, year: int, month: int, parsing_spec=PARSING_SPECIFICATION):
         self.year, self.month = year, month
         csv_text = InterimCSV(year, month).text()
-        parsing_definition.attach_data(csv_text)
-        self.emitter = Datapoints(parsing_definition.tables)
-        self.dfs = {freq: self.emitter.get_dataframe(freq) for freq in FREQUENCIES}
+        parsing_spec.attach_data(csv_text)
+        self.values = parsing_spec.values 
+        self.dfs = {freq: create_dataframe(self.values, freq) for freq in FREQUENCIES}
 
     @property
     def datapoints(self):        
@@ -33,7 +33,13 @@ class Vintage:
         csv_processed = ProcessedCSV(self.year, self.month, folder)
         for freq, df in self.dfs.items():
             path = csv_processed.path(freq)
-            df.to_csv(path)
+            # Convert 1524.3999999999996 back to 1524.4
+            # Deaccumulation procedure in parser.py responsible  
+            # for float number generation. 
+            # WONTFIX: the risk is loss of data for exchange rate, 
+            #          may need fomatter by column. annual values can be
+            #          a guidance for a number of decimal positions.
+            df.to_csv(path, float_format='%.2f')
             print("Saved dataframe to", path)
 
     def validate(self):
@@ -66,9 +72,8 @@ class Latest(Vintage):
         self.validate()
         # FIXME: possible risk - *self.datapoints* may have different serialisation 
         #        format compared to what Uploader() expects
-        #        (a) date format   
-        #        (b) extra keys in dictionary
-        #        (c) may be part of 
+        #           (a) date format   
+        #           (b) extra keys in dictionary
         Uploader(self.datapoints).post()
 
     def save(self, folder=None):
@@ -79,7 +84,13 @@ class Latest(Vintage):
 
 
 if __name__ == "__main__": # pragma: no cover
-    v = Vintage(2016, 10)
+    v = Vintage(2017, 12)
     v.validate()
-    # Expected:
+    v.save()
+    # Expected output:
     # Test values parsed OK for Vintage(2016, 10)
+
+    import pandas as pd
+    # TODO: convert to test for to_csv(), hitting deaccumulation procedure
+    assert pd.DataFrame([{'a': 1}]).to_csv(float_format='%.2f') == ',a\n0,1\n'
+    assert pd.DataFrame([{'a': 1.0005}]).to_csv(float_format='%.2f') == ',a\n0,1.00\n'

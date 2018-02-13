@@ -16,21 +16,31 @@ from kep.csv2df.util.to_float import to_float
 __all__ = ['extract_tables']
 
 
-def extract_tables(csv_segment: str, pdef):
-    """Extract tables from *csv_segment* string using *pdef* parsing defintion.
 
-    Args:
-        csv_segment(str): CSV text
-        pdef: parsing defintion with search strings for header and unit
-
-    Returns:
-        list of Table() instances
-    """
-    tables = split_to_tables(csv_segment)
-    tables = parse_tables(tables, pdef)
-    verify_tables(tables, pdef)
-    # there can be more tables than required_labels, occasionally
-    return [t for t in tables if t.label in pdef.required_labels]
+class Segment:
+    def __init__(self, rows, pdef):
+        """
+        Args:
+            rows: list of lists with strings, represent CSV
+            pdef: parsing defintion with search strings for header and unit
+        """
+        self.tables = split_to_tables(rows)
+        self.pdef = pdef
+    
+    def parse(self):
+        self.tables = parse_tables(self.tables, self.pdef)
+        
+    def verify(self):
+        verify_tables(self.tables, self.pdef)    
+        
+    def extract_tables(self):
+        self.parse()
+        self.verify()
+        return [t for t in self.tables 
+                if t.label in self.pdef.required_labels]       
+    @property    
+    def values(self):
+        return [v for t in self.extract_tables() for v in t.values]    
 
 
 def parse_tables(tables, pdef):
@@ -49,9 +59,8 @@ def parse_tables(tables, pdef):
 
 
 def verify_tables(tables, pdef):
-    labels_in_tables = [t.label for t in tables]
-    labels_missed = [
-        x for x in pdef.required_labels if x not in labels_in_tables]
+    labels_in_tables = {t.label for t in tables}
+    labels_missed = set(pdef.required_labels).difference(labels_in_tables)
     if labels_missed:
         raise ValueError("Missed labels: {}".format(labels_missed))
 
@@ -64,7 +73,7 @@ class State(Enum):
 
 
 def split_to_tables(rows):
-    """Yields Table() instances from *rows*."""
+    """Yield Table() instances from *rows* list of lists."""
     datarows = []
     headers = []
     state = State.INIT
@@ -86,103 +95,42 @@ def split_to_tables(rows):
         yield Table(headers, datarows)
 
 
-class HeaderParsingProgress:
+class HeaderParser:
     def __init__(self, headers):
-        self.lines = [Row(line).name for line in headers]
-        self.is_known = {line: False for line in self.lines}
-
-    def set_as_known(self, line):
-        self.is_known[line] = True
-
-    def is_line_parsed(self, line):
-        return self.is_known[line]
-
-    def is_parsed(self):
-        return all(self.is_known.values())
-
-    @property
-    def printable(self):
-        def sym(line):
-            return {True: "+", False: "-"}[self.is_known[line]]
-        return ['{} <{}>'.format(sym(line), line) for line in self.lines]
-
-    def __str__(self):
-        return '\n'.join(self.printable)
-
-
-# TODO: convert to unit test
-progress = HeaderParsingProgress([['abc', 'zzz'], ['def', '...']])
-assert progress.is_parsed() is False
-progress.set_as_known('abc')
-progress.set_as_known('def')
-assert progress.is_parsed() is True
-assert '<abc>' in str(progress)
-
-
-class Table:
-    """Representation of CSV table, has headers and datarows."""
-
-    def __init__(self, headers, datarows):
-        self.headers = headers
-        self.datarows = datarows
-        # parsing
-        self.splitter_func = None
+        self.rows = [Row(line) for line in headers]
         self.varname = None
         self.unit = None
-        self.datapoints = []
-        # prasing progress indicator
-        self.progress = HeaderParsingProgress(headers)
-
-    @property
-    def coln(self):
-        """Number of columns in table."""
-        return max(len(Row(row)) for row in self.datarows)
 
     def set_label(self, varnames_dict, units_dict):
-        for row in self.headers:
-            r = Row(row)
-            varname = r.get_varname(varnames_dict)
+        for i, row in enumerate(self.rows):
+            varname = row.get_varname(varnames_dict)
             if varname:
                 self.varname = varname
-                self.progress.set_as_known(r.name)
-            unit = r.get_unit(units_dict)
+                self.rows[i].is_parsed = True
+            unit = row.get_unit(units_dict)
             if unit:
                 self.unit = unit
-                self.progress.set_as_known(r.name)
-
-    def set_splitter(self, reader):
-        key = reader or self.coln
-        self.splitter_func = splitter.get_splitter(key)
+                self.rows[i].is_parsed = True
+        return self.varname, self.unit
 
     @property
-    def label(self):
-        vn = self.varname
-        u = self.unit
-        if vn and u:
-            return make_label(vn, u)
-        else:
-            return None
-
-    def is_defined(self):
-        return bool(self.label and self.splitter_func)
-
-    def has_unknown_lines(self):
-        return not self.progress.is_parsed()
-
-    def __eq__(self, x):
-        return self.headers == x.headers and self.datarows == x.datarows
+    def is_parsed(self):
+        return all(row.is_parsed for row in self.rows)
 
     def __str__(self):
-        def join(items):
-            return '\n'.join([str(x) for x in items])
-        _title = "Table {} ({} columns)".format(self.label, self.coln)
-        _header = join(self.progress.printable)
-        _data = join(self.datarows)
-        return join([_title, _header, _data])
+        return '\n'.join(map(str,self.rows))
 
-    def __repr__(self):
-        return "Table(\n    headers={},\n    datarows={})" \
-               .format(repr(self.headers), repr(self.datarows))
+
+def count_columns(datarows):
+    """Number of columns in table."""
+    return max(len(row) for row in map(Row, datarows))
+
+
+class DataBlock:
+    def __init__(self, datarows, label, splitter_func):
+        self.datarows = datarows
+        self.label = label
+        self.splitter_func = splitter_func        
 
     def make_datapoint(self, value: str, time_stamp, freq):
         return dict(label=self.label,
@@ -191,8 +139,14 @@ class Table:
                     freq=freq)
 
     def extract_values(self):
+        """Filter out None values from ._extract_values() stream."""
+        def has_value(d):
+            return d['value'] is not None
+        return filter(has_value, self._extract_values())
+
+    def _extract_values(self):
         """Yield dictionaries with variable name, frequency, time_index
-           and value.
+           and value. May yield a dictionary where d['value'] is None.
         """
         for row in self.datarows:
             year = Row(row).year
@@ -209,7 +163,9 @@ class Table:
                 for t, val in enumerate(m_values):
                     time_stamp = timestamp_month(year, t + 1)
                     yield self.make_datapoint(val, time_stamp, 'm')
-
+                    
+    def __str__(self):
+        return '\n'.join(map(str, self.datarows))
 
 def timestamp_annual(year):
     return pd.Timestamp(year, 12, 31)
@@ -224,6 +180,48 @@ def timestamp_month(year, month):
     return pd.Timestamp(year, month, 1) + pd.offsets.MonthEnd()
 
 
+class Table:
+    """Representation of CSV table, has headers and datarows.
+       Depends on HeaderParser and DataBlock classes.
+    """
+    def __init__(self, headers, datarows):
+        self.header = HeaderParser(headers)
+        self.datarows = datarows
+        self.varname, self.unit = None, None
+        self.splitter_func  = None
+
+    @property
+    def label(self): 
+        return make_label(self.varname, self.unit)
+
+    def set_label(self, varnames_dict, units_dict):
+        self.varname, self.unit = self.header.set_label(varnames_dict, units_dict)
+
+    def set_splitter(self, reader=None):
+        key = reader or count_columns(self.datarows)
+        self.splitter_func = splitter.get_splitter(key)
+
+    def is_defined(self):
+        return bool(self.label and self.splitter_func)
+
+    def has_unknown_lines(self):
+        return not self.header.is_parsed
+    
+    @property
+    def values(self):        
+        if self.is_defined():
+            dblock = DataBlock(self.datarows, self.label, self.splitter_func)
+            return list(dblock.extract_values())
+        else:
+            return []
+
+    def __str__(self):
+        _title = "Table {}".format(self.label)
+        _header = str(self.header)
+        _data = str(DataBlock(self.datarows, None, None))
+        return '\n'.join([_title, _header, _data])
+
+
 if __name__ == "__main__":  # pragma: no cover
     # example 1
     DOC = """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
@@ -235,7 +233,7 @@ if __name__ == "__main__":  # pragma: no cover
     t.set_splitter(None)
     t.varname = 'GDP'
     t.unit = 'bln_rub'
-    datapoints = list(t.extract_values())
+    datapoints = t.values
     assert datapoints[0] == {'freq': 'a',
                              'label': 'GDP_bln_rub',
                              'time_index': pd.Timestamp('1999-12-31'),
@@ -364,3 +362,10 @@ if __name__ == "__main__":  # pragma: no cover
     for t in tables:
         assert t.varname == 'INVESTMENT'
         assert t.unit in units.values()
+
+    # TODO: Add support for any incoming type to to_float() function
+    #   only str is type is supported by to_float, but actually Python
+    #   don't care if there would be float for example
+
+    # TODO: Create checker for year and tests for that
+    #   The missing of the year is not checked

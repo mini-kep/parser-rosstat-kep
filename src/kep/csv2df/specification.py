@@ -8,9 +8,9 @@ Definition().tables property uses csv2df.parser.extract_tables() function.
 
 """
 
-from kep.csv2df.parser import extract_tables
+from kep.csv2df.parser import Segment
 from kep.csv2df.row_model import Row
-from kep.csv2df.reader import Popper
+from kep.csv2df.reader import Popper, text_to_list
 from kep.csv2df.util.label import make_label
 
 
@@ -151,7 +151,7 @@ class Definition(object):
     def __init__(self, commands, units, boundaries=None, reader=None):
         self.commands = [ParsingCommand(**c) for c in as_list(commands)]
         self.units = units
-        self.csv_segment = ''
+        self.rows = []
         if boundaries:
             self.scope = Scope(boundaries)
         else:
@@ -173,18 +173,12 @@ class Definition(object):
         return self.scope.get_bounds(rows)
 
     @property
-    def tables(self):
-        return extract_tables(self.csv_segment, self)
-
-    @property
     def values(self):
-        return [dp for t in self.tables for dp in t.extract_values()]
+        return Segment(self.rows, self).values 
 
 
 class Specification:
-    """
-    Hold main parsing instruction and instructions by segment.
-    """
+    """Main parsing definition and instructions by segment."""
 
     def __init__(self, commands, units):
         self.default = Definition(commands=commands, units=units)
@@ -201,18 +195,19 @@ class Specification:
         self.segments.append(pdef)
 
     def attach_data(self, csv_text: str):
-        """Break *csv_text* into segments using self.segments boundaries."""
+        """Break *csv_text* into segments using self.segments boundaries.
+        Converts to *csv_text* string to list of lists of strings.
+        """
         stack = Popper(csv_text)
         for pdef in self.segments:
             start, end = pdef.get_bounds(stack.rows)
-            pdef.csv_segment = stack.pop(start, end)
-        self.default.csv_segment = stack.remaining_rows()
+            pdef.rows = stack.pop(start, end)
+        self.default.rows = stack.remaining_rows()
 
     @property
-    def tables(self):
-        all_definitions = [self.default] + self.segments
-        return [t for pdef in all_definitions for t in pdef.tables]
+    def definitions(self):
+        return [self.default] + self.segments
 
     @property
     def values(self):
-        return [dp for t in self.tables for dp in t.extract_values()]
+        return [v for pdef in self.definitions for v in pdef.values]

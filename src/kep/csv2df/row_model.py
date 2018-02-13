@@ -42,6 +42,7 @@ class Row:
         """
         self.name = row[0]
         self.data = row[1:]
+        self.is_parsed = False
 
     def is_datarow(self):
         """Helper function for table demarkation.
