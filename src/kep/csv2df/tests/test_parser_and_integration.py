@@ -19,25 +19,28 @@ def create_table():
 
 
 def test_split_to_tables():
-    assert create_table() == \
-        Table(headers=[['Объем ВВП, млрд.рублей / Gross domestic product, bln rubles']],
-              datarows=[['1999', '4823', '901', '1102', '1373', '1447'],
-                        ['2000', '7306', '1527', '1697', '2038', '2044']]
-              )
-
-
-class Test_Table():
     t = create_table()
+    assert t.header.rows[0].name == \
+        'Объем ВВП, млрд.рублей / Gross domestic product, bln rubles'
+    assert t.datarows == \
+         [['1999', '4823', '901', '1102', '1373', '1447'],
+          ['2000', '7306', '1527', '1697', '2038', '2044']]
+              
 
-    def test_extract_values_method_on_table_after_parsing_returns_expected_dicts(
+
+class Test_Table():    
+
+    def test_extract_values_on_defined_table_returns_expected_dicts(
             self):
         # prepare
-        self.t.set_splitter(None)
-        self.t.varname = 'GDP'
-        self.t.unit = 'bln_rub'
+        t = create_table()
+        t.set_splitter(None)
+        t.varname = 'GDP'
+        t.unit = 'bln_rub'
         # run
-        datapoints = list(self.t.extract_values())
+        datapoints = t.values
         # compare
+        assert t.is_defined() is True
         assert datapoints[0] == {'freq': 'a',
                                  'label': 'GDP_bln_rub',
                                  'time_index': pd.Timestamp('1999-12-31'),

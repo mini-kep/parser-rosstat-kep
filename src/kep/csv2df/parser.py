@@ -16,6 +16,7 @@ from kep.csv2df.util.to_float import to_float
 __all__ = ['extract_tables']
 
 
+
 class Segment:
     def __init__(self, rows, pdef):
         """
@@ -36,7 +37,10 @@ class Segment:
         self.parse()
         self.verify()
         return [t for t in self.tables 
-                if t.label in self.pdef.required_labels]        
+                if t.label in self.pdef.required_labels]       
+    @property    
+    def values(self):
+        return [v for t in self.extract_tables() for v in t.values]    
 
 
 def parse_tables(tables, pdef):

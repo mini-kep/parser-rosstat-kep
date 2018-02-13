@@ -1,7 +1,7 @@
 """Extract dataframes by year and month."""
 
-from kep import FREQUENCIES, PARSING_DEFINITION
-from kep.csv2df.dataframe_maker import Datapoints
+from kep import FREQUENCIES, PARSING_SPECIFICATION
+from kep.csv2df.dataframe_maker import create_dataframe
 from kep.df2xl.to_excel import save_xls
 from kep.helper.date import Date
 from kep.helper.path import InterimCSV, ProcessedCSV
@@ -13,12 +13,12 @@ class Vintage:
         Performs interim CSV file parsing on construction and obtains 
         resulting dataframes.
     """
-    def __init__(self, year: int, month: int, parsing_definition=PARSING_DEFINITION):
+    def __init__(self, year: int, month: int, parsing_spec=PARSING_SPECIFICATION):
         self.year, self.month = year, month
         csv_text = InterimCSV(year, month).text()
-        parsing_definition.attach_data(csv_text)
-        self.emitter = Datapoints(parsing_definition.tables)
-        self.dfs = {freq: self.emitter.get_dataframe(freq) for freq in FREQUENCIES}
+        parsing_spec.attach_data(csv_text)
+        self.values = parsing_spec.values 
+        self.dfs = {freq: create_dataframe(self.values, freq) for freq in FREQUENCIES}
 
     @property
     def datapoints(self):        

@@ -1,2 +1,2 @@
 FREQUENCIES = ['a', 'q', 'm']
-from .parsing_definition import PARSING_DEFINITION, UNITS
+from .parsing_definition import PARSING_SPECIFICATION, UNITS
