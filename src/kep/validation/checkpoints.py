@@ -219,7 +219,11 @@ CHECKPOINTS = dict(
     m=as_checkpoints(MONTHLY_STR)
 )
 
-OPTIONAL_CHECKPOINTS = dict(a=as_checkpoints(ANNUAL_STR_2016))
+OPTIONAL_CHECKPOINTS = dict(
+    a=as_checkpoints(ANNUAL_STR_2016),
+    q=[],
+    m=[],
+)
 
 
 def is_found(df, d):
