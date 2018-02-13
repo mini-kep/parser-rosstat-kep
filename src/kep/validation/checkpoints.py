@@ -263,6 +263,7 @@ def validate2(df, default_checkpoints, optional_checkpoints):
     missed_required = find_missed_checkpoints(df, default_checkpoints)
     missed_optional = find_missed_checkpoints(df, optional_checkpoints)
 
+    # onkery: now validation logic simply discards any missed optional checkpoints
     # TODO: maybe we could show Warnings for missed optional checkpoints
 
     # ensure a variable in dataframe is covered by at least one checkpoint
