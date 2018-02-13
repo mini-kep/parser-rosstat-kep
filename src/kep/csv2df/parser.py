@@ -85,6 +85,7 @@ def split_to_tables(rows):
     if len(headers) > 0 and len(datarows) > 0:
         yield Table(headers, datarows)
 
+
 # TODO: depreciate in favour of HeaderParser + move tests to HeaderParser
 class HeaderParsingProgress:
     def __init__(self, headers):
@@ -104,6 +105,7 @@ class HeaderParsingProgress:
     def printable(self):
         def symbolize(line):
             return {True: "+", False: "-"}[self.is_known[line]]
+
         return ['{} <{}>'.format(symbolize(line), line) for line in self.lines]
 
     def __str__(self):
@@ -117,7 +119,7 @@ class HeaderParser:
         self.unit = None
 
     def set_label(self, varnames_dict, units_dict):
-        for i, row in enumerate(self.rows):            
+        for i, row in enumerate(self.rows):
             varname = row.get_varname(varnames_dict)
             if varname:
                 self.varname = varname
@@ -125,8 +127,8 @@ class HeaderParser:
             unit = row.get_unit(units_dict)
             if unit:
                 self.unit = unit
-                self.rows[i].is_parsed = True 
-        return self.varname, self.unit        
+                self.rows[i].is_parsed = True
+        return self.varname, self.unit
 
     def is_parsed(self):
         return all(row.is_parsed for row in self.rows)
@@ -134,9 +136,11 @@ class HeaderParser:
     def printable(self):
         def symbolize(flag):
             return {True: "+", False: "-"}[flag]
-        def as_string(row):    
+
+        def as_string(row):
             return '{} <{}>'.format(symbolize(row.is_parsed), row.name)
-        return [as_string(row) for row in self.rows]    
+
+        return [as_string(row) for row in self.rows]
 
     def __str__(self):
         return '\n'.join(self.printable())
@@ -147,7 +151,7 @@ class DataBlock:
         self.datarows = datarows
         self.label = None
         self.splitter_func = None
-                    
+
     @property
     def coln(self):
         """Number of columns in table."""
@@ -155,8 +159,8 @@ class DataBlock:
 
     def set_splitter(self, reader=None):
         key = reader or self.coln
-        self.splitter_func = splitter.get_splitter(key)    
-        
+        self.splitter_func = splitter.get_splitter(key)
+
     def make_datapoint(self, value: str, time_stamp, freq):
         return dict(label=self.label,
                     value=to_float(value),
@@ -165,9 +169,11 @@ class DataBlock:
 
     def extract_values(self):
         """Filter out None values from ._extract_values() stream."""
+
         def has_value(d):
             return d['value'] is not None
-        return filter(has_value, self._extract_values())    
+
+        return filter(has_value, self._extract_values())
 
     def _extract_values(self):
         """Yield dictionaries with variable name, frequency, time_index
@@ -189,8 +195,9 @@ class DataBlock:
                     time_stamp = timestamp_month(year, t + 1)
                     yield self.make_datapoint(val, time_stamp, 'm')
 
-#TODO 1: Table 2 should be renamed Table and replace existing Table class
-#TODO 2: some of Table class tests should go to HeaderParser and DataBlock classes
+
+# TODO 1: Table 2 should be renamed Table and replace existing Table class
+# TODO 2: some of Table class tests should go to HeaderParser and DataBlock classes
 class Table2:
     """Representation of CSV table, has headers and datarows.
     
@@ -200,9 +207,9 @@ class Table2:
 
     def __init__(self, headers, datarows):
         self.header = HeaderParser(headers)
-        self.datablock = DataBlock(datarows)        
+        self.datablock = DataBlock(datarows)
         self.splitter_func = None
-        self.label = None        
+        self.label = None
 
     def set_label(self, varnames_dict, units_dict):
         varname, unit = self.header.set_label(varnames_dict, units_dict)
@@ -219,12 +226,13 @@ class Table2:
         return not self.header.is_parsed
 
     def __eq__(self, x):
-        #FIXME: need __eq__ methods in classes
+        # FIXME: need __eq__ methods in classes
         return self.header == x.header and self.datablock == x.datablock
 
     def __str__(self):
         def join(items):
             return '\n'.join([str(x) for x in items])
+
         _title = "Table {} ({} columns)".format(self.label, self.datablock.coln)
         _header = join(self.header.printable())
         _data = join(self.datablock)
@@ -487,29 +495,9 @@ if __name__ == "__main__":  # pragma: no cover
         assert t.varname == 'INVESTMENT'
         assert t.unit in units.values()
 
-
-    # Testing extract_values work with missing values
-    # setup
-    test_headers = [['Объем ВВП', '', '', '', ''],
-                  ['млрд.рублей', '', '', '', '']]
-    test_dataitems = [["1991", "", "901", "1102", "1373", "1447"]]
-
-    t = Table(test_headers, test_dataitems)
-    t.set_label(varnames_dict={'Объем ВВП': 'GDP'},
-                units_dict={'млрд.рублей': 'bln_rub'})
-    t.set_splitter(reader=None)
-
-    # test missing last value
-    assert len(list(t.extract_values())) == 4
-
-    # test missing several values
-    t.datarows = [["1997", "1998", "123", "55", "", ""]]
-    assert len(list(t.extract_values())) == 3
-
     # TODO: Add support for any incoming type to to_float() function
     #   only str is type is supported by to_float, but actually Python
     #   don't care if there would be float for example
 
     # TODO: Create checker for year and tests for that
     #   The missing of the year is not checked
-

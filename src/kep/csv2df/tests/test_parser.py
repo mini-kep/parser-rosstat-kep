@@ -174,6 +174,24 @@ class Test_Table_after_parsing:
         assert repr(self.table_after_parsing)
 
 
+class Test_Table_extract_values_wrapper:
+    def setup(self):
+        test_headers = [['Объем ВВП', '', '', '', ''],
+                        ['млрд.рублей', '', '', '', '']]
+        self.t = Table(test_headers, [["" for _ in range(6)]])
+        self.t.set_label(varnames_dict={'Объем ВВП': 'GDP'},
+                         units_dict={'млрд.рублей': 'bln_rub'})
+        self.t.set_splitter(reader=None)
+
+    def test_datarow_is_correct(self):
+        self.t.datarows = [["1991", "125", "901", "1102", "1373", "1447"]]
+        assert len(list(self.t.extract_values())) == 5
+
+    def test_datarow_with_missing_last_value(self):
+        self.t.datarows = [["1991", "125", "901", "1102", "1373", ""]]
+        assert len(list(self.t.extract_values())) == 4
+
+
 class Test_extract_tables_function:
     tables = extract_tables(csv_segment=mock_rows(), pdef=Sample.pdef())
 
