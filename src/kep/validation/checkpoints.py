@@ -274,7 +274,7 @@ def validate2(df, default_checkpoints, optional_checkpoints):
     uncovered = uncovered_required.intersection(uncovered_optional)
 
     if uncovered:
-        raise ValueError(f"Variables not covered by checkpoints: {uncovered_required}")
+        raise ValueError(f"Variables not covered by checkpoints: {uncovered}")
 
 
 def find_missed_checkpoints(df, checkpoints):
