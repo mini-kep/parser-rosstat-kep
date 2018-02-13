@@ -20,7 +20,7 @@
 #  -  the problem I see is that the variables that do not have a 1999 value, which start observationlater (eg INDPRO, PPI, some others)
 #  -  another problem is that we just copy an occasional parsing result to CHEKCPOINTS, not really looking at CSV file 
 #     is it is really the value in original data source
-  
+
 # Risks:
 # - dataframes may have parsing results not covered by checkpoints
 # - not all indicators start in 1999, they need other checkpoints 
@@ -39,6 +39,7 @@
 #  - should speciifation include control datapoints?#
 #
 # ----------------------------------------------------------------------------------------
+from collections import namedtuple
 
 ANNUAL_STR = """
 year                                1999.0
@@ -74,6 +75,12 @@ WAGE_NOMINAL_rub                    1523.0
 WAGE_REAL_yoy                         78.0
 INDPRO_yoy                             NaN
 PPI_rog                                NaN
+"""
+
+ANNUAL_STR_2016 = """
+year                                2016.0
+INDPRO_yoy                           101.3
+PPI_rog                              107.5
 """
 
 QTR_STR = """
@@ -117,7 +124,6 @@ UNEMPL_pct                            14.3
 WAGE_NOMINAL_rub                    1248.0
 WAGE_REAL_rog                         80.9
 WAGE_REAL_yoy                         60.7"""
-
 
 MONTHLY_STR = """
 year                                1999.0
@@ -186,23 +192,27 @@ def as_dict(s):
 
 
 def extract_date(d):
-    year = int(d.pop('year'))
+    # onkery: Using `get` instead of `pop` to avoid false
+    # positives during validation.
+    year = int(d.get('year'))
     if 'month' in d.keys():
-        month = int(d.pop('month'))
+        month = int(d.get('month'))
         return from_month(year, month)
     elif 'qtr' in d.keys():
-        qtr = int(d.pop('qtr'))
+        qtr = int(d.get('qtr'))
         return from_qtr(year, qtr)
     else:
         return from_year(year)
 
 
+Checkpoint = namedtuple("Checkpoint", ["date", "name", "value"])
+
+
 def as_checkpoints(text):
     d = as_dict(text)
-    dt_str = extract_date(d)
-    return [dict(date=dt_str,
-                 name=name,
-                 value=d[name]) for name in d.keys()]
+    return [Checkpoint(date=extract_date(d),
+                       name=name,
+                       value=d[name]) for name in d.keys()]
 
 
 CHECKPOINTS = dict(
@@ -212,15 +222,21 @@ CHECKPOINTS = dict(
 )
 
 
+# onkery: Using stub values for now-absent optional checkpoints to
+# avoid awkward calls outside.
+OPTIONAL_CHECKPOINTS = dict(
+    a=as_checkpoints(ANNUAL_STR_2016),
+    q=[],
+    m=[],
+)
+
+
 def is_found(df, d):
     """Return true if dictionary *d* value
        if found in dataframe *df*.
     """
-    dt = d['date']
-    colname = d['name']
-    x = d['value']
     try:
-        return df.loc[dt, colname].iloc[0] == x
+        return df.loc[d.date, d.name].iloc[0] == d.value
     except KeyError:
         return False
 
@@ -229,21 +245,67 @@ def validate(df, checkpoints):
     """Validate dataframe *df* with list of dictionaries
        *checkpoints*.
     """
-    flags = [is_found(df, c) for c in checkpoints]
-    if not all(flags):
-        missed_points = [
-            c for f, c in zip(
-                flags, checkpoints) if not f]
-        raise ValueError(missed_points)
+    missed = find_missed_checkpoints(df, checkpoints)
+    if missed:
+        raise ValueError(f"Required checkpoints not found in dataframe: {missed}")
+
+    uncovered = find_uncovered_column_names(df, checkpoints)
+    if uncovered:
+        raise ValueError(f"Variables not covered by checkpoints: {uncovered}")
+
+
+# FIXME: should accept default and optional checkpoints list
+#        desired bahaviour is following:
+#        at least default or optional datapoint must be found for every column in dataframe
+#        suggested interface is
+
+def validate2(df, default_checkpoints, optional_checkpoints):
+    missed_required = find_missed_checkpoints(df, default_checkpoints)
+    missed_optional = find_missed_checkpoints(df, optional_checkpoints)
+
+    # onkery: now validation logic simply discards any missed optional checkpoints
+    # TODO: maybe we could show Warnings for missed optional checkpoints
+
+    # ensure a variable in dataframe is covered by at least one checkpoint
+    if missed_required:
+        raise ValueError(f"Required checkpoints not found in dataframe: {missed_required}")
+
+    uncovered_required = find_uncovered_column_names(df, default_checkpoints)
+    uncovered_optional = find_uncovered_column_names(df, optional_checkpoints)
+
+    # onkery: `intersection` here because we need to find columns which
+    # are not covered by both required AND optional checkpoints.
+    uncovered = uncovered_required.intersection(uncovered_optional)
+
+    if uncovered:
+        raise ValueError(f"Variables not covered by checkpoints: {uncovered}")
+
+
+def find_missed_checkpoints(df, checkpoints):
+    """
+    Returns checkpoints not found in dataframe *df*.
+
+    Args:
+        df (pandas dataframe): parsing result
+        checkpoints: list of dictionaries
+
+    Returns:
+        subset of *checkpoints* not found in dataframe *df*
+    """
+    return {c for c in checkpoints if not is_found(df, c)}
 
 
 def find_uncovered_column_names(df, checkpoints):
-    checkpoint_column_names = {c["name"] for c in checkpoints}
-    df_column_names = set()
+    """
+    Returns column names in dataframe *df*
+    that are not covered by *checkpoints*.
 
-    d = df.to_dict('index')
-    for dt in d.keys():
-        for name, value in d[dt].items():
-            df_column_names.add(name)
-
+    Args:
+        df (pandas dataframe): parsing result
+        checkpoints: list of dictionaries
+    Returns:
+        set of column names not matched by *checkpoints*
+    """
+    checkpoint_column_names = {c.name for c in checkpoints}
+    df_column_names = set(df.columns)
     return df_column_names.difference(checkpoint_column_names)

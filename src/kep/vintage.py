@@ -5,7 +5,12 @@ from kep.csv2df.dataframe_maker import create_dataframe
 from kep.df2xl.to_excel import save_xls
 from kep.helper.date import Date
 from kep.helper.path import InterimCSV, ProcessedCSV
-from kep.validation.checkpoints import CHECKPOINTS, validate
+from kep.validation.checkpoints import (
+    CHECKPOINTS,
+    OPTIONAL_CHECKPOINTS,
+    validate,
+    validate2
+)
 
 
 class Vintage:
@@ -40,8 +45,14 @@ class Vintage:
     def validate(self):
         for freq in FREQUENCIES:
             df = self.dfs[freq]
-            checkpoints = CHECKPOINTS[freq]
-            validate(df, checkpoints)
+            required = CHECKPOINTS[freq]
+            optional = OPTIONAL_CHECKPOINTS[freq]
+
+            try:
+                validate2(df, required, optional)
+            except ValueError as err:
+                raise ValueError(f"Validated frequency: '{freq}'") from err
+
         print("Test values parsed OK for", self)
 
     def __repr__(self):
@@ -58,7 +69,7 @@ class Latest(Vintage):
 
     def upload(self):
         from parsers.mover.uploader import Uploader
-        self.validate()        
+        self.validate()
         # FIXME: possible risk - *self.datapoints* may have different serialisation 
         #        format compared to what Uploader() expects
         #           (a) date format   
