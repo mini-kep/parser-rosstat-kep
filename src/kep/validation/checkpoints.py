@@ -257,12 +257,25 @@ def validate(df, checkpoints):
         raise ValueError(f"Variables not covered by checkpoints: {uncovered}")
 
 
-def validate2(df, default_checkpoints, optional_checkpoints, strict_validation=False):
-    missed_required = find_missed_checkpoints(df, default_checkpoints)
-    missed_optional = find_missed_checkpoints(df, optional_checkpoints)
+def validate2(df, required_checkpoints, optional_checkpoints, strict_validation=False):
+    """
+    Validates given dataframe *df* against *required_checkpoints* and *optional_checkpoints*.
+    If any required checkpoint is missed, raises ValueError with missed checkpoints.
 
-    # FIXME:
-    #   - write func docstring
+    *strict_validation* flag controls validation strictness for optional checkpoints.
+
+    Args:
+        df: parsing result as Pandas dataframe
+        required_checkpoints: list of dictionaries with required checkpoints
+        optional_checkpoints: list of dictionaries with optional checkpoints
+        strict_validation: if set, function raises exception on any missed
+        optional checkpoint and only shows warning otherwise
+
+    Returns:
+        None
+    """
+    missed_required = find_missed_checkpoints(df, required_checkpoints)
+    missed_optional = find_missed_checkpoints(df, optional_checkpoints)
 
     if missed_required or missed_optional and strict_validation:
         missed = missed_required.union(missed_optional)
@@ -271,7 +284,7 @@ def validate2(df, default_checkpoints, optional_checkpoints, strict_validation=F
     if missed_optional and not strict_validation:
         raise RuntimeWarning(f"Optional checkpoints not found in dataframe: {missed_optional}")
 
-    uncovered_required = find_uncovered_column_names(df, default_checkpoints)
+    uncovered_required = find_uncovered_column_names(df, required_checkpoints)
     uncovered_optional = find_uncovered_column_names(df, optional_checkpoints)
 
     # onkery: `intersection` here because we need to find columns which
