@@ -269,8 +269,12 @@ def validate2(df, required_checkpoints, optional_checkpoints, strict=False):
     """
     Validates given dataframe *df* against *required_checkpoints* and *optional_checkpoints*.
 
+    Step 1. Are all checkpoints found in frame?
+
     If any required checkpoint is missed, raises ValueError with missed checkpoints.
     *strict_validation* flag controls validation strictness for optional checkpoints.
+
+    Step 2. Are there any dataframe columns not covered by non-Nan checkpoints?
 
     After that function checks if dataframe *df* contains any variables which
     are not covered by passed checkpoints (both required and optional).
