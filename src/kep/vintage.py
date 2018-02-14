@@ -51,11 +51,7 @@ class Vintage:
             try:
                 validate2(df, required, optional)            
             except ValueError as err:
-                # EP: в чем смысл сообщения? рассказать о контексте ошибки? 
-                #     f"Validated frequency: '{freq}'" - ничего про ошибку не говорит,                 
-                #     а для диагностики все равно недостаточно. может не надо тут validate2
-                #     в try-except оборачивать?
-                raise ValueError(f"Validated frequency: '{freq}'") from err
+                raise ValueError(f"Validation error occurred at frequency: '{freq}'") from err
 
         print("Test values parsed OK for", self)
 
