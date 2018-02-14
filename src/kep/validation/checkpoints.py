@@ -244,17 +244,25 @@ def is_found(df, d):
         return False
 
 
+class ValidationError(ValueError):
+    pass
+
+
+class ValidationWarning(Warning):
+    pass
+
+
 def validate(df, checkpoints):
     """Validate dataframe *df* with list of dictionaries
        *checkpoints*.
     """
     missed = find_missed_checkpoints(df, checkpoints)
     if missed:
-        raise ValueError(f"Required checkpoints not found in dataframe: {missed}")
+        raise ValidationError(f"Required checkpoints not found in dataframe: {missed}")
 
     uncovered = find_uncovered_column_names(df, checkpoints)
     if uncovered:
-        raise ValueError(f"Variables not covered by checkpoints: {uncovered}")
+        raise ValidationError(f"Variables not covered by checkpoints: {uncovered}")
 
 
 def validate2(df, required_checkpoints, optional_checkpoints, strict=False):
@@ -281,14 +289,14 @@ def validate2(df, required_checkpoints, optional_checkpoints, strict=False):
     missed_optional = find_missed_checkpoints(df, optional_checkpoints)
 
     if missed_required:
-        raise ValueError(f"Required checkpoints not found in dataframe: {missed_required}")
+        raise ValidationError(f"Required checkpoints not found in dataframe: {missed_required}")
 
     if missed_optional:
         msg = f"Optional checkpoints not found in dataframe: {missed_optional}"
         if strict:
-            raise ValueError(msg)
+            raise ValidationError(msg)
         else:
-            raise RuntimeWarning(msg)
+            raise ValidationWarning(msg)
 
     uncovered_required = find_uncovered_column_names(df, required_checkpoints)
     uncovered_optional = find_uncovered_column_names(df, optional_checkpoints)
@@ -299,7 +307,7 @@ def validate2(df, required_checkpoints, optional_checkpoints, strict=False):
 
     # ensure a variable in dataframe is covered by at least one checkpoint
     if uncovered:
-        raise ValueError(f"Variables not covered by checkpoints: {uncovered}")
+        raise ValidationError(f"Variables not covered by checkpoints: {uncovered}")
 
 
 def find_missed_checkpoints(df, checkpoints):

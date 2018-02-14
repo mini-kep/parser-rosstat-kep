@@ -9,7 +9,8 @@ from kep.validation.checkpoints import (
     CHECKPOINTS,
     OPTIONAL_CHECKPOINTS,
     validate,
-    validate2
+    validate2,
+    ValidationError,
 )
 
 
@@ -50,8 +51,8 @@ class Vintage:
             # EP: что сейчас тестируется? как это понять?
             try:
                 validate2(df, required, optional)            
-            except ValueError as err:
-                raise ValueError(f"Validation error occurred at frequency: '{freq}'") from err
+            except ValidationError as err:
+                raise ValidationError(f"Validation error occurred at frequency: '{freq}'") from err
 
         print("Test values parsed OK for", self)
 
