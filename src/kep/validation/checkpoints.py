@@ -257,17 +257,19 @@ def validate(df, checkpoints):
         raise ValueError(f"Variables not covered by checkpoints: {uncovered}")
 
 
-# TODO: use *strong* parameter to raise exceptions, print warnings on optional checks otherwise
-def validate2(df, default_checkpoints, optional_checkpoints, strong=False):
+def validate2(df, default_checkpoints, optional_checkpoints, strict_validation=False):
     missed_required = find_missed_checkpoints(df, default_checkpoints)
     missed_optional = find_missed_checkpoints(df, optional_checkpoints)
 
     # FIXME:
     #   - write func docstring
 
-    # onkery: now validation logic simply discards any missed optional checkpoints
-    if missed_required:
-        raise ValueError(f"Required checkpoints not found in dataframe: {missed_required}")
+    if missed_required or missed_optional and strict_validation:
+        missed = missed_required.union(missed_optional)
+        raise ValueError(f"Checkpoints not found in dataframe: {missed}")
+
+    if missed_optional and not strict_validation:
+        raise RuntimeWarning(f"Optional checkpoints not found in dataframe: {missed_optional}")
 
     uncovered_required = find_uncovered_column_names(df, default_checkpoints)
     uncovered_optional = find_uncovered_column_names(df, optional_checkpoints)
