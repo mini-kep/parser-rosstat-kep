@@ -96,11 +96,8 @@ tables = split_to_tables(csv_segment)
 tables = parse_tables(tables, pdef)
 
 # checks
-assert len(tables) == 3
-assert all([t.has_unknown_lines() for t in tables]) is False
-assert [t.varname for t in tables] == ['INVESTMENT'] * 3
-assert [t.unit for t in tables] == ['bln_rub', 'yoy', 'rog']
-
-# result
-for t in tables:
-    print(t.varname, t.unit)
+def test_check_parsing_result():
+    assert len(tables) == 3
+    assert all([t.has_unknown_lines() for t in tables]) is False
+    assert [t.varname for t in tables] == ['INVESTMENT'] * 3
+    assert [t.unit for t in tables] == ['bln_rub', 'yoy', 'rog']

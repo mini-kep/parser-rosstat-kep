@@ -181,7 +181,8 @@ def from_qtr(year, qtr):
     return from_month(year, month)
 
 
-def as_dict(s):
+def as_dict(s: str):
+    """Convert dataframe printout string to dictionary."""
     result = {}
     for row in s.strip().split('\n'):
         d = [x for x in row.split(' ') if x]
@@ -192,6 +193,8 @@ def as_dict(s):
 
 
 def extract_date(d):
+    """
+    """
     # onkery: Using `get` instead of `pop` to avoid false
     # positives during validation.
     year = int(d.get('year'))
@@ -221,7 +224,7 @@ CHECKPOINTS = dict(
     m=as_checkpoints(MONTHLY_STR)
 )
 
-
+# NOT TODO: add q and m strings
 # onkery: Using stub values for now-absent optional checkpoints to
 # avoid awkward calls outside.
 OPTIONAL_CHECKPOINTS = dict(
@@ -253,18 +256,17 @@ def validate(df, checkpoints):
     if uncovered:
         raise ValueError(f"Variables not covered by checkpoints: {uncovered}")
 
-
-# FIXME: should accept default and optional checkpoints list
-#        desired bahaviour is following:
-#        at least default or optional datapoint must be found for every column in dataframe
-#        suggested interface is
-
-def validate2(df, default_checkpoints, optional_checkpoints):
+# TODO: use *strong* parameter to raise exceptions, print warnings on optional checks otherwise  
+def validate2(df, default_checkpoints, optional_checkpoints, strong=False):
     missed_required = find_missed_checkpoints(df, default_checkpoints)
     missed_optional = find_missed_checkpoints(df, optional_checkpoints)
 
+    # FIXME:
+    #   - write func docstring
+    #   - sort out comments in func body
+
     # onkery: now validation logic simply discards any missed optional checkpoints
-    # TODO: maybe we could show Warnings for missed optional checkpoints
+    # SUGGESTION: maybe we could show Warnings for missed optional checkpoints
 
     # ensure a variable in dataframe is covered by at least one checkpoint
     if missed_required:

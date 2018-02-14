@@ -47,10 +47,14 @@ class Vintage:
             df = self.dfs[freq]
             required = CHECKPOINTS[freq]
             optional = OPTIONAL_CHECKPOINTS[freq]
-
+            # EP: что сейчас тестируется? как это понять?
             try:
-                validate2(df, required, optional)
+                validate2(df, required, optional)            
             except ValueError as err:
+                # EP: в чем смысл сообщения? рассказать о контексте ошибки? 
+                #     f"Validated frequency: '{freq}'" - ничего про ошибку не говорит,                 
+                #     а для диагностики все равно недостаточно. может не надо тут validate2
+                #     в try-except оборачивать?
                 raise ValueError(f"Validated frequency: '{freq}'") from err
 
         print("Test values parsed OK for", self)
