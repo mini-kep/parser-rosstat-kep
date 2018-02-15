@@ -8,12 +8,13 @@ from kep.validation.checkpoints import validate2, Checkpoint
 def dataframe():
     return Vintage(2017, 12).dfs["a"]
 
-#NOT TODO: this is bad checkpoints, need a ficture with good checkpoints 
+# TODO: this is 'bad path' checkpoints, need a fixture + test with 'good path' checkpoints 
 @pytest.fixture(scope="module")
 def checkpoints():
     return [
         Checkpoint(
             date="1999",
+            freq ="z"
             name="some_really_long_test_variable",
             value="100.0"
         )
