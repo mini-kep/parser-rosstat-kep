@@ -224,9 +224,11 @@ CHECKPOINTS = dict(
     m=as_checkpoints(MONTHLY_STR)
 )
 
-# NOT TODO: add q and m strings
-# onkery: Using stub values for now-absent optional checkpoints to
-# avoid awkward calls outside.
+# TODO: (1) for optional checkpoints need textual description, eg. 
+#       "in releases prior to 2016 INDPRO is Nan, we check it with additional 
+#       values"
+#
+# NOT TODO: need actual check values. 
 OPTIONAL_CHECKPOINTS = dict(
     a=as_checkpoints(ANNUAL_STR_2016),
     q=[],
@@ -264,13 +266,7 @@ def validate(df, checkpoints):
     if uncovered:
         raise ValidationError(f"Variables not covered by checkpoints: {uncovered}")
 
-# COMMENT: 
-# (1) optional checkpoints need textual description, eg. 
-#     "in releases prior to 2016 INDPRO is Nan, we check it with additional 
-#      values"
-#     may rename 'optional' to 'additional', as both types are in fact mandatory 
-# (2) if we switch to checling only NaN values, the behaviour
-#    of validate2 func will change - there will be more
+
 # (3) we need values for all optional checkpoints
 
 def validate2(df, required_checkpoints, optional_checkpoints, strict=False):
@@ -312,7 +308,6 @@ def validate2(df, required_checkpoints, optional_checkpoints, strict=False):
     if missed_required:
         msg = f"Required checkpoints not found in dataframe: {missed_required}"
         echo(msg, True)
-
     if missed_optional:
         msg = f"Optional checkpoints not found in dataframe: {missed_optional}"
         echo(msg, strict)
@@ -324,16 +319,15 @@ def validate2(df, required_checkpoints, optional_checkpoints, strict=False):
     # ensure a variable in dataframe is covered by at least one checkpoint
     # we use `intersection` here because we need to find columns which
     # are not covered by both required AND optional checkpoints
-    # ERROR: this does not seem right, imagine uncovered_required={'GDP_yoy'}
-    #        and uncovered_optional={}, then intersection is empty and 
-    #        we miss the fact that 'GDP_yoy' is not covered
+    # if both of them miss the column, it is uncovered
     uncovered = uncovered_required.intersection(uncovered_optional)
-
     if uncovered:
         msg = f"Variables in dataframe not covered by checkpoints: {uncovered}"
         echo(msg, strict)
 
 
+# COMMENT: NOT TODO if we switch to checking only non-NaN values, the behaviour
+#     of validate2 func will change - there will be more values muissed, probably
 def find_missed_checkpoints(df, checkpoints):
     """
     Returns checkpoints not found in dataframe *df*.
