@@ -214,6 +214,7 @@ class CheckpointList:
     def __getitem__(self, i:int):
         return self._list[i]
 
+
 CHECKPOINTS = dict(
     a=CheckpointList(ANNUAL_STR),
     q=CheckpointList(QTR_STR),
