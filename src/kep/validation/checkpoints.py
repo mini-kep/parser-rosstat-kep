@@ -259,9 +259,8 @@ def validate(df, checkpoints):
     if uncovered:
         raise ValidationError(f"Variables not covered by checkpoints: {uncovered}")
 
-# NOT TODO: optional_checkpoints name is not as good, they are also required
-#           'additional' my be better
-def validate2(df, required_checkpoints, optional_checkpoints, strict=False):
+
+def validate2(df, required_checkpoints, additional_checkpoints, strict=False):
     """
     Validate dataframe *df* against *required_checkpoints* and *optional_checkpoints*. 
     *strict* flag controls exception/warning handling. 
@@ -279,7 +278,7 @@ def validate2(df, required_checkpoints, optional_checkpoints, strict=False):
     Args:
         df: parsing result as pandas dataframe
         required_checkpoints(list of dictionaries): required checkpoints
-        optional_checkpoints(list of dictionaries): optional checkpoints
+        additional_checkpoints(list of dictionaries): optional checkpoints
         strict(bool): if True raise exceptions for warnings
         optional checkpoint and only shows warning otherwise
 
@@ -297,7 +296,7 @@ def validate2(df, required_checkpoints, optional_checkpoints, strict=False):
 
     # this is "Step 1"
     missed_required = find_missed_checkpoints(df, required_checkpoints)
-    missed_optional = find_missed_checkpoints(df, optional_checkpoints)
+    missed_optional = find_missed_checkpoints(df, additional_checkpoints)
 
     if missed_required:
         msg = f"Required checkpoints not found in dataframe: {missed_required}"
@@ -308,7 +307,7 @@ def validate2(df, required_checkpoints, optional_checkpoints, strict=False):
 
     # this is "Step 2" 
     uncovered_required = find_uncovered_column_names(df, required_checkpoints)
-    uncovered_optional = find_uncovered_column_names(df, optional_checkpoints)
+    uncovered_optional = find_uncovered_column_names(df, additional_checkpoints)
 
     # ensure a variable in dataframe is covered by at least one checkpoint
     # we use `intersection` here because we need to find columns which
@@ -321,8 +320,6 @@ def validate2(df, required_checkpoints, optional_checkpoints, strict=False):
         echo(msg, strict)
 
 
-# COMMENT: NOT TODO if we switch to checking only non-NaN values, the behaviour
-#     of validate2 func will change - there will be more values muissed, probably
 def find_missed_checkpoints(df, checkpoints):
     """
     Returns checkpoints not found in dataframe *df*.
