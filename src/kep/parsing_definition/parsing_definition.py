@@ -1,79 +1,22 @@
 """Parsing definition to identify tables in the data source file.
     
-   A defnition contains: 
-   - variable name ('GDP')
-   - corresponding headers ('Oбъем ВВП')
-   - units of measurement ('bln_rub')
+   A defnition contains a list of nested dicts. 
+
+   Each dict has following keys: 
+   - commands, a list of dicts each with following keys:     
+       - variable name ('GDP')
+       - corresponding headers ('Oбъем ВВП')
+       - units of measurement ('bln_rub')
    - boundaries (start and end lines of text)   
-   
+   - reader function name(string)
 
 """
-from typing import List, Union
 
-
-def as_list(x):
-    """Transform *x* to list *[x]*.
-
-       Returns:
-           list
-    """
-    if isinstance(x, list):
-        return x
-    elif isinstance(x, tuple):
-        return list(x)
-    else:
-        return [x]
-
-
-class ParsingCommand():
-    def __init__(self, var: str, 
-                       header: Union[str, List[str]], 
-                       unit: Union[str, List[str]]):
-        """Create parsing instructions for an individual variable.
-
-        Args:
-            var (str):
-                varaible name, ex: 'GDP'
-            headers (str or list of strings):
-                header string(s) associated with variable names
-                ex: 'Oбъем ВВП' or ['Oбъем ВВП', 'Индекс физического объема произведенного ВВП']
-            units (str or list):
-                required_labels unit(s) of measurement
-                ex: 'bln_usd' or ['rog', 'rub']
-        """
-        self.varname = var
-        self.header_strings = as_list(header)
-        self.required_units = as_list(unit)
-
-
-class Definition(object):
-    """Holds together:
-        - parsing commands
-        - units dictionary
-        - (optional) defintion scope
-        - (optional) custom reader function name
-
-       Properties:
-           - mapper (dict)
-           - required_labels (list)
-           - units (dict)
-           - reader (str)
-           - scope(Scope)
-
-    """
-
-    def __init__(self, commands, boundaries=List[dict], reader: str = ''):
-        self.commands = [ParsingCommand(**c) for c in as_list(commands)]
-        self.rows = []
-        self.boundaries = boundaries
-        self.reader = reader
-
-
-DEFAULT_COMMANDS = [dict(
+COMMANDS_DEFAULT = [dict(
     var='GDP',
     header=['Oбъем ВВП',
-                    'Индекс физического объема произведенного ВВП, в %',
-                    'Валовой внутренний продукт'],
+            'Индекс физического объема произведенного ВВП, в %',
+            'Валовой внутренний продукт'],
     unit=['bln_rub', 'yoy']),
     dict(
     var='INDPRO',
@@ -249,28 +192,80 @@ COMMANDS_BY_SEGMENT = [
 ]
 
 
-#import json
-#import pathlib
-#
-#def dump(what, filename):
-#    x = json.dumps(what, ensure_ascii=False, sort_keys=True, indent=4)
-#    pathlib.Path(filename).write_text(x)
-#
-#def read(filname):
-#    return json.loads(pathlib.Path(filname).read_text())
+from typing import List, Union, Any
+StringType = Union[str, List[str]]
 
 
-def make_parsing_definition_list(default=DEFAULT_COMMANDS,
+def as_list(x: Any):
+    """Transform *x* to list *[x]*.
+
+       Returns:
+           list
+    """
+    if isinstance(x, list):
+        return x
+    elif isinstance(x, tuple):
+        return list(x)
+    else:
+        return [x]
+
+
+def make_parsing_command(var: str, header: StringType, unit: StringType):
+    """Create parsing instructions for an individual variable.
+
+    Keys:
+        varname (str):
+            varaible name, ex: 'GDP'
+        headers-strings (list of strings):
+            header string(s) associated with variable names
+            ex: ['Oбъем ВВП'] or ['Oбъем ВВП', 'Индекс физического объема произведенного ВВП']
+        units (list of strings):
+            required_labels unit(s) of measurement
+            ex: ['bln_usd]' or ['rog', 'rub']
+    """
+    return dict(varname = var,
+                header_strings = as_list(header), 
+                required_units = as_list(unit))
+
+
+def make_definition_entry(commands: List[dict] , 
+                          # FIXME: is this type annotation valid?
+                          boundaries: List[dict] = [], 
+                          reader: str = ''):
+    commands_list = [make_parsing_command(**c) for c in as_list(commands)]
+    return dict(commands = commands_list,
+                boundaries = boundaries,
+                reader = reader)    
+
+
+def make_parsing_definition_list(default=COMMANDS_DEFAULT,
                                  by_segment=COMMANDS_BY_SEGMENT):
-    definitions = [Definition(default)]
-    for seg_dict in by_segment:
-        pdef = Definition(**seg_dict)        
+    definitions = [make_definition_entry(default)]
+    for segment_dict in by_segment:
+        pdef = make_definition_entry(**segment_dict)        
         definitions.append(pdef)
     return definitions
 
 
 PARSING_DEFINITIONS = make_parsing_definition_list()
+assert isinstance(PARSING_DEFINITIONS, list)
+assert isinstance(PARSING_DEFINITIONS[0], dict)
+assert isinstance(PARSING_DEFINITIONS[1], dict)
+assert PARSING_DEFINITIONS[0]['boundaries'] == []
+assert PARSING_DEFINITIONS[1]['boundaries'] != []
+
+# WARNING: this is optional part, this serialisation is never used
+import json
+import pathlib
+
+def dump(what, filename):
+    x = json.dumps(what, ensure_ascii=False, sort_keys=True, indent=4)
+    pathlib.Path(filename).write_text(x)
 
 
-#if __name__ == '__main__': # pragma: no cover
-#    dump(PARSING_DEFINITIONS, 'parsing_definitions.json')
+def read(filname):
+    return json.loads(pathlib.Path(filname).read_text())
+
+
+if __name__ == '__main__': # pragma: no cover
+    dump(PARSING_DEFINITIONS, 'parsing_definitions.json')

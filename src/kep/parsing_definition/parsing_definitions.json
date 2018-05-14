@@ -1,0 +1,395 @@
+[
+    {
+        "boundaries": [],
+        "commands": [
+            {
+                "header_strings": [
+                    "Oбъем ВВП",
+                    "Индекс физического объема произведенного ВВП, в %",
+                    "Валовой внутренний продукт"
+                ],
+                "required_units": [
+                    "bln_rub",
+                    "yoy"
+                ],
+                "varname": "GDP"
+            },
+            {
+                "header_strings": [
+                    "Индекс промышленного производства"
+                ],
+                "required_units": [
+                    "yoy",
+                    "rog"
+                ],
+                "varname": "INDPRO"
+            },
+            {
+                "header_strings": [
+                    "Индекс производства продукции сельского хозяйства в хозяйствах всех категорий",
+                    "Продукция сельского хозяйства в хозяйствах всех категорий"
+                ],
+                "required_units": [
+                    "yoy"
+                ],
+                "varname": "AGROPROD"
+            },
+            {
+                "header_strings": [
+                    "Среднемесячная номинальная начисленная заработная плата работников организаций",
+                    "Среднемесячная номинальная начисленная заработная плата одного работника"
+                ],
+                "required_units": [
+                    "rub"
+                ],
+                "varname": "WAGE_NOMINAL"
+            },
+            {
+                "header_strings": [
+                    "Реальная начисленная заработная плата работников организаций",
+                    "Реальная начисленная заработная плата одного работника"
+                ],
+                "required_units": [
+                    "yoy",
+                    "rog"
+                ],
+                "varname": "WAGE_REAL"
+            },
+            {
+                "header_strings": [
+                    "Коммерческий грузооборот транспорта"
+                ],
+                "required_units": [
+                    "bln_tkm"
+                ],
+                "varname": "TRANSPORT_FREIGHT"
+            },
+            {
+                "header_strings": [
+                    "Уровень безработицы",
+                    "Общая численность безработных"
+                ],
+                "required_units": [
+                    "pct"
+                ],
+                "varname": "UNEMPL"
+            },
+            {
+                "header_strings": [
+                    "Индексы цен производителей промышленных товаров"
+                ],
+                "required_units": [
+                    "rog"
+                ],
+                "varname": "PPI"
+            }
+        ],
+        "reader": ""
+    },
+    {
+        "boundaries": [
+            {
+                "end": "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья",
+                "start": "1.9. Внешнеторговый оборот – всего"
+            },
+            {
+                "end": "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья",
+                "start": "1.10. Внешнеторговый оборот – всего"
+            },
+            {
+                "end": "1.10.1.Внешнеторговый оборот со странами дальнего зарубежья",
+                "start": "1.10. Внешнеторговый оборот – всего"
+            }
+        ],
+        "commands": [
+            {
+                "header_strings": [
+                    "экспорт товаров – всего",
+                    "Экспорт товаров"
+                ],
+                "required_units": [
+                    "bln_usd"
+                ],
+                "varname": "EXPORT_GOODS"
+            },
+            {
+                "header_strings": [
+                    "импорт товаров – всего",
+                    "Импорт товаров"
+                ],
+                "required_units": [
+                    "bln_usd"
+                ],
+                "varname": "IMPORT_GOODS"
+            }
+        ],
+        "reader": ""
+    },
+    {
+        "boundaries": [
+            {
+                "end": "1.6.1. Инвестиции в основной капитал организаций",
+                "start": "1.6. Инвестиции в основной капитал"
+            },
+            {
+                "end": "1.7.1. Инвестиции в основной капитал организаций",
+                "start": "1.7. Инвестиции в основной капитал"
+            }
+        ],
+        "commands": [
+            {
+                "header_strings": [
+                    "Инвестиции в основной капитал"
+                ],
+                "required_units": [
+                    "bln_rub",
+                    "yoy",
+                    "rog"
+                ],
+                "varname": "INVESTMENT"
+            }
+        ],
+        "reader": ""
+    },
+    {
+        "boundaries": [
+            {
+                "end": "4. Социальная сфера",
+                "start": "3.5. Индекс потребительских цен"
+            }
+        ],
+        "commands": [
+            {
+                "header_strings": [
+                    "Индекс потребительских цен"
+                ],
+                "required_units": [
+                    "rog"
+                ],
+                "varname": "CPI"
+            },
+            {
+                "header_strings": [
+                    "непродовольственные товары",
+                    "непродовольст- венные товары"
+                ],
+                "required_units": [
+                    "rog"
+                ],
+                "varname": "CPI_NONFOOD"
+            },
+            {
+                "header_strings": [
+                    "продукты питания"
+                ],
+                "required_units": [
+                    "rog"
+                ],
+                "varname": "CPI_FOOD"
+            },
+            {
+                "header_strings": [
+                    "услуги"
+                ],
+                "required_units": [
+                    "rog"
+                ],
+                "varname": "CPI_SERVICES"
+            },
+            {
+                "header_strings": [
+                    "алкогольные напитки"
+                ],
+                "required_units": [
+                    "rog"
+                ],
+                "varname": "CPI_ALCOHOL"
+            }
+        ],
+        "reader": ""
+    },
+    {
+        "boundaries": [
+            {
+                "end": "1.12.1. Оборот общественного питания",
+                "start": "1.12. Оборот розничной торговли"
+            },
+            {
+                "end": "1.13.1. Оборот общественного питания",
+                "start": "1.13. Оборот розничной торговли"
+            }
+        ],
+        "commands": [
+            {
+                "header_strings": [
+                    "Оборот розничной торговли"
+                ],
+                "required_units": [
+                    "bln_rub",
+                    "yoy",
+                    "rog"
+                ],
+                "varname": "RETAIL_SALES"
+            },
+            {
+                "header_strings": [
+                    "продовольственные товары",
+                    "пищевые продукты, включая напитки и табачные изделия",
+                    "пищевые продукты, включая напитки, и табачные изделия"
+                ],
+                "required_units": [
+                    "bln_rub",
+                    "yoy",
+                    "rog"
+                ],
+                "varname": "RETAIL_SALES_FOOD"
+            },
+            {
+                "header_strings": [
+                    "непродовольственные товары"
+                ],
+                "required_units": [
+                    "bln_rub",
+                    "yoy",
+                    "rog"
+                ],
+                "varname": "RETAIL_SALES_NONFOOD"
+            }
+        ],
+        "reader": ""
+    },
+    {
+        "boundaries": [
+            {
+                "end": "2.1.2. Расходы (по данным Федерального казначейства)",
+                "start": "2.1.1. Доходы (по данным Федерального казначейства)"
+            }
+        ],
+        "commands": [
+            {
+                "header_strings": [
+                    "Консолидированный бюджет"
+                ],
+                "required_units": [
+                    "bln_rub"
+                ],
+                "varname": "GOV_REVENUE_ACCUM_CONSOLIDATED"
+            },
+            {
+                "header_strings": [
+                    "Федеральный бюджет"
+                ],
+                "required_units": [
+                    "bln_rub"
+                ],
+                "varname": "GOV_REVENUE_ACCUM_FEDERAL"
+            },
+            {
+                "header_strings": [
+                    "Консолидированные бюджеты субъектов Российской Федерации"
+                ],
+                "required_units": [
+                    "bln_rub"
+                ],
+                "varname": "GOV_REVENUE_ACCUM_SUBFEDERAL"
+            }
+        ],
+        "reader": "fiscal"
+    },
+    {
+        "boundaries": [
+            {
+                "end": "2.1.3. Превышение доходов над расходами",
+                "start": "2.1.2. Расходы (по данным Федерального казначейства)"
+            }
+        ],
+        "commands": [
+            {
+                "header_strings": [
+                    "Консолидированный бюджет"
+                ],
+                "required_units": [
+                    "bln_rub"
+                ],
+                "varname": "GOV_EXPENSE_ACCUM_CONSOLIDATED"
+            },
+            {
+                "header_strings": [
+                    "Федеральный бюджет"
+                ],
+                "required_units": [
+                    "bln_rub"
+                ],
+                "varname": "GOV_EXPENSE_ACCUM_FEDERAL"
+            },
+            {
+                "header_strings": [
+                    "Консолидированные бюджеты субъектов Российской Федерации"
+                ],
+                "required_units": [
+                    "bln_rub"
+                ],
+                "varname": "GOV_EXPENSE_ACCUM_SUBFEDERAL"
+            }
+        ],
+        "reader": "fiscal"
+    },
+    {
+        "boundaries": [
+            {
+                "end": "2.2. Сальдированный финансовый результат",
+                "start": "2.1.3. Превышение доходов над расходами"
+            }
+        ],
+        "commands": [
+            {
+                "header_strings": [
+                    "Федеральный бюджет"
+                ],
+                "required_units": [
+                    "bln_rub"
+                ],
+                "varname": "GOV_SURPLUS_ACCUM_FEDERAL"
+            },
+            {
+                "header_strings": [
+                    "Консолидированные бюджеты субъектов Российской Федерации"
+                ],
+                "required_units": [
+                    "bln_rub"
+                ],
+                "varname": "GOV_SURPLUS_ACCUM_SUBFEDERAL"
+            }
+        ],
+        "reader": "fiscal"
+    },
+    {
+        "boundaries": [
+            {
+                "end": "2.5. Просроченная задолженность по заработной плате на начало месяца",
+                "start": "2.4.2. Дебиторская задолженность"
+            }
+        ],
+        "commands": [
+            {
+                "header_strings": [
+                    "Дебиторская задолженность"
+                ],
+                "required_units": [
+                    "bln_rub"
+                ],
+                "varname": "CORP_RECEIVABLE"
+            },
+            {
+                "header_strings": [
+                    "в том числе просроченная"
+                ],
+                "required_units": [
+                    "bln_rub"
+                ],
+                "varname": "CORP_RECEIVABLE_OVERDUE"
+            }
+        ],
+        "reader": ""
+    }
+]
