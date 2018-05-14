@@ -228,12 +228,6 @@
                 "var": "CORP_RECEIVABLE"
             },
             {
-                "check": [
-                    "bln_rub",
-                    "m",
-                    "2017-09",
-                    2445.8
-                ],
                 "header": "в том числе просроченная",
                 "unit": "bln_rub",
                 "var": "CORP_RECEIVABLE_OVERDUE"

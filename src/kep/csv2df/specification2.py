@@ -13,6 +13,8 @@ from kep.csv2df.row_model import Row
 from kep.csv2df.reader import Popper
 from kep.csv2df.util.label import make_label
 
+from typing import List, Union
+
 
 def as_list(x):
     """Transform *x* to list *[x]*.
@@ -28,77 +30,108 @@ def as_list(x):
         return [x]
 
 
+class Boundary():
+    def __init__(self, line, rows, name='boundary'):
+        self._is_found = self._find(line, rows)
+        self._name = name
+        self._line = line
+        
+    def is_found(self):    
+        return self._is_found
+
+    @staticmethod    
+    def _find(line: str, rows:  List[str]):                
+       for row in rows:
+            if Row(row).startswith(line):
+                return True  
+       return False
+   
+    def __str__(self):
+        def shorten(string):
+            tab = 10 
+            if len(string) > tab:
+                s = string[:tab] + '...'
+            else:
+                s = string
+            return  f'\'{s}\''
+        line = shorten(self._line)
+        result = {True:'found', False:'not found'}[self._is_found]        
+        return f'{self._name} line {result}: {line}'       
+
+b1 = Boundary('a', ['a', 'b', 'k', 'zzz'])
+assert b1.is_found() is True  
+
+b2 = Boundary('hm!', ['a', 'b', 'k', 'zzz'])
+assert b2.is_found() is False
+      
+
+class Partition:   
+    def __init__(self, start: str, end: str, rows: List[str]):
+        self.start = Boundary(start, rows, 'start')
+        self.end = Boundary(end, rows, 'end')
+        self.lines_count = len(rows)
+
+    @property        
+    def is_matched(self) -> bool:
+        return self.start.is_found() and self.end.is_found()
+    
+    def __str__(self):
+        msg = [str(self.start), 
+               str(self.end), 
+               f'Total of {self.lines_count} rows']
+        return '\n'.join(msg)
+
+
+p = Partition('a', 'k', ['a', 'b', 'k', 'zzz'])
+assert p.is_matched is True
+assert 'Total of 4 rows' in str(p)
+   
+
 class Scope():
-    """Delimit start and end line in CSV file.
+    """Delimit start and end line for CSV fragment using several lines.
 
        Holds several versions of start and end line, returns applicable lines
        for a particular CSV. This solves problem of different
        headers for same table at various data releases.
-
-       #We parse CSV file by segment, because some table headers repeat themselves in
-       #CSV file. Extracting a piece out of CSV file gives a good isolated input for parsing.
-
     """
-
-    def __init__(self, boundaries):
-        self._markers = as_list(boundaries)
-
-    def get_bounds(self, rows):
-        """Get start and end line, which can be found in *rows*.
-
+    def __init__(self, boundaries: Union[dict, List[dict]]):
+        self.markers = as_list(boundaries)        
+        
+    def get_bounds(self, rows: List[str]):
+        """Get start and end line, which is found in *rows* list of strings.
         Returns:
             start, end - tuple of start and end strings found in *rows*
-
         Raises:
             ValueError: no start/end line pairs was found in *rows*.
-
         """
-        rows = list(rows)
-        for marker in self._markers:
-            s = marker['start']
-            e = marker['end']
-            if self._is_found(s, rows) and self._is_found(e, rows):
-                return s, e
+        for m in self.markers:
+            partition = Partition(m['start'], m['end'], rows)
+            if partition.is_matched:
+                return partition.start, partition.end
         self._raise_error(rows)
-
-    @staticmethod
-    def _is_found(line: str, rows: list):
-        """
-        Return:
-           True, if *line* found at start of *rows[0]*
-           False otherwise
-        """
-        if not isinstance(rows, list):
-            raise TypeError(rows)
-        for row in rows:
-            r = Row(row)
-            if r.startswith(line):
-                return True
-        return False
 
     def _raise_error(self, rows):
         """Prepare error message with diagnostics.
-
-        Returns:
-            string with message text
+        Raises:
+            ValueError with message string
         """
-        msg = []
-        msg.append('start or end line marker not found')
-        for marker in self._markers:
-            s = marker['start']
-            e = marker['end']
-            msg.append('is_found: {} <{}>'.format(self._is_found(s, rows), s))
-            msg.append('is_found: {} <{}>'.format(self._is_found(e, rows), e))
+        msg = ['Start or end boundary not found:']
+        for m in self.markers:
+            partition = Partition(m['start'], m['end'], rows)
+            msg.extend(str(partition.start))
+            msg.extend(str(partition.end))
         raise ValueError('\n'.join(msg))
 
-    def __str__(self):  # possible misuse of special method consider using __str__
-        s = self.__markers[0]['start'][:10]
-        e = self.__markers[0]['end'][:10]
-        return 'bound by start <{}...> and end <{}...>'.format(s, e)
+    def __repr__(self):
+        return self.markers.__repr__()
+
+
+sc = Scope(dict(start='a', end='k'))
+assert 'a', 'k' == sc.get_bounds(['a', 'b', 'k', 'zzz'])
 
 
 class ParsingCommand():
-    def __init__(self, var, header, unit, check=None):
+    def __init__(self, var, header, unit):
         """Create parsing instructions for an individual variable.
 
         Args:
@@ -117,13 +150,11 @@ class ParsingCommand():
 
     @property
     def mapper(self):
-        return {
-            _header_string: self._varname for _header_string in self._header_strings}
+        return {header_str: self._varname for header_str in self._header_strings}
 
     @property
     def required_labels(self):
-        return [make_label(self._varname, unit)
-                for unit in self._required_units]
+        return [make_label(self._varname, unit) for unit in self.units]
 
     @property
     def units(self):
@@ -211,3 +242,6 @@ class Specification:
     @property
     def values(self):
         return [v for pdef in self.definitions for v in pdef.values]
+
+def create_specification(default_commands, default_units):
+    return Specification(default_commands, default_units)

@@ -1,4 +1,73 @@
-# first element
+"""Parsing definition to identify tables in the data source file.
+    
+   A defnition contains: 
+   - variable name ('GDP')
+   - corresponding headers ('Oбъем ВВП')
+   - units of measurement ('bln_rub')
+   - boundaries (start and end lines of text)   
+   
+
+"""
+from typing import List, Union
+String = Union[str, List[str]]
+ 
+
+
+def as_list(x):
+    """Transform *x* to list *[x]*.
+
+       Returns:
+           list
+    """
+    if isinstance(x, list):
+        return x
+    elif isinstance(x, tuple):
+        return list(x)
+    else:
+        return [x]
+
+
+class ParsingCommand():
+    def __init__(self, var: str, header: String, unit: String):
+        """Create parsing instructions for an individual variable.
+
+        Args:
+            var (str):
+                varaible name, ex: 'GDP'
+            headers (str or list of strings):
+                header string(s) associated with variable names
+                ex: 'Oбъем ВВП' or ['Oбъем ВВП', 'Индекс физического объема произведенного ВВП']
+            units (str or list):
+                required_labels unit(s) of measurement
+                ex: 'bln_usd' or ['rog', 'rub']
+        """
+        self._varname = var
+        self._header_strings = as_list(header)
+        self._required_units = as_list(unit)
+
+
+class Definition(object):
+    """Holds together:
+        - parsing commands
+        - units dictionary
+        - (optional) defintion scope
+        - (optional) custom reader function name
+
+       Properties:
+           - mapper (dict)
+           - required_labels (list)
+           - units (dict)
+           - reader (str)
+           - scope(Scope)
+
+    """
+
+    def __init__(self, commands, boundaries=[], reader=None):
+        self.commands = [ParsingCommand(**c) for c in as_list(commands)]
+        self.rows = []
+        self.boundaries = boundaries
+        self.reader = reader
+
 
 DEFAULT_COMMANDS = [dict(
     var='GDP',
@@ -39,7 +108,7 @@ DEFAULT_COMMANDS = [dict(
     unit='rog'),
 ]
 
-PARSING_DEFINITION_BY_SEGMENT = [
+COMMANDS_BY_SEGMENT = [
     dict(
         boundaries=[
             dict(start='1.9. Внешнеторговый оборот – всего',
@@ -174,42 +243,34 @@ PARSING_DEFINITION_BY_SEGMENT = [
                  unit='bln_rub'),
             dict(var='CORP_RECEIVABLE_OVERDUE',
                  header='в том числе просроченная',
-                 unit='bln_rub',
-                 # LATER: incorporate a check value
-                 check=('bln_rub', 'm', '2017-09', 2445.8)
+                 unit='bln_rub'
                  )]
     )
 ]
 
 
-import json
-import pathlib
-
-from kep.csv2df.specification import Specification
-from kep.parsing_definition.units import UNITS
-
-
-def dump(what, filename):
-    x = json.dumps(what, ensure_ascii=False, sort_keys=True, indent=4)
-    pathlib.Path(filename).write_text(x)
-
-
-def read(filname):
-    return json.loads(pathlib.Path(filname).read_text())
+#import json
+#import pathlib
+#
+#def dump(what, filename):
+#    x = json.dumps(what, ensure_ascii=False, sort_keys=True, indent=4)
+#    pathlib.Path(filename).write_text(x)
+#
+#def read(filname):
+#    return json.loads(pathlib.Path(filname).read_text())
 
 
-def make_parsing_definition(default=DEFAULT_COMMANDS,
-                            by_segment=PARSING_DEFINITION_BY_SEGMENT,
-                            units=UNITS):
-    pdef = Specification(default, units)
-    for seg in by_segment:
-        pdef.append(**seg)
-    return pdef
+def make_parsing_definition_list(default=DEFAULT_COMMANDS,
+                                 by_segment=COMMANDS_BY_SEGMENT):
+    definitions = [Definition(default)]
+    for seg_dict in by_segment:
+        pdef = Definition(**seg_dict)        
+        definitions.append(pdef)
+    return definitions
 
 
-PARSING_DEFINITION = make_parsing_definition()
+PARSING_DEFINITIONS = make_parsing_definition_list()
 
 
-if __name__ == '__main__': # pragma: no cover
-    dump(DEFAULT_COMMANDS, 'default.json')
-    dump(PARSING_DEFINITION_BY_SEGMENT, 'by_segment.json')
+#if __name__ == '__main__': # pragma: no cover
+#    dump(PARSING_DEFINITIONS, 'parsing_definitions.json')
