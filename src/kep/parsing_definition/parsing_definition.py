@@ -9,8 +9,6 @@
 
 """
 from typing import List, Union
-String = Union[str, List[str]]
- 
 
 
 def as_list(x):
@@ -28,7 +26,9 @@ def as_list(x):
 
 
 class ParsingCommand():
-    def __init__(self, var: str, header: String, unit: String):
+    def __init__(self, var: str, 
+                       header: Union[str, List[str]], 
+                       unit: Union[str, List[str]]):
         """Create parsing instructions for an individual variable.
 
         Args:
@@ -41,9 +41,9 @@ class ParsingCommand():
                 required_labels unit(s) of measurement
                 ex: 'bln_usd' or ['rog', 'rub']
         """
-        self._varname = var
-        self._header_strings = as_list(header)
-        self._required_units = as_list(unit)
+        self.varname = var
+        self.header_strings = as_list(header)
+        self.required_units = as_list(unit)
 
 
 class Definition(object):
@@ -62,7 +62,7 @@ class Definition(object):
 
     """
 
-    def __init__(self, commands, boundaries=[], reader=None):
+    def __init__(self, commands, boundaries=List[dict], reader: str = ''):
         self.commands = [ParsingCommand(**c) for c in as_list(commands)]
         self.rows = []
         self.boundaries = boundaries
