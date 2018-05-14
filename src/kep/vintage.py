@@ -14,8 +14,8 @@ from kep.validation.checkpoints import (
 
 class Vintage:
     """Represents dataset release for a given year and month.
-        Performs interim CSV file parsing on construction and obtains 
-        resulting dataframes.
+    
+       Parses interim CSV file and obtains resulting dataframes.
     """
     def __init__(self, year: int, month: int, parsing_spec=PARSING_SPECIFICATION):
         self.year, self.month = year, month

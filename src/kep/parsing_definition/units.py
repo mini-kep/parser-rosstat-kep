@@ -1,3 +1,13 @@
+"""Units of measurement definition.
+
+   Converts text like 'млрд. долларов' to 'bln_usd'
+   
+   For import:
+       
+       UNITS
+       UNIT_NAMES 
+       
+"""
 from collections import OrderedDict as odict
 
 # mapper dictionary to convert text in table headers to unit of measurement
@@ -17,6 +27,7 @@ UNITS = odict([  # 1. MONEY
     ('в % к предыдущему месяцу', 'rog'),
     ('в % к предыдущему периоду', 'rog'),
     ('% к концу предыдущего периода', 'rog'),
+    # IMPORTANT:
     # this...
     ('период с начала отчетного года в % к соответствующему периоду предыдущего года', 'ytd'),
     #       ... must precede this
