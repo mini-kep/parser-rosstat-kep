@@ -1,11 +1,14 @@
-"""Parsing parameters used to extract variables from raw CSV.
+"""Create units of work that contain data and parsing parameters.
+
+    yield_parsing_assingments(...)
+
 """
 from typing import List
 from collections import namedtuple
 
 from kep.csv2df.row_model import Row
 from kep.csv2df.reader import Popper
-from kep.parsing_definition import UNITS  
+
 
 class Boundary():
     def __init__(self, line, rows, name='boundary'):
@@ -96,20 +99,19 @@ assert r1
 Assignment = namedtuple('Assignment', 
                         ['mapper', 'required_labels', 'units', 'reader', 'rows']) 
 
-def make_assignment(def_dict, rows, global_units=UNITS):
-    return Assignment(mapper=def_dict['mapper'],
-                      required_labels=def_dict['required_labels'],
-                      reader=def_dict['reader'],
-                      units = global_units,
+def make_assignment(rows, def_dict, units):
+    return Assignment(mapper = def_dict['mapper'],
+                      required_labels = def_dict['required_labels'],
+                      reader = def_dict['reader'],
+                      units = units,
                       rows = rows)
 
-
-def yield_parsing_assingments(definition_dicts: list, csv_text: str):
+def yield_parsing_assingments(csv_text: str, definition_dicts, units):    
+    def factory(def_dict, rows):
+        return make_assignment(rows, def_dict, units)              
     stack = Popper(csv_text)
     for def_dict in definition_dicts[1:]:
         start, end = get_boundaries(def_dict['boundaries'], stack.rows)
-        yield make_assignment(def_dict, 
-                              rows=stack.pop(start, end))
-    yield make_assignment(definition_dicts[0], 
-                          rows=stack.remaining_rows())
+        yield factory(def_dict, rows=stack.pop(start, end))
+    yield factory(definition_dicts[0], rows=stack.remaining_rows())
 

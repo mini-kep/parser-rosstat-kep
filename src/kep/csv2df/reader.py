@@ -1,5 +1,4 @@
 """
-
 Read a text string with CSV data as list of lists with:
     text_to_list()
 
@@ -54,15 +53,12 @@ class Popper:
     """Stack for CSV rows.
 
       Encapsulates a list of Row class instances. Used to obtain segments of
-      CSV file w2ith corresponding to parsing instructions.
+      CSV file corresponding to parsing instruction scopes.
 
-      Internal methods:
+      Methods to extract segments of CSV file:
+         self.pop(start, end) 
+         self.remaining_rows()          
 
-        self.pop(start, end) and self.remaining_rows() - extracts segments of CSV file
-
-      Public method:
-
-          yield_populated_defintions()
     """
 
     def __init__(self, csv_text: str):

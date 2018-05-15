@@ -2,22 +2,29 @@
 
 from kep import FREQUENCIES
 
-from kep.parsing_definition import PARSING_DEFINITIONS
+from kep.parsing_definition import PARSING_DEFINITIONS, UNITS
 from kep.csv2df.allocation import yield_parsing_assingments
 from kep.csv2df.parser import evaluate_assignment
 
 from kep.csv2df.dataframe_maker import create_dataframe
+
+#FIXME: not working
 from kep.df2xl.to_excel import save_xls
+
+
 from kep.helper.date import Date
 from kep.helper.path import InterimCSV, ProcessedCSV
+
+
+#FIXME: validation is ugly 
 from kep.validation.checkpoints import (
     CHECKPOINTS,
     OPTIONAL_CHECKPOINTS,
     validate2
 )
 
-def get_values(csv_text, pdefs=PARSING_DEFINITIONS): 
-    jobs_list = list(yield_parsing_assingments(pdefs, csv_text))
+def get_values(csv_text, pdefs=PARSING_DEFINITIONS, units=UNITS): 
+    jobs_list = list(yield_parsing_assingments(csv_text, pdefs, units))
     return [v for a in jobs_list for v in evaluate_assignment(a)]
 
 
