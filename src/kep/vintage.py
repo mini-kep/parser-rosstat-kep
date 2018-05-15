@@ -1,7 +1,11 @@
 """Extract dataframes by year and month."""
 
 from kep import FREQUENCIES
-from kep.csv2df.specification import PARSING_SPECIFICATION
+
+from kep.parsing_definition import PARSING_DEFINITIONS
+from kep.csv2df.allocation import yield_parsing_assingments
+from kep.csv2df.parser import evaluate_assignment
+
 from kep.csv2df.dataframe_maker import create_dataframe
 from kep.df2xl.to_excel import save_xls
 from kep.helper.date import Date
@@ -12,22 +16,21 @@ from kep.validation.checkpoints import (
     validate2
 )
 
+def get_values(csv_text, pdefs=PARSING_DEFINITIONS): 
+    jobs_list = list(yield_parsing_assingments(pdefs, csv_text))
+    return [v for a in jobs_list for v in evaluate_assignment(a)]
+
 
 class Vintage:
     """Represents dataset release for a given year and month.
     
        Parses interim CSV file and obtains resulting dataframes.
     """
-    def __init__(self, year: int, month: int, parsing_spec=PARSING_SPECIFICATION):
+    def __init__(self, year: int, month: int):
         self.year, self.month = year, month
         csv_text = InterimCSV(year, month).text()
-        parsing_spec.attach_data(csv_text)
-        self.values = parsing_spec.values 
+        self.values = get_values(csv_text)
         self.dfs = {freq: create_dataframe(self.values, freq) for freq in FREQUENCIES}
-
-    @property
-    def datapoints(self):        
-        return self.emitter.datapoints
 
     def save(self, folder=None):
         csv_processed = ProcessedCSV(self.year, self.month, folder)
@@ -82,42 +85,3 @@ if __name__ == "__main__": # pragma: no cover
     v = Vintage(2018, 1)
     v.validate()
     v.save()
-    # Expected output:
-    # Test values parsed OK for Vintage(2016, 10)
-
-#    import pandas as pd
-#    # TODO: convert to test for to_csv(), hitting deaccumulation procedure
-#    assert pd.DataFrame([{'a': 1}]).to_csv(float_format='%.2f') == ',a\n0,1\n'
-#    assert pd.DataFrame([{'a': 1.0005}]).to_csv(float_format='%.2f') == ',a\n0,1.00\n'
-#    
-#    ix = list(reversed(Date.supported_dates))[1:]
-#    for date in ix:
-#        Vintage(*date).validate()
-   
-    # FIXME: first fail here
-
-#     Test values parsed OK for Vintage(2010, 2)
-# Traceback (most recent call last):
-#
-#   File "<ipython-input-50-45ec4d698994>", line 1, in <module>
-#     runfile('C:/Users/PogrebnyakEV/Desktop/mini-kep/kep/src/kep/vintage.py', wdir='C:/Users/PogrebnyakEV/Desktop/mini-kep/kep/src/kep')
-#
-#   File "D:\Continuum\Anaconda3\lib\site-packages\spyder\utils\site\sitecustomize.py", line 880, in runfile
-#     execfile(filename, namespace)
-#
-#   File "D:\Continuum\Anaconda3\lib\site-packages\spyder\utils\site\sitecustomize.py", line 102, in execfile
-#     exec(compile(f.read(), filename, 'exec'), namespace)
-#
-#   File "C:/Users/PogrebnyakEV/Desktop/mini-kep/kep/src/kep/vintage.py", line 95, in <module>
-#     Vintage(*date).validate()
-#
-#   File "C:/Users/PogrebnyakEV/Desktop/mini-kep/kep/src/kep/vintage.py", line 49, in validate
-#     strict=False)
-#
-#   File "C:\Users\PogrebnyakEV\Desktop\mini-kep\kep\src\kep\validation\checkpoints.py", line 308, in validate2
-#     echo(msg, True)
-#
-#   File "C:\Users\PogrebnyakEV\Desktop\mini-kep\kep\src\kep\validation\checkpoints.py", line 297, in echo
-#     raise ValidationError(msg)
-#
-# ValidationError: Required checkpoints not found in dataframe: {Checkpoint(date='1999', freq='a', name='AGROPROD_yoy', value=103.8)}

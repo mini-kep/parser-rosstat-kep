@@ -14,44 +14,6 @@ from kep.csv2df.util.label import make_label
 from kep.csv2df.util.to_float import to_float
 
 
-#class Segment:
-#    def __init__(self, rows, pdef):
-#        """
-#        Args:
-#            rows: list of lists with strings, represent CSV
-#            pdef: parsing defintion with search strings for header and unit
-#        """
-#        self.tables = list(split_to_tables(rows))
-#        self.pdef = pdef
-#    
-#    def parse(self):
-#        self.tables = parse_tables(self.tables, self.pdef)
-#        
-#    def verify(self):
-#        verify_tables(self.tables, self.pdef)    
-#        
-#    def extract_tables(self):
-#        self.parse()
-#        self.verify()
-#        return [t for t in self.tables 
-#                if t.label in self.pdef.required_labels]       
-#    @property    
-#    def values(self):
-#        return [v for t in self.extract_tables() for v in t.values]    
-
-
-from typing import List
-
-def get_tables(rows: List[List[str]], pdef: object):
-    tables = split_to_tables(rows)
-    tables = parse_tables(tables, pdef)
-    verify_tables(tables, pdef) 
-    return [t for t in tables if (t.label in pdef.required_labels)]
-    
-def get_values(rows: List[List[str]], pdef: object):
-    tables = get_tables(rows, pdef)
-    return [v for t in tables for v in t.values]   
-
 def evaluate_assignment(ass):
     tables = split_to_tables(ass.rows)
     tables = parse_tables(tables, ass)
@@ -72,7 +34,6 @@ def parse_tables(tables, pdef):
         if table.varname is None and not table.has_unknown_lines():
             table.varname = prev_table.varname
     return tables
-
 
 def verify_tables(tables, pdef):
     labels_in_tables = {t.label for t in tables}

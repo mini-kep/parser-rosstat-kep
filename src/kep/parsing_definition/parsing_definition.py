@@ -230,66 +230,6 @@ def make_parsing_command(var: str, header: StringType, unit: StringType):
                 required_units = as_list(unit))
 
 
-def make_definition_entry(commands: List[dict] , 
-                          # FIXME: is this type annotation valid?
-                          boundaries: List[dict] = [], 
-                          reader: str = ''):
-    commands_list = [make_parsing_command(**c) for c in as_list(commands)]
-    return dict(commands = commands_list,
-                boundaries = boundaries,
-                reader = reader)    
-
-
-def make_parsing_definition_list(default=COMMANDS_DEFAULT,
-                                 by_segment=COMMANDS_BY_SEGMENT):
-    definitions = [make_definition_entry(default)]
-    for segment_dict in by_segment:
-        pdef = make_definition_entry(**segment_dict)        
-        definitions.append(pdef)
-    return definitions
-
-
-PARSING_DEFINITIONS = make_parsing_definition_list()
-assert isinstance(PARSING_DEFINITIONS, list)
-assert isinstance(PARSING_DEFINITIONS[0], dict)
-assert isinstance(PARSING_DEFINITIONS[1], dict)
-assert PARSING_DEFINITIONS[0]['boundaries'] == []
-assert PARSING_DEFINITIONS[1]['boundaries'] != []
-
-
-from schema import Schema
-
-DEFINITIONS_SCHEMA = Schema(
-          [{'commands': [{'varname': str, 
-                          'table_headers': [str], 
-                          'required_units': [str]}], 
-            'boundaries': [{'start': str, 'end': str}], 
-            'reader': str}]
-)
-    
-def validate_defintion_list(defs, schema=DEFINITIONS_SCHEMA):
-    schema.validate(defs)     
-
-validate_defintion_list(PARSING_DEFINITIONS)
-    
-
-d1 =  [{'commands': [{'table_headers': ['экспорт товаров – всего', 'Экспорт товаров'],
-                      'required_units': ['bln_usd'],
-                      'varname': 'EXPORT_GOODS'},
-                     {'table_headers': ['импорт товаров – всего', 'Импорт товаров'],
-                      'required_units': ['bln_usd'],
-                      'varname': 'IMPORT_GOODS'}], 
-        'boundaries': [{'end': '1.9.1. Внешнеторговый оборот со странами дальнего зарубежья',
-                        'start': '1.9. Внешнеторговый оборот – всего'},
-                       {'end': '1.10.1. Внешнеторговый оборот со странами дальнего зарубежья',
-                        'start': '1.10. Внешнеторговый оборот – всего'},
-                       {'end': '1.10.1.Внешнеторговый оборот со странами дальнего зарубежья',
-                        'start': '1.10. Внешнеторговый оборот – всего'}], 
-        'reader': 'fiscal'}]
-
-DEFINITIONS_SCHEMA.validate(d1)
-
-
 def make_super_definition_entry(commands: List[dict] , 
                           boundaries: List[dict] = [], 
                           reader: str = ''):
@@ -326,36 +266,5 @@ def make_super_parsing_definition_list(default=COMMANDS_DEFAULT,
         definitions.append(pdef)
     return definitions
 
-DL = make_super_parsing_definition_list()
+PARSING_DEFINITIONS = make_super_parsing_definition_list()
 
-
-# WARNING: this is optional part, this serialisation is never used
-import json
-import pathlib
-
-
-from ruamel.yaml import YAML
-#import sys
-from pathlib import Path
-
-p = Path("out.yaml")
-
-yaml=YAML(typ='rt')
-yaml.preserve_quotes = True
-yaml.default_flow_style = False
-yaml.default_style="'"
-yaml.indent(mapping=2, sequence=4, offset=2)
-#yaml.dump_all(PARSING_DEFINITIONS, sys.stdout)
-
-
-def dump(what, filename):
-    x = json.dumps(what, ensure_ascii=False, sort_keys=True, indent=4)
-    pathlib.Path(filename).write_text(x)
-
-
-def read(filname):
-    return json.loads(pathlib.Path(filname).read_text())
-
-
-if __name__ == '__main__': # pragma: no cover
-    dump(PARSING_DEFINITIONS, 'parsing_definitions.json')
