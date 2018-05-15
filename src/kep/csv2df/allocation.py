@@ -40,14 +40,6 @@ class End(Boundary):
       def __init__(self, line, rows):
           super().__init__(line, rows, "End")
       
-
-b1 = Boundary('a', ['a', 'b', 'k', 'zzz'])
-assert b1.is_found is True  
-
-b2 = Boundary('hm!', ['a', 'b', 'k', 'zzz'])
-assert b2.is_found is False
-      
-
 class Partition:   
     def __init__(self, start: str, end: str, rows: List[List[str]]):
         self.start = Start(start, rows)
@@ -63,11 +55,7 @@ class Partition:
                f'Total of {self.lines_count} rows']
         return '\n'.join(msg)
 
-
-p = Partition('a', 'k', ['a', 'b', 'k', 'zzz'])
-assert p.is_matched() is True
-assert 'Total of 4 rows' in str(p)
-   
+ 
 
 def get_boundaries(boundaries: List[dict], rows: List[str]):
     """Get start and end line, which is found in *rows* list of strings.
@@ -85,19 +73,11 @@ def get_boundaries(boundaries: List[dict], rows: List[str]):
             return s.text(), e.text() 
         error_message.extend([str(s), str(e)])
     raise ValueError('\n'.join(error_message))    
-        
 
-
-r1 = get_boundaries ([dict(start='a', end='k'), dict(start='a', end='g1')],
-                     [['a'], ['b'], ['g12345'], ['zzz']])
-assert r1
-
-# TEST: results in rrror
-#get_boundaries ([dict(start='a', end='k'), dict(start='a', end='g1')],
-#                     [['a'], ['b'], ['EEE'], ['zzz']])
 
 Assignment = namedtuple('Assignment', 
                         ['mapper', 'required_labels', 'units', 'reader', 'rows']) 
+
 
 def make_assignment(rows, def_dict, units):
     return Assignment(mapper = def_dict['mapper'],
@@ -106,12 +86,18 @@ def make_assignment(rows, def_dict, units):
                       units = units,
                       rows = rows)
 
-def yield_parsing_assingments(csv_text: str, definition_dicts, units):    
+
+def yield_parsing_assignments(csv_text: str, 
+                              units,
+                              default_definition, 
+                              definitions_by_segment):    
     def factory(def_dict, rows):
         return make_assignment(rows, def_dict, units)              
     stack = Popper(csv_text)
-    for def_dict in definition_dicts[1:]:
+    for def_dict in definitions_by_segment:
         start, end = get_boundaries(def_dict['boundaries'], stack.rows)
         yield factory(def_dict, rows=stack.pop(start, end))
-    yield factory(definition_dicts[0], rows=stack.remaining_rows())
+    yield factory(default_definition, rows=stack.remaining_rows())
 
+#TODO: look at assignments
+ 

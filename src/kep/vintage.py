@@ -2,18 +2,33 @@
 
 from kep import FREQUENCIES
 
-from kep.parsing_definition import PARSING_DEFINITIONS, UNITS
-from kep.csv2df.allocation import yield_parsing_assingments
+from kep.parsing_definition import (DEFINITION_DEFAULT, 
+                                    DEFINITIONS_BY_SEGMENT, 
+                                    UNITS)
+from kep.csv2df.allocation import yield_parsing_assignments
 from kep.csv2df.parser import evaluate_assignment
 
 from kep.csv2df.dataframe_maker import create_dataframe
-
-#FIXME: not working
-from kep.df2xl.to_excel import save_xls
-
-
 from kep.helper.date import Date
 from kep.helper.path import InterimCSV, ProcessedCSV
+
+
+"""
+units.py
+- UNITS
+parsing_definition.py:
+- YAML_DEFAULT -> COMMANDS_DEFAULT -> DEFINITION_DEFAULT 
+- YAML_BY_SEGMENT -> INSTRUCTIONS_BY_SEGMENT -> DEFINITIONS_BY_SEGMENT
+
+allocation.py and vintage.py
+- DEFINITION_DEFAULT + DEFINITIONS_BY_SEGMENT + UNITS + csv_text -> jobs
+
+parser.py and vintage.py:
+- jobs -> values
+
+dataframe_maker.py and vintage.py:
+- values -> dataframes
+"""
 
 
 #FIXME: validation is ugly 
@@ -23,10 +38,13 @@ from kep.validation.checkpoints import (
     validate2
 )
 
-def get_values(csv_text, pdefs=PARSING_DEFINITIONS, units=UNITS): 
-    jobs_list = list(yield_parsing_assingments(csv_text, pdefs, units))
-    return [v for a in jobs_list for v in evaluate_assignment(a)]
-
+def yield_values(csv_text: str,
+                 units = UNITS,
+                 def0 = DEFINITION_DEFAULT, 
+                 pdefs = DEFINITIONS_BY_SEGMENT): 
+    for a in yield_parsing_assignments(csv_text, units, def0, pdefs):
+        for value in evaluate_assignment(a):
+            yield value 
 
 class Vintage:
     """Represents dataset release for a given year and month.
@@ -36,7 +54,7 @@ class Vintage:
     def __init__(self, year: int, month: int):
         self.year, self.month = year, month
         csv_text = InterimCSV(year, month).text()
-        self.values = get_values(csv_text)
+        self.values = list(yield_values(csv_text))
         self.dfs = {freq: create_dataframe(self.values, freq) for freq in FREQUENCIES}
 
     def save(self, folder=None):
@@ -52,6 +70,7 @@ class Vintage:
             df.to_csv(path, float_format='%.2f')
             print("Saved dataframe to", path)
 
+    #FIXME: validation is ugly 
     def validate(self):
         for freq in FREQUENCIES:
             validate2(df=self.dfs[freq],
@@ -64,6 +83,7 @@ class Vintage:
         return "Vintage({}, {})".format(self.year, self.month)
 
 
+# FIXME: too many responsibilities
 class Latest(Vintage):
     """Operations on most recent data release."""
 
@@ -83,9 +103,6 @@ class Latest(Vintage):
 
     def save(self, folder=None):
         ProcessedCSV(self.year, self.month).to_latest()
-
-    def to_excel(self):
-        save_xls()
 
 
 if __name__ == "__main__": # pragma: no cover
