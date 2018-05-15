@@ -22,13 +22,14 @@ def kep_run(year, month): # pragma: no cover
 
 
 if '__main__' == __name__: # pragma: no cover
+    # not todo: convert to docopt
     import sys
     command = sys.argv[1]
     year, month = (int(sys.argv[i]) for i in (2, 3))
 
     if command == 'download':
         # FIXME: when no data available, must not download file (currently in
-        # is a 3k html error message, which is saved as rar file, causes error
+        # is a 3kilobyte html error message, which is saved as rar file, causes error
         # elsewhere in a program
         remote = RemoteFile(year, month)
         remote.download()

@@ -16,14 +16,17 @@ def check_duplicates(df):
     else:
         dups = df[df.duplicated(keep=False)]
     if not dups.empty:
-        raise ValueError("Duplicate rows found {}".format(dups))
+        # raise ValueError("Duplicate rows found {}".format(dups))
+        print("Duplicate rows found {}".format(dups))
 
 
 def create_dataframe(datapoints, freq):    
     df = pd.DataFrame([x for x in datapoints if x['freq'] == freq])
     if df.empty:
         return pd.DataFrame()
+    #import pdb; pdb.set_trace()
     check_duplicates(df)
+    df = df.drop_duplicates(['freq', 'label', 'time_index'], keep='first')
     # reshape
     df = df.pivot(columns='label', values='value', index='time_index')
     # delete some internals for better view

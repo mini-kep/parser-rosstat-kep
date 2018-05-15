@@ -12,6 +12,8 @@
 
 """
 
+from kep.csv2df.util.label import make_label
+
 COMMANDS_DEFAULT = [dict(
     var='GDP',
     header=['Oбъем ВВП',
@@ -216,7 +218,7 @@ def make_parsing_command(var: str, header: StringType, unit: StringType):
     Keys:
         varname (str):
             varaible name, ex: 'GDP'
-        headers-strings (list of strings):
+        table_headers-strings (list of strings):
             header string(s) associated with variable names
             ex: ['Oбъем ВВП'] or ['Oбъем ВВП', 'Индекс физического объема произведенного ВВП']
         units (list of strings):
@@ -224,7 +226,7 @@ def make_parsing_command(var: str, header: StringType, unit: StringType):
             ex: ['bln_usd]' or ['rog', 'rub']
     """
     return dict(varname = var,
-                header_strings = as_list(header), 
+                table_headers = as_list(header), 
                 required_units = as_list(unit))
 
 
@@ -254,9 +256,97 @@ assert isinstance(PARSING_DEFINITIONS[1], dict)
 assert PARSING_DEFINITIONS[0]['boundaries'] == []
 assert PARSING_DEFINITIONS[1]['boundaries'] != []
 
+
+from schema import Schema
+
+DEFINITIONS_SCHEMA = Schema(
+          [{'commands': [{'varname': str, 
+                          'table_headers': [str], 
+                          'required_units': [str]}], 
+            'boundaries': [{'start': str, 'end': str}], 
+            'reader': str}]
+)
+    
+def validate_defintion_list(defs, schema=DEFINITIONS_SCHEMA):
+    schema.validate(defs)     
+
+validate_defintion_list(PARSING_DEFINITIONS)
+    
+
+d1 =  [{'commands': [{'table_headers': ['экспорт товаров – всего', 'Экспорт товаров'],
+                      'required_units': ['bln_usd'],
+                      'varname': 'EXPORT_GOODS'},
+                     {'table_headers': ['импорт товаров – всего', 'Импорт товаров'],
+                      'required_units': ['bln_usd'],
+                      'varname': 'IMPORT_GOODS'}], 
+        'boundaries': [{'end': '1.9.1. Внешнеторговый оборот со странами дальнего зарубежья',
+                        'start': '1.9. Внешнеторговый оборот – всего'},
+                       {'end': '1.10.1. Внешнеторговый оборот со странами дальнего зарубежья',
+                        'start': '1.10. Внешнеторговый оборот – всего'},
+                       {'end': '1.10.1.Внешнеторговый оборот со странами дальнего зарубежья',
+                        'start': '1.10. Внешнеторговый оборот – всего'}], 
+        'reader': 'fiscal'}]
+
+DEFINITIONS_SCHEMA.validate(d1)
+
+
+def make_super_definition_entry(commands: List[dict] , 
+                          boundaries: List[dict] = [], 
+                          reader: str = ''):
+    # preprocessing
+    commands_list = [make_parsing_command(**c) for c in as_list(commands)]
+    # control tructure
+    return dict(mapper = make_table_header_mapper(commands_list),
+                required_labels = make_required_labels(commands_list),
+                boundaries = boundaries,
+                reader = reader)  
+
+
+def make_table_header_mapper(commands):
+    result = {}
+    for c in commands:
+        for header in c['table_headers']:
+            result[header] = c['varname'] 
+    return result
+
+    
+def make_required_labels(commands):
+    result = []
+    for c in commands:
+        for unit in c['required_units']:
+            result.append(make_label(c['varname'], unit))
+    return result
+
+def make_super_parsing_definition_list(default=COMMANDS_DEFAULT,
+                                       by_segment=COMMANDS_BY_SEGMENT,
+                                       factory=make_super_definition_entry):
+    definitions = [factory(default)]
+    for segment_dict in by_segment:
+        pdef = factory(**segment_dict)        
+        definitions.append(pdef)
+    return definitions
+
+DL = make_super_parsing_definition_list()
+
+
 # WARNING: this is optional part, this serialisation is never used
 import json
 import pathlib
+
+
+from ruamel.yaml import YAML
+#import sys
+from pathlib import Path
+
+p = Path("out.yaml")
+
+yaml=YAML(typ='rt')
+yaml.preserve_quotes = True
+yaml.default_flow_style = False
+yaml.default_style="'"
+yaml.indent(mapping=2, sequence=4, offset=2)
+#yaml.dump_all(PARSING_DEFINITIONS, sys.stdout)
+
 
 def dump(what, filename):
     x = json.dumps(what, ensure_ascii=False, sort_keys=True, indent=4)

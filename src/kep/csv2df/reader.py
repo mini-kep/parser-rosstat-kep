@@ -39,7 +39,8 @@ def is_valid_row(row):
         x = row[0]
         return x is not None and  \
             x != '' and \
-            not x.startswith("___")
+            not x.startswith("___") and \
+            not 'В целях обеспечения статистической сопоставимости' in x
     else:
         return False
 

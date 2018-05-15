@@ -3,83 +3,83 @@
         "boundaries": [],
         "commands": [
             {
-                "header_strings": [
-                    "Oбъем ВВП",
-                    "Индекс физического объема произведенного ВВП, в %",
-                    "Валовой внутренний продукт"
-                ],
                 "required_units": [
                     "bln_rub",
                     "yoy"
                 ],
+                "table_headers": [
+                    "Oбъем ВВП",
+                    "Индекс физического объема произведенного ВВП, в %",
+                    "Валовой внутренний продукт"
+                ],
                 "varname": "GDP"
             },
             {
-                "header_strings": [
-                    "Индекс промышленного производства"
-                ],
                 "required_units": [
                     "yoy",
                     "rog"
+                ],
+                "table_headers": [
+                    "Индекс промышленного производства"
                 ],
                 "varname": "INDPRO"
             },
             {
-                "header_strings": [
-                    "Индекс производства продукции сельского хозяйства в хозяйствах всех категорий",
-                    "Продукция сельского хозяйства в хозяйствах всех категорий"
-                ],
                 "required_units": [
                     "yoy"
+                ],
+                "table_headers": [
+                    "Индекс производства продукции сельского хозяйства в хозяйствах всех категорий",
+                    "Продукция сельского хозяйства в хозяйствах всех категорий"
                 ],
                 "varname": "AGROPROD"
             },
             {
-                "header_strings": [
-                    "Среднемесячная номинальная начисленная заработная плата работников организаций",
-                    "Среднемесячная номинальная начисленная заработная плата одного работника"
-                ],
                 "required_units": [
                     "rub"
+                ],
+                "table_headers": [
+                    "Среднемесячная номинальная начисленная заработная плата работников организаций",
+                    "Среднемесячная номинальная начисленная заработная плата одного работника"
                 ],
                 "varname": "WAGE_NOMINAL"
             },
             {
-                "header_strings": [
-                    "Реальная начисленная заработная плата работников организаций",
-                    "Реальная начисленная заработная плата одного работника"
-                ],
                 "required_units": [
                     "yoy",
                     "rog"
                 ],
+                "table_headers": [
+                    "Реальная начисленная заработная плата работников организаций",
+                    "Реальная начисленная заработная плата одного работника"
+                ],
                 "varname": "WAGE_REAL"
             },
             {
-                "header_strings": [
-                    "Коммерческий грузооборот транспорта"
-                ],
                 "required_units": [
                     "bln_tkm"
+                ],
+                "table_headers": [
+                    "Коммерческий грузооборот транспорта"
                 ],
                 "varname": "TRANSPORT_FREIGHT"
             },
             {
-                "header_strings": [
-                    "Уровень безработицы",
-                    "Общая численность безработных"
-                ],
                 "required_units": [
                     "pct"
+                ],
+                "table_headers": [
+                    "Уровень безработицы",
+                    "Общая численность безработных"
                 ],
                 "varname": "UNEMPL"
             },
             {
-                "header_strings": [
-                    "Индексы цен производителей промышленных товаров"
-                ],
                 "required_units": [
                     "rog"
+                ],
+                "table_headers": [
+                    "Индексы цен производителей промышленных товаров"
                 ],
                 "varname": "PPI"
             }
@@ -103,22 +103,22 @@
         ],
         "commands": [
             {
-                "header_strings": [
-                    "экспорт товаров – всего",
-                    "Экспорт товаров"
-                ],
                 "required_units": [
                     "bln_usd"
+                ],
+                "table_headers": [
+                    "экспорт товаров – всего",
+                    "Экспорт товаров"
                 ],
                 "varname": "EXPORT_GOODS"
             },
             {
-                "header_strings": [
-                    "импорт товаров – всего",
-                    "Импорт товаров"
-                ],
                 "required_units": [
                     "bln_usd"
+                ],
+                "table_headers": [
+                    "импорт товаров – всего",
+                    "Импорт товаров"
                 ],
                 "varname": "IMPORT_GOODS"
             }
@@ -138,13 +138,13 @@
         ],
         "commands": [
             {
-                "header_strings": [
-                    "Инвестиции в основной капитал"
-                ],
                 "required_units": [
                     "bln_rub",
                     "yoy",
                     "rog"
+                ],
+                "table_headers": [
+                    "Инвестиции в основной капитал"
                 ],
                 "varname": "INVESTMENT"
             }
@@ -160,48 +160,48 @@
         ],
         "commands": [
             {
-                "header_strings": [
-                    "Индекс потребительских цен"
-                ],
                 "required_units": [
                     "rog"
+                ],
+                "table_headers": [
+                    "Индекс потребительских цен"
                 ],
                 "varname": "CPI"
             },
             {
-                "header_strings": [
-                    "непродовольственные товары",
-                    "непродовольст- венные товары"
-                ],
                 "required_units": [
                     "rog"
+                ],
+                "table_headers": [
+                    "непродовольственные товары",
+                    "непродовольст- венные товары"
                 ],
                 "varname": "CPI_NONFOOD"
             },
             {
-                "header_strings": [
-                    "продукты питания"
-                ],
                 "required_units": [
                     "rog"
+                ],
+                "table_headers": [
+                    "продукты питания"
                 ],
                 "varname": "CPI_FOOD"
             },
             {
-                "header_strings": [
-                    "услуги"
-                ],
                 "required_units": [
                     "rog"
+                ],
+                "table_headers": [
+                    "услуги"
                 ],
                 "varname": "CPI_SERVICES"
             },
             {
-                "header_strings": [
-                    "алкогольные напитки"
-                ],
                 "required_units": [
                     "rog"
+                ],
+                "table_headers": [
+                    "алкогольные напитки"
                 ],
                 "varname": "CPI_ALCOHOL"
             }
@@ -221,37 +221,37 @@
         ],
         "commands": [
             {
-                "header_strings": [
-                    "Оборот розничной торговли"
-                ],
                 "required_units": [
                     "bln_rub",
                     "yoy",
                     "rog"
+                ],
+                "table_headers": [
+                    "Оборот розничной торговли"
                 ],
                 "varname": "RETAIL_SALES"
             },
             {
-                "header_strings": [
+                "required_units": [
+                    "bln_rub",
+                    "yoy",
+                    "rog"
+                ],
+                "table_headers": [
                     "продовольственные товары",
                     "пищевые продукты, включая напитки и табачные изделия",
                     "пищевые продукты, включая напитки, и табачные изделия"
                 ],
-                "required_units": [
-                    "bln_rub",
-                    "yoy",
-                    "rog"
-                ],
                 "varname": "RETAIL_SALES_FOOD"
             },
             {
-                "header_strings": [
-                    "непродовольственные товары"
-                ],
                 "required_units": [
                     "bln_rub",
                     "yoy",
                     "rog"
+                ],
+                "table_headers": [
+                    "непродовольственные товары"
                 ],
                 "varname": "RETAIL_SALES_NONFOOD"
             }
@@ -267,29 +267,29 @@
         ],
         "commands": [
             {
-                "header_strings": [
-                    "Консолидированный бюджет"
-                ],
                 "required_units": [
                     "bln_rub"
+                ],
+                "table_headers": [
+                    "Консолидированный бюджет"
                 ],
                 "varname": "GOV_REVENUE_ACCUM_CONSOLIDATED"
             },
             {
-                "header_strings": [
-                    "Федеральный бюджет"
-                ],
                 "required_units": [
                     "bln_rub"
+                ],
+                "table_headers": [
+                    "Федеральный бюджет"
                 ],
                 "varname": "GOV_REVENUE_ACCUM_FEDERAL"
             },
             {
-                "header_strings": [
-                    "Консолидированные бюджеты субъектов Российской Федерации"
-                ],
                 "required_units": [
                     "bln_rub"
+                ],
+                "table_headers": [
+                    "Консолидированные бюджеты субъектов Российской Федерации"
                 ],
                 "varname": "GOV_REVENUE_ACCUM_SUBFEDERAL"
             }
@@ -305,29 +305,29 @@
         ],
         "commands": [
             {
-                "header_strings": [
-                    "Консолидированный бюджет"
-                ],
                 "required_units": [
                     "bln_rub"
+                ],
+                "table_headers": [
+                    "Консолидированный бюджет"
                 ],
                 "varname": "GOV_EXPENSE_ACCUM_CONSOLIDATED"
             },
             {
-                "header_strings": [
-                    "Федеральный бюджет"
-                ],
                 "required_units": [
                     "bln_rub"
+                ],
+                "table_headers": [
+                    "Федеральный бюджет"
                 ],
                 "varname": "GOV_EXPENSE_ACCUM_FEDERAL"
             },
             {
-                "header_strings": [
-                    "Консолидированные бюджеты субъектов Российской Федерации"
-                ],
                 "required_units": [
                     "bln_rub"
+                ],
+                "table_headers": [
+                    "Консолидированные бюджеты субъектов Российской Федерации"
                 ],
                 "varname": "GOV_EXPENSE_ACCUM_SUBFEDERAL"
             }
@@ -343,20 +343,20 @@
         ],
         "commands": [
             {
-                "header_strings": [
-                    "Федеральный бюджет"
-                ],
                 "required_units": [
                     "bln_rub"
+                ],
+                "table_headers": [
+                    "Федеральный бюджет"
                 ],
                 "varname": "GOV_SURPLUS_ACCUM_FEDERAL"
             },
             {
-                "header_strings": [
-                    "Консолидированные бюджеты субъектов Российской Федерации"
-                ],
                 "required_units": [
                     "bln_rub"
+                ],
+                "table_headers": [
+                    "Консолидированные бюджеты субъектов Российской Федерации"
                 ],
                 "varname": "GOV_SURPLUS_ACCUM_SUBFEDERAL"
             }
@@ -372,20 +372,20 @@
         ],
         "commands": [
             {
-                "header_strings": [
-                    "Дебиторская задолженность"
-                ],
                 "required_units": [
                     "bln_rub"
+                ],
+                "table_headers": [
+                    "Дебиторская задолженность"
                 ],
                 "varname": "CORP_RECEIVABLE"
             },
             {
-                "header_strings": [
-                    "в том числе просроченная"
-                ],
                 "required_units": [
                     "bln_rub"
+                ],
+                "table_headers": [
+                    "в том числе просроченная"
                 ],
                 "varname": "CORP_RECEIVABLE_OVERDUE"
             }

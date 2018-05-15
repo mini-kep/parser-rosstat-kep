@@ -13,35 +13,51 @@ from kep.csv2df.reader import text_to_list
 from kep.csv2df.util.label import make_label
 from kep.csv2df.util.to_float import to_float
 
-__all__ = ['extract_tables']
+
+#class Segment:
+#    def __init__(self, rows, pdef):
+#        """
+#        Args:
+#            rows: list of lists with strings, represent CSV
+#            pdef: parsing defintion with search strings for header and unit
+#        """
+#        self.tables = list(split_to_tables(rows))
+#        self.pdef = pdef
+#    
+#    def parse(self):
+#        self.tables = parse_tables(self.tables, self.pdef)
+#        
+#    def verify(self):
+#        verify_tables(self.tables, self.pdef)    
+#        
+#    def extract_tables(self):
+#        self.parse()
+#        self.verify()
+#        return [t for t in self.tables 
+#                if t.label in self.pdef.required_labels]       
+#    @property    
+#    def values(self):
+#        return [v for t in self.extract_tables() for v in t.values]    
 
 
+from typing import List
 
-class Segment:
-    def __init__(self, rows, pdef):
-        """
-        Args:
-            rows: list of lists with strings, represent CSV
-            pdef: parsing defintion with search strings for header and unit
-        """
-        self.tables = split_to_tables(rows)
-        self.pdef = pdef
+def get_tables(rows: List[List[str]], pdef: object):
+    tables = split_to_tables(rows)
+    tables = parse_tables(tables, pdef)
+    verify_tables(tables, pdef) 
+    return [t for t in tables if (t.label in pdef.required_labels)]
     
-    def parse(self):
-        self.tables = parse_tables(self.tables, self.pdef)
-        
-    def verify(self):
-        verify_tables(self.tables, self.pdef)    
-        
-    def extract_tables(self):
-        self.parse()
-        self.verify()
-        return [t for t in self.tables 
-                if t.label in self.pdef.required_labels]       
-    @property    
-    def values(self):
-        return [v for t in self.extract_tables() for v in t.values]    
+def get_values(rows: List[List[str]], pdef: object):
+    tables = get_tables(rows, pdef)
+    return [v for t in tables for v in t.values]   
 
+def evaluate_assignment(ass):
+    tables = split_to_tables(ass.rows)
+    tables = parse_tables(tables, ass)
+    verify_tables(tables, ass) 
+    tables = [t for t in tables if (t.label in ass.required_labels)]
+    return [v for t in tables for v in t.values] 
 
 def parse_tables(tables, pdef):
     tables = list(tables)
@@ -330,9 +346,9 @@ if __name__ == "__main__":  # pragma: no cover
              end='1.7.1. Инвестиции в основной капитал организаций')]
     commands = [
         dict(
-            var='INVESTMENT',
-            header=['Инвестиции в основной капитал'],
-            unit=['bln_rub', 'yoy', 'rog'])]
+            varname='INVESTMENT',
+            table_headers=['Инвестиции в основной капитал'],
+            required_units=['bln_rub', 'yoy', 'rog'])]
     # mapper dictionary to convert text in table headers to units of
     # measurement
     units = odict([  # 1. MONEY
