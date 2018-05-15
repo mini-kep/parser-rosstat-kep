@@ -68,3 +68,17 @@ assert ({'freq': 'a',
   'time_index': Timestamp('1999-12-31 00:00:00'),
   'value': 75.6} in values)
 
+New pseudocode:
+===============    
+
+1 COMMANDS_DEFAULT + COMMANDS_BY_SEGMENT -> parsing definition
+2 parsing definition + csv_text -> assignments(data and parsing parameters)
+3 assignments are evaluated to produce values
+4 values produce dataframes 
+5 dataframes are saves 
+
+
+
+
+
+
