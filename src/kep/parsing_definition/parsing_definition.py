@@ -28,10 +28,12 @@ Create parsing instructions for an individual variable.
             ex: ['bln_usd]' or ['rog', 'rub']
 """
 
+from collections import namedtuple
 from typing import List
 
 from kep.csv2df.util.label import make_label
 from kep.parsing_definition.parameters import YAML_DEFAULT, YAML_BY_SEGMENT
+from kep.parsing_definition.units import UNITS
 
 def iterate(x):
     if isinstance(x, list):
@@ -58,13 +60,19 @@ def make_required_labels(commands):
     return result
 
 
-def make_entry(commands: List[dict], 
-               boundaries: List[dict] = [], 
-               reader: str = ''):
-    return dict(mapper = make_table_header_mapper(commands),
+DefinitionFactory = namedtuple('ParsingDefinition', 
+                              ['mapper', 'required_labels', 'boundaries',
+                               'units', 'reader']) 
+
+
+def make_entry(commands: List[dict], boundaries: List[dict] = [], 
+               reader: str = '', units = UNITS):
+    return DefinitionFactory(mapper = make_table_header_mapper(commands),
                 required_labels = make_required_labels(commands),
                 boundaries = boundaries,
-                reader = reader)  
+                reader = reader,
+                units = UNITS)  
+
 
 import yaml    
 commands_default = list(yaml.load_all(YAML_DEFAULT))

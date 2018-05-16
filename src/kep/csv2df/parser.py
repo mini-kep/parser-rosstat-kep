@@ -14,11 +14,11 @@ from kep.csv2df.util.label import make_label
 from kep.csv2df.util.to_float import to_float
 
 
-def evaluate_assignment(ass):
-    tables = split_to_tables(ass.rows)
-    tables = parse_tables(tables, ass)
-    verify_tables(tables, ass) 
-    tables = [t for t in tables if (t.label in ass.required_labels)]
+def evaluate_assignment(rows, pdef):
+    tables = split_to_tables(rows)
+    tables = parse_tables(tables, pdef)
+    verify_tables(tables, pdef) 
+    tables = [t for t in tables if (t.label in pdef.required_labels)]
     return [v for t in tables for v in t.values] 
 
 def parse_tables(tables, pdef):

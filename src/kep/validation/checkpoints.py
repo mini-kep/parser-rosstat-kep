@@ -2,7 +2,6 @@
 
 'Dataframes':
  - parsing results ('dataframes') are guarnteed to have exactly same set of labels as parsing definition
- - Validate(year, month).dfs has three dataframes with parsing results ('dataframes')
 
 'Checkpoints':
 - these are dictionaries with reference values for variables at all frequencies 
@@ -23,7 +22,8 @@ Risks:
 """
 
 from collections import namedtuple
-
+from numpy import isnan
+import pandas as pd
 
 # How CHECKPOINTS are constructed?
 #  -  a checkpoint is  a frequency-label--date-value dictionary
@@ -34,218 +34,248 @@ from collections import namedtuple
 #  -  the problem I see is that the variables that do not have a 1999 value, which start observationlater (eg INDPRO, PPI, some others)
 #  -  another problem is that we just copy an occasional parsing result to CHEKCPOINTS, not really looking at CSV file 
 
-ANNUAL_STR = """
-year                                1999.0
-AGROPROD_yoy                         103.8
-CPI_ALCOHOL_rog                      143.2
-CPI_FOOD_rog                         135.0
-CPI_NONFOOD_rog                      139.2
-CPI_SERVICES_rog                     134.0
-CPI_rog                              136.5
-EXPORT_GOODS_bln_usd                  75.6
-GDP_bln_rub                         4823.0
-GDP_yoy                              106.4
-GOV_EXPENSE_CONSOLIDATED_bln_rub    1258.0
-GOV_EXPENSE_FEDERAL_bln_rub          666.9
-GOV_EXPENSE_SUBFEDERAL_bln_rub       653.8
-GOV_REVENUE_CONSOLIDATED_bln_rub    1213.6
-GOV_REVENUE_FEDERAL_bln_rub          615.5
-GOV_REVENUE_SUBFEDERAL_bln_rub       660.8
-GOV_SURPLUS_FEDERAL_bln_rub          -51.4
-GOV_SURPLUS_SUBFEDERAL_bln_rub         7.0
-IMPORT_GOODS_bln_usd                  39.5
-INVESTMENT_bln_rub                   670.4
-INVESTMENT_yoy                       105.3
-RETAIL_SALES_FOOD_bln_rub            866.1
-RETAIL_SALES_FOOD_yoy                 93.6
-RETAIL_SALES_NONFOOD_bln_rub         931.3
-RETAIL_SALES_NONFOOD_yoy              94.7
-RETAIL_SALES_bln_rub                1797.4
-RETAIL_SALES_yoy                      94.2
-TRANSPORT_FREIGHT_bln_tkm           3372.0
-UNEMPL_pct                            13.0
-WAGE_NOMINAL_rub                    1523.0
-WAGE_REAL_yoy                         78.0
-INDPRO_yoy                             NaN
-PPI_rog                                NaN
-"""
-
-ANNUAL_STR_2016 = """
-year                                2016.0
-INDPRO_yoy                           101.3
-PPI_rog                              107.5
-"""
-
-QTR_STR = """
-year                                1999.0
-qtr                                    1.0
-AGROPROD_yoy                          97.2
-CPI_ALCOHOL_rog                      118.2
-CPI_FOOD_rog                         118.4
-CPI_NONFOOD_rog                      114.0
-CPI_SERVICES_rog                     109.5
-CPI_rog                              116.0
-EXPORT_GOODS_bln_usd                  15.3
-GDP_bln_rub                          901.0
-GDP_yoy                               98.1
-GOV_EXPENSE_CONSOLIDATED_bln_rub     189.0
-GOV_EXPENSE_FEDERAL_bln_rub          108.3
-GOV_EXPENSE_SUBFEDERAL_bln_rub        91.5
-GOV_REVENUE_CONSOLIDATED_bln_rub     171.9
-GOV_REVENUE_FEDERAL_bln_rub           89.1
-GOV_REVENUE_SUBFEDERAL_bln_rub        93.6
-GOV_SURPLUS_FEDERAL_bln_rub          -19.2
-GOV_SURPLUS_SUBFEDERAL_bln_rub         2.1
-IMPORT_GOODS_bln_usd                   9.1
-INDPRO_rog                             NaN
-INDPRO_yoy                             NaN
-INVESTMENT_bln_rub                    96.8
-INVESTMENT_rog                         NaN
-INVESTMENT_yoy                        93.8
-PPI_rog                                NaN
-RETAIL_SALES_FOOD_bln_rub            186.8
-RETAIL_SALES_FOOD_rog                 85.0
-RETAIL_SALES_FOOD_yoy                 92.7
-RETAIL_SALES_NONFOOD_bln_rub         192.2
-RETAIL_SALES_NONFOOD_rog              90.7
-RETAIL_SALES_NONFOOD_yoy              84.3
-RETAIL_SALES_bln_rub                 379.0
-RETAIL_SALES_rog                      88.0
-RETAIL_SALES_yoy                      88.1
-TRANSPORT_FREIGHT_bln_tkm            821.0
-UNEMPL_pct                            14.3
-WAGE_NOMINAL_rub                    1248.0
-WAGE_REAL_rog                         80.9
-WAGE_REAL_yoy                         60.7"""
-
-MONTHLY_STR = """
-year                                1999.0
-month                                  1.0
-AGROPROD_yoy                          96.5
-CORP_RECEIVABLE_OVERDUE_bln_rub      772.0
-CORP_RECEIVABLE_bln_rub             1550.6
-CPI_ALCOHOL_rog                      109.7
-CPI_FOOD_rog                         110.4
-CPI_NONFOOD_rog                      106.2
-CPI_SERVICES_rog                     104.1
-CPI_rog                              108.4
-EXPORT_GOODS_bln_usd                   4.5
-GOV_EXPENSE_CONSOLIDATED_bln_rub      45.6
-GOV_EXPENSE_FEDERAL_bln_rub           27.4
-GOV_EXPENSE_SUBFEDERAL_bln_rub        22.7
-GOV_REVENUE_CONSOLIDATED_bln_rub      49.0
-GOV_REVENUE_FEDERAL_bln_rub           27.8
-GOV_REVENUE_SUBFEDERAL_bln_rub        25.7
-GOV_SURPLUS_FEDERAL_bln_rub            0.4
-GOV_SURPLUS_SUBFEDERAL_bln_rub         3.0
-IMPORT_GOODS_bln_usd                   2.7
-INVESTMENT_bln_rub                    28.5
-INVESTMENT_rog                        42.5
-INVESTMENT_yoy                        92.2
-RETAIL_SALES_FOOD_bln_rub             60.3
-RETAIL_SALES_FOOD_rog                 82.5
-RETAIL_SALES_FOOD_yoy                 90.3
-RETAIL_SALES_NONFOOD_bln_rub          61.5
-RETAIL_SALES_NONFOOD_rog              81.0
-RETAIL_SALES_NONFOOD_yoy              79.0
-RETAIL_SALES_bln_rub                 121.8
-RETAIL_SALES_rog                      81.7
-RETAIL_SALES_yoy                      84.0
-TRANSPORT_FREIGHT_bln_tkm            277.7
-UNEMPL_pct                            14.3
-WAGE_NOMINAL_rub                    1167.0
-WAGE_REAL_rog                         72.5
-WAGE_REAL_yoy                         58.6
-"""
-from numpy import isnan
-
-
-def as_dict(s: str):
-    """Convert dataframe printout string to dictionary."""
-    result = {}
-    for row in s.strip().split('\n'):
-        d = [x for x in row.split(' ') if x]
-        val = float(d[-1])
-        if not isnan(val):
-            result[d[0]] = val
-    return result
-
-
-def from_year(year: str):
-    return str(int(year))
-
-assert from_year(1999.0) == '1999'
-
-
-def from_month(year, month):
-    year, month = int(year), int(month)
-    return f'{year}-{month}'
-
-
-def from_qtr(year, qtr):
-    month = int(qtr) * 3
-    return from_month(year, month)
-
-
-def extract_date_and_frequency(d: dict):
-    """Return date and string from dictionary."""
-    year = d.get('year')
-    if 'month' in d.keys():
-        month = d.get('month')
-        return from_month(year, month), 'm'
-    elif 'qtr' in d.keys():
-        qtr = d.get('qtr')
-        return from_qtr(year, qtr), 'q'
-    else:
-        return from_year(year), 'a'
-
-
-Checkpoint = namedtuple("Checkpoint", ["date", "freq", "name", "value"])
-
-
-class CheckpointList:
-    """Converter for printout string to list of named tuples."""
-    def __init__(self, printout:str):
-        source_dict = as_dict(printout)
-        date, freq = extract_date_and_frequency(source_dict)
-        self._list = [Checkpoint(date, freq, name, value) 
-                      for name, value in source_dict.items()]
-
-    def __getitem__(self, i:int):
-        return self._list[i]
-
-
-CHECKPOINTS = dict(
-    a=CheckpointList(ANNUAL_STR),
-    q=CheckpointList(QTR_STR),
-    m=CheckpointList(MONTHLY_STR)
+VALUES_ANNUAL_1999 = dict(date='1999', 
+                       freq='a',
+                       values=
+ {'AGROPROD_yoy': 103.8,
+ 'CPI_ALCOHOL_rog': 143.2,
+ 'CPI_FOOD_rog': 135.0,
+ 'CPI_NONFOOD_rog': 139.2,
+ 'CPI_SERVICES_rog': 134.0,
+ 'CPI_rog': 136.5,
+ 'EXPORT_GOODS_bln_usd': 75.6,
+ 'GDP_bln_rub': 4823.0,
+ 'GDP_yoy': 106.4,
+ 'GOV_EXPENSE_CONSOLIDATED_bln_rub': 1258.0,
+ 'GOV_EXPENSE_FEDERAL_bln_rub': 666.9,
+ 'GOV_EXPENSE_SUBFEDERAL_bln_rub': 653.8,
+ 'GOV_REVENUE_CONSOLIDATED_bln_rub': 1213.6,
+ 'GOV_REVENUE_FEDERAL_bln_rub': 615.5,
+ 'GOV_REVENUE_SUBFEDERAL_bln_rub': 660.8,
+ 'GOV_SURPLUS_FEDERAL_bln_rub': -51.4,
+ 'GOV_SURPLUS_SUBFEDERAL_bln_rub': 7.0,
+ 'IMPORT_GOODS_bln_usd': 39.5,
+ 'INVESTMENT_bln_rub': 670.4,
+ 'INVESTMENT_yoy': 105.3,
+ 'RETAIL_SALES_FOOD_bln_rub': 866.1,
+ 'RETAIL_SALES_FOOD_yoy': 93.6,
+ 'RETAIL_SALES_NONFOOD_bln_rub': 931.3,
+ 'RETAIL_SALES_NONFOOD_yoy': 94.7,
+ 'RETAIL_SALES_bln_rub': 1797.4,
+ 'RETAIL_SALES_yoy': 94.2,
+ 'TRANSPORT_FREIGHT_bln_tkm': 3372.0,
+ 'UNEMPL_pct': 13.0,
+ 'WAGE_NOMINAL_rub': 1523.0,
+ 'WAGE_REAL_yoy': 78.0,
+}
 )
 
 
-# TODO (EP): add QTR_STR_2016
-# TODO (EP): add MONTH_STR_2016
-# TODO (EP): for optional checkpoints need textual description, eg. 
-#            "in releases prior to 2016 INDPRO and PPI is Nan, we check it 
-#             with additional values for 2016."
-OPTIONAL_CHECKPOINTS = dict(
-    a=CheckpointList(ANNUAL_STR_2016),
-    q=[],
-    m=[],
+VALUES_ANNUAL_2017 = dict(date='1999', 
+                          freq='a',
+                          values=
+ {'INDPRO_yoy': 101.0,
+  'PPI_rog': 108.4}
 )
 
 
-def is_found(df, d):
-    """Return true if dictionary *d* value
-       if found in dataframe *df*.
-    """
+VALUES_QTR_1999 = dict(date='1999-03', 
+                       freq='q',
+                       values=
+{'AGROPROD_yoy': 97.2,
+ 'CPI_ALCOHOL_rog': 118.2,
+ 'CPI_FOOD_rog': 118.4,
+ 'CPI_NONFOOD_rog': 114.0,
+ 'CPI_SERVICES_rog': 109.5,
+ 'CPI_rog': 116.0,
+ 'EXPORT_GOODS_bln_usd': 15.3,
+ 'GDP_bln_rub': 901.0,
+ 'GDP_yoy': 98.1,
+ 'GOV_EXPENSE_CONSOLIDATED_bln_rub': 189.0,
+ 'GOV_EXPENSE_FEDERAL_bln_rub': 108.3,
+ 'GOV_EXPENSE_SUBFEDERAL_bln_rub': 91.5,
+ 'GOV_REVENUE_CONSOLIDATED_bln_rub': 171.9,
+ 'GOV_REVENUE_FEDERAL_bln_rub': 89.1,
+ 'GOV_REVENUE_SUBFEDERAL_bln_rub': 93.6,
+ 'GOV_SURPLUS_FEDERAL_bln_rub': -19.2,
+ 'GOV_SURPLUS_SUBFEDERAL_bln_rub': 2.1,
+ 'IMPORT_GOODS_bln_usd': 9.1,
+ 'INVESTMENT_bln_rub': 96.8,
+ 'INVESTMENT_yoy': 93.8,
+ 'RETAIL_SALES_FOOD_bln_rub': 186.8,
+ 'RETAIL_SALES_FOOD_rog': 85.0,
+ 'RETAIL_SALES_FOOD_yoy': 92.7,
+ 'RETAIL_SALES_NONFOOD_bln_rub': 192.2,
+ 'RETAIL_SALES_NONFOOD_rog': 90.7,
+ 'RETAIL_SALES_NONFOOD_yoy': 84.3,
+ 'RETAIL_SALES_bln_rub': 379.0,
+ 'RETAIL_SALES_rog': 88.0,
+ 'RETAIL_SALES_yoy': 88.1,
+ 'TRANSPORT_FREIGHT_bln_tkm': 821.0,
+ 'UNEMPL_pct': 14.3,
+ 'WAGE_NOMINAL_rub': 1248.0,
+ 'WAGE_REAL_rog': 80.9,
+ 'WAGE_REAL_yoy': 60.7,
+})
+
+
+VALUES_MONTHLY_1999 = dict(date='1999-01', 
+                           freq='m',
+                           values=
+                           {'AGROPROD_yoy': 96.5,
+ 'CORP_RECEIVABLE_OVERDUE_bln_rub': 772.0,
+ 'CORP_RECEIVABLE_bln_rub': 1550.6,
+ 'CPI_ALCOHOL_rog': 109.7,
+ 'CPI_FOOD_rog': 110.4,
+ 'CPI_NONFOOD_rog': 106.2,
+ 'CPI_SERVICES_rog': 104.1,
+ 'CPI_rog': 108.4,
+ 'EXPORT_GOODS_bln_usd': 4.5,
+ 'GOV_EXPENSE_CONSOLIDATED_bln_rub': 45.6,
+ 'GOV_EXPENSE_FEDERAL_bln_rub': 27.4,
+ 'GOV_EXPENSE_SUBFEDERAL_bln_rub': 22.7,
+ 'GOV_REVENUE_CONSOLIDATED_bln_rub': 49.0,
+ 'GOV_REVENUE_FEDERAL_bln_rub': 27.8,
+ 'GOV_REVENUE_SUBFEDERAL_bln_rub': 25.7,
+ 'GOV_SURPLUS_FEDERAL_bln_rub': 0.4,
+ 'GOV_SURPLUS_SUBFEDERAL_bln_rub': 3.0,
+ 'IMPORT_GOODS_bln_usd': 2.7,
+ #'INDPRO_rog': nan,
+ #'INDPRO_yoy': nan,
+ 'INVESTMENT_bln_rub': 28.5,
+ 'INVESTMENT_rog': 42.5,
+ 'INVESTMENT_yoy': 92.2,
+ #'PPI_rog': nan,
+ 'RETAIL_SALES_FOOD_bln_rub': 60.3,
+ 'RETAIL_SALES_FOOD_rog': 82.5,
+ 'RETAIL_SALES_FOOD_yoy': 90.3,
+ 'RETAIL_SALES_NONFOOD_bln_rub': 61.5,
+ 'RETAIL_SALES_NONFOOD_rog': 81.0,
+ 'RETAIL_SALES_NONFOOD_yoy': 79.0,
+ 'RETAIL_SALES_bln_rub': 121.8,
+ 'RETAIL_SALES_rog': 81.7,
+ 'RETAIL_SALES_yoy': 84.0,
+ 'TRANSPORT_FREIGHT_bln_tkm': 277.7,
+ 'UNEMPL_pct': 14.3,
+ 'WAGE_NOMINAL_rub': 1167.0,
+ 'WAGE_REAL_rog': 72.5,
+ 'WAGE_REAL_yoy': 58.6})
+    
+   
+def serialise_checkpoint(cp: dict):
+    for name, value in cp['values'].items():
+        yield [cp['date'], name, value]
+
+
+assert ['1999-01', 'AGROPROD_yoy', 96.5] == next(serialise_checkpoint(VALUES_MONTHLY_1999))
+
+
+def is_found(df, date, name, value):
+    """Return true if *date, name, value* found in dataframe *df*."""
     try:
-        return df.loc[d.date, d.name].iloc[0] == d.value
+        return df.loc[date, name].iloc[0] == value
     except KeyError:
-        return False
+        return False      
 
 
+def items_not_found_in_dataframe(df, cp: dict):
+    return [[cp['freq']] + args for args in serialise_checkpoint(cp) 
+            if not is_found(df, *args)]
+
+
+def comparison_allowed(df, date: str):
+    return any([df.index >= pd.Timestamp(date) for x in df.index]) 
+
+
+def checkpoint_passed(df, cp: dict):
+    return not items_not_found_in_dataframe(df, cp)
+
+
+def not_found_factory(checkpoint: dict):
+    def not_found(dataframe):
+        return items_not_found_in_dataframe(dataframe, checkpoint)
+    return not_found
+
+
+def not_found_factory_conditional(checkpoint: dict, start_date: str):
+    def not_found(dataframe):
+        if checkpoint_passed(dataframe, start_date):
+            return items_not_found_in_dataframe(dataframe, checkpoint)
+        else:
+            return True
+    return not_found
+
+CHECKERS = dict(
+    a=[not_found_factory(VALUES_ANNUAL_1999), 
+       # FIXME:
+       #not_found_factory_conditional(VALUES_ANNUAL_2017, '2017')
+       ],
+    q=[not_found_factory(VALUES_QTR_1999)],
+    m=[not_found_factory(VALUES_MONTHLY_1999)]
+)
+
+def omissions(dfs): 
+    return [x for freq in 'aqm' 
+              for not_found in CHECKERS[freq] 
+              for x in not_found(dfs[freq])]
+
+
+def uncovered_columns(df, cp_list: list):
+    """
+    Returns column names in dataframe *df*
+    that are not covered by *checkpoints*.
+
+    Args:
+        df (pandas dataframe): parsing result
+        checkpoints: list of dictionaries
+    Returns:
+        list of column names not matched by *checkpoints*
+    """
+    checkpoint_column_names = [key for cp in cp_list
+                                   for key in cp['values'].keys()]
+    diff = set(df.columns).difference(set(checkpoint_column_names)) \
+                          .difference(['year', 'month', 'qtr'])
+    return list(diff)                          
+
+CHECKERS2 = dict(
+    a=lambda df: uncovered_columns(df, [VALUES_ANNUAL_1999, VALUES_ANNUAL_2017]),
+    q=lambda df: uncovered_columns(df, [VALUES_QTR_1999]),
+    m=lambda df: uncovered_columns(df, [VALUES_MONTHLY_1999])
+)
+
+def orphans(dfs):
+    return [{freq: x} for freq in 'aqm' 
+                      for x in CHECKERS2[freq](dfs[freq])]
+    
+    
 class ValidationError(ValueError):
     pass
+   
+            
+
+## TODO (EP): add QTR_STR_2016
+## TODO (EP): add MONTH_STR_2016
+## TODO (EP): for optional checkpoints need textual description, eg. 
+##            "in releases prior to 2016 INDPRO and PPI is Nan, we check it 
+##             with additional values for 2016."
+#OPTIONAL_CHECKPOINTS = dict(
+#    a=CheckpointList(ANNUAL_STR_2016),
+#    q=[],
+#    m=[],
+#)
+#
+#
+#def is_found(df, d):
+#    """Return true if dictionary *d* value
+#       if found in dataframe *df*.
+#    """
+#    try:
+#        return df.loc[d.date, d.name].iloc[0] == d.value
+#    except KeyError:
+#        return False
+
+
+
 
 
 def validate(df, checkpoints):
