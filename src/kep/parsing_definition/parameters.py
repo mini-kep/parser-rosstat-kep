@@ -193,10 +193,5 @@ YAML_BY_SEGMENT = """
   - 'var': 'CORP_RECEIVABLE_OVERDUE'
     'header': 'в том числе просроченная'
     'unit': 'bln_rub'
-"""    
-
-
-import yaml    
-COMMANDS_DEFAULT = list(yaml.load_all(YAML_DEFAULT))
-INSTRUCTIONS_BY_SEGMENT = list(yaml.load_all(YAML_BY_SEGMENT))
+"""
         

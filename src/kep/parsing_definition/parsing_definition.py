@@ -31,8 +31,7 @@ Create parsing instructions for an individual variable.
 from typing import List
 
 from kep.csv2df.util.label import make_label
-from kep.parsing_definition.parameters import (COMMANDS_DEFAULT, 
-                                               INSTRUCTIONS_BY_SEGMENT)
+from kep.parsing_definition.parameters import YAML_DEFAULT, YAML_BY_SEGMENT
 
 def iterate(x):
     if isinstance(x, list):
@@ -67,6 +66,8 @@ def make_entry(commands: List[dict],
                 boundaries = boundaries,
                 reader = reader)  
 
-    
-DEFINITION_DEFAULT = make_entry(COMMANDS_DEFAULT, boundaries=[], reader='')
-DEFINITIONS_BY_SEGMENT = [make_entry(**c) for c in INSTRUCTIONS_BY_SEGMENT]
+import yaml    
+commands_default = list(yaml.load_all(YAML_DEFAULT))
+instructions_by_segment = list(yaml.load_all(YAML_BY_SEGMENT))    
+DEFINITION_DEFAULT = make_entry(commands_default, boundaries=[], reader='')
+DEFINITIONS_BY_SEGMENT = [make_entry(**c) for c in instructions_by_segment]

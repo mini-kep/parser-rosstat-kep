@@ -8,6 +8,7 @@ from collections import namedtuple
 
 from kep.csv2df.row_model import Row
 from kep.csv2df.reader import Popper
+from kep.csv2df.parser import evaluate_assignment
 
 
 class Boundary():
@@ -99,5 +100,13 @@ def yield_parsing_assignments(csv_text: str,
         yield factory(def_dict, rows=stack.pop(start, end))
     yield factory(default_definition, rows=stack.remaining_rows())
 
-#TODO: look at assignments
+def yield_values(csv_text: str,
+                 units, #= UNITS,
+                 def0, #= DEFINITION_DEFAULT, 
+                 pdefs, #= DEFINITIONS_BY_SEGMENT
+                 ): 
+    for a in yield_parsing_assignments(csv_text, units, def0, pdefs):
+        for value in evaluate_assignment(a):
+            yield value 
+
  

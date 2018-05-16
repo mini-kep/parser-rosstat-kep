@@ -1,33 +1,38 @@
 """Extract dataframes by year and month."""
 
 from kep import FREQUENCIES
-
-from kep.parsing_definition import (DEFINITION_DEFAULT, 
-                                    DEFINITIONS_BY_SEGMENT, 
-                                    UNITS)
-from kep.csv2df.allocation import yield_parsing_assignments
-from kep.csv2df.parser import evaluate_assignment
-
+from kep.parsing_definition import (UNITS, DEFINITION_DEFAULT, 
+                                    DEFINITIONS_BY_SEGMENT)
+from kep.csv2df.allocation import yield_values
 from kep.csv2df.dataframe_maker import create_dataframe
 from kep.helper.date import Date
 from kep.helper.path import InterimCSV, ProcessedCSV
 
 
 """
-units.py
-- UNITS
-parsing_definition.py:
-- YAML_DEFAULT -> COMMANDS_DEFAULT -> DEFINITION_DEFAULT 
-- YAML_BY_SEGMENT -> INSTRUCTIONS_BY_SEGMENT -> DEFINITIONS_BY_SEGMENT
+Dataflow:
+    
+  parameters + data -> values -> dataframes
 
+Parameters are in units.py and parsing_definition.py:
+- UNITS
+- YAML_DEFAULT (string) -> DEFINITION_DEFAULT (dict)
+- YAML_BY_SEGMENT (string)-> DEFINITIONS_BY_SEGMENT (dict)
+
+reader.py:
+- handles csv_text
+    
 allocation.py and vintage.py
 - DEFINITION_DEFAULT + DEFINITIONS_BY_SEGMENT + UNITS + csv_text -> jobs
 
 parser.py and vintage.py:
-- jobs -> values
+- jobs -> ... -> values
 
 dataframe_maker.py and vintage.py:
-- values -> dataframes
+- values -> raw dataframes -> final dataframes
+
+validation:
+- ...    
 """
 
 
@@ -38,13 +43,7 @@ from kep.validation.checkpoints import (
     validate2
 )
 
-def yield_values(csv_text: str,
-                 units = UNITS,
-                 def0 = DEFINITION_DEFAULT, 
-                 pdefs = DEFINITIONS_BY_SEGMENT): 
-    for a in yield_parsing_assignments(csv_text, units, def0, pdefs):
-        for value in evaluate_assignment(a):
-            yield value 
+
 
 class Vintage:
     """Represents dataset release for a given year and month.
@@ -54,7 +53,8 @@ class Vintage:
     def __init__(self, year: int, month: int):
         self.year, self.month = year, month
         csv_text = InterimCSV(year, month).text()
-        self.values = list(yield_values(csv_text))
+        self.values = list(yield_values(csv_text, UNITS, DEFINITION_DEFAULT, 
+                                    DEFINITIONS_BY_SEGMENT))
         self.dfs = {freq: create_dataframe(self.values, freq) for freq in FREQUENCIES}
 
     def save(self, folder=None):
