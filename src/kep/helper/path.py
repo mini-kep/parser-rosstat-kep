@@ -41,21 +41,24 @@ XL_PATH = str(ROOT / 'output' / 'kep.xlsx')
     
 
 def latest_folder(data_root_folder=None):
-    # a workaround to bypass year and month check
-    # this is a cost we pay to have 'latest' folder in 'processed'
-    year, month = Date.random_valid_date
-    return DataFolder(year, month, data_root_folder).latest
+    folder = DataFolderBase(data_root_folder).latest 
+    md(folder)  
+    return folder
 
-class DataFolder:
-    def __init__(self, year: int, month: int, data_folder = None):        
-        self.date = Date(year, month)
-        self.date.assert_supported()
+class DataFolderBase:
+    def __init__(self, data_folder=None):
         if not data_folder:
             data_folder = DATA_FOLDER 
         self.raw_folder = data_folder / 'raw'
         self.interim_folder = data_folder / 'interim'
         self.processed_folder = data_folder / 'processed' 
         self.latest = self.processed_folder / 'latest' 
+    
+
+class DataFolder(DataFolderBase):
+    def __init__(self, year: int, month: int, data_folder = None):        
+        super().__init__(data_folder)
+        self.date = Date(year, month)
 
     def year_month_subfolder(self, subfolder):        
         year = str(self.date.year)
@@ -112,14 +115,13 @@ class InterimCSV(FileBase):
 class LatestCSV:
      def __init__(self, data_root_folder=None):
         self.folder = latest_folder(data_root_folder)
-        md(self.folder)  
         
      def path(self, freq: str):             
         return self.folder / ProcessedCSV.make_filename(freq) 
 
 class ProcessedCSV:
     """A family of three CSV files by frequency. 
-       These files hold parsing result."""
+       The files hold parsing result."""
        
     def __init__(self, year: int, month: int, data_root_folder=None):
         self.date = Date(year, month)
@@ -136,27 +138,20 @@ class ProcessedCSV:
     def path(self, freq: str):
         return self.folder / self.make_filename(freq)
 
-    def copy_to_latest(self, freq: str):
-        """Copy csv files from folder like
-               *processed/2017/04
-           to
-               *processed/latest.
-        """  
-        if self.date.is_latest():
-            src = str(self.path(freq))
-            dst = str(self.latest_csv.path(freq))
-            shutil.copyfile(src, dst)
-            print("Updated", dst)
-        print("No files copied, use more recent date.")    
-
-    def to_latest(self):
-        for freq in FREQUENCIES:    
-            self.copy_to_latest(freq)
-
+def copy_to_latest(year:int, month: int):
+     """Copy csv files from folder like *processed/2017/04* to 
+        *processed/latest*.
+     """    
+     if not Date(year, month).is_latest():
+         raise ValueError("No files copied, use more recent date.")  
+     for freq in FREQUENCIES:    
+         src = ProcessedCSV(year, month).path(freq)
+         dst = LatestCSV().path(freq)         
+         shutil.copyfile(str(src), str(dst))
+         print("Updated", dst)
 
 def get_path_in_latest_folder(freq: str): 
     return LatestCSV().path(freq)
-
 
 if __name__ == "__main__":
     pass

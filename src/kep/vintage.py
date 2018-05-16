@@ -2,7 +2,7 @@
 
 Dataflow:    
    - csv data based on year and month + parsing definitions 
-   - parsing jobs (a job is a csv data block and its parsing definition) 
+   - parsing jobs (job is a csv data block and its parsing definition) 
    - values 
    - dataframes by frequency
   
@@ -13,7 +13,7 @@ from kep.parsing_definition import DEFINITION_DEFAULT, DEFINITIONS_BY_SEGMENT
 from kep.csv2df.allocation import get_values
 from kep.csv2df.dataframe_maker import create_dataframe 
 from kep.validation.checkpoints import omissions, orphans, ValidationError
-from kep.helper.path import InterimCSV, ProcessedCSV
+from kep.helper.path import InterimCSV, ProcessedCSV, copy_to_latest
 
 
 class Vintage:
@@ -50,14 +50,27 @@ class Vintage:
         orphan_columns = orphans(self.dfs)
         if orphan_columns:  
             print('Not covered by checkpoints', orphan_columns)
-        # TODO: concat time series in order 
+            
+    def to_latest(self):
+        copy_to_latest(self.year, self.month) 
 
+    #TODO: upload to a database
+#    def upload(self):
+#        from parsers.mover.uploader import Uploader
+#        self.validate()
+#        # FIXME: possible risk - *self.datapoints* may have different serialisation 
+#        #        format compared to what Uploader() expects
+#        #           (a) date format   
+#        #           (b) extra keys in dictionary
+#        Uploader(self.datapoints).post()          
+            
     def __repr__(self):
         return "Vintage({}, {})".format(self.year, self.month)
 
 if __name__ == "__main__": # pragma: no cover
-    v = Vintage(2018, 1)
+    v = Vintage(2018, 3)    
     v.save()
     dfm = v.dfs['m']
     dfa = v.dfs['a']
     dfq = v.dfs['q']
+    
