@@ -1,12 +1,13 @@
 import pytest
 import pandas as pd
 
-from kep.csv2df.parser import Table, Segment, DataBlock, HeaderParser
+from kep.csv2df.parser import Table, DataBlock, HeaderParser
 from kep.csv2df.parser import timestamp_quarter, timestamp_month, timestamp_annual
 
 from kep.csv2df.util.row_splitter import split_row_by_year_and_qtr
 from kep.parsing_definition.units import UNITS
-from kep.csv2df.specification import Definition
+#TODO: rename globally
+from kep.parsing_definition.parsing_definition import make_entry
 
 
 @pytest.fixture
@@ -84,13 +85,13 @@ def parsing_definition():
                       unit='yoy')
     return Definition(commands=[gdp_def, indpro_def], units=UNITS)
 
-
-def test_extract_tables():
-    seg = Segment(mock_rows(), parsing_definition())
-    tables = seg.extract_tables()
-    assert isinstance(tables, list)
-    assert len(tables) == 3 
-    assert isinstance(tables[0], Table)
+# FIXME: is this for deleting?
+# def test_extract_tables():
+    # seg = Segment(mock_rows(), parsing_definition())
+    # tables = seg.extract_tables()
+    # assert isinstance(tables, list)
+    # assert len(tables) == 3 
+    # assert isinstance(tables[0], Table)
     
     
 class Test_HeaderParser:

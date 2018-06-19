@@ -31,6 +31,8 @@ Create parsing instructions for an individual variable.
 from collections import namedtuple
 from typing import List
 
+import yaml  
+
 from kep.csv2df.util.label import make_label
 from kep.parsing_definition.parameters import YAML_DEFAULT, YAML_BY_SEGMENT
 from kep.parsing_definition.units import UNITS
@@ -64,18 +66,18 @@ DefinitionFactory = namedtuple('ParsingDefinition',
                               ['mapper', 'required_labels', 'boundaries',
                                'units', 'reader']) 
 
-
-def make_entry(commands: List[dict], boundaries: List[dict] = [], 
-               reader: str = '', units = UNITS):
+#FIXME: rename to make_parsing_defintion()
+def make_entry(commands: List[dict], 
+               boundaries: List[dict] = [], 
+               reader: str = '', 
+               units = UNITS):
     return DefinitionFactory(mapper = make_table_header_mapper(commands),
                 required_labels = make_required_labels(commands),
                 boundaries = boundaries,
                 reader = reader,
                 units = UNITS)  
 
-
-import yaml    
 commands_default = list(yaml.load_all(YAML_DEFAULT))
 instructions_by_segment = list(yaml.load_all(YAML_BY_SEGMENT))    
 DEFINITION_DEFAULT = make_entry(commands_default, boundaries=[], reader='')
-DEFINITIONS_BY_SEGMENT = [make_entry(**c) for c in instructions_by_segment]
+DEFINITIONS_BY_SEGMENT = [make_entry(**instruction) for instruction in instructions_by_segment]

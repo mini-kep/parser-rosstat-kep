@@ -34,6 +34,7 @@ import pandas as pd
 #  -  the problem I see is that the variables that do not have a 1999 value, which start observationlater (eg INDPRO, PPI, some others)
 #  -  another problem is that we just copy an occasional parsing result to CHEKCPOINTS, not really looking at CSV file 
 
+
 VALUES_ANNUAL_1999 = dict(date='1999', 
                        freq='a',
                        values=
@@ -290,6 +291,69 @@ def validate(df, checkpoints):
     if uncovered:
         raise ValidationError(f"Variables not covered by checkpoints: {uncovered}")
 
+
+###############################################################################
+# This is new code
+
+from collections import namedtuple
+import pandas as pd 
+
+Annual = namedtuple('Checkpoint', 'label date value')
+Qtr = namedtuple('Checkpoint', 'label date value')
+Monthly = namedtuple('Checkpoint', 'label date value')
+
+def contains(df: pd.DataFrame, checkpoint):
+    try:
+        subset = df[checkpoint.label]
+    except KeyError:
+        return False              
+    return checkpoint.value == subset.loc[checkpoint.date].iloc[0]
+
+def missed(df: pd.DataFrame, checkpoints: list):
+    return [c for c in checkpoints if not contains(df, c)]
+
+def uncovered(df: pd.DataFrame, checkpoints: list):
+    """Returns column names that are not covered by *checkpoints*."""
+    checkpoint_column_names = {[c.label for c in checkpoints]}
+    diff = set(df.columns) \
+              .difference(checkpoint_column_names) \
+              .difference(['year', 'month', 'qtr'])
+    return list(diff) 
+
+
+
+# This is testing
+_ts = pd.Series([103.8, 104], 
+                index=pd.date_range('1999', periods=2, freq='A'))
+_df = pd.DataFrame({'AGROPROD_yoy': _ts})
+_checkpoint = Annual(1999, 'AGROPROD_yoy', 103.8)
+_c2 = Annual(1999, 'AGROPROD_yoy', 103.8)
+assert _checkpoint.date == '1999'
+assert _checkpoint.freq =='a'
+assert _checkpoint.label == 'AGROPROD_yoy'
+assert _checkpoint.value == 103.8
+assert contains(_df, _checkpoint)
+
+def include(df, checkpoints, optional_checkpoints):
+    _missed = missed(df, checkpoints)
+    if _missed:
+        raise ValidationError( "Required checkpoints not found"
+                              f" in dataframe: {_missed}")
+    _missed2 = missed(df, optional_checkpoints)
+    if _missed2:
+        raise print('Optional checkpoints not found in dataframe:', _missed2)
+
+def cover(df, checkpoints, optional_checkpoints):
+    _uncovered = uncovered(df, checkpoints + optional_checkpoints)
+    print (f'Variables in dataframe not covered by checkpoints {uncovered}')
+    
+# TODO:
+#- serialise
+#- run by frequency   
+
+###############################################################################
+
+        
 
 def validate2(df, required_checkpoints, additional_checkpoints, strict=False):
     """
