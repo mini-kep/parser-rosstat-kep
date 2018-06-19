@@ -1,7 +1,7 @@
 pandas
 openpyxl
 matplotlib
-
+pyyaml 
 requests
 arrow
 
@@ -10,9 +10,10 @@ arrow
 
 # documentation
 # FIXME: not sure if 'm2r' it is necessary
-m2r
+#m2r
 
 # for task orgainisation in tasks.py - https://pypi.python.org/pypi/invoke/0.15.0
 invoke
 
+# for database upload
 git+https://github.com/mini-kep/parsers.git#egg=mini-kep-parsers

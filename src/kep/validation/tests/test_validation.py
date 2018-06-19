@@ -3,7 +3,6 @@ import pytest
 from kep.vintage import Vintage
 from kep.validation.checkpoints import (
     validate2,
-    Checkpoint,
     ValidationError,
     find_missed_checkpoints,
     find_uncovered_column_names

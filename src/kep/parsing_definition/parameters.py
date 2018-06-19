@@ -1,4 +1,4 @@
-"""Two constants:
+"""Two constants as YAML files:
     
     COMMANDS_DEFAULT
     INSTRUCTIONS_BY_SEGMENT
