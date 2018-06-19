@@ -4,8 +4,8 @@ import tempfile
 import pandas as pd
 import pytest
 
-from kep.access import get_dataframe
-from kep.df2xl.to_excel import to_xls
+from access import get_dataframe
+from to_excel import to_xls
 
 
 def test_get_dataframe():

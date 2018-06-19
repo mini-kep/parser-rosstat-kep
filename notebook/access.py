@@ -5,7 +5,8 @@ from pathlib import Path
 
 import pandas as pd
 
-from kep.helper.path import get_path_in_latest_folder
+#FIXME: make new 
+#from kep.helper.path import get_path_in_latest_folder
 
 
 def read_csv(source):
@@ -34,9 +35,11 @@ def proxy(path):
 
 def get_dataframe(freq):
     """Read dataframe from local folder"""
-    path = get_path_in_latest_folder(freq)
-    filelike = proxy(path)
-    return read_csv(filelike)
+    # FIXME:
+    #path = get_path_in_latest_folder(freq)
+    #filelike = proxy(path)
+    #return read_csv(filelike)
+    pass
 
 
 dfa, dfq, dfm = (get_dataframe(freq) for freq in 'aqm')
