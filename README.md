@@ -11,11 +11,10 @@ Schedule        | [2018][schedule]
 Concept
 -------
 
-We make a machine-readable dataset of Russian macroeconomic time series, ready to use with python pandas, R or econometrics tools. 
+Russian statistics agency Rosstat publishes macroeconomic time series as [MS Word files][Rosstat]. In this repo 
+we make a machine-readable dataset of Russian macroeconomic time series and publish it as [CSV files][backend]. 
 
-Russian statistics agency Rosstat publishes macroeconomic time series as [MS Word files][Rosstat]. In this repo we extract the time series as pandas dataframes and save them as [CSV files][backend]. 
-
-This repo replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. In this repo we keep track of macroeconomic data releases since April 2009. 
+We keep track of monthly macroeconomic data releases (vintages) since April 2009. 
 
 
 Interface 
@@ -124,3 +123,9 @@ All historic raw data available on internet?
 Is scrapper automated (can download required_labels information from internet  without manual operations)?
 - [x] Yes
 - [ ] No 
+
+
+History
+-------
+
+This repo replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
