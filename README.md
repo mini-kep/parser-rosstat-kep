@@ -59,14 +59,13 @@ Access to parsing result
 import pandas as pd
 
 def get_dataframe_from_web(freq):
-    url_base = "https://raw.githubusercontent.com/epogrebnyak/mini-kep/master/data/processed/latest/{}"
+    url_base = ('https://raw.githubusercontent.com/'
+                'epogrebnyak/mini-kep/master/data/processed/latest/{}')
     filename = "df{}.csv".format(freq)
     url = url_base.format(filename)
     return pd.read_csv(url, converters={0: pd.to_datetime}, index_col=0)
 
-dfa = get_dataframe_from_web('a')
-dfq = get_dataframe_from_web('q')
-dfm = get_dataframe_from_web('m')
+dfa, dfq, dfm = (get_dataframe_from_web(freq) for freq in 'aqm')
 ```
  
 Repo management

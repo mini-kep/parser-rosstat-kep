@@ -130,16 +130,17 @@ def add(ctx, year, month):
         manage.run(year, month)
 
 
-class PathContext():
-    def __init__(self, path=str(Path(__file__).parent / 'src')):
-        self.path = path
+class PathContext():    
+    path=str(Path(__file__).parent / 'src')
+    
+    def __init__(self):
+        pass
 
     def __enter__(self):
         sys.path.insert(0, self.path)
 
     def __exit__(self, exc_type, exc_value, traceback):
         sys.path.remove(self.path)
-
 
 
 ns = Collection()
