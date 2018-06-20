@@ -2,8 +2,10 @@
 
 import matplotlib.pyplot as plt
 
-from access import dfa, dfq, dfm 
+from access import get_dataframe
 
+
+dfa, dfq, dfm = (get_dataframe(freq) for freq in 'aqm')
 
 start_year = 2016
 
@@ -32,8 +34,6 @@ def plot_one(subplot_location, freq, name):
     latest_date = ts.index[-1].strftime('%Y-%m') 
     title = f'{renamer.get(name)[0]}\n{renamer.get(name)[1]}'
     rtitle = f'{latest_date}: {latest_value}'    
-    
-    
     ax = ts.plot(ax=axes[subplot_location], 
             color='lightblue',         
             lw = 3) 
@@ -52,4 +52,19 @@ plt.tight_layout()
 # splines?
 # https://github.com/mini-kep/parser-rosstat-kep/blob/2743e624f39246e9760e733ab67ee281fc657cf9/notebooks/images.py
 # see https://github.com/epogrebnyak/plotting/blob/master/matlibplot-ref/4graph.py
+
+
+# TODO: plotting     
+#    import matplotlib.pyplot as plt
+#    df = dfm
+#    for i, name in enumerate(df.columns):
+#        plt.figure()
+#        ts = df[name]
+#        ts.plot(title=name)
+        
+    # see plotting  at       
+    # https://github.com/mini-kep/parser-rosstat-kep/blob/2743e624f39246e9760e733ab67ee281fc657cf9/notebooks/images.py
+    
+    # see https://github.com/epogrebnyak/plotting/blob/master/matlibplot-ref/4graph.py        
+
 

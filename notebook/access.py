@@ -7,6 +7,7 @@ import pandas as pd
 
 FOLDER = Path(__file__).parents[1] / 'data' / 'processed' / 'latest'
 
+
 def locate(freq):
     return FOLDER / 'df{}.csv'.format(freq)
 
@@ -41,6 +42,7 @@ def get_dataframe(freq):
     filelike = proxy(path)
     return read_csv(filelike)
 
+
 # This is example in README.md
 def get_dataframe_from_web(freq):
     url_base = ('https://raw.githubusercontent.com/'
@@ -52,16 +54,3 @@ def get_dataframe_from_web(freq):
 
 if '__main__' == __name__:   
      dfa, dfq, dfm = (get_dataframe(freq) for freq in 'aqm')
-
-# TODO: plotting     
-#    import matplotlib.pyplot as plt
-#    df = dfm
-#    for i, name in enumerate(df.columns):
-#        plt.figure()
-#        ts = df[name]
-#        ts.plot(title=name)
-        
-    # see plotting  at       
-    # https://github.com/mini-kep/parser-rosstat-kep/blob/2743e624f39246e9760e733ab67ee281fc657cf9/notebooks/images.py
-    
-    # see https://github.com/epogrebnyak/plotting/blob/master/matlibplot-ref/4graph.py        
