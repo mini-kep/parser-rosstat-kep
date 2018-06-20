@@ -1,10 +1,11 @@
 """Save xls file."""
 
+from pathlib import Path
 import pandas as pd
 
-#from kep.access import get_dataframe
-#from kep.helper.path import XL_PATH
+from access import get_dataframe
 
+XL_PATH = str(Path(__file__).with_name('kep.xlsx'))
 
 def to_xls(filepath, dfa, dfq, dfm):
     """Save dataframes *dfa, dfq, dfm* in .xlsx *filepath*."""
@@ -17,21 +18,13 @@ def to_xls(filepath, dfa, dfq, dfm):
 
 # ERROR: the excel file treats decimal separators badly
 
+# TODO: pretty formatting of Excel file 
 
 def save_xls(): # pragma: no cover
-#    dfa = get_dataframe('a')
-#    dfq = get_dataframe('q')
-#    dfm = get_dataframe('m')
-#    to_xls(XL_PATH, dfa, dfq, dfm)
-#    print('Saved', XL_PATH)
-     #FIXME: 
-     pass    
+    dfa, dfq, dfm = (get_dataframe(freq) for freq in 'aqm')
+    to_xls(XL_PATH, dfa, dfq, dfm)
+    print('Saved', XL_PATH)
 
 
 if '__main__' == __name__:  # pragma: no cover
-#    dfa = get_dataframe('a')
-#    dfq = get_dataframe('q')
-#    dfm = get_dataframe('m')
-#    save_xls()
-     #FIXME: 
-     pass    
+   save_xls()  
