@@ -13,7 +13,6 @@ Concept
 
 Russian statistics agency Rosstat publishes macroeconomic time series as [MS Word files][Rosstat]. In this repo 
 we make a machine-readable dataset of Russian macroeconomic time series and publish it as [CSV files][backend]. 
-
 We keep track of monthly macroeconomic data releases (vintages) since April 2009. 
 
 
