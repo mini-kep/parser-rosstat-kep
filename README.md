@@ -20,7 +20,7 @@ We keep track of monthly macroeconomic data releases (vintages) since April 2009
 Interface 
 ---------
 
-[manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py) does the following job:
+[manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/kep/manage.py) does the following job:
 - download and unpack MS Word files from Rosstat
 - extract tables from Word files and assigns variable names
 - create pandas dataframes with time series (at annual, quarterly and monthly frequency) 
@@ -55,9 +55,6 @@ has datasets by year and month (vintages).
 
 Access to parsing result
 ------------------------
-
-[access.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/access.py) 
-is an entry point to get parsed data.
 
 ```python
 import pandas as pd
