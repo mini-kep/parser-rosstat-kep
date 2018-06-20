@@ -2,22 +2,24 @@
 [![Coverage badge](https://codecov.io/gh/mini-kep/parser-rosstat-kep/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parser-rosstat-kep)
 
 
+Parser          |                       KEP    
+----------------|-------------------------------------------------------------------------------------------------
+Data source     | ["Short-term Economic Indicators" (KEP) monthly Rosstat publication][Rosstat]
+Parsing result  | [Three CSV files with time series at annual, quarterly and monthly frequencies][backend]
+Schedule        | [2018][schedule]
+
 Concept
 -------
 
-Russian statistics agency Rosstat publishes macroeconomic time series as [MS Word files][Rosstat]. In this repo we extract these time series as pandas dataframes and save them as [CSV files][backend]. This is a machine-readable dataset, ready to use with python/R and econometrics tools. 
-
-This code replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
-
-
-Data source:  [Short-term Economic Indicators (KEP) monthly Rosstat publication][Rosstat]
-
-Parsing result: [three CSV files at annual, quarterly and monthly frequencies][backend]
+Russian statistics agency Rosstat publishes macroeconomic time series as [MS Word files][Rosstat]. In this repo 
+we make a machine-readable dataset of Russian macroeconomic time series and publish it as [CSV files][backend]. 
+We keep track of monthly macroeconomic data releases (vintages) since April 2009. 
 
 
 Interface 
 ---------
-[manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py) does the following job:
+
+[manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/kep/manage.py) does the following job:
 - download and unpack MS Word files from Rosstat
 - extract tables from Word files and assigns variable names
 - create pandas dataframes with time series (at annual, quarterly and monthly frequency) 
@@ -26,14 +28,23 @@ Interface
 [kep]: https://github.com/mini-kep/parser-rosstat-kep
 [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
 [backend]: https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest
+[schedule]: http://www.gks.ru/gis/images/graf-oper2018.htm
 
+Directory structure
+-------------------
 
-# Directory structure
-
-[kep] follows [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
+We follow [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
 directory structure. 
 
-[Source code (src) folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/src):
+#### Data
+[Processed data folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed)
+has datasets by year and month (vintages).
+
+[kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true) has is the latest data in Excel (but use of csv is still encouraged). 
+
+#### Code
+
+[kep package](https://github.com/mini-kep/parser-rosstat-kep/tree/master/src/kep) has follwoing subpackages:
    - **download**: download and unpack rar files from Rosstat website
    - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
    - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
@@ -41,13 +52,8 @@ directory structure.
 
 *NOTE:* Windows and MS Word are required to create interim text dumps from MS Word files. Оnce these text files are created, they can be parsed on a linux machine.
 
-[Processed data folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed)
-has datasets by year and month (vintages).
-
-# Access to parsing result
-
-[access.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/access.py) 
-is an entry point to get parsed data.
+Access to parsing result
+------------------------
 
 ```python
 import pandas as pd
@@ -62,37 +68,33 @@ dfa = get_dataframe_from_web('a')
 dfq = get_dataframe_from_web('q')
 dfm = get_dataframe_from_web('m')
 ```
-
-# Data in Excel
-
- Here is the latest data in Excel (but use of csv is still encouraged): 
  
- - [kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true)
-  
-# Repo management
+Repo management
+---------------
 
-Around [this schedule](http://www.gks.ru/gis/images/graf-oper2017.htm) on a Windows machine I run:   
+Around [this schedule][schedule] on a Windows machine I run:   
 
 ```
 invoke add <year> <month>
 ```
 
-and commit to this repo.
+and commit changes to this repo.
 
 This command:
 - downloads a rar file from Rosstat, 
 - unpacks MS Word files, 
 - dumps all tables from MS Word files to an interim CSV file, 
 - parses interim CSV file to three dataframes by frequency 
-- validates parsing result
 - transforms some variables (eg. deaccumulates government expenditures)
+- validates parsing result
 - saves dataframes as processed CSV files
-- saves csv for latest date
-- saves an Excel file for latest date.
+- saves csv for latest date (todo)
+- saves an Excel file for latest date (todo).
 
-Same job is done by [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py)
+Same job can be done by [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py)
 
-# Parcer summary
+Parcer summary
+--------------
 
 Parcer              |  mini-kep 
 --------------------|----------------------------------------
@@ -117,3 +119,9 @@ All historic raw data available on internet?
 Is scrapper automated (can download required_labels information from internet  without manual operations)?
 - [x] Yes
 - [ ] No 
+
+
+History
+-------
+
+This repo replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 

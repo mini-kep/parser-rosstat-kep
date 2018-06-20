@@ -2,7 +2,8 @@ import pytest
 import pandas as pd
 from collections import OrderedDict as odict
 
-from kep.csv2df.specification import Definition, Specification
+from kep.parsing_definition.parsing_definition import make_entry
+
 from kep.csv2df.reader import text_to_list
 from kep.csv2df.parser import split_to_tables, parse_tables, Table
 
@@ -19,25 +20,28 @@ def create_table():
 
 
 def test_split_to_tables():
-    assert create_table() == \
-        Table(headers=[['Объем ВВП, млрд.рублей / Gross domestic product, bln rubles']],
-              datarows=[['1999', '4823', '901', '1102', '1373', '1447'],
-                        ['2000', '7306', '1527', '1697', '2038', '2044']]
-              )
-
-
-class Test_Table():
     t = create_table()
+    assert t.header.rows[0].name == \
+        'Объем ВВП, млрд.рублей / Gross domestic product, bln rubles'
+    assert t.datarows == \
+         [['1999', '4823', '901', '1102', '1373', '1447'],
+          ['2000', '7306', '1527', '1697', '2038', '2044']]
+              
 
-    def test_extract_values_method_on_table_after_parsing_returns_expected_dicts(
+
+class Test_Table():    
+
+    def test_extract_values_on_defined_table_returns_expected_dicts(
             self):
         # prepare
-        self.t.set_splitter(None)
-        self.t.varname = 'GDP'
-        self.t.unit = 'bln_rub'
+        t = create_table()
+        t.set_splitter(None)
+        t.varname = 'GDP'
+        t.unit = 'bln_rub'
         # run
-        datapoints = list(self.t.extract_values())
+        datapoints = t.values
         # compare
+        assert t.is_defined() is True
         assert datapoints[0] == {'freq': 'a',
                                  'label': 'GDP_bln_rub',
                                  'time_index': pd.Timestamp('1999-12-31'),
@@ -102,7 +106,7 @@ def make_definition():
     # mapper dictionary to convert text in table headers to units of
     # measurement
     units = UNITS
-    return Definition(commands, units, boundaries)
+    return make_entry(commands, boundaries, '', units)
 
 
 def create_tables():
@@ -127,55 +131,56 @@ class Test_parse_tables:
 DOC3 = '\n'.join([DOC, DOC2])
 
 
-def make_specification():
-    commands = [
-        dict(
-            var='GDP',
-            header='Объем ВВП',
-            unit='bln_rub')]
-    specification = Specification(commands=commands, units=UNITS)
-    boundaries1 = [
-        dict(start='1.6. Инвестиции в основной капитал',
-             end='1.6.1. Инвестиции в основной капитал организаций'),
-        dict(start='1.7. Инвестиции в основной капитал',
-             end='1.7.1. Инвестиции в основной капитал организаций')]
-    commands1 = [
-        dict(
-            var='INVESTMENT',
-            header=['Инвестиции в основной капитал'],
-            unit=['bln_rub', 'yoy', 'rog'])]
-    specification.append(commands1, boundaries1)
-    return specification
+# def make_specification():
+    # commands = [
+        # dict(
+            # var='GDP',
+            # header='Объем ВВП',
+            # unit='bln_rub')]
+    # specification = Specification(commands=commands, units=UNITS)
+    # boundaries1 = [
+        # dict(start='1.6. Инвестиции в основной капитал',
+             # end='1.6.1. Инвестиции в основной капитал организаций'),
+        # dict(start='1.7. Инвестиции в основной капитал',
+             # end='1.7.1. Инвестиции в основной капитал организаций')]
+    # commands1 = [
+        # dict(
+            # var='INVESTMENT',
+            # header=['Инвестиции в основной капитал'],
+            # unit=['bln_rub', 'yoy', 'rog'])]
+    # specification.append(commands1, boundaries1)
+    # return specification
+
+# FIXME: shoudl this code be replaced?
+
+# control_values = [
+    # {'freq': 'a', 'label': 'GDP_bln_rub',
+     # 'time_index': pd.Timestamp('1999-12-31'),
+     # 'value': 4823.0},
+    # {'freq': 'q',
+     # 'label': 'GDP_bln_rub',
+     # 'time_index': pd.Timestamp('2000-12-31'),
+     # 'value': 2044.0},
+    # {'freq': 'a',
+     # 'label': 'INVESTMENT_bln_rub',
+     # 'time_index': pd.Timestamp('2015-12-31'),
+     # 'value': 14555.9},
+    # {'freq': 'q',
+     # 'label': 'INVESTMENT_rog',
+     # 'time_index': pd.Timestamp('2016-09-30'),
+     # 'value': 119.2}
+# ]
 
 
-control_values = [
-    {'freq': 'a', 'label': 'GDP_bln_rub',
-     'time_index': pd.Timestamp('1999-12-31'),
-     'value': 4823.0},
-    {'freq': 'q',
-     'label': 'GDP_bln_rub',
-     'time_index': pd.Timestamp('2000-12-31'),
-     'value': 2044.0},
-    {'freq': 'a',
-     'label': 'INVESTMENT_bln_rub',
-     'time_index': pd.Timestamp('2015-12-31'),
-     'value': 14555.9},
-    {'freq': 'q',
-     'label': 'INVESTMENT_rog',
-     'time_index': pd.Timestamp('2016-09-30'),
-     'value': 119.2}
-]
-
-
-def test_specification_with_2_segments_on_valid_csv_data():
-    # setting
-    spec = make_specification()
-    spec.attach_data(DOC3)
-    # call
-    values = spec.values
-    # check
-    for d in control_values:
-        assert d in values
+# def test_specification_with_2_segments_on_valid_csv_data():
+    # # setting
+    # spec = make_specification()
+    # spec.attach_data(DOC3)
+    # # call
+    # values = spec.values
+    # # check
+    # for d in control_values:
+        # assert d in values
 
 
 if __name__ == "__main__":

@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pandas = "*"
+openpyxl = "*"
+matplotlib = "*"
+requests = "*"
+arrow = "*"
+"m2r" = "*"
+invoke = "*"
+mini-kep-parsers = {git = "https://github.com/mini-kep/parsers.git"}
+pyyaml = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.6"
