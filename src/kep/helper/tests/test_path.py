@@ -18,7 +18,7 @@ def test_constants():
     assert isinstance(XL_PATH, str)
 
 
-# TODO: randomise test with a random pair from supported dates
+# TODO: randomise tests with a random pair from supported dates
 class Test_DataFolder():
 
     # we assume for (2015, 5) all folders exist

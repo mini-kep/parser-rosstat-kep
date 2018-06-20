@@ -1,8 +1,8 @@
 """Run full cycle of data processing from download to saving dataframe."""
 
-from kep.download.download import RemoteFile
-from kep.word2csv.word import word2csv
+from kep.download import RemoteFile, word2csv
 from kep.vintage import Vintage
+
 
 def run(year, month): # pragma: no cover
     #download and unpack
@@ -10,10 +10,10 @@ def run(year, month): # pragma: no cover
     remote.download()
     remote.unrar()
 
-    # Word files -> interim csv files
+    # convert Word files to interim csv files
     word2csv(year, month)
 
-    # parse interim csv, validate, save to prcessed foolder
+    # parse interim csv, validate, save to processed foolder
     vint = Vintage(year, month)
     vint.validate()
     vint.save()

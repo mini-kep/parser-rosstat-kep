@@ -100,9 +100,9 @@ if __name__ == '__main__':
     dfq = e.get_dataframe('q')
     dfm = e.get_dataframe('m')
 
-    from kep.csv2df.reader import text_to_rows
-    from kep.csv2df.parser import extract_tables
-    from kep.csv2df.specification import Definition
+    from kep.csv2values.reader import text_to_rows
+    from kep.csv2values.parser import extract_tables
+    from kep.csv2values.specification import Definition
 
     # input data
     csv_segment = text_to_rows(

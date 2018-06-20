@@ -9,7 +9,7 @@ Use Popper class as a stack to split CSV data.
 import csv
 from io import StringIO
 
-from kep.csv2df.row_model import Row
+from kep.pipeline.parser.row_model import Row
 
 CSV_FORMAT = dict(delimiter="\t", lineterminator="\n")
 

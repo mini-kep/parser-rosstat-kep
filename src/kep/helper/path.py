@@ -98,7 +98,7 @@ class FileBase:
     path = Path()
 
     def exists(self):
-        return self.path.exists()
+        return self.path.exists() and len(self) > 0
 
     def text(self):
         return self.path.read_text(encoding='utf-8')

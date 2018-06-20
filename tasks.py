@@ -61,7 +61,7 @@ def lint(ctx, folder="src/csv2df"):
     """
     # E501 line too long
     # --max-line-length=100
-    ctx.run('flake8 {} --exclude test* --ignore E501'.format(folder))
+    ctx.run('flake8 {} --exclude tests* --ignore E501'.format(folder))
 
 # documentation 
 
@@ -96,7 +96,7 @@ def doc(ctx):
 
 @task
 def find(ctx, regex):
-    exclude = """ -name "*.py" ! -name "__init__.py" ! -name "test*" """
+    exclude = """ -name "*.py" ! -name "__init__.py" ! -name "tests*" """
     command = ' | '.join([f"find . -type f {exclude}"
                         , f"xargs grep -nH '{regex}'"])
     ctx.run(command)
@@ -104,12 +104,12 @@ def find(ctx, regex):
 
 @task
 def test(ctx):
-    ctx.run("py.test src --doctest-modules")  # --cov=csv2df
+    ctx.run("py.tests src --doctest-modules")  # --cov=csv2df
 
 
 @task
 def cov(ctx):
-    ctx.run("py.test --cov=csv2df")
+    ctx.run("py.tests --cov=csv2df")
     ctx.run("coverage report --omit=*tests*,*__init__*")
 
 

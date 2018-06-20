@@ -1,6 +1,6 @@
 import pytest
 
-from kep.csv2df.util.to_float import to_float
+from kep.pipeline.parser.to_float import to_float
 
 
 class Test_to_float:

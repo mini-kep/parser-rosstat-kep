@@ -26,14 +26,6 @@ class Test_Vintage:
     def test_repr_is_callable_and_returns_a_string(self):
         assert isinstance(repr(self.vintage), str)
 
-    def test_save_writes_files_to_folder(self):
-        # call
-        self.vintage.save(folder=self.temp_folder)
-        # check
-        for f in self.paths:
-            assert f.exists()
-            assert f.stat().st_size > 0
-
     def teardown(self):
         for f in self.paths:
             if f.exists():
@@ -47,7 +39,7 @@ class Test_Vintage:
 #        with pytest.raises(ValueError, match=r'Operation cannot be completed .*'):
 #            Latest(year, month)
 #
-#    # WARNING: the test will fail if no current pasring took place 
+#    # WARNING: the tests will fail if no current pasring took place 
 #    #          and files for recent month were not created 
 #    def test_init_on_recent_date_creates_instance(self):
 #        year, month = Date.latest_dates[0]

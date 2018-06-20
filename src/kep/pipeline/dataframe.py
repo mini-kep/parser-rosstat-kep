@@ -89,9 +89,9 @@ if __name__ == '__main__':  # pragma: no cover
     dfq = create_dataframe(values, 'q')
     dfm = create_dataframe(values, 'm')
 
-    from kep.csv2df.reader import text_to_list
-    from kep.csv2df.parser import Segment
-    from kep.csv2df.specification import Definition
+    from kep.csv2values.reader import text_to_list
+    from kep.csv2values.parser import Segment
+    from kep.csv2values.specification import Definition
 
     # input data
     csv_segment = text_to_list(

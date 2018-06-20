@@ -1,12 +1,12 @@
 import pytest
 
-from kep.vintage import Vintage
-from kep.validation.checkpoints import (
+from kep.parsing_definition.checkpoints import (
     Annual,
     ValidationError,
     include,
     expect
 )
+from kep.vintage import Vintage
 
 
 @pytest.fixture(scope="module")

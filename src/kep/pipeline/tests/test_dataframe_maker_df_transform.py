@@ -1,9 +1,10 @@
-import pytest
-import pandas as pd
 from itertools import accumulate
 from random import randint
 
-from kep.csv2df.dataframe_maker import deaccumulate
+import pandas as pd
+import pytest
+
+from kep.pipeline.dataframe import deaccumulate
 
 
 def _make_df(name, values, freq):

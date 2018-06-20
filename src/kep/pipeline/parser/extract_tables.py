@@ -5,13 +5,14 @@
 
 from collections import OrderedDict as odict
 from enum import Enum, unique
-import pandas as pd
 
-import kep.csv2df.util.row_splitter as splitter
-from kep.csv2df.row_model import Row
-from kep.csv2df.reader import text_to_list
-from kep.csv2df.util.label import make_label
-from kep.csv2df.util.to_float import to_float
+import pandas as pd
+from kep.pipeline.helper import make_label
+from .row_splitter import get_splitter
+from .to_float import to_float
+
+from kep.pipeline.reader.popper import text_to_list
+from .row_model import Row
 
 
 def evaluate_assignment(rows, pdef):
@@ -176,7 +177,7 @@ class Table:
 
     def set_splitter(self, reader=None):
         key = reader or count_columns(self.datarows)
-        self.splitter_func = splitter.get_splitter(key)
+        self.splitter_func = get_splitter(key)
 
     def is_defined(self):
         return bool(self.label and self.splitter_func)
@@ -296,8 +297,8 @@ if __name__ == "__main__":  # pragma: no cover
 2016		36,9	147,1	119,2
 1.7.1. Инвестиции в основной капитал организаций"""
 
-    from kep.csv2df.reader import text_to_list
-    from kep.csv2df.specification import Definition
+    from kep.csv2values.reader import text_to_list
+    from kep.csv2values.specification import Definition
 
     # settings
     boundaries = [

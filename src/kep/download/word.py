@@ -213,13 +213,18 @@ def folder_to_csv(folder, csv_filename):
 #
 # -------------------------------------------------------------------------------
 
+from kep.helper.path import DataFolder, InterimCSV
 
-def word2csv(year, month, force=False):
-    from kep.helper.path import DataFolder, InterimCSV
+def convert_msword_to_csv(year, month):
     raw_folder = DataFolder(year, month).raw
     interim_csv = InterimCSV(year, month)
-    if force or not interim_csv.exists() or len(interim_csv) == 0:
-        folder_to_csv(folder=raw_folder, csv_filename=interim_csv.path)
+    folder_to_csv(folder=raw_folder, csv_filename=interim_csv.path)
+
+
+def word2csv(year, month, force=False):
+    interim_csv = InterimCSV(year, month)
+    if force or not interim_csv.exists():
+        convert_msword_to_csv(year, month)
 
 
 if __name__ == "__main__":

@@ -1,12 +1,11 @@
-import pytest
-import pandas as pd
 from collections import OrderedDict as odict
 
-from kep.parsing_definition.parsing_definition import make_entry
+import pandas as pd
+import pytest
 
-from kep.csv2df.reader import text_to_list
-from kep.csv2df.parser import split_to_tables, parse_tables, Table
-
+from kep.parsing_definition.parsing_definition import make_parsing_definition
+from kep.pipeline.parser.extract_tables import split_to_tables, parse_tables
+from kep.pipeline.reader.popper import text_to_list
 
 DOC = """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447
@@ -106,7 +105,7 @@ def make_definition():
     # mapper dictionary to convert text in table headers to units of
     # measurement
     units = UNITS
-    return make_entry(commands, boundaries, '', units)
+    return make_parsing_definition(commands, boundaries, '', units)
 
 
 def create_tables():

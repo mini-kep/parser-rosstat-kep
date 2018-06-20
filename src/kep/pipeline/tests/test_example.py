@@ -62,10 +62,10 @@ csv_text = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.
 1.7.1. Инвестиции в основной капитал организаций"""
 
 from collections import OrderedDict as odict
-from kep.csv2df.reader import text_to_list
-from kep.csv2df.parser import split_to_tables, parse_tables
-from kep.parsing_definition.parsing_definition import make_entry
 
+from kep.parsing_definition import make_parsing_definition
+from kep.pipeline.parser.extract_tables import split_to_tables, parse_tables
+from kep.pipeline.reader.popper import text_to_list
 
 # settings
 boundaries = [
@@ -89,7 +89,7 @@ units = odict([  # 1. MONEY
     ('в % к соответствующему периоду предыдущего года', 'yoy'),
     ('в % к соответствующему месяцу предыдущего года', 'yoy')
 ])
-pdef = make_entry(commands, boundaries, '', units)
+pdef = make_parsing_definition(commands, boundaries, '', units)
 
 
 

@@ -1,6 +1,6 @@
 import pytest
 
-import kep.csv2df.util.label as label
+import kep.helper.label as label
 
 
 # TODO: add variable name with underscore, like GOV_EXPENSE

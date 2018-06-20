@@ -5,34 +5,32 @@ Dataflow:
    - parsing jobs (job is a csv data block and its parsing definition) 
    - values 
    - dataframes by frequency
-  
+
 """
 
-from kep import FREQUENCIES
-from kep.parsing_definition import DEFINITION_DEFAULT, DEFINITIONS_BY_SEGMENT
-from kep.csv2df.allocation import get_values
-from kep.csv2df.dataframe_maker import create_dataframe 
-from kep.validation.checkpoints import verify
-from kep.helper.path import InterimCSV, ProcessedCSV, copy_to_latest
 
+from kep.helper.path import InterimCSV, ProcessedCSV, copy_to_latest
+from kep.pipeline import create_parser, create_dataframe
+from kep.parsing_definition import (DEFINITION_DEFAULT, DEFINITIONS_BY_SEGMENT, 
+                                    verify)
 
 class Vintage:
-    """Represents dataset release for a given year and month.    
-       Parses interim CSV file and obtains resulting dataframes.
-    """
     def __init__(self, year: int, month: int):
         self.year, self.month = year, month
-        csv_text = InterimCSV(year, month).text()
-        self.values = get_values(csv_text, DEFINITION_DEFAULT, DEFINITIONS_BY_SEGMENT)
-        self.dfs = {freq: create_dataframe(self.values, freq) for freq in FREQUENCIES}
-
-    def save(self, folder=None):
+        csv_text = InterimCSV(self.year, self.month).text()
+        parser = create_parser(DEFINITION_DEFAULT, DEFINITIONS_BY_SEGMENT)
+        self.values = list(parser(csv_text))
+        self.dfs = {}
+        for freq in 'aqm':
+            self.dfs[freq] = create_dataframe(self.values, freq) 
         self.validate()
-        csv_processed = ProcessedCSV(self.year, self.month, folder)
+
+    def save(self):
+        csv_processed = ProcessedCSV(self.year, self.month)
         for freq, df in self.dfs.items():
             path = csv_processed.path(freq)
             # Convert 1524.3999999999996 back to 1524.4
-            # Deaccumulation procedure in parser.py responsible  
+            # Deaccumulation procedure in extract_tables.py responsible
             # for float number generation. 
             # WONTFIX: the risk is loss of data for exchange rate, 
             #          may need fomatter by column. annual values can be
@@ -67,4 +65,4 @@ if __name__ == "__main__": # pragma: no cover
     dfm = v.dfs['m']
     dfa = v.dfs['a']
     dfq = v.dfs['q']
-    
+    v.to_latest()

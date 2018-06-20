@@ -1,7 +1,7 @@
 import pytest
 from collections import OrderedDict as odict
 
-from kep.csv2df.row_model import get_year, is_year, Row
+from kep.pipeline.parser.row_model import get_year, is_year, Row
 
 
 class Test_get_year():

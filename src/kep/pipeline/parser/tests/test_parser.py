@@ -1,13 +1,11 @@
-import pytest
 import pandas as pd
+import pytest
 
-from kep.csv2df.parser import Table, DataBlock, HeaderParser
-from kep.csv2df.parser import timestamp_quarter, timestamp_month, timestamp_annual
-
-from kep.csv2df.util.row_splitter import split_row_by_year_and_qtr
+from kep.parsing_definition import make_parsing_definition
 from kep.parsing_definition.units import UNITS
-#TODO: rename globally
-from kep.parsing_definition.parsing_definition import make_entry
+from kep.pipeline.parser.extract_tables import Table, DataBlock, HeaderParser
+from kep.pipeline.parser.extract_tables import timestamp_quarter, timestamp_month, timestamp_annual
+from kep.pipeline.parser.row_splitter import split_row_by_year_and_qtr
 
 
 @pytest.fixture
