@@ -2,10 +2,10 @@ import pytest
 
 from kep.vintage import Vintage
 from kep.validation.checkpoints import (
-    validate2,
+    Annual,
     ValidationError,
-    find_missed_checkpoints,
-    find_uncovered_column_names
+    include,
+    expect
 )
 
 
@@ -15,53 +15,36 @@ def dataframe():
 
 
 @pytest.fixture(scope="module")
-def upfront_absent_dicts():
+def absent():
     return [
-        dict(
+        Annual(
             date="1999",
-            freq="z",
-            name="some_really_long_test_variable",
+            label="some_really_long_test_variable",
             value=100.0,
         )
     ]
 
 
 @pytest.fixture(scope="module")
-def good_path_dicts():
+def present():
     return [
-        dict(
+        Annual(
             date="1999",
-            freq="a",
-            name="AGROPROD_yoy",
+            label="AGROPROD_yoy",
             value=103.8,
         )
     ]
 
+class Test_verify():
 
-def test_validate_raises_value_error_on_missed_dict_in_dataframe(dataframe, upfront_absent_dicts):
-    with pytest.raises(ValidationError):
-        validate2(dataframe, upfront_absent_dicts, [])
+    def test_raises_value_error_on_missed_points(self, dataframe, absent):
+        with pytest.raises(ValidationError):
+            include(dataframe, absent)    
+    
+    def test_returns_without_error_on_good_path(self, dataframe, present):
+        include(dataframe, present)
 
-
-def test_validate_returns_without_error_on_good_path(dataframe, good_path_dicts):
-    validate2(dataframe, good_path_dicts, [])
-
-
-def test_validate_raises_value_error_on_uncovered_dict_in_dataframe(dataframe, good_path_dicts):
-    with pytest.raises(ValidationError):
-        validate2(dataframe, good_path_dicts, good_path_dicts, strict=True)
-
-
-def test_find_missed_checkpoints_returns_missed_dicts(dataframe, upfront_absent_dicts):
-    assert find_missed_checkpoints(dataframe, upfront_absent_dicts) == set(upfront_absent_dicts)
-
-
-def test_find_missed_checkpoints_returns_empty_set_on_valid_data(dataframe, good_path_dicts):
-    assert find_missed_checkpoints(dataframe, good_path_dicts) == set()
-
-
-def test_find_uncovered_column_names_returns_valid_data(dataframe, upfront_absent_dicts, good_path_dicts):
-    assert len(find_uncovered_column_names(dataframe, [])) == len(dataframe.columns)
-    assert len(find_uncovered_column_names(dataframe, upfront_absent_dicts)) == len(dataframe.columns)
-    assert len(find_uncovered_column_names(dataframe, good_path_dicts)) == \
-        len(dataframe.columns) - len(good_path_dicts)
+    def test_expect_passed(self, dataframe, present, absent):
+        expect(dataframe, present)
+        expect(dataframe, absent)
+    

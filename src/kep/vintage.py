@@ -12,7 +12,7 @@ from kep import FREQUENCIES
 from kep.parsing_definition import DEFINITION_DEFAULT, DEFINITIONS_BY_SEGMENT
 from kep.csv2df.allocation import get_values
 from kep.csv2df.dataframe_maker import create_dataframe 
-from kep.validation.checkpoints import omissions, orphans, ValidationError
+from kep.validation.checkpoints import verify
 from kep.helper.path import InterimCSV, ProcessedCSV, copy_to_latest
 
 
@@ -41,15 +41,9 @@ class Vintage:
             print("Saved dataframe to", path)
             
     def validate(self):
-        not_found = omissions(self.dfs) 
-        if not_found:
-            print('Not found in dataset:') 
-            raise ValidationError(not_found)
-        else:
-            print('All checkpoints found in dataset') 
-        orphan_columns = orphans(self.dfs)
-        if orphan_columns:  
-            print('Not covered by checkpoints', orphan_columns)
+        print('Started validation...')
+        verify(**self.dfs) 
+        print('All required checkpoints found in dataset, validation passed') 
             
     def to_latest(self):
         copy_to_latest(self.year, self.month) 
@@ -68,7 +62,7 @@ class Vintage:
         return "Vintage({}, {})".format(self.year, self.month)
 
 if __name__ == "__main__": # pragma: no cover
-    v = Vintage(2018, 3)    
+    v = Vintage(2018, 4)    
     v.save()
     dfm = v.dfs['m']
     dfa = v.dfs['a']
