@@ -2,7 +2,6 @@
 
    extract_tables(csv_segment, pdef)
 """
-
 from collections import OrderedDict as odict
 from enum import Enum, unique
 
@@ -10,8 +9,6 @@ import pandas as pd
 from kep.helper.label import make_label
 from .row_splitter import get_splitter
 from .to_float import to_float
-
-from kep.pipeline.reader.popper import text_to_list
 from .row_model import Row
 
 
@@ -201,6 +198,7 @@ class Table:
 
 
 if __name__ == "__main__":  # pragma: no cover
+    from kep.pipeline.reader.popper import text_to_list
     # example 1
     DOC = """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447

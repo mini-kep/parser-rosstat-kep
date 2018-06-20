@@ -30,27 +30,6 @@ Interface
 [backend]: https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest
 [schedule]: http://www.gks.ru/gis/images/graf-oper2018.htm
 
-Directory structure
--------------------
-
-We follow [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
-directory structure. 
-
-#### Data
-[Processed data folder](https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed)
-has datasets by year and month (vintages).
-
-[kep.xlsx](https://github.com/epogrebnyak/mini-kep/blob/master/output/kep.xlsx?raw=true) has is the latest data in Excel (but use of csv is still encouraged). 
-
-#### Code
-
-[kep package](https://github.com/mini-kep/parser-rosstat-kep/tree/master/src/kep) has follwoing subpackages:
-   - **download**: download and unpack rar files from Rosstat website
-   - **word2csv**: convert MS Word files to single interim CSV file (Windows-only)
-   - **csv2df**: parse interim CSV files and save processed CSV files with annual, quarterly and monthly data
-   - **df2xl**: make Excel file with three worksheets for annual, quarterly and monthly data 
-
-*NOTE:* Windows and MS Word are required to create interim text dumps from MS Word files. Оnce these text files are created, they can be parsed on a linux machine.
 
 Access to parsing result
 ------------------------
@@ -120,7 +99,13 @@ Is scrapper automated (can download required_labels information from internet  w
 - [ ] No 
 
 
-History
--------
 
-This repo replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
+Notes
+-----
+
+- We follow [cookiecutter-data-science](https://github.com/drivendata/cookiecutter-data-science) template for 
+directory structure. 
+
+- Windows and MS Word are required to create interim text dumps from MS Word files. Оnce these text files are created, they can be parsed on a linux machine.
+
+- This repo replaces a predecessor, [data-rosstat-kep](https://github.com/epogrebnyak/data-rosstat-kep), which could not handle vintages of macroeconomic data. 
