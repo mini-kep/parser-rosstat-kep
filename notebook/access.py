@@ -43,10 +43,10 @@ def get_dataframe(freq):
     return read_csv(filelike)
 
 
-# This is example in README.md
+# example in README.md
 def get_dataframe_from_web(freq):
-    url_base = ('https://raw.githubusercontent.com/'
-                'epogrebnyak/mini-kep/master/data/processed/latest/{}')
+    url_base = ('https://raw.githubusercontent.com/mini-kep/parser-rosstat-kep/'
+                'master/data/processed/latest/{}')
     filename = "df{}.csv".format(freq)
     url = url_base.format(filename)
     return pd.read_csv(url, converters={0: pd.to_datetime}, index_col=0)

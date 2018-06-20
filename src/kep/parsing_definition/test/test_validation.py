@@ -3,7 +3,7 @@ import pytest
 from kep.parsing_definition.checkpoints import (
     Annual,
     ValidationError,
-    include,
+    require,
     expect
 )
 from kep.vintage import Vintage
@@ -39,10 +39,10 @@ class Test_verify():
 
     def test_raises_value_error_on_missed_points(self, dataframe, absent):
         with pytest.raises(ValidationError):
-            include(dataframe, absent)    
+            require(dataframe, absent)
     
     def test_returns_without_error_on_good_path(self, dataframe, present):
-        include(dataframe, present)
+        require(dataframe, present)
 
     def test_expect_passed(self, dataframe, present, absent):
         expect(dataframe, present)

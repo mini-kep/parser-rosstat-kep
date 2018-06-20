@@ -162,31 +162,38 @@ class ValidationError(ValueError):
     pass
 
 def fmt(_list):
-    return '    ' + '\n    '.join(map(str, _list))
+    prefix = '\n'+' '*4
+    return prefix + prefix.join(map(str, _list))
 
-def include(df, checkpoints):
-    _missed = missed(df, checkpoints)
-    if _missed:
-        raise ValidationError(f"Dataframe must contain:"
-                              f"\n{fmt(_missed)}")
+def _check(df, checkpoints, examiner, exc_handler, exc_message: str):
+    _missed = examiner(df, checkpoints)
+    if _missed:        
+        exc_handler(exc_message + fmt(_missed))
+
+def require(df, checkpoints):
+    return _check(df, checkpoints, 
+                  examiner=missed,
+                  exc_handler=lambda x: ValidationError(x),
+                  exc_message = 'Dataframe must contain:')
+
+def expect(df, checkpoints):
+    return _check(df, checkpoints, 
+                  examiner=missed,
+                  exc_handler=print,
+                  exc_message = 'Optional checkpoints not found in dataframe:')
         
-def expect(df, optional_checkpoints):        
-    _missed = missed(df, optional_checkpoints)
-    if _missed:
-        print(f'Optional checkpoints not found in dataframe:'
-              f'\n{fmt(_missed)}')
-
 def cover(df, checkpoints):
-    _uncovered = uncovered(df, checkpoints)
-    if _uncovered:
-        print (f'Variables in dataframe not covered by checkpoints:'
-               f'\n{fmt(_uncovered)}')
+    return _check(df, checkpoints, 
+                  examiner=uncovered,
+                  exc_handler=print,
+                  exc_message = 'Variables in dataframe not covered by checkpoints:')
+
     
 def verify(a, q, m):
-    include(a, VALUES_ANNUAL_1999)
+    require(a, VALUES_ANNUAL_1999)
     expect(a, VALUES_ANNUAL_2017)    
-    include(q, VALUES_QTR_1999)
-    include(m, VALUES_MONTHLY_1999)
+    require(q, VALUES_QTR_1999)
+    require(m, VALUES_MONTHLY_1999)
     cover(a, VALUES_ANNUAL_1999+VALUES_ANNUAL_2017)
     cover(q, VALUES_QTR_1999)
     cover(m, VALUES_MONTHLY_1999)

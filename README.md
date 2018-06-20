@@ -11,9 +11,11 @@ Schedule        | [2018][schedule]
 Concept
 -------
 
-Russian statistics agency Rosstat publishes macroeconomic time series as [MS Word files][Rosstat]. In this repo 
-we make a machine-readable dataset of Russian macroeconomic time series and publish it as [CSV files][backend]. 
-We keep track of monthly macroeconomic data releases (vintages) since April 2009. 
+In this repo we publish a dataset of Russian macroeconomic time series 
+as machine-readable [CSV files][backend]. 
+We keep track of monthly macroeconomic data releases (vintages) 
+since April 2009.
+Original files by Rosstat are in [MS Word format][Rosstat]. 
 
 
 Interface 
@@ -34,12 +36,18 @@ Interface
 Access to parsing result
 ------------------------
 
+Stable URL: <https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest> 
+
+<!--
+Excel file: [kep.xlsx](https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest/kep.xlsx)
+-->
+
 ```python
 import pandas as pd
 
 def get_dataframe_from_web(freq):
-    url_base = ('https://raw.githubusercontent.com/'
-                'epogrebnyak/mini-kep/master/data/processed/latest/{}')
+    url_base = ('https://raw.githubusercontent.com/mini-kep/parser-rosstat-kep/'
+                'master/data/processed/latest/{}')
     filename = "df{}.csv".format(freq)
     url = url_base.format(filename)
     return pd.read_csv(url, converters={0: pd.to_datetime}, index_col=0)

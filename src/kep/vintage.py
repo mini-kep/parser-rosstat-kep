@@ -8,7 +8,6 @@ Dataflow:
 
 """
 
-
 from kep.helper.path import InterimCSV, ProcessedCSV, copy_to_latest
 from kep.pipeline import create_parser, create_dataframe
 from kep.parsing_definition import (DEFINITION_DEFAULT, DEFINITIONS_BY_SEGMENT, 
