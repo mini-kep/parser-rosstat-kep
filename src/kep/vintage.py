@@ -17,13 +17,21 @@ from kep.parsing_definition import (DEFINITION_DEFAULT, DEFINITIONS_BY_SEGMENT,
 class Vintage:
     def __init__(self, year: int, month: int):
         self.year, self.month = year, month
+        self.values = self._values()     
+        self.dfs = self._dataframes(self.values)
+        self.validate()
+        
+    def _values(self):    
         csv_text = InterimCSV(self.year, self.month).text()
         parser = create_parser(DEFINITION_DEFAULT, DEFINITIONS_BY_SEGMENT)
-        self.values = list(parser(csv_text))
-        self.dfs = {}
+        return list(parser(csv_text))
+    
+    @staticmethod
+    def _dataframes(values):
+        dfs = {}
         for freq in 'aqm':
-            self.dfs[freq] = create_dataframe(self.values, freq) 
-        self.validate()
+            dfs[freq] = create_dataframe(values, freq) 
+        return dfs
 
     def save(self):
         csv_processed = ProcessedCSV(self.year, self.month)
