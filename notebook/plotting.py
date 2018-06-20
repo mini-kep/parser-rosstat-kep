@@ -1,3 +1,15 @@
+# Workflow
+# --------    
+#
+# 1. what is latest date available? 
+# 2. could newer data have come already?
+# 3. [+] let's parse the new data 
+# 4. [-] commit to repo
+# 5. upload to database
+# 6. create a PDF handout or other assets
+
+
+
 # plotting
 
 import matplotlib.pyplot as plt
