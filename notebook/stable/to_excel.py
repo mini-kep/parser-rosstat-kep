@@ -1,11 +1,10 @@
 """Save xls file."""
 
-from pathlib import Path
 import pandas as pd
 
-from access import get_dataframe
+from access import get_dataframe, FOLDER
 
-XL_PATH = str(Path(__file__).with_name('kep.xlsx'))
+XL_PATH = str(FOLDER / 'kep.xlsx')
 
 def to_xls(filepath, dfa, dfq, dfm):
     """Save dataframes *dfa, dfq, dfm* in .xlsx *filepath*."""

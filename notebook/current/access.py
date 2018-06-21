@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pandas as pd
 
-FOLDER = Path(__file__).parents[1] / 'data' / 'processed' / 'latest'
+FOLDER = Path(__file__).parents[2] / 'data' / 'processed' / 'latest'
 
 
 def locate(freq):
