@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=master)](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=master)
-[![Build Status](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=dev)](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=dev)
+[![Build Status](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=master)](https://travis-ci.org/mini-kep/parser-rosstat-kep)
+[![Build Status](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=dev)](https://travis-ci.org/mini-kep/parser-rosstat-kep)
 [![Coverage badge](https://codecov.io/gh/mini-kep/parser-rosstat-kep/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parser-rosstat-kep)
 
 
