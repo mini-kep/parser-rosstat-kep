@@ -1,11 +1,12 @@
-[![Build Status](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=master)](https://travis-ci.org/mini-kep/parser-rosstat-kep)
+[![Build Status](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=master)](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=master)
+[![Build Status](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=dev)](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=dev)
 [![Coverage badge](https://codecov.io/gh/mini-kep/parser-rosstat-kep/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parser-rosstat-kep)
 
 
 Parser          |                       KEP    
 ----------------|-------------------------------------------------------------------------------------------------
-Data source     | ["Short-term Economic Indicators" (KEP) monthly Rosstat publication][Rosstat]
-Parsing result  | [CSV files with time series at annual, quarterly and monthly frequencies][backend]
+Data source     | ["Short-term Economic Indicators" (KEP) by Rosstat][Rosstat]
+Parsing result  | [Annual, quarterly and monthly time series in CSV files][backend]
 Schedule        | [2018][schedule]
 
 Concept
