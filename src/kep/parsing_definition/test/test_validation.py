@@ -48,3 +48,7 @@ class Test_verify():
         expect(dataframe, present)
         expect(dataframe, absent)
     
+
+if __name__ == "__main__":
+    pytest.main([__file__])
+

@@ -4,10 +4,8 @@ from collections import namedtuple
 import pandas as pd
 
 var_str = 'date label value'
-Annual = namedtuple('Annual', var_str)
-Qtr = namedtuple('Quarter', var_str)
-Month = namedtuple('Month', var_str)
-
+Annual, Qtr, Month = (namedtuple(name, 'date label value')
+                      for name in 'Annual Quarter Month'.split(' '))
 
 def make_list(cls, date, values):
     return [cls(date, k, v) for k, v in values.items()]
@@ -161,6 +159,9 @@ def uncovered(df: pd.DataFrame, checkpoints: list):
 class ValidationError(ValueError):
     pass
 
+def raise_validation_error(message: str):
+    raise ValidationError(message)  
+    
 def fmt(_list):
     prefix = '\n'+' '*4
     return prefix + prefix.join(map(str, _list))
@@ -173,7 +174,7 @@ def _check(df, checkpoints, examiner, exc_handler, exc_message: str):
 def require(df, checkpoints):
     return _check(df, checkpoints, 
                   examiner=missed,
-                  exc_handler=lambda x: ValidationError(x),
+                  exc_handler=raise_validation_error,
                   exc_message = 'Dataframe must contain:')
 
 def expect(df, checkpoints):
