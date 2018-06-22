@@ -1,5 +1,7 @@
+import os
 import pandas as pd
 import matplotlib
+#matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import matplotlib.dates as dates
 matplotlib.style.use('ggplot')
@@ -135,31 +137,34 @@ print (rows)
     
 df = dfq
 df['TRADE_SURPLUS_bln_usd'] = (df['EXPORT_GOODS_bln_usd'] 
-                             - df['IMPORT_GOODS_bln_usd'])    
-for topic in rows.keys():
+                             - df['IMPORT_GOODS_bln_usd'])  
+tableitems = []  
+for t, topic in enumerate(rows.keys()):
     # this becomes a header for a pair of graphs
+    trow = [topic, ]
     print(topic)
-    for d in rows[topic]:
+    for i, d in enumerate(rows[topic]):
         plt.figure()
         try:
             plot_long(df[d.names],
                       title=d.title, 
                       start=2005)
+            plt.savefig('%s_%s.png' % (t,i))
+            trow.append("""<img class="rowimage" src="./%s_%s.png" ></img>""" % (t,i))
         except KeyError:
             print ('Not plotted:', d)
-
+    tableitems.append(trow)
 # #a4: adapt code below to writing a PDF with charts to file
 
-table_doc = """<table>
+table_doc = """
 {% for item in items %}
-<TR>
-   <TD colspan=2>{{item.header}}</TD>
-<TR>
-   <TD>insert image 1 here </TD>
-   <TD>insert image 2 here</TD>
-</TR>
+<p>{{item[0]}}</p>
+<div id="images">
+{{item[1]}}
+{{item[2]}}
+</div>
 {% endfor %}
-</table>"""
+"""
    
 template_doc = """
 <!DOCTYPE html>
@@ -167,11 +172,22 @@ template_doc = """
 <head lang="ru">
     <meta charset="UTF-8">
     <title>{{ page_header }}</title>
+<style>
+.rowimage {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    height: 260px; 
+}
+#images{
+    text-align:center;
+}
+  </style>
 </head>
 <body>
-      insert table_doc here
+      %s
 </body>
-</html>"""
+</html>""" % table_doc
 
 from pathlib import Path
 Path('ts.html').write_text(template_doc)
@@ -182,11 +198,14 @@ env = Environment(loader=FileSystemLoader('.'))
 template = env.get_template('ts.html')
 
 template_vars = {"title" : "Sales Funnel Report - National",
-                 "national_pivot_table": df.to_html()}
-html_out = template.render(template_vars)
+                 "national_pivot_table": df.to_html(),
+                 "items": tableitems
+                 }
 
-from weasyprint import HTML
-HTML(string=html_out).write_pdf("ts.pdf")
+html_out = template.render(template_vars)
+print(html_out)
+from weasyprint import HTML, CSS
+HTML(string=html_out, base_url=os.path.dirname(os.path.abspath(__file__))).write_pdf("ts.pdf", stylesheets=[CSS(string='@page {size: Letter;  margin: 0in 0.44in 0.2in 0.44in;}')])
 
 # end - adapt code below to writing a PDF with charts to file
 
@@ -215,7 +234,9 @@ groups = {
                  'RETAIL_SALES_yoy'],   
 'corporate': ['CORP_RECEIVABLE_OVERDUE_bln_rub', 'CORP_RECEIVABLE_bln_rub']
 }   
-all_vars = list(set(dfa.columns + dfq.columns + dfm.columns))
+
+# иначе не получается складывать объекты 'numpy.ndarray'. если разное кол-во элементов - ошибка. 
+all_vars = list(set(list(dfa.columns.values) + list(dfq.columns.values) + list(dfm.columns.values)))
 x = [k for keys in groups.values() for k in keys]
 not_found = [y for y in all_vars if y not in x]
 print('Variables not grouped:\n', not_found)
