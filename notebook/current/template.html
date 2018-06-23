@@ -1,0 +1,32 @@
+
+<!DOCTYPE html>
+<html>
+<head lang="ru">
+    <meta charset="UTF-8">
+    <title>{{ page_header }}</title>
+<style>
+.rowimage {
+    display: inline-block;
+    margin-left: auto;
+    margin-right: auto;
+    height: 260px; 
+}
+  </style>
+</head>
+<body>
+     
+{% for plot in plot_dicts %}
+
+<div id="section_header">
+{{plot['header']}}
+</div>
+
+<div id="images">
+<img class="image" src="{{plot['filenames'][0]}}"></img>
+<img class="image" src="{{plot['filenames'][1]}}"></img>
+</div>
+
+{% endfor %}
+
+</body>
+</html>

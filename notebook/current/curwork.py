@@ -1,5 +1,9 @@
-import os
-from collections import OrderedDict
+from collections import namedtuple
+
+from pathlib import Path
+from jinja2 import Environment, FileSystemLoader
+#from weasyprint import HTML, CSS
+
 import pandas as pd
 import matplotlib
 matplotlib.use('agg')
@@ -7,8 +11,12 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as dates
 matplotlib.style.use('ggplot')
 
+import access    
 
-def plot(df, title, minor_ticks, major_ticks):
+def plot(df, title: str, minor_ticks, major_ticks):
+    """
+    Plot dataframe using title and ticks specification.
+    """
     ax = df.plot(x_compat=True)           
     # set ticks
     ax.set_xticks(minor_ticks, minor=True)
@@ -27,9 +35,8 @@ def plot_long(df, title, start=2005, end=2020, left_offset=1):
     major_ticks = pd.date_range(str(start), str(end), freq='5YS') 
     return plot(df, title, minor_ticks, major_ticks)
 
-import access    
-dfa, dfq, dfm = (access.get_dataframe(freq) for freq in 'aqm')
-df = dfa['EXPORT_GOODS_bln_usd'] - dfa['IMPORT_GOODS_bln_usd']
+
+
 
 # TODO: 
 """
@@ -75,13 +82,10 @@ doc = """
        Comment text
        on 2 lines       
    charts:      
-    
        - title: ВВП, темп прироста за 12 мес.
          names: GDP_yoy
-    
        - title: Инвестиции, темп прироста за 12 мес.
          names: INVESTMENT_yoy
-
 
 Выпуск:     
    comment:       
@@ -90,7 +94,6 @@ doc = """
    charts:    
        - title: Промышленное производство, темп прироста за 12 мес.
          names: INDPRO_yoy
-         
        - title: Сельское хозяйство, темп прироста за 12 мес.
          names: AGROPROD_yoy
 
@@ -98,7 +101,6 @@ doc = """
    charts: 
        - names: CPI_rog
          title: Индекс потребительских цен (ИПЦ), в % пред.периоду
-       
        - names: CPI_FOOD_rog, CPI_NONFOOD_rog, CPI_SERVICES_rog
          title: ИПЦ по компонентам, в % пред.периоду    
        
@@ -107,7 +109,6 @@ doc = """
    charts:     
        - names: GOV_SURPLUS_FEDERAL_bln_rub
          title: Федеральный бюджет, млрд.руб.
-
        - names: GOV_SURPLUS_SUBFEDERAL_bln_rub
          title: Региональные бюджеты, млрд.руб.
 
@@ -115,65 +116,71 @@ doc = """
    charts:     
        - names: EXPORT_GOODS_bln_usd, IMPORT_GOODS_bln_usd
          title: Экспорт и импорт товаров, млрд.долл.
-    
        - names: TRADE_SURPLUS_bln_usd
          title: Сальдо торгового баланса, млрд.долл.
      
      
 """
-z = yaml.load(doc)
 
-
-from collections import namedtuple
 Chart = namedtuple('Chart', 'names title')
 
 def as_chart(d):
         title = d['title']
         names = [s.strip() for s in d['names'].split(',')]
         return Chart(names, title)
-   
-rows = {k: list(map(as_chart, v['charts'])) for k,v in z.items()}
-print (rows)
 
+dfa, dfq, dfm = (access.get_dataframe(freq) for freq in 'aqm')
+z = yaml.load(doc)   
+rows_dict = {k: list(map(as_chart, v['charts'])) for k,v in z.items()}
+print (rows_dict)
     
 df = dfq
 df['TRADE_SURPLUS_bln_usd'] = (df['EXPORT_GOODS_bln_usd'] 
                              - df['IMPORT_GOODS_bln_usd'])  
-tableitems = OrderedDict()
-  
+ 
 
-for t, topic in enumerate(rows.keys()):
-    # this becomes a header for a pair of graphs
-    tableitems[topic] = {}
-    for i, d in enumerate(rows[topic]):
-        plt.figure()
-        try:
-            plot_long(df[d.names],
-                      title=d.title, 
-                      start=2005)
-            figname = '%s_%s.png' % (t,i)
-            plt.savefig(figname)
-            tableitems[topic]["plot_%s"%i] = figname
-        except KeyError:
-            print ('Not plotted:', d)
-# #a4: adapt code below to writing a PDF with charts to file
+def filename(names):
+    return f"{'_'.join(names)}.png"
+
+def get_filename(chart: Chart):
+    return filename(chart.names)
+
+# create png files
+for header, charts in rows_dict.items():
+    for chart in charts:
+        plot_long(df[chart.names],
+                  title=chart.title, 
+                  start=2005)
+        figname = filename(chart.names)
+        plt.savefig(figname)
+
+# create template parameters
+plot_dicts = [dict(header=header,
+              filenames=list(get_filename(c) for c in charts))    
+              for header, charts in rows_dict.items()]
 
 table_doc = """
-{% for topic in items.keys() %}
-{% if loop.index == 4 %}
-<div style="page-break-before: always" id="plot">
-{% else %}
-<div id="plot">
-{% endif %}
-{{topic}}
+{% for plot in plot_dicts %}
+
+<div id="section_header">
+{{plot['header']}}
+</div>
+
 <div id="images">
-<img class="rowimage" src="{{items[topic]['plot_0']}}"></img>
-<img class="rowimage" src="{{items[topic]['plot_1']}}"></img>
+<img class="image" src="{{plot['filenames'][0]}}"></img>
+<img class="image" src="{{plot['filenames'][1]}}"></img>
 </div>
-</div>
+
 {% endfor %}
-"""
-   
+""" 
+
+# NOT TODO: put me back
+
+#{% if loop.index == 4 %}
+#<div style="page-break-before: always" id="plot">
+#{% else %}
+
+ 
 template_doc = """
 <!DOCTYPE html>
 <html>
@@ -181,71 +188,36 @@ template_doc = """
     <meta charset="UTF-8">
     <title>{{ page_header }}</title>
 <style>
-
 .rowimage {
     display: inline-block;
     margin-left: auto;
     margin-right: auto;
     height: 260px; 
 }
-#images{
-    text-align:center;
-}
   </style>
 </head>
 <body>
-      %s
+     %s
 </body>
 </html>""" % table_doc
 
-from pathlib import Path
-Path('ts.html').write_text(template_doc)
+Path('template.html').write_text(template_doc, encoding='utf-8')
 
-
-from jinja2 import Environment, FileSystemLoader
 env = Environment(loader=FileSystemLoader('.'))
-template = env.get_template('ts.html')
+template = env.get_template('template.html')
 
-template_vars = {"title" : "Sales Funnel Report - National",
-                 "national_pivot_table": df.to_html(),
-                 "items": tableitems
+template_vars = {"page_header" : "Macroeconomic Charts",
+                 "plot_dicts": plot_dicts
                  }
 
 html_out = template.render(template_vars)
 print(html_out)
-from weasyprint import HTML, CSS
-HTML(string=html_out, base_url=os.path.dirname(os.path.abspath(__file__))).write_pdf("ts.pdf", stylesheets=[CSS(string='@page {size: Letter;  margin: 0.3in 0.3in 0.3in 0.3in;}')])
-
-# end - adapt code below to writing a PDF with charts to file
+Path('listing.html').write_text(html_out)
+# FIXME: index.html not legible in firefox due to encoding issues  
 
 
-# what variables not grouped?    
-groups = {
-'GDP': ['GDP_bln_rub', 'GDP_yoy'],
-'output': ['INDPRO_rog', 'INDPRO_yoy', 'AGROPROD_yoy', 
-           'TRANSPORT_FREIGHT_bln_tkm'],
-'prices': ['CPI_rog', 'PPI_rog', 'CPI_FOOD_rog', 'CPI_NONFOOD_rog', 
-         'CPI_SERVICES_rog', 'CPI_ALCOHOL_rog',], 
-'employment':['UNEMPL_pct'],
-'wages': ['WAGE_NOMINAL_rub', 'WAGE_REAL_rog', 'WAGE_REAL_yoy'],
-'foreing trade': ['IMPORT_GOODS_bln_usd', 'EXPORT_GOODS_bln_usd'],
-'budget': ['GOV_EXPENSE_CONSOLIDATED_bln_rub',
-       'GOV_EXPENSE_FEDERAL_bln_rub', 'GOV_EXPENSE_SUBFEDERAL_bln_rub',
-       'GOV_REVENUE_CONSOLIDATED_bln_rub', 'GOV_REVENUE_FEDERAL_bln_rub',
-       'GOV_REVENUE_SUBFEDERAL_bln_rub', 'GOV_SURPLUS_FEDERAL_bln_rub',
-       'GOV_SURPLUS_SUBFEDERAL_bln_rub'],
-'investment':  ['INVESTMENT_bln_rub', 'INVESTMENT_rog', 'INVESTMENT_yoy'] ,               
+# FIXME: weasyprint is not windows-compatible. msu yuse different pdf renderer
+#HTML(string=html_out, base_url=os.path.dirname(os.path.abspath(__file__))).write_pdf("ts.pdf", stylesheets=[CSS(string='@page {size: Letter;  margin: 0.3in 0.3in 0.3in 0.3in;}')])
 
-'retail sales': ['RETAIL_SALES_FOOD_bln_rub', 'RETAIL_SALES_FOOD_rog', 
-                 'RETAIL_SALES_FOOD_yoy', 'RETAIL_SALES_NONFOOD_bln_rub', 
-                 'RETAIL_SALES_NONFOOD_rog', 'RETAIL_SALES_NONFOOD_yoy', 
-                 'RETAIL_SALES_bln_rub', 'RETAIL_SALES_rog', 
-                 'RETAIL_SALES_yoy'],   
-'corporate': ['CORP_RECEIVABLE_OVERDUE_bln_rub', 'CORP_RECEIVABLE_bln_rub']
-}   
 
-# иначе не получается складывать объекты 'numpy.ndarray'. если разное кол-во элементов - ошибка. 
-all_vars = list(set(list(dfa.columns.values) + list(dfq.columns.values) + list(dfm.columns.values)))
-x = [k for keys in groups.values() for k in keys]
-not_found = [y for y in all_vars if y not in x]
-print('Variables not grouped:\n', not_found)
+
