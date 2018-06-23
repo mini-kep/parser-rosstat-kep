@@ -160,15 +160,17 @@ for t, topic in enumerate(rows.keys()):
 
 table_doc = """
 {% for topic in items.keys() %}
+{% set image0 = items[topic]['plot_0'] %}
+{% set image1 = items[topic]['plot_1'] %}
 {% if loop.index == 4 %}
-<div style="page-break-before: always" id="plot">
+<div style="page-break-before: always" id="imageswithheader">
 {% else %}
-<div id="plot">
+<div id="imageswithheader">
 {% endif %}
 {{topic}}
 <div id="images">
-<img class="rowimage" src="{{items[topic]['plot_0']}}"></img>
-<img class="rowimage" src="{{items[topic]['plot_1']}}"></img>
+<img class="rowimage" src="{{image0}}"></img>
+<img class="rowimage" src="{{image1}}"></img>
 </div>
 </div>
 {% endfor %}
