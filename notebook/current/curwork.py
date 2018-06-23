@@ -174,6 +174,26 @@ table_doc = """
 {% endfor %}
 """ 
 
+# DELETE: very sloppy code, dont do it this way
+#<<<<<<< HEAD
+#=======
+#{% for topic in items.keys() %}
+#{% set image0 = items[topic]['plot_0'] %}
+#{% set image1 = items[topic]['plot_1'] %}
+#{% if loop.index == 4 %}
+#<div style="page-break-before: always" id="imageswithheader">
+#{% else %}
+#<div id="imageswithheader">
+#{% endif %}
+#{{topic}}
+#<div id="images">
+#<img class="rowimage" src="{{image0}}"></img>
+#<img class="rowimage" src="{{image1}}"></img>
+#>>>>>>> origin/dev-jinja
+
+
+
+
 # NOT TODO: put me back
 
 #{% if loop.index == 4 %}
