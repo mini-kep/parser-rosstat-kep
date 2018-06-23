@@ -1,4 +1,5 @@
 import os
+from collections import OrderedDict
 import pandas as pd
 import matplotlib
 matplotlib.use('agg')
@@ -138,35 +139,36 @@ print (rows)
 df = dfq
 df['TRADE_SURPLUS_bln_usd'] = (df['EXPORT_GOODS_bln_usd'] 
                              - df['IMPORT_GOODS_bln_usd'])  
-tableitems = []  
+tableitems = OrderedDict()
+  
+
 for t, topic in enumerate(rows.keys()):
     # this becomes a header for a pair of graphs
-    trow = [topic, ]
-    print(topic)
+    tableitems[topic] = {}
     for i, d in enumerate(rows[topic]):
         plt.figure()
         try:
             plot_long(df[d.names],
                       title=d.title, 
                       start=2005)
-            plt.savefig('%s_%s.png' % (t,i))
-            trow.append("""<img class="rowimage" src="./%s_%s.png" ></img>""" % (t,i))
+            figname = '%s_%s.png' % (t,i)
+            plt.savefig(figname)
+            tableitems[topic]["plot_%s"%i] = figname
         except KeyError:
             print ('Not plotted:', d)
-    tableitems.append(trow)
 # #a4: adapt code below to writing a PDF with charts to file
 
 table_doc = """
-{% for item in items %}
+{% for topic in items.keys() %}
 {% if loop.index == 4 %}
 <div style="page-break-before: always" id="plot">
 {% else %}
 <div id="plot">
 {% endif %}
-{{item[0]}}
+{{topic}}
 <div id="images">
-{{item[1]}}
-{{item[2]}}
+<img class="rowimage" src="{{items[topic]['plot_0']}}"></img>
+<img class="rowimage" src="{{items[topic]['plot_1']}}"></img>
 </div>
 </div>
 {% endfor %}
