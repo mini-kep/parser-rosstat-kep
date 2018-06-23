@@ -1,7 +1,7 @@
 import os
 import pandas as pd
 import matplotlib
-#matplotlib.use('agg')
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
 import matplotlib.dates as dates
 matplotlib.style.use('ggplot')
@@ -158,10 +158,16 @@ for t, topic in enumerate(rows.keys()):
 
 table_doc = """
 {% for item in items %}
-<p>{{item[0]}}</p>
+{% if loop.index == 4 %}
+<div style="page-break-before: always" id="plot">
+{% else %}
+<div id="plot">
+{% endif %}
+{{item[0]}}
 <div id="images">
 {{item[1]}}
 {{item[2]}}
+</div>
 </div>
 {% endfor %}
 """
@@ -173,6 +179,7 @@ template_doc = """
     <meta charset="UTF-8">
     <title>{{ page_header }}</title>
 <style>
+
 .rowimage {
     display: inline-block;
     margin-left: auto;
@@ -205,7 +212,7 @@ template_vars = {"title" : "Sales Funnel Report - National",
 html_out = template.render(template_vars)
 print(html_out)
 from weasyprint import HTML, CSS
-HTML(string=html_out, base_url=os.path.dirname(os.path.abspath(__file__))).write_pdf("ts.pdf", stylesheets=[CSS(string='@page {size: Letter;  margin: 0in 0.44in 0.2in 0.44in;}')])
+HTML(string=html_out, base_url=os.path.dirname(os.path.abspath(__file__))).write_pdf("ts.pdf", stylesheets=[CSS(string='@page {size: Letter;  margin: 0.3in 0.3in 0.3in 0.3in;}')])
 
 # end - adapt code below to writing a PDF with charts to file
 
