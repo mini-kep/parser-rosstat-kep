@@ -143,7 +143,8 @@ def filename(names):
     return f"{'_'.join(names)}.png"
 
 def get_filename(chart: Chart):
-    return filename(chart.names)
+    path = 'file:///C:/Users/%D0%95%D0%B2%D0%B3%D0%B5%D0%BD%D0%B8%D0%B9/Documents/GitHub/mini-kep/notebook/current/'
+    return path + filename(chart.names)
 
 # create png files
 for header, charts in rows_dict.items():
@@ -201,11 +202,8 @@ table_doc = """
 #{% else %}
 
  
-template_doc = """
-<!DOCTYPE html>
-<html>
+template_doc = """<html>
 <head lang="ru">
-    <meta charset="UTF-8">
     <title>{{ page_header }}</title>
 <style>
 .rowimage {
@@ -236,7 +234,7 @@ Path('listing.html').write_text(html_out)
 # FIXME: index.html not legible in firefox due to encoding issues  
 
 
-# FIXME: weasyprint is not windows-compatible. msu yuse different pdf renderer
+# NOTE: weasyprint is not windows-compatible. msu yuse different pdf renderer
 #HTML(string=html_out, base_url=os.path.dirname(os.path.abspath(__file__))).write_pdf("ts.pdf", stylesheets=[CSS(string='@page {size: Letter;  margin: 0.3in 0.3in 0.3in 0.3in;}')])
 
 
@@ -258,9 +256,30 @@ def convertHtmlToPdf(sourceHtml, outputFilename):
     # return True on success and False on errors
     return pisaStatus.err
 
+# ERROR: xhtml2pdf does not show images
 convertHtmlToPdf(html_out, 'out.pdf')
 
+k = str(Path(__file__).parent / 'pdf.js')
 
+PATH_PHANTOM_JS = r'C:\Users\Евгений\Desktop\node_modules\phantomjs\lib\phantom\bin\phantomjs.exe'
+
+#def render_pdf_phantomjs(html: str):
+#    """mimerender helper to render a PDF from HTML using phantomjs."""
+#    # The 'makepdf.js' PhantomJS program takes HTML via stdin and returns PDF binary via stdout
+#    # https://gist.github.com/philfreo/5854629
+#    # Another approach would be to have PhantomJS do a localhost read of the URL, rather than passing html around.
+#    from subprocess import Popen, PIPE, STDOUT, run 
+#    p = Popen([PATH_PHANTOM_JS, str(Path(__file__).parent / 'pdf.js')], 
+#               stdout=PIPE, stdin=PIPE, stderr=STDOUT)
+#    return p.communicate(input=html.encode('utf-8'))[0]
+#
+#x = render_pdf_phantomjs(html_out)
+#with open('ph.pdf', "w+b") as f:
+#    f.write(x)
+#
+#import pathlib
+#print(pathlib.Path(__file__).as_uri())
+#run('html-pdf')
 
 
 
