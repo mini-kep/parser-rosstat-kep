@@ -240,4 +240,31 @@ Path('listing.html').write_text(html_out)
 #HTML(string=html_out, base_url=os.path.dirname(os.path.abspath(__file__))).write_pdf("ts.pdf", stylesheets=[CSS(string='@page {size: Letter;  margin: 0.3in 0.3in 0.3in 0.3in;}')])
 
 
+# alternatives documented at https://gist.github.com/philfreo/44e2e26a65820497db234d0c66ed58ae
+# python: weasyprint or xhtml2pdf.pisa
+
+
+from xhtml2pdf import pisa             # import python module
+
+# Utility function
+def convertHtmlToPdf(sourceHtml, outputFilename):
+    # open output file for writing (truncated binary)
+    with open(outputFilename, "w+b") as resultFile:
+        # convert HTML to PDF
+        pisaStatus = pisa.CreatePDF(
+                sourceHtml,                # the HTML to convert
+                dest=resultFile)           # file handle to recieve result
+
+    # return True on success and False on errors
+    return pisaStatus.err
+
+convertHtmlToPdf(html_out, 'out.pdf')
+
+
+
+
+
+
+
+
 
