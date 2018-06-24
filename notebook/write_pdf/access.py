@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pandas as pd
 
-FOLDER = Path(__file__).parents[2] / 'data' / 'processed' / 'latest'
-
+FOLDER = Path(__file__).parent / 'data' 
+             
 
 def locate(freq):
     return FOLDER / 'df{}.csv'.format(freq)
@@ -41,15 +41,6 @@ def get_dataframe(freq):
     path = locate(freq)
     filelike = proxy(path)
     return read_csv(filelike)
-
-
-# example in README.md
-def get_dataframe_from_web(freq):
-    url_base = ('https://raw.githubusercontent.com/mini-kep/parser-rosstat-kep/'
-                'master/data/processed/latest/{}')
-    filename = "df{}.csv".format(freq)
-    url = url_base.format(filename)
-    return pd.read_csv(url, converters={0: pd.to_datetime}, index_col=0)
 
 
 if '__main__' == __name__:   
