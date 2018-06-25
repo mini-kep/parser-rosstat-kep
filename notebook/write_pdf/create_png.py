@@ -4,8 +4,14 @@ import matplotlib
 import matplotlib.pyplot as plt
 import matplotlib.dates as dates
 
-matplotlib.use('agg')
+matplotlib.use('agg') # FIXME: is this necessary?
 matplotlib.style.use('ggplot')
+
+# WARNING:
+#C:/Users/PogrebnyakEV/Desktop/mini-kep/kep/notebook/write_pdf/create_png.py:2: UserWarning: 
+#This call to matplotlib.use() has no effect because the backend has already
+#been chosen; matplotlib.use() must be called *before* pylab, matplotlib.pyplot,
+#or matplotlib.backends is imported for the first time.
 
 def plot(df, title: str, minor_ticks, major_ticks):
     """Plot dataframe with title and ticks specification."""
