@@ -55,6 +55,10 @@ YAML_DEFAULT = """
 'header':
   - 'Индексы цен производителей промышленных товаров'
 'unit': 'rog'
+---
+var: DWELLINGS_CONSTRUCTION
+header: Ввод в действие жилых домов организациями всех форм собственности
+unit: mln_m2
 """
 
 YAML_BY_SEGMENT = """

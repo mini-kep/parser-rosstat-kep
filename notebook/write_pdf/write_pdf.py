@@ -88,7 +88,7 @@ if __name__ == "__main__":
                                  - df['IMPORT_GOODS_bln_usd'])                       
     
     # png files
-    if 0:
+    if 1:
         for header, charts in page_definition.CHARTS_DICT.items():
             for chart in charts:
                 create_png.plot_long(df[chart.names],
@@ -96,6 +96,9 @@ if __name__ == "__main__":
                           start=2005)
                 figname = locate(chart.filename)
                 create_png.save(figname)
+
+    df = dfm.DWELLINGS_CONSTRUCTION_mln_m2
+    ax = create_png.plot_long(df, 'Ввод жилья, млн.кв.м')
     
     # render template
     template = Template(template_doc)
@@ -112,3 +115,5 @@ if __name__ == "__main__":
     
     # ERROR: xhtml2pdf cannot render Russian letters without patching
     convertHtmlToPdf(html_out, locate('out.pdf'))
+    
+

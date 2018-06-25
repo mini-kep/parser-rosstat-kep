@@ -36,3 +36,13 @@ def plot_long(df, title, start=2005, end=2020, left_offset=1):
 
 def save(filename):
     plt.savefig(filename)
+    
+    
+if __name__ == '_main__':
+    import access   
+    dfa, dfq, dfm = (access.get_dataframe(freq) for freq in 'aqm')
+    df = dfm.DWELLINGS_CONSTRUCTION_mln_m2
+    ax = plot_long(df, 'Ввод жилья, млн.кв.м')
+    plt.show()
+    
+    

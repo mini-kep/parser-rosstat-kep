@@ -48,7 +48,8 @@ UNITS = odict([  # 1. MONEY
     ("алкогольные напитки", 'rog'),
     ("непродовольственные товары", 'rog'),
     ("непродовольст- венные товары", 'rog'),
-    ("услуги", 'rog')
+    ("услуги", 'rog'),
+    ('млн.кв.м', 'mln_m2'),
 
 ])
 
@@ -62,7 +63,8 @@ UNIT_NAMES = {'bln_rub': 'млрд.руб.',
               'yoy': '% год к году',
               'ytd': 'период с начала года',
               'pct': '%',
-              'bln_tkm': 'млрд. тонно-км'}
+              'bln_tkm': 'млрд. тонно-км', 
+              'mln_m2': 'млн.кв.м'}
 
 # validation: all units in mapper dict have an 'offical' name
 assert set(UNIT_NAMES.keys()) == set(UNITS.values())
