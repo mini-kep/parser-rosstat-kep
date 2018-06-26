@@ -1,20 +1,60 @@
-from pathlib import Path
+"""Run full cycle of data processing from download to saving dataframe."""
 
-from download import Downloader
+# Workflow
+# --------    
+#
+# 1. what is latest date available? 
+# 2. could newer data have come already?
+# 3. [+] let's parse the new data 
+# 4. [-] commit to repo
+# 5. upload to database
+# 6. create a PDF handout or other assets
+
+# Something to know:
+# ------------------ 
+# - output: 
+#   - industrial production and other busness activity
+#   - corp profits
+# - housing construction
+# - retail sales and household incomes    
+# - budget expenditure and revenues
+# - export and import
+# - prices, inflation, interest rates
+# - exchange rate
+# - Q:GDP
+# - Q:investment (unrelaible)
+# - targets/forecasts   
+
+
+from pathlib import Path
+import shutil
+
+from download import Downloader, Unpacker
 from word2csv import folder_to_csv
 from units import UNITS
 from variables import YAML_DEFAULT, YAML_BY_SEGMENT 
-from pipeline import create_parser
-from to_dataframe.dataframe import create_dataframe
+from parsing import create_parser
+from dataframe import create_dataframe
+from checkpoints import verify 
+from util import is_latest, to_excel
 
-DATA_ROOT = Path(__file__).parents[1] / 'data' 
+
+FREQUENCIES = list('aqm')
+PROJECT_ROOT = Path(__file__).parents[1]
+DATA_ROOT = PROJECT_ROOT / 'data' 
+OUTPUT_ROOT = PROJECT_ROOT / 'output' 
 assert DATA_ROOT.exists()
+assert OUTPUT_ROOT.exists()
                 
 class Locations():
-    def __init__(self, year: int, month: int, data_root):
+    def __init__(self, year: int, 
+                 month: int, 
+                 data_root,
+                 output_root):
         self.year = year
         self.month = month
         self.data = Path(data_root) 
+        self.out = Path(output_root) 
         
     def inner_path(self, tag):    
         if not tag in ('raw', 'interim', 'processed'):
@@ -29,6 +69,10 @@ class Locations():
         return self.inner_path('raw')
 
     @property
+    def archive_filepath(self):
+        return str(self.raw_folder / 'download.rar')
+
+    @property
     def interim_csv(self):
         return self.inner_path('interim') / 'tab.csv' 
 
@@ -41,6 +85,10 @@ class Locations():
     @staticmethod
     def filename(freq):
         return 'df{}.csv'.format(freq)
+    
+    @property
+    def xlsx_filepath(self):
+        return str(self.out / 'kep.xlsx')
 
 # not used   
 def make_reader(units=UNITS, 
@@ -48,44 +96,53 @@ def make_reader(units=UNITS,
                 yaml_by_segment=YAML_BY_SEGMENT):
     return create_parser(units, default_yaml, yaml_by_segment)
 
-def validate(df, freq):
-    pass
+def to_latest(year:int, month: int, loc):
+     """Copy csv files from folder like *processed/2017/04* to 
+        *processed/latest*.
+     """    
+     for freq in FREQUENCIES:    
+         src = loc.processed_csv(freq)
+         dst = loc.latest_csv(freq)      
+         shutil.copyfile(str(src), str(dst))
+         print("Updated", dst)
+     print(f"Latest folder now refers to {loc.year}-{loc.month}")
 
-def to_latest(year, month, data_root):
-    pass
-
-def is_latest(year, month):
-    return True
-
-def full(year,
+def update(year,
          month, 
          units=UNITS, 
          default_yaml=YAML_DEFAULT, 
          yaml_by_segment=YAML_BY_SEGMENT,
-         data_root=DATA_ROOT):
-    loc = Locations(year, month, data_root)
-    #perisist data
-    d = Downloader(year, month, loc.raw_folder)
-    d.download()
-    d.unpack()
+         data_root=DATA_ROOT,
+         output_root=OUTPUT_ROOT,
+         force=False):
+    # filesystem
+    loc = Locations(year, month, data_root, output_root)
+    # perisist data
+    d = Downloader(year, month, loc.archive_filepath)
+    d.download(force)
+    u = Unpacker(loc.archive_filepath, loc.raw_folder)
+    u.unpack(force)
     if not loc.interim_csv.exists():
          folder_to_csv(loc.raw_folder, loc.interim_csv)
-    #parse
+    # parse
     text = loc.interim_csv.read_text(encoding='utf-8')
     reader = create_parser(units, default_yaml, yaml_by_segment)
     values = list(reader(text))
-    res = []
+    dfs = {}
     # save dataframes
     for freq in 'aqm':
         df = create_dataframe(values, freq)
-        res.append(df)        
-        validate(df, freq)        
+        dfs[freq] = df
+        verify(df, freq)        
         df.to_csv(str(loc.processed_csv(freq)))
     if is_latest(year, month):
-        to_latest(year, month, loc.data)
-    return res  
+        to_latest(year, month, loc)
+        to_excel(str(loc.xlsx_filepath), dfs)   
+        print('Saved Excel file to:\n    ', loc.xlsx_filepath)
+    return dfs  
         
 if __name__ == '__main__':
-    dfa, dfq, dfm = full(2018,4)
+    dfs = update(2018, 4)
+    dfa, dfq, dfm = (dfs[freq] for freq in FREQUENCIES)
 
              

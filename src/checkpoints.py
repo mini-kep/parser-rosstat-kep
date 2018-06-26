@@ -189,14 +189,17 @@ def cover(df, checkpoints):
                   exc_handler=print,
                   exc_message = 'Variables in dataframe not covered by checkpoints:')
 
+def verify(df, freq):    
+    print(f'Analysing frequency <{freq}>...')
+    if freq == 'a':
+        require(df, VALUES_ANNUAL_1999)
+        expect(df, VALUES_ANNUAL_2017)    
+        cover(df, VALUES_ANNUAL_1999+VALUES_ANNUAL_2017)
+    elif freq == 'q':    
+        require(df, VALUES_QTR_1999)
+        cover(df, VALUES_QTR_1999)
+    elif freq == 'm':
+        require(df, VALUES_MONTHLY_1999)
+        cover(df, VALUES_MONTHLY_1999)
     
-def verify(a, q, m):
-    require(a, VALUES_ANNUAL_1999)
-    expect(a, VALUES_ANNUAL_2017)    
-    require(q, VALUES_QTR_1999)
-    require(m, VALUES_MONTHLY_1999)
-    cover(a, VALUES_ANNUAL_1999+VALUES_ANNUAL_2017)
-    cover(q, VALUES_QTR_1999)
-    cover(m, VALUES_MONTHLY_1999)
-
     

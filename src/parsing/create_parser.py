@@ -1,14 +1,6 @@
-from .this_parser.extract_tables import evaluate_assignment
-from .reader.boundaries import get_boundaries
-from .reader.popper import Popper
+from .extractor.extract_tables import evaluate_assignment
+from .popper import yield_parsing_jobs
 from .make_definitions import make_default_definition, make_segment_definition
-
-def yield_parsing_jobs(csv_text: str, definition_default, definitions_by_segment):
-    stack = Popper(csv_text)
-    for pdef in definitions_by_segment:
-        start, end = get_boundaries(pdef.boundaries, stack.rows)
-        yield stack.pop(start, end), pdef
-    yield stack.remaining_rows(), definition_default
 
 def create_parser(units, default_yaml, yaml_by_segment):
     default_definition = make_default_definition(units, default_yaml)  

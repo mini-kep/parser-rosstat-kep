@@ -96,7 +96,8 @@ if __name__ == "__main__":
                           start=2005)
                 figname = locate(chart.filename)
                 create_png.save(figname)
-
+                
+    plt.figure()           
     df = dfm.DWELLINGS_CONSTRUCTION_mln_m2
     ax = create_png.plot_long(df, 'Ввод жилья, млн.кв.м')
     

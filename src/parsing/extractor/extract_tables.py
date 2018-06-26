@@ -6,7 +6,7 @@ from collections import OrderedDict as odict
 from enum import Enum, unique
 
 import pandas as pd
-from kep.helper.label import make_label
+from ..label import make_label
 from .row_splitter import get_splitter
 from .to_float import to_float
 from .row_model import Row

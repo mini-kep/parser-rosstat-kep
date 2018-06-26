@@ -1,2 +1,2 @@
-from .download import Downloader
+from .download import Downloader, Unpacker
 

@@ -9,8 +9,6 @@ Use Popper class as a stack to split CSV data.
 import csv
 from io import StringIO
 
-from kep.pipeline.parser.row_model import Row
-
 CSV_FORMAT = dict(delimiter="\t", lineterminator="\n")
 
 
@@ -43,11 +41,16 @@ def is_valid_row(row):
     else:
         return False
 
-
 def text_to_list(csv_text: str):
     csv_rows = filter(is_valid_row, yield_csv_rows(csv_text))
     return list(csv_rows)
 
+#utils
+def supress_apos(text):
+    return text.replace('"', '')
+
+def startswith(text, start):
+    return supress_apos(text).startswith(supress_apos(start))
 
 class Popper:
     """Stack for CSV rows.
@@ -69,10 +72,6 @@ class Popper:
         remaining = self.rows
         self.rows = []
         return remaining
-
-    @staticmethod
-    def startswith(row, text):
-        return Row(row).startswith(text)
 
     def pop(self, start, end):
         """Pops elements of *self.rows* between [start, end).
@@ -97,9 +96,9 @@ class Popper:
         i = 0
         while i < len(self.rows):
             row = self.rows[i]
-            if self.startswith(row, start):
+            if startswith(row, start):
                 we_are_in_segment = True
-            if self.startswith(row, end):
+            if startswith(row, end):
                 break
             if we_are_in_segment:
                 segment.append(row)
