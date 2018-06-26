@@ -1,63 +1,91 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Jun 25 23:53:17 2018
+from pathlib import Path
 
-@author: Евгений
-"""
+from download import Downloader
+from word2csv import folder_to_csv
+from units import UNITS
+from variables import YAML_DEFAULT, YAML_BY_SEGMENT 
+from pipeline import create_parser
+from to_dataframe.dataframe import create_dataframe
 
-class FileLocations():
-    def __init__(self, root: str, year, month):
-        self.root = Path(root)
-        data = self.root / 'data' 
-        self.raw = data / 'raw'
-        self.interim = data / 'interim'
-        self.processed = data / 'processed'
-        self.latest = self.processed / 'latest'
+DATA_ROOT = Path(__file__).parents[1] / 'data' 
+assert DATA_ROOT.exists()
+                
+class Locations():
+    def __init__(self, year: int, month: int, data_root):
         self.year = year
         self.month = month
+        self.data = Path(data_root) 
+        
+    def inner_path(self, tag):    
+        if not tag in ('raw', 'interim', 'processed'):
+            raise ValueError(tag)
+        folder = self.data / tag / str(self.year) / str(self.month).zfill(2)
+        if not folder.exists():
+             folder.mkdir(parents=True)
+        return folder            
     
+    @property
     def raw_folder(self):
-        pass
+        return self.inner_path('raw')
 
+    @property
     def interim_csv(self):
-        pass
+        return self.inner_path('interim') / 'tab.csv' 
 
-    def processed_csv(self,freq: str):
-        pass
+    def processed_csv(self, freq: str):
+        return self.inner_path('processed')  / self.filename(freq) 
 
+    def latest_csv(self, freq: str):
+        return self.data / 'processed' / 'latest' / self.filename(freq) 
+    
+    @staticmethod
+    def filename(freq):
+        return 'df{}.csv'.format(freq)
 
+# not used   
+def make_reader(units=UNITS, 
+                default_yaml=YAML_DEFAULT, 
+                yaml_by_segment=YAML_BY_SEGMENT):
+    return create_parser(units, default_yaml, yaml_by_segment)
 
-def download(year, month, folder):
+def validate(df, freq):
     pass
 
-def unpack(year, month, folder):
+def to_latest(year, month, data_root):
     pass
 
-def word2csv(source_folder, interim_csv_path):
-    pass
+def is_latest(year, month):
+    return True
 
-def get_text(csv_path: str):
-    pass
-
-def extract_values(text: str, variables: dict, units: dict):
-    pass
-
-def as_dataframe(values, freq):
-    pass
-
-def to_csv(df, csv_path):
-    pass
-
-from pathlib import Path
-ROOT=Path(__file__).parents[1]
-
-def main(year, month, variables, units, root=ROOT):
-    locations = FileLocations(root, year, month) 
-    download(year, month, locations.raw_folder())
-    unpack(year, month, locations.raw_folder())
-    word2csv(locations.raw_folder(), locations.interim_csv())
-    text = get_text(locations.interim_csv())
-    values = list(extract_values(text, variables, units))
+def full(year,
+         month, 
+         units=UNITS, 
+         default_yaml=YAML_DEFAULT, 
+         yaml_by_segment=YAML_BY_SEGMENT,
+         data_root=DATA_ROOT):
+    loc = Locations(year, month, data_root)
+    #perisist data
+    d = Downloader(year, month, loc.raw_folder)
+    d.download()
+    d.unpack()
+    if not loc.interim_csv.exists():
+         folder_to_csv(loc.raw_folder, loc.interim_csv)
+    #parse
+    text = loc.interim_csv.read_text(encoding='utf-8')
+    reader = create_parser(units, default_yaml, yaml_by_segment)
+    values = list(reader(text))
+    res = []
+    # save dataframes
     for freq in 'aqm':
-        to_csv(df = as_dataframe(values, freq),
-                csv_path = locations.processed_csv(freq)) 
+        df = create_dataframe(values, freq)
+        res.append(df)        
+        validate(df, freq)        
+        df.to_csv(str(loc.processed_csv(freq)))
+    if is_latest(year, month):
+        to_latest(year, month, loc.data)
+    return res  
+        
+if __name__ == '__main__':
+    dfa, dfq, dfm = full(2018,4)
+
+             

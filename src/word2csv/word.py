@@ -207,25 +207,6 @@ def folder_to_csv(folder, csv_filename):
     print("Finished creating raw CSV file:", csv_filename)
     return True
 
-# -------------------------------------------------------------------------------
-#
-#    Interface
-#
-# -------------------------------------------------------------------------------
-
-from kep.helper.path import DataFolder, InterimCSV
-
-def convert_msword_to_csv(year, month):
-    raw_folder = DataFolder(year, month).raw
-    interim_csv = InterimCSV(year, month)
-    folder_to_csv(folder=raw_folder, csv_filename=interim_csv.path)
-
-
-def word2csv(year, month, force=False):
-    interim_csv = InterimCSV(year, month)
-    if force or not interim_csv.exists():
-        convert_msword_to_csv(year, month)
-
 
 if __name__ == "__main__":
     pass

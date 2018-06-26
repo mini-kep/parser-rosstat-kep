@@ -1,2 +1,2 @@
-from .pipeline import create_parser
+from .main import create_parser
 from .dataframe import create_dataframe
