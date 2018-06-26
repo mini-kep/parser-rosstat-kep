@@ -1,17 +1,18 @@
 import pytest
 
-from kep.parsing_definition.checkpoints import (
+from dispatch import get_dataframe
+
+from checkpoints import (
     Annual,
     ValidationError,
     require,
     expect
 )
-from kep.vintage import Vintage
 
 
 @pytest.fixture(scope="module")
 def dataframe():
-    return Vintage(2017, 12).dfs["a"]
+    return get_dataframe(2017, 1, 'a')
 
 
 @pytest.fixture(scope="module")

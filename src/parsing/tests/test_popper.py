@@ -1,6 +1,6 @@
-import pytest
+﻿import pytest
 
-from kep.pipeline.reader.popper import is_valid_row, yield_csv_rows, text_to_list, Popper
+from parsing.popper import is_valid_row, yield_csv_rows, text_to_list, Popper
 
 DOC = """__________
 \t\t\t

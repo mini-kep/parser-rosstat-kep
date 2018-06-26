@@ -28,6 +28,8 @@
 
 from pathlib import Path
 import shutil
+import pandas as pd
+from io import StringIO
 
 from download import Downloader, Unpacker
 from word2csv import folder_to_csv
@@ -45,7 +47,13 @@ DATA_ROOT = PROJECT_ROOT / 'data'
 OUTPUT_ROOT = PROJECT_ROOT / 'output' 
 assert DATA_ROOT.exists()
 assert OUTPUT_ROOT.exists()
-                
+
+
+def md(folder):
+    if not folder.exists():
+        folder.mkdir(parents=True)
+    return folder   
+
 class Locations():
     def __init__(self, year: int, 
                  month: int, 
@@ -60,9 +68,7 @@ class Locations():
         if not tag in ('raw', 'interim', 'processed'):
             raise ValueError(tag)
         folder = self.data / tag / str(self.year) / str(self.month).zfill(2)
-        if not folder.exists():
-             folder.mkdir(parents=True)
-        return folder            
+        return md(folder)
     
     @property
     def raw_folder(self):
@@ -79,8 +85,8 @@ class Locations():
     def processed_csv(self, freq: str):
         return self.inner_path('processed')  / self.filename(freq) 
 
-    def latest_csv(self, freq: str):
-        return self.data / 'processed' / 'latest' / self.filename(freq) 
+    def latest_csv(self, freq: str):        
+        return md(self.data / 'processed' / 'latest') / self.filename(freq) 
     
     @staticmethod
     def filename(freq):
@@ -111,6 +117,36 @@ def to_excel(path, dfs):
     save_excel(path, dfs)   
     print('Saved Excel file to:\n    ', path)
 
+def read_csv(source):
+    """Wrapper for pd.read_csv(). Treats first column at time index.
+
+       Returns:
+           pd.DataFrame()
+    """
+    converter_arg = dict(converters={0: pd.to_datetime}, index_col=0)
+    return pd.read_csv(source, **converter_arg)
+
+
+def proxy(path):
+    """A workaround for pandas problem with non-ASCII paths on Windows
+       See <https://github.com/pandas-dev/pandas/issues/15086>
+
+       Args:
+           path (pathlib.Path) - CSV filepath
+
+       Returns:
+           io.StringIO with CSV content
+    """
+    content = Path(path).read_text()
+    return StringIO(content)
+
+
+def get_dataframe(year, month, freq):
+    """Read dataframe from local folder"""
+    loc = Locations(year, month, DATA_ROOT, OUTPUT_ROOT) 
+    filelike = proxy(loc.processed_csv(freq))
+    return read_csv(filelike)
+
 def update(year,
          month, 
          units=UNITS, 
@@ -118,20 +154,22 @@ def update(year,
          yaml_by_segment=YAML_BY_SEGMENT,
          data_root=DATA_ROOT,
          output_root=OUTPUT_ROOT,
-         force=False):
+         force_download=False,
+         force_unrar=False,
+         force_convert_word=False):
     # filesystem
     loc = Locations(year, month, data_root, output_root)
     # perisist data
     d = Downloader(year, month, loc.archive_filepath)
-    if force or not d.path.exists():
+    if force_download or not d.path.exists():
          d.run()
     print(d.status)
     u = Unpacker(loc.archive_filepath, loc.raw_folder)
-    if force or not u.docs.exist():
-         u.run(force)
+    if force_unrar or not u.docs.exist():
+         u.run()
     print(u.status)
     # convert Word to csv
-    if force or not loc.interim_csv.exists():
+    if force_convert_word or not loc.interim_csv.exists():
          folder_to_csv(loc.raw_folder, loc.interim_csv)
     # parse
     text = loc.interim_csv.read_text(encoding='utf-8')
@@ -146,8 +184,7 @@ def update(year,
         df.to_csv(str(loc.processed_csv(freq)))
     if is_latest(year, month):
         to_latest(year, month, loc)
-        to_excel(loc.xlsx_filepath, dfs)        
-
+        to_excel(loc.xlsx_filepath, dfs) 
     return dfs  
         
 if __name__ == '__main__':

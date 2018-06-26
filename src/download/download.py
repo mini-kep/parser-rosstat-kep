@@ -50,7 +50,7 @@ class Unpacker:
                        else None)
     @property
     def docs(self):
-        return DocFiles(self.folder)   
+        return DocFiles(self.folder)
            
     @property        
     def tokens(self):        
@@ -87,7 +87,7 @@ class Downloader():
 
     def run(self):
         download(self.url, self.path)
-        self.status = 'Downloaded {self.path}'
+        self.status = f'Downloaded {self.path}'
         return True
     
 

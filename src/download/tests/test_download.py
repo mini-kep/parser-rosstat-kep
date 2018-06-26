@@ -4,11 +4,6 @@ from pathlib import Path
 
 from ..download import Downloader, Unpacker
 
-def filename():
-    with tempfile.NamedTemporaryFile() as f:
-        path = f.name 
-    return path    
-
 
 class Test_Downloader_and_Unpacker():
   

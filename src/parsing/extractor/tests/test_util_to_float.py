@@ -1,6 +1,6 @@
-import pytest
+﻿import pytest
 
-from kep.pipeline.parser.to_float import to_float
+from parsing.extractor.to_float import to_float
 
 
 class Test_to_float:
