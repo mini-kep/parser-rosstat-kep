@@ -36,7 +36,7 @@ from variables import YAML_DEFAULT, YAML_BY_SEGMENT
 from parsing import create_parser
 from dataframe import create_dataframe
 from checkpoints import verify 
-from util import is_latest, to_excel
+from util import is_latest, save_excel
 
 
 FREQUENCIES = list('aqm')
@@ -107,6 +107,10 @@ def to_latest(year:int, month: int, loc):
          print("Updated", dst)
      print(f"Latest folder now refers to {loc.year}-{loc.month}")
 
+def to_excel(path, dfs):
+    save_excel(path, dfs)   
+    print('Saved Excel file to:\n    ', path)
+
 def update(year,
          month, 
          units=UNITS, 
@@ -122,14 +126,15 @@ def update(year,
     d.download(force)
     u = Unpacker(loc.archive_filepath, loc.raw_folder)
     u.unpack(force)
-    if not loc.interim_csv.exists():
+    # convert Word to csv
+    if force or not loc.interim_csv.exists():
          folder_to_csv(loc.raw_folder, loc.interim_csv)
     # parse
     text = loc.interim_csv.read_text(encoding='utf-8')
-    reader = create_parser(units, default_yaml, yaml_by_segment)
-    values = list(reader(text))
-    dfs = {}
+    parse = create_parser(units, default_yaml, yaml_by_segment)
+    values = list(parse(text))
     # save dataframes
+    dfs = {}
     for freq in 'aqm':
         df = create_dataframe(values, freq)
         dfs[freq] = df
@@ -137,8 +142,8 @@ def update(year,
         df.to_csv(str(loc.processed_csv(freq)))
     if is_latest(year, month):
         to_latest(year, month, loc)
-        to_excel(str(loc.xlsx_filepath), dfs)   
-        print('Saved Excel file to:\n    ', loc.xlsx_filepath)
+        to_excel(loc.xlsx_filepath, dfs)        
+
     return dfs  
         
 if __name__ == '__main__':

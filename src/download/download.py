@@ -53,7 +53,7 @@ class Unpacker:
             return True
         res = self.run()
         if res == 0:
-            print('UnRARed', self.path)
+            print('UnRARed', self.folder)
             return True
         return False
 
