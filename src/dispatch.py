@@ -123,9 +123,13 @@ def update(year,
     loc = Locations(year, month, data_root, output_root)
     # perisist data
     d = Downloader(year, month, loc.archive_filepath)
-    d.download(force)
+    if force or not d.path.exists():
+         d.run()
+    print(d.status)
     u = Unpacker(loc.archive_filepath, loc.raw_folder)
-    u.unpack(force)
+    if force or not u.docs.exist():
+         u.run(force)
+    print(u.status)
     # convert Word to csv
     if force or not loc.interim_csv.exists():
          folder_to_csv(loc.raw_folder, loc.interim_csv)
