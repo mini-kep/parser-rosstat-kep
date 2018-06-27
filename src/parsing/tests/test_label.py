@@ -1,5 +1,5 @@
 import pytest
-import parsing.common.label as label
+import parsing.label as label
 
 # TODO: add variable name with underscore, like GOV_EXPENSE
 

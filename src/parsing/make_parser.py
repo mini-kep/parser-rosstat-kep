@@ -1,5 +1,5 @@
 from parsing.csv_reader import clean_rows, read_csv, pop_rows
-from parsing.make_definitions import create_definitions
+from parsing.definition import create_definitions
 from parsing.extract import evaluate_assignment
 
 

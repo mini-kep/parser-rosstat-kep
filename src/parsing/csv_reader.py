@@ -47,6 +47,11 @@ def read_csv(csv_text: str):
     return list(yield_csv_rows(csv_text))
 
 
+def as_rows(csv_text):
+    return clean_rows(read_csv(csv_text))
+    
+
+
 def is_identical(row, x):
     def supress_apos(text):
         return text.replace('"', '')  

@@ -25,9 +25,8 @@ Create parsing instructions for an individual variable.
 
 import yaml
 
-
-from parsing.common.label import make_label
 from parsing.csv_reader import is_identical
+from parsing.label import make_label
 
 
 def iterate(x):

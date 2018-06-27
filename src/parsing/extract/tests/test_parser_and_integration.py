@@ -3,9 +3,9 @@ from collections import OrderedDict as odict
 import pandas as pd
 import pytest
 
-from parsing.make_definitions import Definition
+from parsing.definition import Definition
 from parsing.extract.extract_tables import split_to_tables, parse_tables
-from parsing.csv_reader import read_csv
+from parsing.csv_reader import read_csv, clean_rows
 
 
 
@@ -82,18 +82,6 @@ DOC2 = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	М�
 1.7.1. Инвестиции в основной капитал организаций"""
 
 
-UNITS = odict([  # 1. MONEY
-    ('млрд.рублей', 'bln_rub'),
-    ('млрд. рублей', 'bln_rub'),
-    # 2. RATES OF CHANGE
-    ('в % к прошлому периоду', 'rog'),
-    ('в % к предыдущему месяцу', 'rog'),
-    ('в % к предыдущему периоду', 'rog'),
-    ('в % к соответствующему периоду предыдущего года', 'yoy'),
-    ('в % к соответствующему месяцу предыдущего года', 'yoy')
-])
-
-
 def make_definition():
     boundaries = [
         dict(start='1.6. Инвестиции в основной капитал',
@@ -124,12 +112,14 @@ def make_definition():
 
 def create_tables():
     csv_segment = read_csv(DOC2)
+    csv_segment = clean_rows(csv_segment)
     return split_to_tables(csv_segment)
 
 
 class Test_parse_tables:
     pdef = make_definition()
-    tables = create_tables()
+    tables = list(create_tables())
+    tables = parse_tables(tables, pdef)
 
     def test_parse_tables(self):
         tables = parse_tables(self.tables, self.pdef)

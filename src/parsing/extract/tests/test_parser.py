@@ -2,7 +2,7 @@ from collections import OrderedDict
 import pandas as pd
 import pytest
 
-from parsing.make_definitions  import Definition
+from parsing.definition  import Definition
 #from kep.parsing_definition.units import UNITS
 
 
