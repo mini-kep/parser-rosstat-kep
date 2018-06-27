@@ -1,6 +1,6 @@
 ﻿import pytest
 
-from parsing.extractor.to_float import to_float
+from parsing.extract.to_float import to_float
 
 
 class Test_to_float:

@@ -1,11 +1,14 @@
+from collections import OrderedDict
 import pandas as pd
 import pytest
 
-from kep.parsing_definition import make_parsing_definition
-from kep.parsing_definition.units import UNITS
-from kep.pipeline.parser.extract_tables import Table, DataBlock, HeaderParser
-from kep.pipeline.parser.extract_tables import timestamp_quarter, timestamp_month, timestamp_annual
-from kep.pipeline.parser.row_splitter import split_row_by_year_and_qtr
+from parsing.make_definitions  import Definition
+#from kep.parsing_definition.units import UNITS
+
+
+from parsing.extract.extract_tables import Table, DataBlock, HeaderParser
+from parsing.extract.extract_tables import timestamp_quarter, timestamp_month, timestamp_annual
+from parsing.extract.row_splitter import split_row_by_year_and_qtr
 
 
 @pytest.fixture
@@ -81,15 +84,18 @@ def parsing_definition():
     indpro_def = dict(var="INDPRO",
                       header='Индекс промышленного производства',
                       unit='yoy')
-    return Definition(commands=[gdp_def, indpro_def], units=UNITS)
-
-# FIXME: is this for deleting?
-# def test_extract_tables():
-    # seg = Segment(mock_rows(), parsing_definition())
-    # tables = seg.extract_tables()
-    # assert isinstance(tables, list)
-    # assert len(tables) == 3 
-    # assert isinstance(tables[0], Table)
+    units = OrderedDict([  # 1. MONEY
+        ('млрд.рублей', 'bln_rub'),
+        ('млрд. рублей', 'bln_rub'),
+        # 2. RATES OF CHANGE
+        ('в % к прошлому периоду', 'rog'),
+        ('в % к предыдущему месяцу', 'rog'),
+        ('в % к предыдущему периоду', 'rog'),
+        ('в % к соответствующему периоду предыдущего года', 'yoy'),
+        ('в % к соответствующему месяцу предыдущего года', 'yoy')    ])
+        
+    return Definition(commands=[gdp_def, indpro_def], 
+                      units=units)
     
     
 class Test_HeaderParser:

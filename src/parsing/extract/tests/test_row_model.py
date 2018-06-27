@@ -1,7 +1,7 @@
 ﻿import pytest
 from collections import OrderedDict as odict
 
-from parsing.extractor.row_model import get_year, is_year, Row
+from parsing.extract.row_model import get_year, is_year, Row
 
 
 class Test_get_year():

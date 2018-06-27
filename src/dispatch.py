@@ -10,7 +10,7 @@
 # 5. upload to database
 # 6. create a PDF handout or other assets
 
-# Something to know:
+# To demonstrate:
 # ------------------ 
 # - output: 
 #   - industrial production and other busness activity
@@ -150,7 +150,7 @@ def get_dataframe(year, month, freq):
 def update(year,
          month, 
          units=UNITS, 
-         default_yaml=YAML_DEFAULT, 
+         yaml_default=YAML_DEFAULT, 
          yaml_by_segment=YAML_BY_SEGMENT,
          data_root=DATA_ROOT,
          output_root=OUTPUT_ROOT,
@@ -173,7 +173,7 @@ def update(year,
          folder_to_csv(loc.raw_folder, loc.interim_csv)
     # parse
     text = loc.interim_csv.read_text(encoding='utf-8')
-    parse = create_parser(units, default_yaml, yaml_by_segment)
+    parse = create_parser(units, yaml_default, yaml_by_segment)
     values = list(parse(text))
     # save dataframes
     dfs = {}
@@ -186,9 +186,10 @@ def update(year,
         to_latest(year, month, loc)
         to_excel(loc.xlsx_filepath, dfs) 
     return dfs  
-        
+
 if __name__ == '__main__':
     dfs = update(2018, 4)
     dfa, dfq, dfm = (dfs[freq] for freq in FREQUENCIES)
+
 
              

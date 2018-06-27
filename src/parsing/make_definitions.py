@@ -23,11 +23,11 @@ Create parsing instructions for an individual variable.
             ex: ['bln_usd]' or ['rog', 'rub']
 """
 
-from collections import namedtuple
 import yaml
-from typing import List
 
-from .label import make_label
+
+from parsing.common.label import make_label
+from parsing.csv_reader import is_identical
 
 
 def iterate(x):
@@ -37,51 +37,64 @@ def iterate(x):
         return [x]
     else:
         raise TypeError(x)
+
+
+class Definition:
+    def __init__(self, units,
+                 commands,
+                 boundaries = [],
+                 reader = ''
+                 ):
+         self.units = units
+         # transform commands
+         self.mapper = self.make_mapper_dict_for_table_headers(commands)
+         self.required_labels = self.make_required_labels(commands) 
+         # attach as is
+         self.boundaries = boundaries
+         self.reader = reader
+
+    @staticmethod
+    def make_mapper_dict_for_table_headers(commands):
+        result = {}
+        for command in iterate(commands):
+            for header in iterate(command['header']):
+                result[header] = command['var'] 
+        return result
+
+    @staticmethod
+    def make_required_labels(commands):
+        result = []
+        for command in iterate(commands):
+            for unit in iterate(command['unit']):
+                result.append(make_label(command['var'], unit))
+        return result
     
+    def select_applicable_boundaries(self, csv_rows: list, 
+                                           is_identical=is_identical):
+        def is_found(rows, x):
+            for row in rows:
+                if is_identical(row[0], x): 
+                    return True
+            return False
+        error_messages = ['Start or end boundary not found:']    
+        for boundary in self.boundaries:
+            start = boundary['start']
+            end = boundary['end']
+            flag2 = False
+            flag1 = is_found(csv_rows, start)
+            if flag1:
+                flag2 = is_found(csv_rows, end)
+            if flag2 and flag1:
+                return start, end
+            error_messages.append(start[:20])
+            error_messages.append(end[:20])
+        raise ValueError('\n'.join(error_messages))     
 
-def make_table_header_mapper(commands):
-    result = {}
-    for c in iterate(commands):
-        for header in iterate(c['header']):
-            result[header] = c['var'] 
-    return result
+def from_yaml(yaml_text: str):
+    return list(yaml.load_all(yaml_text))
 
-    
-def make_required_labels(commands):
-    result = []
-    for c in iterate(commands):
-        for unit in iterate(c['unit']):
-            result.append(make_label(c['var'], unit))
-    return result
-
-
-DefinitionFactory = namedtuple('ParsingDefinition', 
-                              ['mapper', 'required_labels', 'boundaries',
-                               'units', 'reader']) 
-
-def make_parsing_definition(units,
-                            commands: List[dict],
-                            boundaries: List[dict] = [],
-                            reader: str = ''
-                            ):
-    return DefinitionFactory(mapper = make_table_header_mapper(commands),
-                required_labels = make_required_labels(commands),
-                boundaries = boundaries,
-                reader = reader,
-                units = units)  
-
-
-def from_yaml(yaml_str):
-    return list(yaml.load_all(yaml_str))
-
-def make_default_definition(units, default_yaml):
-    commands_default = from_yaml(default_yaml)
-    return make_parsing_definition(units, commands_default, boundaries=[], reader='')
-
-def make_segment_definition(units, yaml_by_segment):
-    instructions_by_segment = from_yaml(yaml_by_segment) 
-    return [make_parsing_definition(units, **instruction) 
-            for instruction in instructions_by_segment]     
-
-    
+def create_definitions(units: dict, yaml_text: str):
+    instructions_by_segment = from_yaml((yaml_text))
+    return [Definition(units=units, **instruction_set)
+            for instruction_set in instructions_by_segment]
 

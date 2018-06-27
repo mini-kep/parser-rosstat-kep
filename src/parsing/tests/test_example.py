@@ -1,4 +1,4 @@
-csv_text = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.
+﻿csv_text = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.
 		I	II	III	IV
 1.7. Инвестиции в основной капитал1), млрд. рублей / Fixed capital investments1), bln rubles
 1999	670,4	96,8	131,1	185,6	256,9	28,5	31,8	36,5	36,9	41,4	52,8	56,2	61,8	67,6	66,5	72,0	118,4
@@ -63,38 +63,39 @@ csv_text = """	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.
 
 from collections import OrderedDict as odict
 
-from kep.parsing_definition import make_parsing_definition
-from kep.pipeline.parser.extract_tables import split_to_tables, parse_tables
-from kep.pipeline.reader.popper import text_to_list
+from parsing.extract.extract_tables import split_to_tables, parse_tables
+from parsing.csv_reader import read_csv
+from parsing.make_definitions import Definition
 
 # settings
-boundaries = [
-    dict(start='1.6. Инвестиции в основной капитал',
-         end='1.6.1. Инвестиции в основной капитал организаций'),
-    dict(start='1.7. Инвестиции в основной капитал',
-         end='1.7.1. Инвестиции в основной капитал организаций')]
-commands = [
-    dict(
-        var='INVESTMENT',
-        header=['Инвестиции в основной капитал'],
-        unit=['bln_rub', 'yoy', 'rog'])]
-# mapper dictionary to convert text in table headers to units of measurement
-units = odict([  # 1. MONEY
-    ('млрд.рублей', 'bln_rub'),
-    ('млрд. рублей', 'bln_rub'),
-    # 2. RATES OF CHANGE
-    ('в % к прошлому периоду', 'rog'),
-    ('в % к предыдущему месяцу', 'rog'),
-    ('в % к предыдущему периоду', 'rog'),
-    ('в % к соответствующему периоду предыдущего года', 'yoy'),
-    ('в % к соответствующему месяцу предыдущего года', 'yoy')
-])
-pdef = make_parsing_definition(commands, boundaries, '', units)
 
-
+pdef_source = dict(
+    boundaries = [
+        dict(start='1.6. Инвестиции в основной капитал',
+             end='1.6.1. Инвестиции в основной капитал организаций'),
+        dict(start='1.7. Инвестиции в основной капитал',
+             end='1.7.1. Инвестиции в основной капитал организаций')],
+    commands = [
+        dict(
+            var='INVESTMENT',
+            header=['Инвестиции в основной капитал'],
+            unit=['bln_rub', 'yoy', 'rog'])],
+    # mapper dictionary to convert text in table headers to units of measurement
+    units = odict([  # 1. MONEY
+        ('млрд.рублей', 'bln_rub'),
+        ('млрд. рублей', 'bln_rub'),
+        # 2. RATES OF CHANGE
+        ('в % к прошлому периоду', 'rog'),
+        ('в % к предыдущему месяцу', 'rog'),
+        ('в % к предыдущему периоду', 'rog'),
+        ('в % к соответствующему периоду предыдущего года', 'yoy'),
+        ('в % к соответствующему месяцу предыдущего года', 'yoy')
+    ])
+)
+pdef = Definition(**pdef_source)
 
 # actions
-csv_segment = text_to_list(csv_text)
+csv_segment = read_csv(csv_text)
 tables = split_to_tables(csv_segment)
 tables = parse_tables(tables, pdef)
 
@@ -102,5 +103,13 @@ tables = parse_tables(tables, pdef)
 def test_check_parsing_result():
     assert len(tables) == 3
     assert all([t.has_unknown_lines() for t in tables]) is False
-    assert [t.varname for t in tables] == ['INVESTMENT'] * 3
     assert [t.unit for t in tables] == ['bln_rub', 'yoy', 'rog']
+    
+def test_all_tables_are_parsed():
+    assert [t.varname for t in tables] == ['INVESTMENT'] * 3    
+    
+
+
+if __name__ == "__main__":
+    import pytest
+    pytest.main([__file__])

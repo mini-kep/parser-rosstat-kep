@@ -1,6 +1,7 @@
 ﻿import pytest
+from copy import copy
 
-from parsing.popper import is_valid_row, yield_csv_rows, text_to_list, Popper
+from parsing.csv_reader import is_valid_row, yield_csv_rows, pop_rows, is_identical
 
 DOC = """__________
 \t\t\t
@@ -38,10 +39,6 @@ def test_yield_csv_rows():
     assert list(yield_csv_rows(DOC)) == ROWS
 
 
-def test_text_to_rows():
-    assert text_to_list(DOC) == CLEAN_ROWS
-
-
 # Test Popper class
 def mock_rows():
     yield ["apt extra text", "1", "2"]
@@ -52,34 +49,37 @@ def mock_rows():
     yield ["zed some text"]
 
 
-csv_rows = '\n'.join(['\t'.join(row) for row in mock_rows()])
+def test_pop_rows():
+    rows = list(mock_rows())        
+    a = pop_rows(rows, "bat", "dot")
+    assert a == [["bat aa...ah", "1", "2"],
+                 ["can extra text", "1", "2"]]
+
+def test_pop_rows_remaining_rows_behaviour():
+    rows = list(mock_rows())   
+    pop_rows(rows, "apt", "wed")
+    assert rows[0] == ["wed more text", "1", "2"]
+    assert rows[1] == ["zed some text"]
 
 
-@pytest.fixture
-def popper():
-    return Popper(csv_rows)
+List0 = [['a', '5', 'z'], 
+         ['b', '4', 'x'], 
+         ['c', '1', 'z'],
+         ['d', '2', 'y'],
+         ['e', '3', 't']]
 
 
-class Test_Popper:
+List1 = copy(List0)
 
-    def test_init(self, popper):
-        assert isinstance(popper.rows, list)
-        assert len(popper.rows) == 6
-        assert isinstance(popper.rows[0], list)
-        assert popper.rows[0][0] == "apt extra text"
+def test_pop_rows_with_another_list_and_injection():
+    assert pop_rows(List0, 'a', 'd', is_identical) == List1[:3] 
+    assert List0 == List1[3:]
 
-    def test_pop(self, popper):
-        a = popper.pop("bat", "dot")
-        assert a == [["bat aa...ah", "1", "2"],
-                     ["can extra text", "1", "2"]]
-
-    def test_pop_segment_and_remaining_rows_behaviour(self, popper):
-        b = popper.pop("apt", "wed")
-        assert len(b) == 4
-        c = popper.remaining_rows()
-        assert c[0] == ["wed more text", "1", "2"]
-        assert c[1] == ["zed some text"]
-
+    
+def test_is_identical():
+    assert is_identical('"abc', 'a') is True
+    assert is_identical('abc', '"a') is True  
+    assert is_identical('aj', 'j') is False    
 
 if __name__ == "__main__":
     pytest.main([__file__])

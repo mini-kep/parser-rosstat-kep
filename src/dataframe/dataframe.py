@@ -73,39 +73,3 @@ def deaccumulate(df, first_month):
             "ACCUM" in vn)]
     df[varnames] = deacc_main(df[varnames], first_month)
     return rename_accum(df)
-
-
-#if __name__ == '__main__':  # pragma: no cover
-#    from kep.helper.path import InterimCSV
-#    from kep.parsing_definition import PARSING_SPECIFICATION
-#
-#    def values(year, month, parsing_spec=PARSING_SPECIFICATION):
-#        csv_text = InterimCSV(year, month).text()
-#        parsing_spec.attach_data(csv_text)
-#        return parsing_spec.values                                
-#
-#    values = values(2016, 10)
-#    dfa = create_dataframe(values, 'a')
-#    dfq = create_dataframe(values, 'q')
-#    dfm = create_dataframe(values, 'm')
-#
-#    from kep.csv2values.reader import text_to_list
-#    from kep.csv2values.parser import Segment
-#    from kep.csv2values.specification import Definition
-#
-#    # input data
-#    csv_segment = text_to_list(
-#        """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
-#1999	4823	901	1102	1373	1447
-#2000	7306	1527	1697	2038	2044""")
-#
-#    # input instruction
-#    commands = dict(var="GDP", header="Объем ВВП", unit=["bln_rub"])
-#    pdef = Definition(commands, units={"млрд.рублей": "bln_rub"})
-#
-#    # execution
-#    seg = Segment(csv_segment, pdef)
-#    values = seg.values
-#    dfa2 = create_dataframe(values, freq='a')
-#    dfq2 = create_dataframe(values, freq='q')
-#    dfm2 = create_dataframe(values, freq='m')

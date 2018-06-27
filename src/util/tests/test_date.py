@@ -18,8 +18,9 @@ class Test_supported_dates():
     
 
        
-def test_is_latest_date(self):
+def test_is_latest():
     year, month = supported_dates()[-1]
+    #year ago
     year -= 1
     assert is_latest(year, month ) is False       
 

@@ -3,9 +3,12 @@ from collections import OrderedDict as odict
 import pandas as pd
 import pytest
 
-from kep.parsing_definition.parsing_definition import make_parsing_definition
-from kep.pipeline.parser.extract_tables import split_to_tables, parse_tables
-from kep.pipeline.reader.popper import text_to_list
+from parsing.make_definitions import Definition
+from parsing.extract.extract_tables import split_to_tables, parse_tables
+from parsing.csv_reader import read_csv
+
+
+
 
 DOC = """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447
@@ -13,7 +16,7 @@ DOC = """Объем ВВП, млрд.рублей / Gross domestic product, bln 
 
 
 def create_table():
-    rows = text_to_list(DOC)
+    rows = read_csv(DOC)
     tables = list(split_to_tables(rows))
     return tables[0]
 
@@ -104,12 +107,23 @@ def make_definition():
             unit=['bln_rub', 'yoy', 'rog'])]
     # mapper dictionary to convert text in table headers to units of
     # measurement
-    units = UNITS
-    return make_parsing_definition(commands, boundaries, '', units)
+    units = odict([  # 1. MONEY
+        ('млрд.рублей', 'bln_rub'),
+        ('млрд. рублей', 'bln_rub'),
+        # 2. RATES OF CHANGE
+        ('в % к прошлому периоду', 'rog'),
+        ('в % к предыдущему месяцу', 'rog'),
+        ('в % к предыдущему периоду', 'rog'),
+        ('в % к соответствующему периоду предыдущего года', 'yoy'),
+        ('в % к соответствующему месяцу предыдущего года', 'yoy')    ])
+    return Definition(commands=commands, boundaries=boundaries, reader='', 
+                      units=units)
+
+
 
 
 def create_tables():
-    csv_segment = text_to_list(DOC2)
+    csv_segment = read_csv(DOC2)
     return split_to_tables(csv_segment)
 
 
@@ -125,61 +139,6 @@ class Test_parse_tables:
         for t in tables:
             assert t.varname == 'INVESTMENT'
         assert [t.unit for t in tables] == ['bln_rub', 'yoy', 'rog']
-
-
-DOC3 = '\n'.join([DOC, DOC2])
-
-
-# def make_specification():
-    # commands = [
-        # dict(
-            # var='GDP',
-            # header='Объем ВВП',
-            # unit='bln_rub')]
-    # specification = Specification(commands=commands, units=UNITS)
-    # boundaries1 = [
-        # dict(start='1.6. Инвестиции в основной капитал',
-             # end='1.6.1. Инвестиции в основной капитал организаций'),
-        # dict(start='1.7. Инвестиции в основной капитал',
-             # end='1.7.1. Инвестиции в основной капитал организаций')]
-    # commands1 = [
-        # dict(
-            # var='INVESTMENT',
-            # header=['Инвестиции в основной капитал'],
-            # unit=['bln_rub', 'yoy', 'rog'])]
-    # specification.append(commands1, boundaries1)
-    # return specification
-
-# FIXME: shoudl this code be replaced?
-
-# control_values = [
-    # {'freq': 'a', 'label': 'GDP_bln_rub',
-     # 'time_index': pd.Timestamp('1999-12-31'),
-     # 'value': 4823.0},
-    # {'freq': 'q',
-     # 'label': 'GDP_bln_rub',
-     # 'time_index': pd.Timestamp('2000-12-31'),
-     # 'value': 2044.0},
-    # {'freq': 'a',
-     # 'label': 'INVESTMENT_bln_rub',
-     # 'time_index': pd.Timestamp('2015-12-31'),
-     # 'value': 14555.9},
-    # {'freq': 'q',
-     # 'label': 'INVESTMENT_rog',
-     # 'time_index': pd.Timestamp('2016-09-30'),
-     # 'value': 119.2}
-# ]
-
-
-# def test_specification_with_2_segments_on_valid_csv_data():
-    # # setting
-    # spec = make_specification()
-    # spec.attach_data(DOC3)
-    # # call
-    # values = spec.values
-    # # check
-    # for d in control_values:
-        # assert d in values
 
 
 if __name__ == "__main__":
