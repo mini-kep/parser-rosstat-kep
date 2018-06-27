@@ -2,12 +2,18 @@
 
 from pathlib import Path
 import os
+import platform
 import subprocess
 import requests
 from datetime import date
 
-UNRAR_EXE = Path(__file__).parent / 'bin' / 'UnRAR.exe'
+IS_WINDOWS = (platform.system() == 'Windows')
+if IS_WINDOWS:
+    UNRAR_EXE = str(Path(__file__).parent / 'bin' / 'UnRAR.exe')
+else:
+    UNRAR_EXE = 'unrar'
 
+    
 def download(url, path):
     r = requests.get(url.strip(), stream=True)
     with open(str(path), 'wb') as f:
