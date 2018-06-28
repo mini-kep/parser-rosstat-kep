@@ -13,7 +13,7 @@ from .row_splitter import get_splitter
 from .to_float import to_float
 
 
-def evaluate_assignment(rows, pdef):
+def evaluate(rows, pdef):
     tables = split_to_tables(rows)
     tables = parse_tables(tables, pdef)
     verify_tables(tables, pdef)

@@ -1,1 +1,1 @@
-from .extract_tables import evaluate_assignment
+from .extract_tables import evaluate

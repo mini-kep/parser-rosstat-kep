@@ -12,3 +12,4 @@ def save_excel(filepath, dataframes):
         dfm.to_excel(writer, sheet_name='month')
         # TODO: add variable names
         #self.df_vars().to_excel(writer, sheet_name='variables')
+    print('Saved Excel file to:\n    ', filepath)

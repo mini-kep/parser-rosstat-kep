@@ -1,44 +1,20 @@
 """Run full cycle of data processing from download to saving dataframe."""
 
-# Workflow
-# --------
-#
-# 1. what is latest date available?
-# 2. could newer data have come already?
-# 3. [+] let's parse the new data
-# 4. [-] commit to repo
-# 5. upload to database
-# 6. create a PDF handout or other assets
-
-# To demonstrate:
-# ------------------
-# - output:
-#   - industrial production and other busness activity
-#   - corp profits
-# - housing construction
-# - retail sales and household incomes
-# - budget expenditure and revenues
-# - export and import
-# - prices, inflation, interest rates
-# - exchange rate
-# - Q:GDP
-# - Q:investment (unrelaible)
-# - targets/forecasts
-
-
 from pathlib import Path
 import shutil
-import pandas as pd
 from io import StringIO
 
-from download import Downloader, Unpacker
-from word2csv import folder_to_csv
-from units import UNITS
-from variables import YAML_DEFAULT, YAML_BY_SEGMENT
+import pandas as pd
+
+
+from inputs import UNITS, YAML_DEFAULT, YAML_BY_SEGMENT
 from parsing import create_parser
-from dataframe import create_dataframe
-from checkpoints import verify
-from util import is_latest, save_excel
+from util.remote import Downloader, Unpacker
+from util.word import folder_to_csv
+from util.dataframe import create_dataframe
+from inputs.checkpoints import verify
+from util.date import is_latest
+from util.to_excel import save_excel
 
 
 FREQUENCIES = list('aqm')
@@ -55,7 +31,7 @@ def md(folder):
     return folder
 
 
-class Locations():
+class Locations(object):
     def __init__(self, year: int,
                  month: int,
                  data_root,
@@ -94,7 +70,7 @@ class Locations():
         return 'df{}.csv'.format(freq)
 
     @property
-    def xlsx_filepath(self):
+    def xlsx(self):
         return str(self.out / 'kep.xlsx')
 
 # not used
@@ -116,11 +92,6 @@ def to_latest(year: int, month: int, loc):
         shutil.copyfile(str(src), str(dst))
         print("Updated", dst)
     print(f"Latest folder now refers to {loc.year}-{loc.month}")
-
-
-def to_excel(path, dfs):
-    save_excel(path, dfs)
-    print('Saved Excel file to:\n    ', path)
 
 
 def read_csv(source):
@@ -161,11 +132,13 @@ def update(year,
            yaml_by_segment=YAML_BY_SEGMENT,
            data_root=DATA_ROOT,
            output_root=OUTPUT_ROOT,
+           validator=verify,
            force_download=False,
            force_unrar=False,
            force_convert_word=False):
     # filesystem
     loc = Locations(year, month, data_root, output_root)
+
     # perisist data
     d = Downloader(year, month, loc.archive_filepath)
     if force_download or not d.path.exists():
@@ -175,26 +148,32 @@ def update(year,
     if force_unrar or not u.docs.exist():
         u.run()
     print(u.status)
+
     # convert Word to csv
     if force_convert_word or not loc.interim_csv.exists():
         folder_to_csv(loc.raw_folder, loc.interim_csv)
+
     # parse
     text = loc.interim_csv.read_text(encoding='utf-8')
     parse = create_parser(units, yaml_default, yaml_by_segment)
     values = list(parse(text))
+
     # save dataframes
     dfs = {}
     for freq in 'aqm':
         df = create_dataframe(values, freq)
         dfs[freq] = df
-        verify(df, freq)
+        validator(df, freq)
         df.to_csv(str(loc.processed_csv(freq)))
     if is_latest(year, month):
         to_latest(year, month, loc)
-        to_excel(loc.xlsx_filepath, dfs)
+        save_excel(loc.xlsx, dfs)
     return dfs
 
 
 if __name__ == '__main__':
-    dfs = update(2018, 4)
+    import sys
+    year = sys.argv[1] or 2018
+    month = sys.argv[2] or 4
+    dfs = update(year, month)
     dfa, dfq, dfm = (dfs[freq] for freq in FREQUENCIES)

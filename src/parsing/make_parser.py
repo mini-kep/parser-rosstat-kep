@@ -1,6 +1,6 @@
 from parsing.csv_reader import clean_rows, read_csv, pop_rows
 from parsing.definition import create_definitions
-from parsing.extract import evaluate_assignment
+from parsing.extract import evaluate
 
 
 def create_parser(units, default_yaml, yaml_by_segment):
@@ -15,7 +15,7 @@ def create_parser(units, default_yaml, yaml_by_segment):
             default_definition,
             other_definitions)
         for csv_rows, definition in jobs:
-            for value in evaluate_assignment(csv_rows, definition):
+            for value in evaluate(csv_rows, definition):
                 yield value
     return _mapper
 

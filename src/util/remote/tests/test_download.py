@@ -2,7 +2,8 @@ import pytest
 import tempfile
 from pathlib import Path
 
-from ..download import Downloader, Unpacker
+from util.remote.download import Downloader
+from util.remote.unpack import Unpacker
 
 
 class Test_Downloader_and_Unpacker():

@@ -4,7 +4,7 @@ from random import randint
 import pandas as pd
 import pytest
 
-from dataframe.dataframe import deaccumulate
+from util.dataframe import deaccumulate
 
 
 def _make_df(name, values, freq):
