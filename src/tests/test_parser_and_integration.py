@@ -1,11 +1,11 @@
-from collections import OrderedDict as odict
+﻿from collections import OrderedDict as odict
 
 import pandas as pd
 import pytest
 
-from parsing.definition import Definition
-from parsing.extract.extract_tables import split_to_tables, parse_tables
-from parsing.csv_reader import read_csv
+from extract.tables import split_to_tables, parse_tables
+from inputs.definition import Definition
+from util.csv_reader import read_csv
 
 DOC = """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447

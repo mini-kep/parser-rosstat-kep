@@ -25,8 +25,6 @@ Create parsing instructions for an individual variable.
 
 import yaml
 
-from parsing.csv_reader import is_identical
-
 
 def iterate(x):
     if isinstance(x, list):
@@ -68,11 +66,10 @@ class Definition:
         return result
 
     def select_applicable_boundaries(self,
-                                     csv_rows: list,
-                                     is_identical=is_identical):
+                                     csv_rows: list):
         def is_found(rows, x):
             for row in rows:
-                if is_identical(row[0], x):
+                if row[0].startswith(x):
                     return True
             return False
         error_messages = ['Start or end boundary not found:']
@@ -88,13 +85,38 @@ class Definition:
             error_messages.append(start[:20])
             error_messages.append(end[:20])
         raise ValueError('\n'.join(error_messages))
+        
+    def headers_dict(self):
+         pass
+     
+    def unit_dict(self):
+         pass
+     
+    def required(self): 
+         pass
 
 
 def from_yaml(yaml_text: str):
     return list(yaml.load_all(yaml_text))
 
 
-def create_definitions(units: dict, yaml_text: str):
-    instructions_by_segment = from_yaml((yaml_text))
-    return [Definition(units=units, **instruction_set)
-            for instruction_set in instructions_by_segment]
+def create_definitions(units: str, yaml_doc: str):
+    base = []
+    others = []    
+    for i in from_yaml(yaml_doc):
+        d = Definition(units, **i) 
+        if 'boundaries' in i.keys():
+            others.append(d)
+        else:
+            base.append(d)
+    assert len(base) == 1
+    return base[0], others
+        
+        
+if __name__ == '__main__':            
+    from inputs import UNITS, YAML_DOC
+    d = create_definitions(UNITS, YAML_DOC)
+
+    
+
+

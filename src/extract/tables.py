@@ -1,15 +1,14 @@
 """Parse CSV text *csv_segment* using parsing definition *pdef*:
 
-   extract_tables(csv_segment, pdef)
+   evaluate(rows, pdef)
 """
-from collections import OrderedDict as odict
 from enum import Enum, unique
 
 import pandas as pd
 
-from parsing.extract.row_model import Row
-from parsing.extract.row_splitter import get_splitter
-from parsing.extract.to_float import to_float
+from extract.row_model import Row
+from extract.to_float import to_float
+from extract.row_splitter import get_splitter
 
 
 def evaluate(rows, pdef):
@@ -70,6 +69,29 @@ def split_to_tables(rows):
     # still have some data left
     if len(headers) > 0 and len(datarows) > 0:
         yield Table(headers, datarows)
+
+def split_to_tables2(rows):
+    """Yield Table() instances from *rows* list of lists."""
+    datarows = []
+    headers = []
+    state = State.INIT
+    for row in rows:
+        r = Row(row)
+        if r.is_datarow():
+            datarows.append(row)
+            state = State.DATA
+        else:
+            if state == State.DATA:
+                # table ended, emit it
+                yield Tab(headers, datarows)
+                headers = []
+                datarows = []
+            headers.append(row)
+            state = State.HEADERS
+    # still have some data left
+    if len(headers) > 0 and len(datarows) > 0:
+        yield Tab(headers, datarows)
+
 
 
 class HeaderParser:
@@ -202,8 +224,156 @@ class Table:
         return '\n'.join([_title, _header, _data])
 
 
+def set_label(self, varnames_dict, units_dict):
+    for i, row in enumerate(self.rows):
+        varname = row.get_varname(varnames_dict)
+        if varname:
+            self.varname = varname
+            self.rows[i].is_parsed = True
+        unit = row.get_unit(units_dict)
+        if unit:
+            self.unit = unit
+            self.rows[i].is_parsed = True
+    return self.varname, self.unit
+
+
+import re
+def matches_at_start(x, pat):
+    """Helper function for header parsing.
+
+    Returns:
+        True if *self.name* contains *text*.
+        False otherwise.
+    """
+    regex = r"\b{}".format(pat)
+    return bool(re.search(regex, x))
+
+def matches_anywhere(x, pat):
+    return pat in x
+
+
+def find(rows, patterns, comparison_func):
+    return [pat
+            for pat in patterns
+            for row in rows
+            if comparison_func(row[0], pat) ]
+   
+    
 if __name__ == "__main__":  # pragma: no cover
-    from parsing.csv_reader import read_csv
+
+    from util.csv_reader import read_csv
+    
+    class Tab:
+        def __init__(self, headers, datarows, reader=None):
+            self.headers = headers
+            self.datarows = datarows
+            self.name = None
+            self.unit = None
+            key = reader if reader else count_columns(self.datarows)
+            self.splitter_func = get_splitter(key)
+
+            
+        def make_datapoint(self, value: str, time_stamp, freq):
+            return dict(label=(self.name, self.unit),                    
+                        value=to_float(value),
+                        time_index=time_stamp,
+                        freq=freq)    
+        
+        def yield_values(self):
+            """Yield dictionaries with variable name, frequency, time_index
+               and value. May yield a dictionary where d['value'] is None.
+            """
+            for row in self.datarows:
+                year = Row(row).year
+                data = Row(row).data
+                a_value, q_values, m_values = self.splitter_func(data)
+                if a_value:
+                    time_stamp = timestamp_annual(year)
+                    yield self.make_datapoint(a_value, time_stamp, 'a')
+                if q_values:
+                    for t, val in enumerate(q_values):
+                        time_stamp = timestamp_quarter(year, t + 1)
+                        yield self.make_datapoint(val, time_stamp, 'q')
+                if m_values:
+                    for t, val in enumerate(m_values):
+                        time_stamp = timestamp_month(year, t + 1)
+                        yield self.make_datapoint(val, time_stamp, 'm')            
+            
+            
+            
+        def __repr__(self):
+            return str(self.__dict__)
+
+
+    def make(csv_text: str, start='', end=''):
+        rows = read_csv(csv_text)
+        return list(split_to_tables2(rows))
+
+    def assign_trailing_units(tables, required):
+        tables = list(tables)
+        for prev_table, table in zip(tables, tables[1:]):
+            if (table.name is None 
+                and table.unit in required[prev_table.name]):
+                table.name = prev_table.name
+                
+    def yield_values(tables):
+       for t in tables:
+           if t.name and t.unit:
+               for x in t.yield_values():
+                   yield x
+    
+    def assignments(tables):
+        return [(t.name, t.unit) for t in tables]        
+        
+    
+    def var_parser(headers, name):
+        def _enclosed(table):
+            if find(table.headers, headers, matches_at_start):
+                table.name = name
+            return table    
+        return _enclosed
+
+
+    def unit_parser(header, unit):
+        def _enclosed(table):
+            if find(table.headers, [header], matches_anywhere):
+                table.unit = unit
+            return table    
+        return _enclosed
+            
+    doc="""1.9. Ввод в действие жилых домов организациями всех форм собственности																	
+    млн.кв.м общей площади																	
+    1999	32,0	4,1	5,5	5,9	16,5	0,7	0,9	2,5	1,0	1,1	3,4	1,2	1,3	3,4	1,6	2,2	12,7
+    2000	30,3	4,1	5,7	5,9	14,6	0,9	1,1	2,1	1,2	1,4	3,1	1,3	1,4	3,2	1,6	2,0	11,0    
+    Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
+    1999	4823	901	1102	1373	1447
+    в % к соответствующему периоду предыдущего года / percent of corresponding period of previous year
+    1999	105,3	93,8	99,2	105,0	117,4	92,2	93,8	95,1	94,7	99,2	102,9	102,1	101,9	111,1	114,8	112,1	122,6
+"""
+    
+    required = {'GDP': ['bln_rub', 'yoy'], 'DWELL': ['mln_m2']}     
+    r1 = var_parser(name='GDP', headers=['Валовый внутренний продукт', 'Объем ВВП'])     
+    r2 = var_parser(name='DWELL', headers=['Ввод в действие жилых домов организациями']) 
+    u1 = unit_parser(header='млрд.рублей', unit='bln_rub')
+    u2 = unit_parser(header='млн.кв.м общей площади', unit='mln_m2')
+    u3 = unit_parser(header='% к соответствующему периоду предыдущего года', unit='yoy')                       
+    
+    tables = make(doc)
+    for x in [u1, u2, u3, r1, r2]:
+        tables = map(x, tables) 
+    tables = list(tables)     
+        
+    print(assignments(tables))
+    assign_trailing_units(tables, required)
+    print(assignments(tables))
+    req = [(name, unit) for name, units in required.items() for unit in units]
+    assert set(req) == set(assignments(tables))
+ 
+
+    values = list(yield_values(tables))
+        
+
+
     # example 1
     DOC = """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447

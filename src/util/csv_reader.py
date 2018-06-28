@@ -39,29 +39,18 @@ def is_valid_row(row):
     else:
         return False
 
+def supress_apos(text):
+    return text.replace('"', '')
 
 def clean_rows(csv_rows: list):
     return list(filter(is_valid_row, csv_rows))
 
-
-def read_csv1(csv_text: str):
-    return list(yield_csv_rows(csv_text))
-
-
 def read_csv(csv_text: str):
+    csv_text = supress_apos(csv_text)
     rows = yield_csv_rows(csv_text)
     return clean_rows(rows)
 
-
-def is_identical(row, x):
-    def supress_apos(text):
-        return text.replace('"', '')
-    _a = supress_apos(row)
-    _b = supress_apos(x)
-    return _a.startswith(_b)
-
-
-def pop_rows(rows, start, end, is_identical=is_identical):
+def pop_rows(rows, start, end):
     """Pops elements of *self.rows* between [start, end).
 
     Pops elements from *self.rows* that are between
@@ -84,9 +73,9 @@ def pop_rows(rows, start, end, is_identical=is_identical):
     i = 0
     while i < len(rows):
         row = rows[i]
-        if is_identical(row[0], start):
+        if row[0].startswith(start):
             we_are_in_segment = True
-        if is_identical(row[0], end):
+        if row[0].startswith(end):
             break
         if we_are_in_segment:
             segment.append(row)

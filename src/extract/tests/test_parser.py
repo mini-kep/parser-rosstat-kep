@@ -1,12 +1,11 @@
 from collections import OrderedDict
+
 import pandas as pd
 import pytest
-
-from parsing.definition import Definition
-
-from parsing.extract.extract_tables import Table, DataBlock, HeaderParser
-from parsing.extract.extract_tables import timestamp_quarter, timestamp_month, timestamp_annual
-from parsing.extract.row_splitter import split_row_by_year_and_qtr
+from extract.tables import (Table, DataBlock, HeaderParser,
+                            timestamp_quarter, timestamp_month, timestamp_annual)
+from extract.row_splitter import split_row_by_year_and_qtr
+from inputs.definition import Definition
 
 
 @pytest.fixture

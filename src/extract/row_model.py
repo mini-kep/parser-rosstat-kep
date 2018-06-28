@@ -106,7 +106,7 @@ class Row:
         for k in varnames_mapper_dict.keys():
             if self.matches(k):
                 varnames.append(varnames_mapper_dict[k])
-        if len(varnames) > 1:
+        if len(set(varnames)) > 1:
             msg = "Multiple entries found in <{0}>: {1}".format(
                 self.name, varnames)
             raise ValueError(msg)

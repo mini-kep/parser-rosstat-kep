@@ -1,5 +1,4 @@
-# TODO: make single yaml - one without boundaries is default
-YAML_DEFAULT = """
+YAML_DOC = """
 commands:
   - var: GDP
     header:
@@ -44,11 +43,11 @@ commands:
       - Индексы цен производителей промышленных товаров
     unit: rog
   - var: DWELLINGS_CONSTRUCTION
-    header: Ввод в действие жилых домов организациями всех форм собственности
+    header: 
+        - Ввод в действие жилых домов организациями всех форм собственности
+        - Ввод в действие жилых домов организациями всех форм
     unit: mln_m2
-"""
-
-YAML_BY_SEGMENT = """
+---
 boundaries:
   - start: 1.9. Внешнеторговый оборот – всего
     end: 1.9.1. Внешнеторговый оборот со странами дальнего зарубежья
@@ -65,7 +64,7 @@ commands:
   - var: IMPORT_GOODS
     header:
       - импорт товаров – всего
-      - Импорт товаров
+      - Импорт товаро
     unit: bln_usd
 ---
 boundaries:
@@ -186,5 +185,5 @@ commands:
     unit: bln_rub
 """
 import yaml
-_ = yaml.load_all(YAML_DEFAULT)
-_ = yaml.load_all(YAML_BY_SEGMENT)
+_ = yaml.load_all(YAML_DOC)
+

@@ -7,13 +7,12 @@ from io import StringIO
 import pandas as pd
 
 
-from inputs import UNITS, YAML_DEFAULT, YAML_BY_SEGMENT
-from parsing import create_parser
+from inputs import UNITS, YAML_DOC, verify
+from dispatch import create_parser
 from util.remote import Downloader, Unpacker
 from util.word import folder_to_csv
 from util.dataframe import create_dataframe
-from inputs.checkpoints import verify
-from util.date import is_latest
+from util.date import is_latest, supported_dates
 from util.to_excel import save_excel
 
 
@@ -73,14 +72,6 @@ class Locations(object):
     def xlsx(self):
         return str(self.out / 'kep.xlsx')
 
-# not used
-
-
-def make_reader(units=UNITS,
-                default_yaml=YAML_DEFAULT,
-                yaml_by_segment=YAML_BY_SEGMENT):
-    return create_parser(units, default_yaml, yaml_by_segment)
-
 
 def to_latest(year: int, month: int, loc):
     """Copy csv files from folder like *processed/2017/04* to
@@ -127,9 +118,8 @@ def get_dataframe(year, month, freq):
 
 def update(year,
            month,
-           units=UNITS,
-           yaml_default=YAML_DEFAULT,
-           yaml_by_segment=YAML_BY_SEGMENT,
+           units_dict=UNITS,
+           yaml_doc=YAML_DOC,
            data_root=DATA_ROOT,
            output_root=OUTPUT_ROOT,
            validator=verify,
@@ -138,26 +128,27 @@ def update(year,
            force_convert_word=False):
     # filesystem
     loc = Locations(year, month, data_root, output_root)
-
+    INTERIM_FOUND = loc.interim_csv.exists()
     # perisist data
-    d = Downloader(year, month, loc.archive_filepath)
-    if force_download or not d.path.exists():
+    if force_download or not INTERIM_FOUND:
+        d = Downloader(year, month, loc.archive_filepath)
         d.run()
-    print(d.status)
-    u = Unpacker(loc.archive_filepath, loc.raw_folder)
-    if force_unrar or not u.docs.exist():
+        print(d.status)
+    if force_unrar or not INTERIM_FOUND:
+        u = Unpacker(loc.archive_filepath, loc.raw_folder)
         u.run()
-    print(u.status)
+        print(u.status)
 
     # convert Word to csv
-    if force_convert_word or not loc.interim_csv.exists():
+    if force_convert_word or not INTERIM_FOUND:
         folder_to_csv(loc.raw_folder, loc.interim_csv)
 
     # parse
     text = loc.interim_csv.read_text(encoding='utf-8')
-    parse = create_parser(units, yaml_default, yaml_by_segment)
+    parse = create_parser(units_dict, yaml_doc)
     values = list(parse(text))
-    # save dataframes
+    
+    # save three dataframes
     dfs = {}
     for freq in 'aqm':
         df = create_dataframe(values, freq)
@@ -169,6 +160,9 @@ def update(year,
         save_excel(loc.xlsx, dfs)
     return dfs
 
+def unpack(dfs):
+    return (dfs[freq] for freq in FREQUENCIES)    
+
 
 if __name__ == '__main__':
     import sys
@@ -177,5 +171,8 @@ if __name__ == '__main__':
         month = int(sys.argv[2]) 
     except IndexError:
         year, month = 2018, 4                    
-    dfs = update(year, month)
-    dfa, dfq, dfm = (dfs[freq] for freq in FREQUENCIES)
+    dfa, dfq, dfm = unpack(update(year, month))
+    
+    for year, month in [(2010, 8)]: # reversed(supported_dates()[:-1]):
+        print("\n"*5, year, month)        
+        dfa, dfq, dfm = dfa, dfq, dfm = unpack(update(year, month))

@@ -1,7 +1,8 @@
-﻿import pytest
-from copy import copy
+﻿from copy import copy
 
-from parsing.csv_reader import is_valid_row, yield_csv_rows, pop_rows, is_identical
+import pytest
+
+from util.csv_reader import is_valid_row, yield_csv_rows, pop_rows
 
 DOC = """__________
 \t\t\t
@@ -74,14 +75,10 @@ List1 = copy(List0)
 
 
 def test_pop_rows_with_another_list_and_injection():
-    assert pop_rows(List0, 'a', 'd', is_identical) == List1[:3]
+    assert pop_rows(List0, 'a', 'd') == List1[:3]
     assert List0 == List1[3:]
 
 
-def test_is_identical():
-    assert is_identical('"abc', 'a') is True
-    assert is_identical('abc', '"a') is True
-    assert is_identical('aj', 'j') is False
 
 
 if __name__ == "__main__":
