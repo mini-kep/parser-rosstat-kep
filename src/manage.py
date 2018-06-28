@@ -18,7 +18,7 @@ from util.to_excel import save_excel
 
 
 FREQUENCIES = list('aqm')
-PROJECT_ROOT = Path(__file__).parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_ROOT = PROJECT_ROOT / 'data'
 OUTPUT_ROOT = PROJECT_ROOT / 'output'
 assert DATA_ROOT.exists()
@@ -173,7 +173,10 @@ def update(year,
 
 if __name__ == '__main__':
     import sys
-    year = sys.argv[1] or 2018
-    month = sys.argv[2] or 4
+    try:
+        year = int(sys.argv[1]) 
+        month = int(sys.argv[2]) 
+    except IndexError:
+        year, month = 2018, 4                    
     dfs = update(year, month)
     dfa, dfq, dfm = (dfs[freq] for freq in FREQUENCIES)

@@ -198,7 +198,7 @@ def make_file_list(folder):
     return [os.path.abspath(os.path.join(folder, fn)) for fn in files]
 
 
-def word_folder_to_csv(folder, csv_filename):
+def folder_to_csv(folder, csv_filename):
     """Make single csv based on sevral .doc files in *folder*. """
     print()
     print("Folder:\n    ", folder)
