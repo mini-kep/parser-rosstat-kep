@@ -5,8 +5,7 @@ import pytest
 
 from parsing.definition import Definition
 from parsing.extract.extract_tables import split_to_tables, parse_tables
-from parsing.csv_reader import read_csv, clean_rows
-
+from parsing.csv_reader import read_csv
 
 DOC = """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447
@@ -42,23 +41,23 @@ class Test_Table():
         # compare
         assert t.is_defined() is True
         assert datapoints[0] == {'freq': 'a',
-                                 'label': 'GDP_bln_rub',
+                                 'label': ('GDP', 'bln_rub'),
                                  'time_index': pd.Timestamp('1999-12-31'),
                                  'value': 4823}
         assert datapoints[1] == {'freq': 'q',
-                                 'label': 'GDP_bln_rub',
+                                 'label': ('GDP', 'bln_rub'),
                                  'time_index': pd.Timestamp('1999-03-31'),
                                  'value': 901}
         assert datapoints[2] == {'freq': 'q',
-                                 'label': 'GDP_bln_rub',
+                                 'label': ('GDP', 'bln_rub'),
                                  'time_index': pd.Timestamp('1999-06-30'),
                                  'value': 1102}
         assert datapoints[3] == {'freq': 'q',
-                                 'label': 'GDP_bln_rub',
+                                 'label': ('GDP', 'bln_rub'),
                                  'time_index': pd.Timestamp('1999-09-30'),
                                  'value': 1373}
         assert datapoints[4] == {'freq': 'q',
-                                 'label': 'GDP_bln_rub',
+                                 'label': ('GDP', 'bln_rub'),
                                  'time_index': pd.Timestamp('1999-12-31'),
                                  'value': 1447}
 
@@ -107,7 +106,6 @@ def make_definition():
 
 def create_tables():
     csv_segment = read_csv(DOC2)
-    csv_segment = clean_rows(csv_segment)
     return split_to_tables(csv_segment)
 
 

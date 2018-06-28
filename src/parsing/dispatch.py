@@ -1,14 +1,14 @@
-from parsing.csv_reader import clean_rows, read_csv, pop_rows
+from parsing.csv_reader import read_csv, pop_rows
 from parsing.definition import create_definitions
 from parsing.extract import evaluate
 
 
 def create_parser(units, default_yaml, yaml_by_segment):
+    """Bundle parsing definitions to accept *csv_text* as argument."""
     # read yamls
     default_definition = create_definitions(units, default_yaml)[0]
-    other_definitions = create_definitions(units, yaml_by_segment)
-    # bundle to parser
-
+    other_definitions = create_definitions(units, yaml_by_segment)    
+    # bundle to parser function
     def _mapper(csv_text: str):
         jobs = yield_parsing_jobs(
             csv_text,
@@ -20,11 +20,9 @@ def create_parser(units, default_yaml, yaml_by_segment):
     return _mapper
 
 
-def yield_parsing_jobs(
-        csv_text: str,
-        definition_default,
-        definitions_by_segment):
-    csv_rows = clean_rows(read_csv(csv_text))
+def yield_parsing_jobs(csv_text: str, definition_default, definitions_by_segment):
+    """Break *csv_text* to segments associated with parsing defintions."""
+    csv_rows = read_csv(csv_text)
     for current_definition in definitions_by_segment:
         start, end = current_definition.select_applicable_boundaries(csv_rows)
         csv_segment = pop_rows(csv_rows, start, end)

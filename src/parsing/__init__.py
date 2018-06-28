@@ -1,1 +1,1 @@
-from .make_parser import create_parser
+from .dispatch import create_parser

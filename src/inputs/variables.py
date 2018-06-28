@@ -1,3 +1,4 @@
+# TODO: make single yaml - one without boundaries is default
 YAML_DEFAULT = """
 commands:
   - var: GDP

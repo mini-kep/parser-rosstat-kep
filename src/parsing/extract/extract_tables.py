@@ -7,10 +7,9 @@ from enum import Enum, unique
 
 import pandas as pd
 
-from parsing.label import make_label
-from .row_model import Row
-from .row_splitter import get_splitter
-from .to_float import to_float
+from parsing.extract.row_model import Row
+from parsing.extract.row_splitter import get_splitter
+from parsing.extract.to_float import to_float
 
 
 def evaluate(rows, pdef):
@@ -172,7 +171,7 @@ class Table:
 
     @property
     def label(self):
-        return make_label(self.varname, self.unit)
+        return (self.varname, self.unit)
 
     def set_label(self, varnames_dict, units_dict):
         self.varname, self.unit = self.header.set_label(
@@ -204,12 +203,12 @@ class Table:
 
 
 if __name__ == "__main__":  # pragma: no cover
-    from kep.pipeline.reader.popper import text_to_list
+    from parsing.csv_reader import read_csv
     # example 1
     DOC = """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447
 2000	7306	1527	1697	2038	2044"""
-    rows = text_to_list(DOC)
+    rows = read_csv(DOC)
     tables = list(split_to_tables(rows))
     t = tables[0]
     t.set_splitter(None)
@@ -217,23 +216,23 @@ if __name__ == "__main__":  # pragma: no cover
     t.unit = 'bln_rub'
     datapoints = t.values
     assert datapoints[0] == {'freq': 'a',
-                             'label': 'GDP_bln_rub',
+                             'label': ('GDP', 'bln_rub'),
                              'time_index': pd.Timestamp('1999-12-31'),
                              'value': 4823}
     assert datapoints[1] == {'freq': 'q',
-                             'label': 'GDP_bln_rub',
+                             'label': ('GDP', 'bln_rub'),
                              'time_index': pd.Timestamp('1999-03-31'),
                              'value': 901}
     assert datapoints[2] == {'freq': 'q',
-                             'label': 'GDP_bln_rub',
+                             'label': ('GDP', 'bln_rub'),
                              'time_index': pd.Timestamp('1999-06-30'),
                              'value': 1102}
     assert datapoints[3] == {'freq': 'q',
-                             'label': 'GDP_bln_rub',
+                             'label': ('GDP', 'bln_rub'),
                              'time_index': pd.Timestamp('1999-09-30'),
                              'value': 1373}
     assert datapoints[4] == {'freq': 'q',
-                             'label': 'GDP_bln_rub',
+                             'label': ('GDP', 'bln_rub'),
                              'time_index': pd.Timestamp('1999-12-31'),
                              'value': 1447}
 
@@ -300,54 +299,3 @@ if __name__ == "__main__":  # pragma: no cover
 2015		35,2	152,1	108,9	160,4	20,7	129,1	116,4	104,2	123,0	118,2	87,8	105,3	103,6	134,3	92,9	163,0
 2016		36,9	147,1	119,2
 1.7.1. Инвестиции в основной капитал организаций"""
-
-    from kep.csv2values.reader import text_to_list
-    from kep.csv2values.specification import Definition
-
-    # settings
-    boundaries = [
-        dict(start='1.6. Инвестиции в основной капитал',
-             end='1.6.1. Инвестиции в основной капитал организаций'),
-        dict(start='1.7. Инвестиции в основной капитал',
-             end='1.7.1. Инвестиции в основной капитал организаций')]
-    commands = [
-        dict(
-            varname='INVESTMENT',
-            table_headers=['Инвестиции в основной капитал'],
-            required_units=['bln_rub', 'yoy', 'rog'])]
-    # mapper dictionary to convert text in table headers to units of
-    # measurement
-    units = odict([  # 1. MONEY
-        ('млрд.рублей', 'bln_rub'),
-        ('млрд. рублей', 'bln_rub'),
-        # 2. RATES OF CHANGE
-        ('в % к прошлому периоду', 'rog'),
-        ('в % к предыдущему месяцу', 'rog'),
-        ('в % к предыдущему периоду', 'rog'),
-        ('в % к соответствующему периоду предыдущего года', 'yoy'),
-        ('в % к соответствующему месяцу предыдущего года', 'yoy')
-    ])
-    pdef = Definition(commands, units, boundaries)
-
-    # actions
-    csv_segment = text_to_list(DOC)
-    tables = split_to_tables(csv_segment)
-    tables = parse_tables(tables, pdef)
-
-    # checks
-    assert len(tables) == 3
-    assert all([t.has_unknown_lines() for t in tables]) is False
-    assert [t.varname for t in tables] == ['INVESTMENT'] * 3
-    assert [t.unit for t in tables] == ['bln_rub', 'yoy', 'rog']
-
-    # result
-    for t in tables:
-        assert t.varname == 'INVESTMENT'
-        assert t.unit in units.values()
-
-    # TODO: Add support for any incoming type to to_float() function
-    #   only str is type is supported by to_float, but actually Python
-    #   don't care if there would be float for example
-
-    # TODO: Create checker for year and tests for that
-    #   The missing of the year is not checked

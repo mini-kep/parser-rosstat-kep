@@ -1,5 +1,5 @@
 import pytest
-import parsing.label as label
+import util.label as label
 
 # TODO: add variable name with underscore, like GOV_EXPENSE
 
@@ -32,5 +32,4 @@ def test_extract_unit():
 
 
 if __name__ == "__main__":
-    import pytest
     pytest.main([__file__])

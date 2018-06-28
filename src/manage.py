@@ -95,7 +95,7 @@ def to_latest(year: int, month: int, loc):
 
 
 def read_csv(source):
-    """Wrapper for pd.read_csv(). Treats first column at time index.
+    """Wrapper for pd.read_csv1(). Treats first column at time index.
 
        Returns:
            pd.DataFrame()
@@ -157,7 +157,6 @@ def update(year,
     text = loc.interim_csv.read_text(encoding='utf-8')
     parse = create_parser(units, yaml_default, yaml_by_segment)
     values = list(parse(text))
-
     # save dataframes
     dfs = {}
     for freq in 'aqm':

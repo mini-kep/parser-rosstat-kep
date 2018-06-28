@@ -7,7 +7,7 @@ Read a text string with CSV data as list of lists with:
 import csv
 from io import StringIO
 
-CSV_FORMAT = dict(delimiter="\t", lineterminator="\n")
+CSV_FORMAT = dict(delimiter='\t', lineterminator='\n')
 
 
 def yield_csv_rows(csv_text, fmt=CSV_FORMAT):
@@ -44,12 +44,13 @@ def clean_rows(csv_rows: list):
     return list(filter(is_valid_row, csv_rows))
 
 
-def read_csv(csv_text: str):
+def read_csv1(csv_text: str):
     return list(yield_csv_rows(csv_text))
 
 
-def as_rows(csv_text):
-    return clean_rows(read_csv(csv_text))
+def read_csv(csv_text: str):
+    rows = yield_csv_rows(csv_text)
+    return clean_rows(rows)
 
 
 def is_identical(row, x):

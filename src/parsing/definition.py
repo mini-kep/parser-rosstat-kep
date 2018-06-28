@@ -26,7 +26,6 @@ Create parsing instructions for an individual variable.
 import yaml
 
 from parsing.csv_reader import is_identical
-from parsing.label import make_label
 
 
 def iterate(x):
@@ -65,7 +64,7 @@ class Definition:
         result = []
         for command in iterate(commands):
             for unit in iterate(command['unit']):
-                result.append(make_label(command['var'], unit))
+                result.append((command['var'], unit))
         return result
 
     def select_applicable_boundaries(self,

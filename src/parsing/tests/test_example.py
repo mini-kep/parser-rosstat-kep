@@ -64,7 +64,7 @@
 from collections import OrderedDict as odict
 
 from parsing.extract.extract_tables import split_to_tables, parse_tables
-from parsing.csv_reader import read_csv, clean_rows
+from parsing.csv_reader import read_csv1, clean_rows
 from parsing.definition import Definition
 
 # settings
@@ -96,7 +96,7 @@ pdef_source = dict(
 pdef = Definition(**pdef_source)
 
 # actions
-rows = read_csv(csv_text)
+rows = read_csv1(csv_text)
 csv_segment = clean_rows(rows)
 tables = split_to_tables(csv_segment)
 tables = parse_tables(tables, pdef)

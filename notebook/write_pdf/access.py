@@ -13,7 +13,7 @@ def locate(freq):
 
 
 def read_csv(source):
-    """Wrapper for pd.read_csv(). Treats first column at time index.
+    """Wrapper for pd.read_csv1(). Treats first column at time index.
 
        Returns:
            pd.DataFrame()

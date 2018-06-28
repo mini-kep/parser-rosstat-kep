@@ -1,6 +1,7 @@
 """Creating pandas dataframes."""
 
 import pandas as pd
+from util.label import make_label
 
 
 def get_duplicates(df):
@@ -20,11 +21,24 @@ def check_duplicates(df):
         print("Duplicate rows found {}".format(dups))
 
 
+def convert_labels(datapoint):
+    try:
+       assert isinstance(datapoint['label'], tuple)
+    except AssertionError:
+       print(datapoint) 
+       import pdb; pdb.set_trace()
+    varname = datapoint['label'][0]
+    unit = datapoint['label'][1]
+    _dict = datapoint.copy()
+    _dict['label'] = make_label(varname, unit)
+    return _dict
+
+
 def create_dataframe(datapoints, freq):
-    df = pd.DataFrame([x for x in datapoints if x['freq'] == freq])
+    df = pd.DataFrame([x for x in map(convert_labels, datapoints)
+                       if x['freq'] == freq])
     if df.empty:
         return pd.DataFrame()
-    #import pdb; pdb.set_trace()
     check_duplicates(df)
     df = df.drop_duplicates(['freq', 'label', 'time_index'], keep='first')
     # reshape

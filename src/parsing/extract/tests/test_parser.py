@@ -3,8 +3,6 @@ import pandas as pd
 import pytest
 
 from parsing.definition import Definition
-#from kep.parsing_definition.units import UNITS
-
 
 from parsing.extract.extract_tables import Table, DataBlock, HeaderParser
 from parsing.extract.extract_tables import timestamp_quarter, timestamp_month, timestamp_annual
@@ -31,7 +29,7 @@ def parsed_table():
 class Test_Table:
 
     def test_on_creation_pasring_attributes_are_unknown(self, table):
-        assert table.label is None
+        assert table.label == (None, None)
         assert table.splitter_func is None
         assert table.varname is None
         assert table.unit is None
@@ -49,7 +47,7 @@ class Test_Table:
                         units_dict={'млрд.рублей': 'bln_rub'})
         assert table.varname == 'GDP'
         assert table.unit == 'bln_rub'
-        assert table.label == 'GDP_bln_rub'
+        assert table.label == ('GDP', 'bln_rub')
         assert table.has_unknown_lines() is False
 
     def test_set_splitter(self, table):
@@ -59,11 +57,11 @@ class Test_Table:
     def test_values_property_on_parsed_table(self, parsed_table):
         values = parsed_table.values
         assert len(values) == 5
-        assert values[0] == {'label': 'GDP_bln_rub',
+        assert values[0] == {'label': ('GDP', 'bln_rub'),
                              'value': 4823.0,
                              'time_index': pd.Timestamp('1991-12-31'),
                              'freq': 'a'}
-        assert values[-1] == {'label': 'GDP_bln_rub',
+        assert values[-1] == {'label': ('GDP', 'bln_rub'),
                               'value': 1447.0,
                               'time_index': pd.Timestamp('1991-12-31'),
                               'freq': 'q'}
@@ -122,7 +120,7 @@ class Test_DataBlock:
     def test_extract_values_on_complete_row_returns_5_dictionaries(self):
         datablock = DataBlock(datarows=[['1999', '4823', '901',
                                          '1102', '1373', '1447']],
-                              label='GDP_bln_rub',
+                              label=('GDP', 'bln_rub'),
                               splitter_func=split_row_by_year_and_qtr)
         values = list(datablock.extract_values())
         assert len(values) == 5
@@ -130,7 +128,7 @@ class Test_DataBlock:
     def test_extract_values_on_incomplete_row_returns_less_dictionaries(self):
         datablock = DataBlock(datarows=[['1999', '', '901',
                                          '1102', '', '']],
-                              label='GDP_bln_rub',
+                              label=('GDP', 'bln_rub'),
                               splitter_func=split_row_by_year_and_qtr)
         values = list(datablock.extract_values())
         assert len(values) == 2
