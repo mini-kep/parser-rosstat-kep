@@ -9,6 +9,7 @@ from io import StringIO
 
 CSV_FORMAT = dict(delimiter="\t", lineterminator="\n")
 
+
 def yield_csv_rows(csv_text, fmt=CSV_FORMAT):
     """Yield CSV rows from *csvfile*.
 
@@ -34,7 +35,7 @@ def is_valid_row(row):
         return x is not None and  \
             x != '' and \
             not x.startswith("___") and \
-            not 'В целях обеспечения статистической сопоставимости' in x
+            'В целях обеспечения статистической сопоставимости' not in x
     else:
         return False
 
@@ -49,12 +50,11 @@ def read_csv(csv_text: str):
 
 def as_rows(csv_text):
     return clean_rows(read_csv(csv_text))
-    
 
 
 def is_identical(row, x):
     def supress_apos(text):
-        return text.replace('"', '')  
+        return text.replace('"', '')
     _a = supress_apos(row)
     _b = supress_apos(x)
     return _a.startswith(_b)
@@ -97,12 +97,7 @@ def pop_rows(rows, start, end, is_identical=is_identical):
     return segment
 
 
-
 if __name__ == "__main__":
     doc = """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447
 2000	7306	1527	1697	2038	2044"""
-    
-    
-    
-    

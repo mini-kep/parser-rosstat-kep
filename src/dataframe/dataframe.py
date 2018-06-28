@@ -20,7 +20,7 @@ def check_duplicates(df):
         print("Duplicate rows found {}".format(dups))
 
 
-def create_dataframe(datapoints, freq):    
+def create_dataframe(datapoints, freq):
     df = pd.DataFrame([x for x in datapoints if x['freq'] == freq])
     if df.empty:
         return pd.DataFrame()
@@ -46,7 +46,7 @@ def create_dataframe(datapoints, freq):
         df = deaccumulate(df, first_month=3)
     if freq == "m":
         df = deaccumulate(df, first_month=1)
-    return df        
+    return df
 
 # government revenue and expense time series transformation
 

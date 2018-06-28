@@ -16,9 +16,10 @@ from .to_float import to_float
 def evaluate_assignment(rows, pdef):
     tables = split_to_tables(rows)
     tables = parse_tables(tables, pdef)
-    verify_tables(tables, pdef) 
+    verify_tables(tables, pdef)
     tables = [t for t in tables if (t.label in pdef.required_labels)]
-    return [v for t in tables for v in t.values] 
+    return [v for t in tables for v in t.values]
+
 
 def parse_tables(tables, pdef):
     tables = list(tables)
@@ -33,6 +34,7 @@ def parse_tables(tables, pdef):
         if table.varname is None and not table.has_unknown_lines():
             table.varname = prev_table.varname
     return tables
+
 
 def verify_tables(tables, pdef):
     labels_in_tables = {t.label for t in tables}
@@ -94,7 +96,7 @@ class HeaderParser:
         return all(row.is_parsed for row in self.rows)
 
     def __str__(self):
-        return '\n'.join(map(str,self.rows))
+        return '\n'.join(map(str, self.rows))
 
 
 def count_columns(datarows):
@@ -106,7 +108,7 @@ class DataBlock:
     def __init__(self, datarows, label, splitter_func):
         self.datarows = datarows
         self.label = label
-        self.splitter_func = splitter_func        
+        self.splitter_func = splitter_func
 
     def make_datapoint(self, value: str, time_stamp, freq):
         return dict(label=self.label,
@@ -139,9 +141,10 @@ class DataBlock:
                 for t, val in enumerate(m_values):
                     time_stamp = timestamp_month(year, t + 1)
                     yield self.make_datapoint(val, time_stamp, 'm')
-                    
+
     def __str__(self):
         return '\n'.join(map(str, self.datarows))
+
 
 def timestamp_annual(year):
     return pd.Timestamp(year, 12, 31)
@@ -160,18 +163,20 @@ class Table:
     """Representation of CSV table, has headers and datarows.
        Depends on HeaderParser and DataBlock classes.
     """
+
     def __init__(self, headers, datarows):
         self.header = HeaderParser(headers)
         self.datarows = datarows
         self.varname, self.unit = None, None
-        self.splitter_func  = None
+        self.splitter_func = None
 
     @property
-    def label(self): 
+    def label(self):
         return make_label(self.varname, self.unit)
 
     def set_label(self, varnames_dict, units_dict):
-        self.varname, self.unit = self.header.set_label(varnames_dict, units_dict)
+        self.varname, self.unit = self.header.set_label(
+            varnames_dict, units_dict)
 
     def set_splitter(self, reader=None):
         key = reader or count_columns(self.datarows)
@@ -182,9 +187,9 @@ class Table:
 
     def has_unknown_lines(self):
         return not self.header.is_parsed
-    
+
     @property
-    def values(self):        
+    def values(self):
         if self.is_defined():
             dblock = DataBlock(self.datarows, self.label, self.splitter_func)
             return list(dblock.extract_values())

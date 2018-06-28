@@ -36,12 +36,13 @@ def present():
         )
     ]
 
+
 class Test_verify():
 
     def test_raises_value_error_on_missed_points(self, dataframe, absent):
         with pytest.raises(ValidationError):
             require(dataframe, absent)
-    
+
     def test_returns_without_error_on_good_path(self, dataframe, present):
         require(dataframe, present)
 
@@ -52,8 +53,8 @@ class Test_verify():
 # FIXME: will fail on longer datasets
 
 #dispatch.get_dataframe(2017, 1, 'a').columns
-#Out[30]: 
-#Index(['year', 'CPI_ALCOHOL_rog', 'CPI_FOOD_rog', 'CPI_NONFOOD_rog',
+# Out[30]:
+# Index(['year', 'CPI_ALCOHOL_rog', 'CPI_FOOD_rog', 'CPI_NONFOOD_rog',
 #       'CPI_SERVICES_rog', 'CPI_rog', 'EXPORT_GOODS_bln_usd', 'GDP_bln_rub',
 #       'GDP_yoy', 'GOV_EXPENSE_CONSOLIDATED_bln_rub',
 #       'GOV_EXPENSE_FEDERAL_bln_rub', 'GOV_EXPENSE_SUBFEDERAL_bln_rub',
@@ -66,8 +67,7 @@ class Test_verify():
 #       'TRANSPORT_FREIGHT_bln_tkm', 'UNEMPL_pct', 'WAGE_NOMINAL_rub',
 #       'WAGE_REAL_yoy'],
 #      dtype='object')
-    
+
 
 if __name__ == "__main__":
     pytest.main([__file__])
-

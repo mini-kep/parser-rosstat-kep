@@ -8,8 +8,6 @@ from parsing.extract.extract_tables import split_to_tables, parse_tables
 from parsing.csv_reader import read_csv, clean_rows
 
 
-
-
 DOC = """Объем ВВП, млрд.рублей / Gross domestic product, bln rubles
 1999	4823	901	1102	1373	1447
 2000	7306	1527	1697	2038	2044"""
@@ -26,12 +24,11 @@ def test_split_to_tables():
     assert t.header.rows[0].name == \
         'Объем ВВП, млрд.рублей / Gross domestic product, bln rubles'
     assert t.datarows == \
-         [['1999', '4823', '901', '1102', '1373', '1447'],
-          ['2000', '7306', '1527', '1697', '2038', '2044']]
-              
+        [['1999', '4823', '901', '1102', '1373', '1447'],
+         ['2000', '7306', '1527', '1697', '2038', '2044']]
 
 
-class Test_Table():    
+class Test_Table():
 
     def test_extract_values_on_defined_table_returns_expected_dicts(
             self):
@@ -103,11 +100,9 @@ def make_definition():
         ('в % к предыдущему месяцу', 'rog'),
         ('в % к предыдущему периоду', 'rog'),
         ('в % к соответствующему периоду предыдущего года', 'yoy'),
-        ('в % к соответствующему месяцу предыдущего года', 'yoy')    ])
-    return Definition(commands=commands, boundaries=boundaries, reader='', 
+        ('в % к соответствующему месяцу предыдущего года', 'yoy')])
+    return Definition(commands=commands, boundaries=boundaries, reader='',
                       units=units)
-
-
 
 
 def create_tables():

@@ -17,7 +17,6 @@ class Test_to_float:
         assert to_float("5,67,") == 5.67
         assert to_float("5.67.") == 5.67
 
-
     def test_on_comments_returns_float(self):
         assert to_float('123,0 4561)') == 123
         assert to_float('6762,31)2)') == 6762.3

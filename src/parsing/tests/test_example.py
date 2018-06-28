@@ -70,18 +70,19 @@ from parsing.definition import Definition
 # settings
 
 pdef_source = dict(
-    boundaries = [
+    boundaries=[
         dict(start='1.6. Инвестиции в основной капитал',
              end='1.6.1. Инвестиции в основной капитал организаций'),
         dict(start='1.7. Инвестиции в основной капитал',
              end='1.7.1. Инвестиции в основной капитал организаций')],
-    commands = [
+    commands=[
         dict(
             var='INVESTMENT',
             header=['Инвестиции в основной капитал'],
             unit=['bln_rub', 'yoy', 'rog'])],
-    # mapper dictionary to convert text in table headers to units of measurement
-    units = odict([  # 1. MONEY
+    # mapper dictionary to convert text in table headers to units of
+    # measurement
+    units=odict([  # 1. MONEY
         ('млрд.рублей', 'bln_rub'),
         ('млрд. рублей', 'bln_rub'),
         # 2. RATES OF CHANGE
@@ -101,14 +102,16 @@ tables = split_to_tables(csv_segment)
 tables = parse_tables(tables, pdef)
 
 # checks
+
+
 def test_check_parsing_result():
     assert len(tables) == 3
     assert all([t.has_unknown_lines() for t in tables]) is False
     assert [t.unit for t in tables] == ['bln_rub', 'yoy', 'rog']
-    
+
+
 def test_all_tables_are_parsed():
-    assert [t.varname for t in tables] == ['INVESTMENT'] * 3    
-    
+    assert [t.varname for t in tables] == ['INVESTMENT'] * 3
 
 
 if __name__ == "__main__":

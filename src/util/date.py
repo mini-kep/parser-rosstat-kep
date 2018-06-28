@@ -4,11 +4,11 @@ import pandas as pd
 
 
 def supported_dates(start_date='2009-04', exclude_dates=['2013-11']):
-    """Get a list of (year, month) tuples starting from (2009, 4) up to 
+    """Get a list of (year, month) tuples starting from (2009, 4) up to
        a previous recent month. This a 'supported date list'.
 
        Excludes (2013, 11) - no archive for this month.
-       
+
     Returns:
         List of (year: int, month: int) tuples.
     """
@@ -20,7 +20,3 @@ def supported_dates(start_date='2009-04', exclude_dates=['2013-11']):
 
 def is_latest(year: int, month: int):
     return (year, month) in supported_dates()[-2:]
-        
-             
-            
-         

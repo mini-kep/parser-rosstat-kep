@@ -1,12 +1,12 @@
 """Units of measurement definition.
 
    Converts text like 'млрд. долларов' to 'bln_usd'
-   
+
    For import:
-       
+
        UNITS
-       UNIT_NAMES 
-       
+       UNIT_NAMES
+
 """
 from collections import OrderedDict as odict
 
@@ -33,7 +33,7 @@ UNITS = odict([  # 1. MONEY
     #       ... must precede this
     # because 'в % к предыдущему периоду' is found in
     # 'период с начала отчетного года в % к соответствующему периоду предыдущего года'
-    ('в % к соответствующему периоду предыдущего года', 'yoy'),    
+    ('в % к соответствующему периоду предыдущего года', 'yoy'),
     ('в % к соответствующему месяцу предыдущего года', 'yoy'),
     ('отчетный месяц в % к предыдущему месяцу', 'rog'),
     ('отчетный месяц в % к соответствующему месяцу предыдущего года', 'yoy'),
@@ -63,7 +63,7 @@ UNIT_NAMES = {'bln_rub': 'млрд.руб.',
               'yoy': '% год к году',
               'ytd': 'период с начала года',
               'pct': '%',
-              'bln_tkm': 'млрд. тонно-км', 
+              'bln_tkm': 'млрд. тонно-км',
               'mln_m2': 'млн.кв.м'}
 
 # validation: all units in mapper dict have an 'offical' name

@@ -50,20 +50,21 @@ def mock_rows():
 
 
 def test_pop_rows():
-    rows = list(mock_rows())        
+    rows = list(mock_rows())
     a = pop_rows(rows, "bat", "dot")
     assert a == [["bat aa...ah", "1", "2"],
                  ["can extra text", "1", "2"]]
 
+
 def test_pop_rows_remaining_rows_behaviour():
-    rows = list(mock_rows())   
+    rows = list(mock_rows())
     pop_rows(rows, "apt", "wed")
     assert rows[0] == ["wed more text", "1", "2"]
     assert rows[1] == ["zed some text"]
 
 
-List0 = [['a', '5', 'z'], 
-         ['b', '4', 'x'], 
+List0 = [['a', '5', 'z'],
+         ['b', '4', 'x'],
          ['c', '1', 'z'],
          ['d', '2', 'y'],
          ['e', '3', 't']]
@@ -71,15 +72,17 @@ List0 = [['a', '5', 'z'],
 
 List1 = copy(List0)
 
+
 def test_pop_rows_with_another_list_and_injection():
-    assert pop_rows(List0, 'a', 'd', is_identical) == List1[:3] 
+    assert pop_rows(List0, 'a', 'd', is_identical) == List1[:3]
     assert List0 == List1[3:]
 
-    
+
 def test_is_identical():
     assert is_identical('"abc', 'a') is True
-    assert is_identical('abc', '"a') is True  
-    assert is_identical('aj', 'j') is False    
+    assert is_identical('abc', '"a') is True
+    assert is_identical('aj', 'j') is False
+
 
 if __name__ == "__main__":
     pytest.main([__file__])

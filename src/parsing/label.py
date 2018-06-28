@@ -23,7 +23,6 @@ def make_label(vn, unit, sep=SEP):
         return vn + sep + unit
     else:
         return None
-    
 
 
 def split_label(label):

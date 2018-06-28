@@ -1,5 +1,5 @@
 YAML_DEFAULT = """
-commands:    
+commands:
   - var: GDP
     header:
       - Oбъем ВВП
@@ -187,4 +187,3 @@ commands:
 import yaml
 _ = yaml.load_all(YAML_DEFAULT)
 _ = yaml.load_all(YAML_BY_SEGMENT)
-        

@@ -2,6 +2,7 @@
 
 import pandas as pd
 
+
 def save_excel(filepath, dataframes):
     """Save *dataframes* .xlsx *filepath*."""
     dfa, dfq, dfm = (dataframes[freq] for freq in 'aqm')
