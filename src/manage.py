@@ -33,8 +33,8 @@ def md(folder):
 class Locations(object):
     def __init__(self, year: int,
                  month: int,
-                 data_root,
-                 output_root):
+                 data_root=DATA_ROOT,
+                 output_root=OUTPUT_ROOT):
         self.year = year
         self.month = month
         self.data = Path(data_root)

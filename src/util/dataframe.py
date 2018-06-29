@@ -18,15 +18,10 @@ def check_duplicates(df):
         dups = df[df.duplicated(keep=False)]
     if not dups.empty:
         # raise ValueError("Duplicate rows found {}".format(dups))
-        print("Duplicate rows found {}".format(dups))
+        print("Warning: duplicate rows found:\n{}".format(dups))
 
 
 def convert_labels(datapoint):
-    try:
-       assert isinstance(datapoint['label'], tuple)
-    except AssertionError:
-       print(datapoint) 
-       import pdb; pdb.set_trace()
     varname = datapoint['label'][0]
     unit = datapoint['label'][1]
     _dict = datapoint.copy()

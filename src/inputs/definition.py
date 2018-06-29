@@ -42,6 +42,7 @@ class Definition:
                  reader=''
                  ):
         self.units = units
+        self.commands = commands
         # transform commands
         self.mapper = self.make_mapper_dict_for_table_headers(commands)
         self.required_labels = self.make_required_labels(commands)
@@ -85,16 +86,28 @@ class Definition:
             error_messages.append(start[:20])
             error_messages.append(end[:20])
         raise ValueError('\n'.join(error_messages))
-        
+    
+    @property    
     def headers_dict(self):
-         pass
+         return {com['var']: iterate(com['header']) for com in self.commands}
      
-    def unit_dict(self):
-         pass
-     
+    @property
     def required(self): 
-         pass
+         return {com['var']: iterate(com['unit']) for com in self.commands}
+     
+    def required_pairs(self):        
+        return {(name, unit) for name, units in self.required.items() for unit in units}
 
+#    values = list(yield_values(tables))
+#    csv_rows = read_csv(doc)
+#    values2 = render(csv_rows, 
+#           headers_dict={'GDP': ['Валовый внутренний продукт', 'Объем ВВП'],
+#                         'DWELL': ['Ввод в действие жилых домов организациями']},
+#           unit_dict={'млрд.рублей': 'bln_rub',
+#                        'млн.кв.м общей площади': 'mln_m2',
+#                        '% к соответствующему периоду предыдущего года': 'yoy'},
+#           required={'GDP': ['bln_rub', 'yoy'], 'DWELL': ['mln_m2']})
+#    assert values == values2
 
 def from_yaml(yaml_text: str):
     return list(yaml.load_all(yaml_text))
