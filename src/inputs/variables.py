@@ -52,6 +52,29 @@ commands:
     unit: mln_m2
 ---
 boundaries:
+  - start: 2.2. Сальдированный финансовый результат
+    end: Убыточные организации
+commands:
+  - var: PROFIT_MINING
+    header: Добыча полезных ископаемых
+    unit: mln_rub
+  - var: PROFIT_MANUF
+    header: Обрабатывающие производства
+    unit: mln_rub  
+  - var: PROFIT_POWER_GAS_WATER
+    header: Обеспечение электрической энергией, газом и паром 
+    unit: mln_rub  
+  - var: PROFIT_CONSTR
+    header: Строительство
+    unit: mln_rub     
+  - var: PROFIT_CONSTR
+    header: Строительство
+    unit: mln_rub     
+  - var: PROFIT_TRANSPORT_STOR
+    header: Транспортировка и хранение
+    unit: mln_rub   
+---
+boundaries:
   - start: 1.9. Внешнеторговый оборот – всего
     end: 1.9.1. Внешнеторговый оборот со странами дальнего зарубежья
   - start: 1.10. Внешнеторговый оборот – всего
@@ -166,7 +189,7 @@ reader: fiscal
 ---
 boundaries:
   - start: 2.1.3. Превышение доходов над расходами
-    end: 2.2. Сальдированный финансовый результат
+    end: Убыточные организации
 commands:
   - var: GOV_SURPLUS_ACCUM_FEDERAL
     header: Федеральный бюджет

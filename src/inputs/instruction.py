@@ -49,8 +49,8 @@ class Instruction:
                 flag2 = is_found(csv_rows, end)
             if flag2 and flag1:
                 return start, end
-            error_messages.append(start[:20])
-            error_messages.append(end[:20])
+            error_messages.append(start)
+            error_messages.append(end)
         raise ValueError('\n'.join(error_messages))
     
     @property    

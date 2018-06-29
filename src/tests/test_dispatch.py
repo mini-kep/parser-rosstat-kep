@@ -156,6 +156,6 @@ def test_long_defintion():
            [('UNEMPL', 'mln'), ('UNEMPL', 'yoy'), ('UNEMPL', 'pct')]
            
 if __name__ == "__main__":
-    import py.test
+    import pytest
     pytest.main([__file__])           
            
