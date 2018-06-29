@@ -50,7 +50,8 @@ UNITS = odict([  # 1. MONEY
     ("непродовольст- венные товары", 'rog'),
     ("услуги", 'rog'),
     ('млн.кв.м', 'mln_m2'),
-
+    ('млн. кв. м', 'mln_m2'),
+    ('млн.человек', 'mln'),
 ])
 
 # 'official' names of units used in project front
@@ -58,6 +59,7 @@ UNIT_NAMES = {'bln_rub': 'млрд.руб.',
               'bln_usd': 'млрд.долл.',
               'gdp_percent': '% ВВП',
               'mln_rub': 'млн.руб.',
+              'mln': 'млн',
               'rub': 'руб.',
               'rog': '% к пред. периоду',
               'yoy': '% год к году',

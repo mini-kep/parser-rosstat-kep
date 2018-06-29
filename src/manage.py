@@ -8,9 +8,10 @@ import pandas as pd
 
 
 from inputs import UNITS, YAML_DOC, verify
-from dispatch import create_parser
+from dispatch import evaluate
 from util.remote import Downloader, Unpacker
 from util.word import folder_to_csv
+# WONTFIX: maybe this is not as uril, part of dataflow
 from util.dataframe import create_dataframe
 from util.date import is_latest, supported_dates
 from util.to_excel import save_excel
@@ -29,6 +30,11 @@ def md(folder):
         folder.mkdir(parents=True)
     return folder
 
+class OutputLocations(object):
+    def __init__(self, output_root=OUTPUT_ROOT):
+        self.out = Path(output_root)
+        self.xlsx = str(self.out / 'kep.xlsx')        
+
 
 class Locations(object):
     def __init__(self, year: int,
@@ -38,7 +44,7 @@ class Locations(object):
         self.year = year
         self.month = month
         self.data = Path(data_root)
-        self.out = Path(output_root)
+
 
     def inner_path(self, tag):
         if tag not in ('raw', 'interim', 'processed'):
@@ -67,10 +73,6 @@ class Locations(object):
     @staticmethod
     def filename(freq):
         return 'df{}.csv'.format(freq)
-
-    @property
-    def xlsx(self):
-        return str(self.out / 'kep.xlsx')
 
 
 def to_latest(year: int, month: int, loc):
@@ -116,18 +118,13 @@ def get_dataframe(year, month, freq):
     return read_csv(filelike)
 
 
-def update(year,
-           month,
-           units_dict=UNITS,
-           yaml_doc=YAML_DOC,
-           data_root=DATA_ROOT,
-           output_root=OUTPUT_ROOT,
-           validator=verify,
-           force_download=False,
-           force_unrar=False,
-           force_convert_word=False):
+def prepare_data(year, month,
+                 data_root=DATA_ROOT,
+                 force_download=False,
+                 force_unrar=False,
+                 force_convert_word=False):
     # filesystem
-    loc = Locations(year, month, data_root, output_root)
+    loc = Locations(year, month, data_root)
     INTERIM_FOUND = loc.interim_csv.exists()
     # perisist data
     if force_download or not INTERIM_FOUND:
@@ -138,16 +135,22 @@ def update(year,
         u = Unpacker(loc.archive_filepath, loc.raw_folder)
         u.run()
         print(u.status)
-
     # convert Word to csv
     if force_convert_word or not INTERIM_FOUND:
         folder_to_csv(loc.raw_folder, loc.interim_csv)
 
-    # parse
+
+def parse(year,
+          month,
+          units_dict=UNITS,
+          yaml_doc=YAML_DOC,
+          data_root=DATA_ROOT,
+          validator=verify):
+    # filesystem
+    loc = Locations(year, month, data_root)
+    #parse    
     text = loc.interim_csv.read_text(encoding='utf-8')
-    parse = create_parser(units_dict, yaml_doc)
-    values = list(parse(text))
-    
+    values = list(evaluate(text, units_dict, yaml_doc))    
     # save three dataframes
     dfs = {}
     for freq in 'aqm':
@@ -155,24 +158,78 @@ def update(year,
         dfs[freq] = df
         validator(df, freq)
         df.to_csv(str(loc.processed_csv(freq)))
-    if is_latest(year, month):
-        to_latest(year, month, loc)
-        save_excel(loc.xlsx, dfs)
     return dfs
 
 def unpack(dfs):
-    return (dfs[freq] for freq in FREQUENCIES)    
+    return (dfs[freq] for freq in FREQUENCIES)   
 
+
+def save(year, month, dfs, data_root=DATA_ROOT, output_root=OUTPUT_ROOT):     
+    loc = Locations(year, month, data_root)
+    oloc = OutputLocations(output_root)
+    if is_latest(year, month):
+        to_latest(year, month, loc)
+        save_excel(oloc.xlsx, dfs)
+        
+def all_months():
+    for year, month in reversed(supported_dates()[:-2]):        
+        print("\n"*5, year, month)        
+        dfa, dfq, dfm = unpack(parse(year, month))
+
+#for speed tests
+SRC = Locations(2018, 1).interim_csv
+TEST_DOC = SRC.read_text(encoding='utf-8') 
+TEST_VALUES = list(evaluate(TEST_DOC, UNITS, YAML_DOC))
+
+def isolation1(): 
+    doc = SRC.read_text(encoding='utf-8') 
+    return evaluate(doc, UNITS, YAML_DOC)  
+
+def isolation2():
+    dfs = {}
+    for freq in 'aqm':
+        df = create_dataframe(TEST_VALUES, freq)
+        dfs[freq] = df
+        verify(df, freq)        
+        df.to_csv('temp.txt')
+    return dfs    
 
 if __name__ == '__main__':
-    import sys
-    try:
-        year = int(sys.argv[1]) 
-        month = int(sys.argv[2]) 
-    except IndexError:
-        year, month = 2018, 4                    
-    dfa, dfq, dfm = unpack(update(year, month))
+    #WONTFIX
+    # - stream warnings with somehtign other than print()
+    # - isolate UNEMPL_mln into segment    
+
+    # typical workflow
+#    import sys
+#    try:
+#        year = int(sys.argv[1]) 
+#        month = int(sys.argv[2]) 
+#    except IndexError:
+#        year, month = 2018, 4  
+#    prepare_data(year, month)    
+#    dfs = parse(year, month)         
+#    save(year, month, dfs)
+#    dfa, dfq, dfm = unpack(dfs)
+
+    # experimental timing
+    from timeit import timeit
+    n = 10
+    exec_time1 = 1/n*timeit('isolation1()', 'from manage import isolation1', number=n)
+    exec_time2 = 1/n*timeit('isolation2()', 'from manage import isolation2', number=n)
+    exec_time3 = 1/n*timeit('parse(2018, 1)', 'from manage import parse', number=n)
+
+    print('Operation 1 - extracting values: {:.4f}'.format(exec_time1))
+    print('Operation 2 - making dataframe:  {:.4f}'.format(exec_time2))
+    print('Sum of operations 1 and 2:       {:.4f}'.format(exec_time3))
     
-    for year, month in [(2010, 8)]: # reversed(supported_dates()[:-1]):
-        print("\n"*5, year, month)        
-        dfa, dfq, dfm = dfa, dfq, dfm = unpack(update(year, month))
+    """
+    Operation 1 - extracting values: 0.0027
+    Operation 2 - making dataframe:  0.2708
+    Sum of operations 1 and 2:       1.2477
+    """
+
+    # QUESTIONS:
+    # 1. why running time for `parse(2018, 1)` is 4 times greater than sum of components
+    #    if it is correctly measured
+    # 2. how can one make parse() run faster?     
+    

@@ -63,13 +63,24 @@
 
 from collections import OrderedDict as odict
 
-from extract.tables import split_to_tables, parse_tables
-from inputs.definition import Definition
+from dispatch import render
+from inputs.instruction import Instruction
 from util.csv_reader import read_csv
 
 # settings
 
-pdef_source = dict(
+units = odict([  # 1. MONEY
+    ('млрд.рублей', 'bln_rub'),
+    ('млрд. рублей', 'bln_rub'),
+    # 2. RATES OF CHANGE
+    ('в % к прошлому периоду', 'rog'),
+    ('в % к предыдущему месяцу', 'rog'),
+    ('в % к предыдущему периоду', 'rog'),
+    ('в % к соответствующему периоду предыдущего года', 'yoy'),
+    ('в % к соответствующему месяцу предыдущего года', 'yoy')
+])
+
+pdef = Instruction(
     boundaries=[
         dict(start='1.6. Инвестиции в основной капитал',
              end='1.6.1. Инвестиции в основной капитал организаций'),
@@ -79,38 +90,22 @@ pdef_source = dict(
         dict(
             var='INVESTMENT',
             header=['Инвестиции в основной капитал'],
-            unit=['bln_rub', 'yoy', 'rog'])],
-    # mapper dictionary to convert text in table headers to units of
-    # measurement
-    units=odict([  # 1. MONEY
-        ('млрд.рублей', 'bln_rub'),
-        ('млрд. рублей', 'bln_rub'),
-        # 2. RATES OF CHANGE
-        ('в % к прошлому периоду', 'rog'),
-        ('в % к предыдущему месяцу', 'rog'),
-        ('в % к предыдущему периоду', 'rog'),
-        ('в % к соответствующему периоду предыдущего года', 'yoy'),
-        ('в % к соответствующему месяцу предыдущего года', 'yoy')
-    ])
-)
-pdef = Definition(**pdef_source)
+            unit=['bln_rub', 'yoy', 'rog'])
+        ],
+    )
 
 # actions
-rows = read_csv(csv_text)
-tables = split_to_tables(rows)
-tables = parse_tables(tables, pdef)
+tables = render(read_csv(csv_text), 
+                units, 
+                pdef.headers_dict, 
+                pdef.required,
+                pdef.reader) 
 
 # checks
-
-
 def test_check_parsing_result():
     assert len(tables) == 3
-    assert all([t.has_unknown_lines() for t in tables]) is False
     assert [t.unit for t in tables] == ['bln_rub', 'yoy', 'rog']
-
-
-def test_all_tables_are_parsed():
-    assert [t.varname for t in tables] == ['INVESTMENT'] * 3
+    assert [t.name for t in tables] == ['INVESTMENT'] * 3
 
 
 if __name__ == "__main__":

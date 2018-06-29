@@ -64,11 +64,29 @@ class Instruction:
     def required_pairs(self):        
         return {(name, unit) for name, units in self.required.items() for unit in units}
 
+
 def from_yaml(yaml_text: str):
     return list(yaml.load_all(yaml_text))
 
+
 def yaml_to_instructions(yaml_doc: str):
     return [Instruction(**i) for i in yaml.load_all(yaml_doc)]
+
+
+class InstructionSet:
+    def __init__(self, yaml_doc: str):
+        self.definitions = yaml_to_instructions(yaml_doc)
+        
+    @property
+    def default(self):    
+        default_definition = [d for d in self.definitions if not d.boundaries]     
+        assert len(default_definition) == 1 
+        return default_definition[0]   
+
+    @property
+    def by_segment(self):    
+        return [d for d in self.definitions if d.boundaries]
+    
     
         
 if __name__ == '__main__':            

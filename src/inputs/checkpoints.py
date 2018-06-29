@@ -16,7 +16,6 @@ VALUES_ANNUAL_1999 = make_list(
     Annual,
     date='1999',
     values={
-        'AGROPROD_yoy': 103.8,
         'CPI_ALCOHOL_rog': 143.2,
         'CPI_FOOD_rog': 135.0,
         'CPI_NONFOOD_rog': 139.2,
@@ -52,12 +51,13 @@ VALUES_ANNUAL_1999 = make_list(
 VALUES_ANNUAL_2017 = make_list(Annual,
                                date='1999',
                                values={'INDPRO_yoy': 101.0,
-                                       'PPI_rog': 108.4}
+                                       'PPI_rog': 108.4,
+                                       'AGROPROD_yoy': 103.8}
                                )
 
 VALUES_QTR_1999 = make_list(Qtr,
                             date='1999-03',
-                            values={'AGROPROD_yoy': 97.2,
+                            values={#'AGROPROD_yoy': 97.2,
                                     'CPI_ALCOHOL_rog': 118.2,
                                     'CPI_FOOD_rog': 118.4,
                                     'CPI_NONFOOD_rog': 114.0,
@@ -96,7 +96,7 @@ VALUES_QTR_1999 = make_list(Qtr,
 
 VALUES_MONTHLY_1999 = make_list(Month,
                                 date='1999-01',
-                                values={'AGROPROD_yoy': 96.5,
+                                values={#'AGROPROD_yoy': 96.5,
                                         'CORP_RECEIVABLE_OVERDUE_bln_rub': 772.0,
                                         'CORP_RECEIVABLE_bln_rub': 1550.6,
                                         'CPI_ALCOHOL_rog': 109.7,
