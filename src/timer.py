@@ -9,7 +9,7 @@ TEST_VALUES = list(manage.evaluate(TEST_DOC, manage.UNITS, manage.YAML_DOC))
 
 def isolation1(): 
     doc = SRC.read_text(encoding='utf-8') 
-    return manage.evaluate(doc, manage.UNITS, manage.YAML_DOC)  
+    return list(manage.evaluate(doc, manage.UNITS, manage.YAML_DOC))
 
 def isolation2():
     dfs = {}
