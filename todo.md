@@ -1,13 +1,28 @@
-Pipeline
-========
-
-Minimal:
- - [ ] dataset in CSV
- - [ ] plotting
- - [ ] presentation
+# Something to know:
+# ------------------ 
+#   
+# - output: 
+#   - industrial production and other busness activity
+#   - corp profits
+# - housing construction
+# - retail sales and household incomes    
+# - budget expenditure and revenues
+# - export and import
+# - prices, inflation, interest rates
+# - exchange rate
+# - Q:GDP
+# - Q:investment (unrelaible)
+# - targets/forecasts   
 
 Projects
 ========
+
+Minimal subset
+--------------
+
+- grouping of variables
+- story
+
 
 DOI/citation
 ------------
@@ -31,12 +46,15 @@ Deliverables
 - data revisions case
 - presentation with text
 
+FINISHED
+========
+- [x] checkpoints / simplify validator
+- [x] does access.py belong to kep package or elsewhere?
+- [x] copying to 'latest' folder
 
 WORKED ON
 =========
-- checkpoints / simplify validator
-- does access.py belong to kep package or elsewhere?
-- copying to 'latest' folder
+
 
 
 OUTSTANDING

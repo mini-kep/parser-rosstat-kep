@@ -1,8 +1,6 @@
 # https://docs.codecov.io/v4.3.6/docs/ignoring-paths
 ignore:
-  - "*/test_*.py"     # wildcards accepted
-  - "tests/*"         # wildcards accepted
-  - */usercase/*.py
+  - */test_*.py     # wildcards accepted
+  - tests/*         # wildcards accepted
   - tasks.py
-  - src/manage.py 
-  - src/kep/word2csv/word.py
+
