@@ -1,10 +1,8 @@
 #for speed tests
 import manage
-from util.dataframe import (to_dataframes, create_dataframe3, 
-                            make_base_dataframe, convert_labels2)
+from util.dataframe import convert_labels2
 from timeit import timeit
 import pandas as pd
-import csv
 
 SRC = manage.Locations(2018, 1).interim_csv
 TEST_DOC = SRC.read_text(encoding='utf-8') 
@@ -32,30 +30,6 @@ if __name__ == '__main__':
     t1 =  1 / n * timeit('iso1()', 'from timer import iso1', number=n)
     print (t0, t1)
 
-    
-#    n = 3 
-#    t = 1 / n
-#    exec_time1 = t * timeit('isolation1()', 'from timer import isolation1', number=n)
-#    exec_time1g = t * timeit('isolation1_gen()', 'from timer import isolation1_gen', number=n)
-#    #exec_time2 = t * timeit('isolation2()', 'from timer import isolation2', number=n)
-#    exec_time2g = t * timeit('isolation2g()', 'from timer import isolation2g', number=n)
-#    exec_time3 = t * timeit('parse(2018, 1)', 'from manage import parse', number=n)
-#
-#    print('Operation 1 - extracting values: {:.4f}'.format(exec_time1))
-#    print('Operation 1 - extracting values (gen): {:.4f}'.format(exec_time1g))
-#    #print('Operation 2 - making dataframe:  {:.4f}'.format(exec_time2))
-#    print('Operation 2 - making dataframe (gen):  {:.4f}'.format(exec_time2g))
-#    print('Sum of operations 1 and 2:       {:.4f}'.format(exec_time3))
-#    
-#    """
-#    Operation 1 - extracting values: 0.0027
-#    Operation 2 - making dataframe:  0.2708
-#    Sum of operations 1 and 2:       1.2477
-#    """
-#
 #    # QUESTIONS:
-#    # 1. why running time for `parse(2018, 1)` is 4 times greater than sum of components
-#    #    if it is correctly measured
-#    # 2. how can one make parse() run faster?    
-#    dfs = isolation2g()
-#    manage.verify(dfs['a'], 'a')
+#      1. overall target: make manage.parse() run faster    
+#      2. specific question: make manage.evaluate() run faster    
