@@ -72,8 +72,10 @@ commands:
   - var: PROFIT_CONSTR
     header: Строительство
     unit: mln_rub     
-  - var: PROFIT_TRANSPORT_STOR
-    header: Транспортировка и хранение
+  - var: PROFIT_TRANSPORT_STOR_COMM
+    header: 
+        - Транспортировка и хранение
+        - Транспорт и связь
     unit: mln_rub   
 ---
 boundaries:
