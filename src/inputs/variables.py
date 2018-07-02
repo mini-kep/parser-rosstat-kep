@@ -62,7 +62,9 @@ commands:
     header: Обрабатывающие производства
     unit: mln_rub  
   - var: PROFIT_POWER_GAS_WATER
-    header: Обеспечение электрической энергией, газом и паром 
+    header: 
+        - Обеспечение электрической энергией, газом и паром 
+        - Производство и распределение электроэнергии, газа и воды
     unit: mln_rub  
   - var: PROFIT_CONSTR
     header: Строительство
@@ -70,8 +72,10 @@ commands:
   - var: PROFIT_CONSTR
     header: Строительство
     unit: mln_rub     
-  - var: PROFIT_TRANSPORT_STOR
-    header: Транспортировка и хранение
+  - var: PROFIT_TRANSPORT_STOR_COMM
+    header: 
+        - Транспортировка и хранение
+        - Транспорт и связь
     unit: mln_rub   
 ---
 boundaries:
