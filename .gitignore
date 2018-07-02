@@ -2,6 +2,7 @@
 *.rar
 doc/html/
 doc2/
+temp.txt
 
 src/.cache
 

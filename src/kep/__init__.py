@@ -1,1 +1,0 @@
-FREQUENCIES = ['a', 'q', 'm']

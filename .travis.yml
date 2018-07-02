@@ -8,6 +8,7 @@ install:
   - pip install pytest-cov
 # command to run tests
 script: 
+  - sudo apt-get install -y unrar
   - pytest src --doctest-modules --cov=src
 after_success:
   - codecov
