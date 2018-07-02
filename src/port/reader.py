@@ -32,42 +32,45 @@ def read_csv(file, fmt=dict(delimiter='\t', lineterminator='\n')):
         with open(file, 'r', encoding='utf-8') as f:
             for row in csv.reader(f, **fmt):
                 yield row
-    return list(_yield())        
-table = read_csv("tab.csv")
+    return list(_yield())  
 
-
-# get size of an array 
-heads = [x[0] for x in table][:35]
-print(heads)
-
-#todo: split table into slices
-
-# first encountered line is "Объем ВВП, млрд.рублей /GDP, bln rubles"
-# last encountered line is 2018
-# must return numeric rows 1999-2018 from 'table'
-# must return table header
-start_line_contains = "Объем ВВП"
-table_endswith = "2018"
-#slice_data, slice_header = extract(table, start_line_contains, table_endwith)
-
-
-# next:
-# name_mapper is a dictionary that maps "Объем ВВП" to "GDP"
-# unit_mapper is a dictionary that maps "млрд.рублей" to  "bln_rub"
-
-
-# name = get_name(name_mapper, slice_header) 
-# unit = get_unit(unit_mapper, slice_header)
-# label is name_unit
-_label = "GDP_bln_rub"
-
-# get_datapoints(data=slice_data, row_pattern="YQQQQ", label=_label)
-# sort to streams of annual, quarterly and monthly data 
-
-
-# ENHANCEMENTS
-# ------------
-# - write test for minimal example
-# - same without table_endswith - stop table before when next text is encountered
-# - trailing tables like "Индекс промышленного производства" + "в % к предыдущему периоду"
-# - cleaning values like "20171)"
+# 
+if __name__ == "__main__":
+    table = read_csv("tab.csv")
+    
+    
+    # get size of an array 
+    heads = [x[0] for x in table][:35]
+    print(heads)
+    
+    #todo: split table into slices
+    
+    # first encountered line is "Объем ВВП, млрд.рублей /GDP, bln rubles"
+    # last encountered line is 2018
+    # must return numeric rows 1999-2018 from 'table'
+    # must return table header
+    start_line_contains = "Объем ВВП"
+    table_endswith = "2018"
+    #slice_data, slice_header = extract(table, start_line_contains, table_endwith)
+    
+    
+    # next:
+    # name_mapper is a dictionary that maps "Объем ВВП" to "GDP"
+    # unit_mapper is a dictionary that maps "млрд.рублей" to  "bln_rub"
+    
+    
+    # name = get_name(name_mapper, slice_header) 
+    # unit = get_unit(unit_mapper, slice_header)
+    # label is name_unit
+    _label = "GDP_bln_rub"
+    
+    # get_datapoints(data=slice_data, row_pattern="YQQQQ", label=_label)
+    # sort to streams of annual, quarterly and monthly data 
+    
+    
+    # ENHANCEMENTS
+    # ------------
+    # - write test for minimal example
+    # - same without table_endswith - stop table before when next text is encountered
+    # - trailing tables like "Индекс промышленного производства" + "в % к предыдущему периоду"
+    # - cleaning values like "20171)"
