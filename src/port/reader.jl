@@ -26,7 +26,7 @@ next unit of measurement
 # MINIMAL EXAMPLE
 # ---------------
 
-table = readdlm("tab.txt", '\t')
+table = readdlm("tab.csv", '\t')
 
 # get size of an array 
 heads = table[1:35,1]

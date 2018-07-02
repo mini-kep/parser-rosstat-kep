@@ -33,7 +33,7 @@ def read_csv(file, fmt=dict(delimiter='\t', lineterminator='\n')):
             for row in csv.reader(f, **fmt):
                 yield row
     return list(_yield())        
-table = read_csv("tab.txt")
+table = read_csv("tab.csv")
 
 
 # get size of an array 
