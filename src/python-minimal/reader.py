@@ -60,7 +60,7 @@ def is_year(string: str) -> bool:
 
 
 def split_to_tables(rows):
-    """Yield Tab() instances from *rows* list of lists."""
+    """Yield Table() instances from *rows* list of lists."""
     datarows = []
     headers = []
     state = State.INIT
@@ -84,38 +84,73 @@ def split_to_tables(rows):
 
 class Table:
     def __init__(self, headers, datarows):
-        self.headers = headers
+        self.headers = [x[0] for x in headers]
         self.datarows = datarows
         self.name = None
         self.unit = None
+        self.row_format = get_row_format(self.coln)
 
+    @property
+    def label(self):
+        return '{}_{}'.format(self.name, self.unit)
+        
+    @property
+    def coln(self):
+        return max([len(row) for row in self.datarows])        
+
+    def headers_contain(self, string):
+        for x in self.headers:
+            if string in x:
+                return True
+        return False
+
+    def headers_search(self, string: str):
+        # FIXME: need test, currently doe snot look at start of words
+        for x in self.headers:
+            if re.search(pattern=string, string=x):
+                return string
+        return None
+
+    def assign_row_format(self, key):
+        self.row_format = get_row_format(key)
+
+    def emit_datapoints(self):
+        _label = self.label
+        for row in self.datarows:
+            for d in emit_datapoints_from_row(row, _label, self.row_format):
+                yield d
+                
     def __repr__(self):
         return f'Table(name={self.name}, unit={self.unit},\n    headers={self.headers},\n    datarows={self.datarows})'
 
 
-def datarows_length(table):
-    return max([len(row) for row in table.datarows])
+def emit_datapoints(tables):
+    for table in tables:
+        if table.unit and table.label:
+            for x in table.emit_datapoints():
+                yield x                
 
 
-def get_row_format(table, key=None):
-    _key = key or datarows_length(table) - 1
-    try:
-        return {1 + 4 + 12: 'Y' + 'A' + 'Q' * 4 + 'M' * 12,
-                1 + 4: 'Y' + 'A' + 'Q' * 4,
-                1 + 12: 'Y' + 'A' + 'M' * 12,
-                12: 'Y' + 'M' * 12,
-                4: 'Y' + 'QQQQ',
-                'fiscal': 'Y' + 'A' + 'M' * 11,
-                }[_key]
+row_formats = ['YA' + 'Q'*4 + 'M'*12,
+               'YA' + 'Q'*4,
+               'YA' + 'M'*12,
+               'Y' + 'M'*12,
+               'Y' + 'QQQQ',
+               'XXXX']
+row_format_dict = {len(x): x for x in row_formats}
+row_format_dict['fiscal'] = 'YA' + 'M' * 11
+
+def get_row_format(key, row_format_dict=row_format_dict):
+    try:          
+        return row_format_dict[key]
     except KeyError:
-        raise ValueError(f'Unknown row format for {table}')
+        raise ValueError(f'Unknown row format: {key}')
 
 
 def extract_unit(table, unit_mapper_dict):
-    for row in table.headers:
-        for text, unit in unit_mapper_dict.items():
-            if text in row[0]:
-                return unit
+    for text, unit in unit_mapper_dict.items():
+        if table.headers_contain(text):
+           return unit
     return None
 
 
@@ -126,33 +161,18 @@ def emit_datapoints_from_row(row, label, row_format):
         occurences += letter
         if letter == 'Y':
             year = value
-        if value and letter in 'AQM':
-            yield dict(label=label,
-                       freq=letter.lower(),
-                       year=year,
-                       period=occurences.count(letter),
-                       value=value)
+        else:    
+            if value:
+                yield dict(label=label,
+                           freq=letter.lower(),
+                           year=year,
+                           period=occurences.count(letter),
+                           value=value)
 
 
-def emit_datapoints_from_table(table, label, row_format):
-    for row in table.datarows:
-        for d in emit_datapoints_from_row(row, label, row_format):
-            yield d
-
-
-def find_at_start(what: str, where: str):
-    # FIXME: need test, currently doe snot look at start of words
-    if re.search(pattern=f'{what}', string=where):
-        return what
-    return None
-
-
-def find_tables(tables, strings, after=None):
-    for t in tables:
-        for string in strings:
-            for row in t.headers:
-                if find_at_start(string, row[0]):
-                    yield t
+def find_tables(tables, strings):
+    return [t for t in tables for string in strings 
+            if t.headers_contain(string)]
 
 
 def assert_single_table(table_subset):
@@ -160,8 +180,8 @@ def assert_single_table(table_subset):
         raise IndexError(f'Found multiple tables: {table_subset}')
 
 
-def find_one_table(tables, header_string: str, after=None):
-    table_subset = list(find_tables(tables, header_string, after))
+def find_one_table(tables, header_strings):
+    table_subset = list(find_tables(tables, header_strings))
     assert_single_table(table_subset)
     return table_subset[0]
 
@@ -173,30 +193,48 @@ def assign_units(tables, unit_mapper_dict):
         tables[i].unit = extract_unit(table, unit_mapper_dict)
 
 
-def make_label(name, unit):
-    return f'{name}_{unit}'
+def make_name_parser(parsing_definitions):
+    def _(table):
+        for pdef in parsing_definitions:
+            for header in pdef['headers']: 
+                if table.header_contains(header):
+                     table.name = pdef['name']
+        return table
+    return _
 
 
-def assert_unit_found(table, unit):
+
+def assert_correct_unit_found(table, unit):
     if table.unit != unit:
         raise ValueError("Unit not found: {unit}")
 
 
 def get_datapoints(tables, parsing_definition):
+    name = parsing_definition['name']
     table = find_one_table(tables, parsing_definition['headers'])
-    assert_unit_found(table, parsing_definition['unit'])
-    row_format = get_row_format(table, parsing_definition.get('reader'))
-    label = make_label(parsing_definition['name'], table.unit)
-    return emit_datapoints_from_table(table, label, row_format)
+    table.name = name
+    key = parsing_definition.get('reader')
+    if key:
+        table.assign_row_format(key)
+    assert_correct_unit_found(table, parsing_definition['unit'])
+    return table.emit_datapoints()
 
 
 def to_values(filename, unit_mapper_dict, parsing_definitions):
     def unit_mapper(table):
         table.unit = extract_unit(table, unit_mapper_dict)
+        return table    
+    def name_mapper(table):
+        for pdef in parsing_definitions:
+            for header in pdef['headers']: 
+                if table.headers_contain(header):
+                     table.name = pdef['name']
         return table
     csv_rows = read_csv("tab.csv")
     tables = split_to_tables(csv_rows)
-    tables = list(map(unit_mapper, tables))
+    tables = map(unit_mapper, tables)
+    tables = map(name_mapper, tables)
+    tables = list(tables)
     for pdef in parsing_definitions:
         for x in get_datapoints(tables, pdef):
             yield x
@@ -221,11 +259,7 @@ if __name__ == "__main__":
     # read csv
     csv_rows = list(read_csv("tab.csv"))
     # split csv rows to tables
-    # NOTES:
-    #   - split_to_tables() is a state machine to traverse through csv file
-    #   - in julia the data structure for Table class is likely to be different
     tables = list(split_to_tables(csv_rows))
-
     # assign units to all tables
     assign_units(tables, unit_mapper_dict)
     assert tables[4].unit == 'ytd'
