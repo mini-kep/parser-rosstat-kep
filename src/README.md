@@ -1,4 +1,4 @@
-## 2018-07-03:
+## 2018-07-03
 
 ##### `src/python`:
  - folder has mature code, runnable from `manage.py`
