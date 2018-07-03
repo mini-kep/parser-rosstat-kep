@@ -1,8 +1,10 @@
 # Parse data from CSV files
 
+
 # This example is work in progress to create minimal example
 # Full code code is at src/python/manage.py 
 # Point of entry of parsing algorithm:  src.python.dispatch.evaluate() 
+
 
 # PSEUDOCODE
 # ---------- 
@@ -13,6 +15,7 @@
 #   3.2. get data from table based on columns format like "YQQQQMMMMMMMMMMMM"
 # 4. combine data from tables into three dataframes based on frequency (dfa, dfq, dfm)
 # 5. write dfa, dfq, dfm as csv files to disk 
+
 
 # READ CSV AND SPLIT INTO TABLES (steps 1 and 2 of pseudocode)
 # ------------------------------------------------------------
