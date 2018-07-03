@@ -17,9 +17,6 @@
 # 5. write dfa, dfq, dfm as csv files to disk
 
 
-# READ CSV AND SPLIT INTO TABLES (steps 1 and 2 of pseudocode)
-# ------------------------------------------------------------
-
 import csv
 import re
 from collections import OrderedDict
@@ -142,10 +139,9 @@ def emit_datapoints_from_table(table, label, row_format):
         for d in emit_datapoints_from_row(row, label, row_format):
             yield d
 
-# FIXME: need test, currently doe snot look at start of words
-
 
 def find_at_start(what: str, where: str):
+    # FIXME: need test, currently doe snot look at start of words
     if re.search(pattern=f'{what}', string=where):
         return what
     return None
