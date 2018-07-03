@@ -27,11 +27,9 @@ from enum import Enum, unique
 def read_csv(file): 
     """Read csv file as list of lists / matrix"""
     fmt=dict(delimiter='\t', lineterminator='\n')
-    table = []
     with open(file, 'r', encoding='utf-8') as f:
         for row in csv.reader(f, **fmt):
-            table.append(row)
-    return table
+            yield row
 
 
 @unique
@@ -87,13 +85,83 @@ class Table:
     def __init__(self, headers, datarows):
         self.headers = headers
         self.datarows = datarows
+        
+    def __repr__(self):    
+        return f'Table(headers={self.headers},\n       datarows={self.datarows}'
 
+
+
+def emit_datapoints_from_row(row, label, row_format):
+    # simplified version of extract.row_splitter()
+    occurences = ''  
+    for value, letter in zip(row, row_format):
+       occurences += letter
+       if letter=='Y':
+           year = value
+       else:       
+           if value: 
+                yield dict(label=label, 
+                           freq=letter.lower(), 
+                           year=year, 
+                           period=occurences.count(letter),
+                           value=value)
+
+def emit_datapoints_from_table(table, label, row_format):
+    for row in table.datarows:
+        for d in emit_datapoints_from_row(row, label, row_format):
+            yield d
+
+# FIXME: need test, currently doe snot look at start of words
+def find_at_start(what: str, where: str):
+    if re.search(pattern=f'{what}', string=where):
+         return what         
+    return None 
+
+def find_tables(tables, strings, after=None):
+    for t in tables:
+        for string in strings:
+            for row in t.headers:            
+                if find_at_start(string, row[0]):
+                    yield t
+                
+def find_one_table(tables, header_string: str, after=None):               
+    table_subset = list(find_tables(tables, header_string, after))
+    if len(table_subset) != 1:
+       raise IndexError(f'Found multiple tables: {table_subset}')
+    return table_subset[0]
+                
+def extract_unit(table, unit_mapper):
+    for row in table.headers:
+        for text, unit in unit_mapper.items():                
+            if text in row[0]:
+                 return unit         
+    return None        
+
+def make_label(name, unit):
+    return f'{name}_{unit}'
     
 if __name__ == "__main__":
     # read csv    
-    csv_rows = read_csv("tab.csv")
+    csv_rows = list(read_csv("tab.csv"))
     # split csv rows to tables
     # NOTES: 
     #   - split_to_tables() is a state machine to traverse through csv file 
     #   - in julia the data structure for Table class is likely to be different     
-    tables = split_to_tables(csv_rows)
+    tables = list(split_to_tables(csv_rows))
+    
+    # NOT TODO: simplest case a) both header and unit name are found in same table
+    unit_mapper = {'млрд.рублей': 'bln_rub'}
+    parsing_definition = dict(headers=['Объем ВВП'],
+                              name='GDP',
+                              unit='bln_rub',
+                              row_format='YAQQQQ')
+    table1 = find_one_table(tables, parsing_definition['headers'])
+    unit = extract_unit(table1, unit_mapper)
+    label = make_label(parsing_definition['name'], unit)
+    datapoints = emit_datapoints_from_table(table1, 
+                                            label, 
+                                            parsing_definition['row_format'])    
+    datapoints = list(datapoints)
+    assert datapoints[-1] == {'freq': 'q',  'label': 'GDP_bln_rub',  'period': 4,  'value': '25503', 'year': '20172)'}
+    assert datapoints[0] == {'freq': 'a',  'label': 'GDP_bln_rub', 'period': 1, 'value': '4823', 'year': '1999'}    
+    # worse case b) find industrial production yoy from tables[4]

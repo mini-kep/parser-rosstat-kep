@@ -2,9 +2,12 @@
 
 import pandas as pd
 import pytest
-from dispatch import (Table, timestamp_quarter, timestamp_month, timestamp_annual)
+from dispatch import (
+    Table,
+    timestamp_quarter,
+    timestamp_month,
+    timestamp_annual)
 from extract.row_splitter import split_row_by_year_and_qtr, split_row_fiscal
-
 
 
 @pytest.fixture
@@ -13,6 +16,7 @@ def table():
                ['млрд.рублей', '', '', '', '']]
     datarows = [['1991', '4823', '901', '1102', '1373', '1447']]
     return Table(headers, datarows)
+
 
 @pytest.fixture
 def parsed_table():
@@ -25,7 +29,7 @@ def parsed_table():
 class Test_Table:
 
     def test_on_creation_pasring_attributes_are_unknown(self, table):
-        assert table.label is None       
+        assert table.label is None
         assert table.heads == ['Объем ВВП', 'млрд.рублей']
         assert table.name is None
         assert table.unit is None
@@ -46,9 +50,9 @@ class Test_Table:
                              'time_index': pd.Timestamp('1991-12-31'),
                              'freq': 'a'}
         assert values[4] == {'label': ('GDP', 'bln_rub'),
-                              'value': 1447.0,
-                              'time_index': pd.Timestamp('1991-12-31'),
-                              'freq': 'q'}
+                             'value': 1447.0,
+                             'time_index': pd.Timestamp('1991-12-31'),
+                             'freq': 'q'}
 
 
 def test_timestamp_quarter():

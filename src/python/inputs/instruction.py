@@ -52,17 +52,18 @@ class Instruction:
             error_messages.append(start)
             error_messages.append(end)
         raise ValueError('\n'.join(error_messages))
-    
-    @property    
-    def headers_dict(self):
-         return {com['var']: iterate(com['header']) for com in self.commands}
-     
+
     @property
-    def required(self): 
-         return {com['var']: iterate(com['unit']) for com in self.commands}
-     
-    def required_pairs(self):        
-        return {(name, unit) for name, units in self.required.items() for unit in units}
+    def headers_dict(self):
+        return {com['var']: iterate(com['header']) for com in self.commands}
+
+    @property
+    def required(self):
+        return {com['var']: iterate(com['unit']) for com in self.commands}
+
+    def required_pairs(self):
+        return {(name, unit) for name, units in self.required.items()
+                for unit in units}
 
 
 def from_yaml(yaml_text: str):
@@ -76,23 +77,18 @@ def yaml_to_instructions(yaml_doc: str):
 class InstructionSet:
     def __init__(self, yaml_doc: str):
         self.definitions = yaml_to_instructions(yaml_doc)
-        
-    @property
-    def default(self):    
-        default_definition = [d for d in self.definitions if not d.boundaries]     
-        assert len(default_definition) == 1 
-        return default_definition[0]   
 
     @property
-    def by_segment(self):    
+    def default(self):
+        default_definition = [d for d in self.definitions if not d.boundaries]
+        assert len(default_definition) == 1
+        return default_definition[0]
+
+    @property
+    def by_segment(self):
         return [d for d in self.definitions if d.boundaries]
-    
-    
-        
-if __name__ == '__main__':            
+
+
+if __name__ == '__main__':
     from inputs import YAML_DOC
     d = yaml_to_instructions(YAML_DOC)
-
-    
-
-
