@@ -13,9 +13,9 @@ from inputs.checkpoints import (
 @pytest.fixture(scope="module")
 def dataframe():
     return pd.DataFrame.from_dict(
-            {'AGROPROD_yoy': {pd.Timestamp('1999-12-31 00:00:00'): 103.8, 
-                              pd.Timestamp('2000-12-31 00:00:00'): 106.2}}
-            )
+        {'AGROPROD_yoy': {pd.Timestamp('1999-12-31 00:00:00'): 103.8,
+                          pd.Timestamp('2000-12-31 00:00:00'): 106.2}}
+    )
 
 
 @pytest.fixture(scope="module")

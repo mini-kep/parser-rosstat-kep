@@ -30,10 +30,11 @@ def md(folder):
         folder.mkdir(parents=True)
     return folder
 
+
 class OutputLocations(object):
     def __init__(self, output_root=OUTPUT_ROOT):
         self.out = Path(output_root)
-        self.xlsx = str(self.out / 'kep.xlsx')        
+        self.xlsx = str(self.out / 'kep.xlsx')
 
 
 class Locations(object):
@@ -44,7 +45,6 @@ class Locations(object):
         self.year = year
         self.month = month
         self.data = Path(data_root)
-
 
     def inner_path(self, tag):
         if tag not in ('raw', 'interim', 'processed'):
@@ -148,9 +148,9 @@ def parse(year,
           validator=verify):
     # filesystem
     loc = Locations(year, month, data_root)
-    #parse    
+    # parse
     text = loc.interim_csv.read_text(encoding='utf-8')
-    values = list(evaluate(text, units_dict, yaml_doc))    
+    values = list(evaluate(text, units_dict, yaml_doc))
     # save three dataframes
     dfs = {}
     for freq in 'aqm':
@@ -160,31 +160,34 @@ def parse(year,
         df.to_csv(str(loc.processed_csv(freq)))
     return dfs
 
+
 def unpack(dfs):
-    return (dfs[freq] for freq in FREQUENCIES)   
+    return (dfs[freq] for freq in FREQUENCIES)
 
 
-def save(year, month, dfs, data_root=DATA_ROOT, output_root=OUTPUT_ROOT):     
+def save(year, month, dfs, data_root=DATA_ROOT, output_root=OUTPUT_ROOT):
     loc = Locations(year, month, data_root)
     oloc = OutputLocations(output_root)
     if is_latest(year, month):
         to_latest(year, month, loc)
         save_excel(oloc.xlsx, dfs)
-        
+
+
 def all_months():
-    for year, month in reversed(supported_dates()[:-2]):        
-        print("\n"*5, year, month)        
+    for year, month in reversed(supported_dates()[:-2]):
+        print("\n" * 5, year, month)
         dfa, dfq, dfm = unpack(parse(year, month))
+
 
 if __name__ == '__main__':
     # typical workflow
     import sys
     try:
-        year = int(sys.argv[1]) 
-        month = int(sys.argv[2]) 
+        year = int(sys.argv[1])
+        month = int(sys.argv[2])
     except IndexError:
-        year, month = 2018, 4  
-    prepare_data(year, month)    
-    dfs = parse(year, month)         
+        year, month = 2018, 4
+    prepare_data(year, month)
+    dfs = parse(year, month)
     save(year, month, dfs)
     dfa, dfq, dfm = unpack(dfs)

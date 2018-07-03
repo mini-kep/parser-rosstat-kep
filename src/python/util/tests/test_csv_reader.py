@@ -79,7 +79,5 @@ def test_pop_rows_with_another_list_and_injection():
     assert List0 == List1[3:]
 
 
-
-
 if __name__ == "__main__":
     pytest.main([__file__])

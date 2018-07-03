@@ -18,6 +18,5 @@ class Test_is_year():
         assert is_year("Объем ВВП") is False
 
 
-
 if __name__ == "__main__":
     pytest.main([__file__])
