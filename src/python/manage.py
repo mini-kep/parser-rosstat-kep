@@ -18,7 +18,7 @@ from util.to_excel import save_excel
 
 
 FREQUENCIES = list('aqm')
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATA_ROOT = PROJECT_ROOT / 'data'
 OUTPUT_ROOT = PROJECT_ROOT / 'output'
 assert DATA_ROOT.exists()
