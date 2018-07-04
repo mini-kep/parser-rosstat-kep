@@ -263,7 +263,7 @@ def iterate(x):
 
 
 if __name__ == "__main__":
-    from parsing_definition import NAMERS, UNITS
+    from parsing_definition import NAMERS, UNITS, Namer
     
 #   Usual case - simple parsing:    
     # example 1
@@ -357,7 +357,28 @@ if __name__ == "__main__":
 
 #    # example 5
 #    # c) test for EXPORT/IMPORT improt with borders
-# TODO here
+    namer5 = Namer(name='EXPORT_GOODS',
+                   headers=['экспорт товаров – всего', 'Экспорт товаров'],
+                   units=['bln_usd'],
+                   starts=["1.9. Внешнеторговый оборот – всего",
+                           "1.10. Внешнеторговый оборот – всего",
+                           "1.10. Внешнеторговый оборот – всего"],
+                   ends=["1.9.1. Внешнеторговый оборот со странами дальнего зарубежья",
+                         "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья",
+                         "1.10.1.Внешнеторговый оборот со странами дальнего зарубежья"])
+    tables5 = parsed_tables(filename,  
+                            unit_mapper_dict=UNITS, 
+                            namers=[namer5])      
+    datapoints5 = [x for x in emit_datapoints(tables5)]    
+    assert datapoints5[0]['value'] == '75,6'
+    """1.9. Внешнеторговый оборот – всего1), млрд.долларов США / Foreign trade turnover – total1), bln US dollars																	
+							
+	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.			
+		I	II	III	IV												
+в том числе:																	
+экспорт товаров – всего, млрд.долларов США																	
+/ of which: export of goods – total, bln US dollars																	
+1999	75,6	15,3	17,1	18,9	24,3	4,5	4,9	5,8	6,6	5,1	5,4	6,3	6,2	6,4	7,0	7,6	9,7"""
 
     
 #   regression test for bugsfix with 'млрд.тонно-км'    
@@ -387,28 +408,32 @@ if __name__ == "__main__":
             print(a)
             expected_values.append(a)
             print(z)
-            expected_values.append(subdata[-1]) 
+            expected_values.append(z) 
     import yaml       
     Path('checkpoints.yaml').write_text(yaml.dump(expected_values))
     
+# WIP:
+#  - full new defintion of parsing_defintion.py  
+#  - write expected values
     
-# TODO:
-#  - full new defintion of parsing_defintion.py     
-#  - testing on tab.csv and tab_old.csv
+# TODO - OTHER:   
 #  - convert to tests
 #  - timeit
-#  - write expected values
+
+# TODO - UNFINISHED WORKFLOW (saver.py)
 #  - type conversions and comment cleaning    
-#  - checkpoints
+#  - (optional) checkpoints
 #  - saving to dataframes
 #  - checking dataframes
 
 # WONTFIX:
-#  - assert schema on namer imports
-#  - check a defintion against file (no duplicate values)    
+#  - testing on tab.csv and tab_old.csv
+#  - clean notebook folders
+#  - check a defintion against file (no duplicate values) - Namer.inspect()    
 #  - header found more than once in tables
 #  - duplicate tables - values appear in two sections, eg CPI
 #  - maybe handle 'reader' directly
 #  - 1.7. Объем работ по виду деятельности ""Строительство - requires supress_apos() 
 
 # DONE 
+#  - assert schema on namer imports
