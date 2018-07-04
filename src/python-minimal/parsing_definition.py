@@ -99,7 +99,7 @@ doc = """
   units: 
     - yoy
 
-- name: WAGE_NOMINAL
+- name: WAGE
   headers:
     - Среднемесячная номинальная начисленная заработная плата работников организаций
     - Среднемесячная номинальная начисленная заработная плата одного работника
@@ -141,21 +141,40 @@ doc = """
      - yoy
      - rog
 
-# собственные средства предприятий
-# TODO:
-# привлеченные средства     
-# из них бюджетные средства
-# из федерального бюджета
-# из бюджетов субъектов Российской Федерации
-     
 - name: INVESTMENT_OWN_FUNDS
   headers:
      - собственные средства предприятий
   units:
      - bln_rub
   
+- name: INVESTMENT_EXTERNAL_FUNDS
+  headers:
+     - привлеченные средства
+  units:
+     - bln_rub  
+ 
+- name: INVESTMENT_BUDGET_FUNDS
+  headers:
+     - из них бюджетные средства
+  units:
+     - bln_rub  
+     
+- name: INVESTMENT_BUDGET_FUNDS_FEDERAL
+  headers:
+     - из федерального бюджета
+  units:
+     - bln_rub  
+
+- name: INVESTMENT_BUDGET_FUNDS_SUBFEDERAL
+  headers:
+     - из бюджетов субъектов Российской Федерации
+  units:
+     - bln_rub       
+     
+  
 # TODO:  
 # 1.7. Объем работ по виду деятельности ""Строительство     
+
 
 - name: EXPORT_GOODS
   headers:
@@ -208,21 +227,114 @@ doc = """
     - Индексы цен производителей промышленных товаров
   units:
     - rog
+    
+    
+- name: RETAIL_SALES
+  headers:
+    - Оборот розничной торговли
+  units:
+    - bln_rub
+    - yoy
+    - rog
+
+- name: RETAIL_SALES_FOOD
+  starts:
+    - "Из общего объема оборота розничной торговли:"
+  ends:
+    - Оборот общественного питания 
+  headers:
+    - продовольственные товары
+    - пищевые продукты, включая напитки и табачные изделия
+    - пищевые продукты, включая напитки, и табачные изделия
+  units:
+    - bln_rub
+    - yoy
+    - rog
+
+- name: RETAIL_SALES_NONFOOD
+  starts:
+    - "Из общего объема оборота розничной торговли:"
+  ends:
+    - Оборот общественного питания 
+  headers: 
+    - непродовольственные товары
+  units:
+    - bln_rub
+    - yoy
+    - rog   
+
+- name: CPI
+  headers: 
+   - Индекс потребительских цен
+  units: 
+   - rog
+
+- name: CPI_NONFOOD
+  starts: 
+   - "3.5. Индекс потребительских цен"
+  ends: 
+   - "4. Социальная сфера"
+  headers:
+    - непродовольственные товары
+    - непродовольст- венные товары
+  units: 
+    - rog
+  
+- name: CPI_FOOD
+  starts: 
+   - "3.5. Индекс потребительских цен"
+  ends: 
+   - "4. Социальная сфера"
+  headers: 
+   - продукты питания
+  units: 
+   - rog
+
+- name: CPI_SERVICES
+  starts: 
+   - "3.5. Индекс потребительских цен"
+  ends: 
+   - "4. Социальная сфера"
+  headers: 
+   - услуги
+  units: 
+   - rog
+
+- name: CPI_ALCOHOL
+  starts: 
+   - "3.5. Индекс потребительских цен"
+  ends: 
+   - "4. Социальная сфера"
+  headers: 
+   - алкогольные напитки
+  units: 
+   - rog    
+    
+    
+    
 """
-
 import yaml  
-
+# docs at https://github.com/keleshev/schema
+from schema import Schema, And, Use, Optional, SchemaMissingKeyError
 from reader import Namer        
-NAMERS = [Namer(x['name'], x['headers'], x['units'],
-                x.get('starts'), x.get('ends'),  x.get('reader'))
-          for x in yaml.load(doc)]
+
 PARSING_DEFINTIONS = list(yaml.load(doc))
 
+schema = Schema({'name': str,
+                 'headers': [str],
+                 'units': [str],
+                 Optional('reader'): str,
+                 Optional('starts'): [str],
+                 Optional('ends'): [str]
+          })
 
-
-
-
-
-
-
-
+for p in PARSING_DEFINTIONS:
+    try:
+        schema.validate(p)
+    except SchemaMissingKeyError:
+        raise ValueError(p)
+    
+NAMERS = [Namer(x['name'], x['headers'], x['units'],
+                x.get('starts'), x.get('ends'),  x.get('reader'))
+          for x in yaml.load(doc)]    
+    

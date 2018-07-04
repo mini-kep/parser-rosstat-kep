@@ -272,11 +272,15 @@ class Namer(object):
     def labels(self):
         return set(make_label(self.name, unit) for unit in self.units)
     
+    def inspect(self, tables):
+        pass
+        # WONTFIX:
+        # is found header found not more than only once?    
+    
     def assert_all_labels_found(self, tables):
         diff = self.labels - {t.label for t in tables if t.is_defined()}
         if diff:
-            raise ValueError(('Not found:', diff))
-        
+            raise ValueError(('Not found:', diff))        
         
     def __repr__(self):    
         return str(self.__dict__)
@@ -374,9 +378,10 @@ if __name__ == "__main__":
                                 'value': '653,8',
                                 'year': '1999'}
 
-# TODO
 #    # example 5
 #    # c) test for EXPORT/IMPORT improt with borders
+# TODO here
+
     
 #   regression test for bugsfix with 'млрд.тонно-км'    
     assert 'млрд.тонно-км' in '1.5. Грузооборот транспорта, включая коммерческий и некоммерческий грузооборот, млрд.тонно-км / Freight turnover, including commercial and noncommercial freight turnover, bln ton-km'
@@ -391,23 +396,40 @@ if __name__ == "__main__":
     b = tables[0]
     assert b.unit=='bln_tkm'
     
-
+    expected_values = []
     for namer in NAMERS:
         param = 'tab.csv', UNITS, [namer]
-        tables = parsed_tables('tab.csv', UNITS, [namer])
+        tables = parsed_tables(*param)
         namer.assert_all_labels_found(tables)
         data = to_values(*param)
         print(namer.name)        
         for label in namer.labels:
             subdata = [x for x in data if x['label']==label]
+            a, z = subdata[0], subdata[-1] 
             print(label)
-            print(subdata[0])
-            print(subdata[-1])
-            #if label.startswith('TRANSPORT_LOADING_RAIL'):
-            #    raise Exception             
+            print(a)
+            expected_values.append(a)
+            print(z)
+            expected_values.append(subdata[-1]) 
+    import yaml       
+    Path('checkpoints.yaml').write_text(yaml.dump(expected_values))
+    
     
 # TODO:
-#    - check a defintion against file (no duplicate values)    
-#    - header found more than once in tables
-#    - duplicate tables - values appear in two sections
+#  - full new defintion of parsing_defintion.py     
+#  - testing on tab.csv and tab_old.csv
+#  - convert to tests
+#  - timeit
+#  - write expected values
+#  - type conversions and comment cleaning    
+#  - checkpoints
+#  - saving to dataframes
+#  - checking dataframes
 
+# WONTFIX:
+#  - assert schema on namer imports
+#  - check a defintion against file (no duplicate values)    
+#  - header found more than once in tables
+#  - duplicate tables - values appear in two sections, eg CPI
+#  - maybe handle 'reader' directly
+#  - 1.7. Объем работ по виду деятельности ""Строительство   

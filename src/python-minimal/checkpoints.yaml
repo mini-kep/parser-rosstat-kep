@@ -1,0 +1,84 @@
+- {freq: a, label: GDP_bln_rub, period: 1, value: '4823', year: '1999'}
+- {freq: q, label: GDP_bln_rub, period: 4, value: '25503', year: 20172)}
+- {freq: a, label: GDP_REAL_yoy, period: 1, value: '106,4', year: '1999'}
+- {freq: q, label: GDP_REAL_yoy, period: 1, value: '101,9', year: '2018'}
+- {freq: q, label: INDPRO_rog, period: 1, value: '82,8', year: '2015'}
+- {freq: m, label: INDPRO_rog, period: 4, value: '97,9', year: '2018'}
+- {freq: a, label: INDPRO_yoy, period: 1, value: '99,2', year: '2015'}
+- {freq: m, label: INDPRO_yoy, period: 4, value: '101,3', year: '2018'}
+- {freq: m, label: INDPRO_ytd, period: 1, value: '100,0', year: '2015'}
+- {freq: m, label: INDPRO_ytd, period: 4, value: '101,8', year: '2018'}
+- {freq: a, label: AGROPROD_yoy, period: 1, value: '103,8', year: '1999'}
+- {freq: m, label: AGROPROD_yoy, period: 4, value: '102,5', year: '2018'}
+- {freq: a, label: WAGE_rub, period: 1, value: '1523', year: '1999'}
+- {freq: m, label: WAGE_rub, period: 4, value: 435502), year: '2018'}
+- {freq: q, label: WAGE_REAL_rog, period: 1, value: '80,9', year: '1999'}
+- {freq: m, label: WAGE_REAL_rog, period: 4, value: '102,43)', year: '2018'}
+- {freq: a, label: WAGE_REAL_yoy, period: 1, value: '78,0', year: '1999'}
+- {freq: m, label: WAGE_REAL_yoy, period: 4, value: '107,83)', year: '2018'}
+- {freq: a, label: TRANSPORT_FREIGHT_TOTAL_bln_tkm, period: 1, value: '3461', year: '1999'}
+- {freq: m, label: TRANSPORT_FREIGHT_TOTAL_bln_tkm, period: 4, value: '463,5', year: '2018'}
+- {freq: a, label: TRANSPORT_FREIGHT_COMMERCIAL_bln_tkm, period: 1, value: '3372',
+  year: '1999'}
+- {freq: m, label: TRANSPORT_FREIGHT_COMMERCIAL_bln_tkm, period: 4, value: '455,2',
+  year: '2018'}
+- {freq: a, label: TRANSPORT_LOADING_RAIL_mln_t, period: 1, value: '947', year: '1999'}
+- {freq: m, label: TRANSPORT_LOADING_RAIL_mln_t, period: 4, value: '109,3', year: '2018'}
+- {freq: a, label: INVESTMENT_yoy, period: 1, value: '105,3', year: '1999'}
+- {freq: q, label: INVESTMENT_yoy, period: 1, value: '103,6', year: '2018'}
+- {freq: m, label: INVESTMENT_rog, period: 1, value: '42,5', year: '1999'}
+- {freq: q, label: INVESTMENT_rog, period: 1, value: '34,5', year: '2018'}
+- {freq: a, label: INVESTMENT_bln_rub, period: 1, value: '670,4', year: '1999'}
+- {freq: q, label: INVESTMENT_bln_rub, period: 1, value: '1146,6', year: '2018'}
+- {freq: a, label: INVESTMENT_OWN_FUNDS_bln_rub, period: 1, value: '304,9', year: '1999'}
+- {freq: q, label: INVESTMENT_OWN_FUNDS_bln_rub, period: 1, value: '676,2', year: '2018'}
+- {freq: a, label: INVESTMENT_EXTERNAL_FUNDS_bln_rub, period: 1, value: '277,2', year: '1999'}
+- {freq: q, label: INVESTMENT_EXTERNAL_FUNDS_bln_rub, period: 1, value: '175,2', year: '2018'}
+- {freq: a, label: INVESTMENT_BUDGET_FUNDS_bln_rub, period: 1, value: '99,2', year: '1999'}
+- {freq: q, label: INVESTMENT_BUDGET_FUNDS_bln_rub, period: 1, value: '71,8', year: '2018'}
+- {freq: a, label: INVESTMENT_BUDGET_FUNDS_FEDERAL_bln_rub, period: 1, value: '37,5',
+  year: '1999'}
+- {freq: q, label: INVESTMENT_BUDGET_FUNDS_FEDERAL_bln_rub, period: 1, value: '91,8',
+  year: '2018'}
+- {freq: a, label: INVESTMENT_BUDGET_FUNDS_SUBFEDERAL_bln_rub, period: 1, value: '55,9',
+  year: '1999'}
+- {freq: q, label: INVESTMENT_BUDGET_FUNDS_SUBFEDERAL_bln_rub, period: 1, value: '1169,7',
+  year: '2018'}
+- {freq: a, label: EXPORT_GOODS_bln_usd, period: 1, value: '75,6', year: '1999'}
+- {freq: m, label: EXPORT_GOODS_bln_usd, period: 3, value: '36,9', year: '2018'}
+- {freq: a, label: IMPORT_GOODS_bln_usd, period: 1, value: '39,5', year: '1999'}
+- {freq: m, label: IMPORT_GOODS_bln_usd, period: 3, value: '21,9', year: '2018'}
+- {freq: a, label: DWELLINGS_CONSTRUCTION_mln_m2, period: 1, value: '32,0', year: '1999'}
+- {freq: m, label: DWELLINGS_CONSTRUCTION_mln_m2, period: 4, value: '4,5', year: '2018'}
+- {freq: a, label: UNEMPL_COUNT_mln, period: 1, value: '4,0', year: '2017'}
+- {freq: m, label: UNEMPL_COUNT_mln, period: 4, value: '3,7', year: '2018'}
+- {freq: a, label: PPI_rog, period: 1, value: '107,5', year: '2016'}
+- {freq: m, label: PPI_rog, period: 4, value: '101,2', year: '2018'}
+- {freq: a, label: RETAIL_SALES_yoy, period: 1, value: '94,2', year: '1999'}
+- {freq: m, label: RETAIL_SALES_yoy, period: 4, value: '102,4', year: '2018'}
+- {freq: q, label: RETAIL_SALES_rog, period: 1, value: '88,0', year: '1999'}
+- {freq: m, label: RETAIL_SALES_rog, period: 4, value: '99,1', year: '2018'}
+- {freq: a, label: RETAIL_SALES_bln_rub, period: 1, value: '1797,4', year: '1999'}
+- {freq: m, label: RETAIL_SALES_bln_rub, period: 4, value: '1183,9', year: '2018'}
+- {freq: a, label: RETAIL_SALES_FOOD_yoy, period: 1, value: '93,6', year: '1999'}
+- {freq: m, label: RETAIL_SALES_FOOD_yoy, period: 4, value: '102,0', year: '2018'}
+- {freq: q, label: RETAIL_SALES_FOOD_rog, period: 1, value: '85,0', year: '1999'}
+- {freq: m, label: RETAIL_SALES_FOOD_rog, period: 4, value: '98,5', year: '2018'}
+- {freq: a, label: RETAIL_SALES_FOOD_bln_rub, period: 1, value: '866,1', year: '1999'}
+- {freq: m, label: RETAIL_SALES_FOOD_bln_rub, period: 4, value: '1263,2', year: '2018'}
+- {freq: q, label: RETAIL_SALES_NONFOOD_rog, period: 1, value: '90,7', year: '1999'}
+- {freq: m, label: RETAIL_SALES_NONFOOD_rog, period: 4, value: '99,6', year: '2018'}
+- {freq: a, label: RETAIL_SALES_NONFOOD_bln_rub, period: 1, value: '931,3', year: '1999'}
+- {freq: m, label: RETAIL_SALES_NONFOOD_bln_rub, period: 4, value: '115,4', year: '2018'}
+- {freq: a, label: RETAIL_SALES_NONFOOD_yoy, period: 1, value: '94,7', year: '1999'}
+- {freq: m, label: RETAIL_SALES_NONFOOD_yoy, period: 4, value: '102,7', year: '2018'}
+- {freq: m, label: CPI_rog, period: 1, value: '108,4', year: '1999'}
+- {freq: m, label: CPI_rog, period: 4, value: '100,4', year: '2018'}
+- {freq: a, label: CPI_NONFOOD_rog, period: 1, value: '139,2', year: '1999'}
+- {freq: m, label: CPI_NONFOOD_rog, period: 4, value: '100,3', year: '2018'}
+- {freq: a, label: CPI_FOOD_rog, period: 1, value: '135,0', year: '1999'}
+- {freq: m, label: CPI_FOOD_rog, period: 4, value: '100,2', year: '2018'}
+- {freq: a, label: CPI_SERVICES_rog, period: 1, value: '134,0', year: '1999'}
+- {freq: m, label: CPI_SERVICES_rog, period: 4, value: '100,3', year: '2018'}
+- {freq: a, label: CPI_ALCOHOL_rog, period: 1, value: '143,2', year: '1999'}
+- {freq: m, label: CPI_ALCOHOL_rog, period: 4, value: '100,4', year: '2018'}
