@@ -82,3 +82,16 @@
 - {freq: m, label: CPI_SERVICES_rog, period: 4, value: '100,3', year: '2018'}
 - {freq: a, label: CPI_ALCOHOL_rog, period: 1, value: '143,2', year: '1999'}
 - {freq: m, label: CPI_ALCOHOL_rog, period: 4, value: '100,4', year: '2018'}
+- {freq: m, label: PROFIT_MINING_mln_rub, period: 1, value: '2595632', year: '2017'}
+- {freq: m, label: PROFIT_MINING_mln_rub, period: 4, value: '634681', year: '2018'}
+- {freq: m, label: PROFIT_MANUF_mln_rub, period: 1, value: '2902753', year: '2017'}
+- {freq: m, label: PROFIT_MANUF_mln_rub, period: 4, value: '274096', year: '2018'}
+- {freq: m, label: PROFIT_POWER_GAS_WATER_mln_rub, period: 1, value: '560093', year: '2017'}
+- {freq: m, label: PROFIT_POWER_GAS_WATER_mln_rub, period: 4, value: '421', year: '2018'}
+- {freq: m, label: PROFIT_CONSTR_mln_rub, period: 1, value: '135639', year: '2017'}
+- {freq: m, label: PROFIT_CONSTR_mln_rub, period: 4, value: '109203', year: '2018'}
+- {freq: m, label: PROFIT_CONSTR_mln_rub, period: 1, value: '135639', year: '2017'}
+- {freq: m, label: PROFIT_CONSTR_mln_rub, period: 4, value: '109203', year: '2018'}
+- {freq: m, label: PROFIT_TRANSPORT_STOR_COMM_mln_rub, period: 1, value: '910754',
+  year: '2017'}
+- {freq: m, label: PROFIT_TRANSPORT_STOR_COMM_mln_rub, period: 4, value: '499', year: '2018'}

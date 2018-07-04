@@ -253,37 +253,14 @@ def to_values(filename, unit_mapper_dict, namers):
     return [x for x in emit_datapoints(tables)]
 
 
+def iterate(x):
+    if isinstance(x, list):
+        return x
+    elif isinstance(x, (str, dict)):
+        return [x]
+    else:
+        raise TypeError(x)
 
-class Namer(object):    
-    _ALWAYS_VALID_START_LINE = ''    
-    def __init__(self, name, headers, units, 
-                       starts=None, ends=None, reader=None):
-        self.name = name
-        self.headers = headers
-        self.units = units
-        if starts:
-            self.starts = starts
-        else:
-            self.starts = [self._ALWAYS_VALID_START_LINE]            
-        self.ends = ends
-        self.reader = reader
-        
-    @property    
-    def labels(self):
-        return set(make_label(self.name, unit) for unit in self.units)
-    
-    def inspect(self, tables):
-        pass
-        # WONTFIX:
-        # is found header found not more than only once?    
-    
-    def assert_all_labels_found(self, tables):
-        diff = self.labels - {t.label for t in tables if t.is_defined()}
-        if diff:
-            raise ValueError(('Not found:', diff))        
-        
-    def __repr__(self):    
-        return str(self.__dict__)
 
 if __name__ == "__main__":
     from parsing_definition import NAMERS, UNITS
@@ -432,4 +409,6 @@ if __name__ == "__main__":
 #  - header found more than once in tables
 #  - duplicate tables - values appear in two sections, eg CPI
 #  - maybe handle 'reader' directly
-#  - 1.7. Объем работ по виду деятельности ""Строительство   
+#  - 1.7. Объем работ по виду деятельности ""Строительство - requires supress_apos() 
+
+# DONE 
