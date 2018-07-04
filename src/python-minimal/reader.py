@@ -1,11 +1,5 @@
 # Parse data from CSV files
 
-
-# This example is work in progress to create minimal example
-# Full code code is at src/python/manage.py
-# Point of entry of parsing algorithm:  src.python.dispatch.evaluate()
-
-
 # PSEUDOCODE
 # ----------
 # 1. read CSV
@@ -15,6 +9,9 @@
 #   3.2. get data from table based on columns format like "YQQQQMMMMMMMMMMMM"
 # 4. combine data from tables into three dataframes based on frequency (dfa, dfq, dfm)
 # 5. write dfa, dfq, dfm as csv files to disk
+
+# Full code code is at src/python/manage.py
+# Point of entry of parsing algorithm:  src.python.dispatch.evaluate()
 
 
 import csv
@@ -83,12 +80,15 @@ def split_to_tables(rows):
 
 
 class Table:
-    def __init__(self, headers, datarows):
-        self.headers = [x[0] for x in headers]
+    def __init__(self, headers, datarows, name=None, unit=None):
+        self.headers = [x[0] for x in headers if x[0]]
         self.datarows = datarows
-        self.name = None
-        self.unit = None
+        self.name = name
+        self.unit = unit
         self.row_format = get_row_format(self.coln)
+        
+    def __eq__(self, x):
+        return str(self) == str(x)
 
     @property
     def label(self):
@@ -98,18 +98,21 @@ class Table:
     def coln(self):
         return max([len(row) for row in self.datarows])        
 
+    def is_defined(self):
+        return self.name and self.unit 
+    
     def headers_contain(self, string):
         for x in self.headers:
             if string in x:
                 return True
         return False
 
-    def headers_search(self, string: str):
-        # FIXME: need test, currently doe snot look at start of words
-        for x in self.headers:
-            if re.search(pattern=string, string=x):
-                return string
-        return None
+#    def headers_search(self, string: str):
+#        # FIXME: need test, currently doe snot look at start of words
+#        for x in self.headers:
+#            if re.search(pattern=string, string=x):
+#                return string
+#        return None
 
     def assign_row_format(self, key):
         self.row_format = get_row_format(key)
@@ -121,41 +124,29 @@ class Table:
                 yield d
                 
     def __repr__(self):
-        return f'Table(name={self.name}, unit={self.unit},\n    headers={self.headers},\n    datarows={self.datarows})'
+        return ',\n      '.join([f"Table(name='{self.name}'", 
+                                f"unit='{self.unit}'",
+                                f'headers={self.headers}',
+                                f'datarows={self.datarows}'])
 
+# row operations
+    
+ROW_FORMAT_DICT = {len(x): x for x in [
+ 'YAQQQQMMMMMMMMMMMM',
+ 'YAQQQQ',
+ 'YAMMMMMMMMMMMM',
+ 'YMMMMMMMMMMMM',
+ 'YQQQQ',
+ 'XXXX']}
+ROW_FORMAT_DICT['fiscal'] = 'YA' + 'M' * 11
 
-def emit_datapoints(tables):
-    for table in tables:
-        if table.unit and table.label:
-            for x in table.emit_datapoints():
-                yield x                
-
-
-row_formats = ['YA' + 'Q'*4 + 'M'*12,
-               'YA' + 'Q'*4,
-               'YA' + 'M'*12,
-               'Y' + 'M'*12,
-               'Y' + 'QQQQ',
-               'XXXX']
-row_format_dict = {len(x): x for x in row_formats}
-row_format_dict['fiscal'] = 'YA' + 'M' * 11
-
-def get_row_format(key, row_format_dict=row_format_dict):
+def get_row_format(key, row_format_dict=ROW_FORMAT_DICT):
     try:          
         return row_format_dict[key]
     except KeyError:
         raise ValueError(f'Unknown row format: {key}')
 
-
-def extract_unit(table, unit_mapper_dict):
-    for text, unit in unit_mapper_dict.items():
-        if table.headers_contain(text):
-           return unit
-    return None
-
-
 def emit_datapoints_from_row(row, label, row_format):
-    # simplified version of extract.row_splitter()
     occurences = ''
     for value, letter in zip(row, row_format):
         occurences += letter
@@ -169,75 +160,81 @@ def emit_datapoints_from_row(row, label, row_format):
                            period=occurences.count(letter),
                            value=value)
 
+# table operations
 
-def find_tables(tables, strings):
-    return [t for t in tables for string in strings 
-            if t.headers_contain(string)]
-
-
-def assert_single_table(table_subset):
-    if len(table_subset) != 1:
-        raise IndexError(f'Found multiple tables: {table_subset}')
-
-
-def find_one_table(tables, header_strings):
-    table_subset = list(find_tables(tables, header_strings))
-    assert_single_table(table_subset)
-    return table_subset[0]
-
-
-def assign_units(tables, unit_mapper_dict):
-    # inline assingment
-    tables = list(tables)
-    for i, table in enumerate(tables):
-        tables[i].unit = extract_unit(table, unit_mapper_dict)
-
-
-def make_name_parser(parsing_definitions):
-    def _(table):
-        for pdef in parsing_definitions:
-            for header in pdef['headers']: 
-                if table.header_contains(header):
-                     table.name = pdef['name']
-        return table
-    return _
-
-
-
-def assert_correct_unit_found(table, unit):
-    if table.unit != unit:
-        raise ValueError("Unit not found: {unit}")
-
-
-def get_datapoints(tables, parsing_definition):
-    name = parsing_definition['name']
-    table = find_one_table(tables, parsing_definition['headers'])
-    table.name = name
-    key = parsing_definition.get('reader')
-    if key:
-        table.assign_row_format(key)
-    assert_correct_unit_found(table, parsing_definition['unit'])
-    return table.emit_datapoints()
-
+def get_tables(filename, unit_mapper_dict, parsing_definitions):
+    def apply(x, funcs):
+        for f in funcs:
+            x = f(x)
+        return x    
+    unit_mapper = make_unit_mapper(unit_mapper_dict)
+    name_mapper = make_name_mapper(parsing_definitions)
+    changer = make_reader_changer(parsing_definitions)    
+    tables = apply(filename, [read_csv,
+                              split_to_tables,
+                              lambda x: map(unit_mapper, x), 
+                              lambda x: map(name_mapper, x),
+                              list])
+    # assign trailing variable names
+    for pdef in parsing_definitions:
+        _units = pdef['units'].copy()
+        for prev_table, table in zip(tables[:-1], tables[1:]):
+            if (table.name is None 
+                and prev_table.name is not None
+                and table.unit in _units):
+                table.name = prev_table.name
+                _units.remove(table.unit)                
+    # end 
+    return [changer(t) for t in tables if t.is_defined()]
+    
 
 def to_values(filename, unit_mapper_dict, parsing_definitions):
-    def unit_mapper(table):
-        table.unit = extract_unit(table, unit_mapper_dict)
-        return table    
-    def name_mapper(table):
-        for pdef in parsing_definitions:
-            for header in pdef['headers']: 
-                if table.headers_contain(header):
-                     table.name = pdef['name']
+    tables = get_tables(filename, unit_mapper_dict, parsing_definitions)
+    return [x for x in emit_datapoints(tables)]    
+
+
+def emit_datapoints(tables):
+    for table in tables:
+        if table.unit and table.label:
+            for x in table.emit_datapoints():
+                yield x     
+
+
+def complies(tables, parsing_definitions):
+    pass                
+
+# mappers
+
+def make_unit_mapper(unit_mapper_dict):
+    def mapper(table):
+        for text, unit in unit_mapper_dict.items():
+            if table.headers_contain(text):
+               table.unit = unit
+               break
         return table
-    csv_rows = read_csv("tab.csv")
-    tables = split_to_tables(csv_rows)
-    tables = map(unit_mapper, tables)
-    tables = map(name_mapper, tables)
-    tables = list(tables)
-    for pdef in parsing_definitions:
-        for x in get_datapoints(tables, pdef):
-            yield x
+    return mapper
+
+
+def make_name_mapper(parsing_definitions):
+    def mapper(table):
+        for pdef in parsing_definitions:
+            for line in pdef['headers']: 
+                if table.headers_contain(line):
+                     table.name = pdef['name']
+                     break
+        return table         
+    return mapper                 
+
+
+def make_reader_changer(parsing_definitions):
+    pdefs = [pdef for pdef in parsing_definitions if pdef.get('reader')]
+    def changer(table):
+        for pdef in pdefs:
+            if table.name == pdef['name']:
+                key = pdef.get('reader')
+                table.assign_row_format(key)
+        return table
+    return changer
 
 
 if __name__ == "__main__":
@@ -251,27 +248,26 @@ if __name__ == "__main__":
         ('в % к предыдущему периоду', 'rog'),
         ('отчетный месяц в % к предыдущему месяцу', 'rog'),
     ])
-
-    def unit_mapper(table):
-        table.unit = extract_unit(table, unit_mapper_dict)
-        return table
-
+    parsing_definition1 = dict(name='GDP',
+                               headers=['Объем ВВП'],
+                               units=['bln_rub'])
+    unit_mapper = make_unit_mapper(unit_mapper_dict)
+    name_mapper = make_name_mapper([parsing_definition1])
     # read csv
     csv_rows = list(read_csv("tab.csv"))
     # split csv rows to tables
     tables = list(split_to_tables(csv_rows))
     # assign units to all tables
-    assign_units(tables, unit_mapper_dict)
-    assert tables[4].unit == 'ytd'
-
-    # simplest case - both header and unit name are found in same table
-    parsing_definition1 = dict(headers=['Объем ВВП'],
-                               name='GDP',
-                               unit='bln_rub')
-    datapoints1 = get_datapoints(tables, parsing_definition1)
+    tables = list(map(unit_mapper, tables))
+    assert tables[4].unit == 'ytd'    
+    # apply defintions
+    tables = list(map(name_mapper, tables))
+    # extract
+    tables = [t for t in tables if t.is_defined()]
+    assert tables == get_tables('tab.csv', unit_mapper_dict, [parsing_definition1])
 
     # check result  of operations
-    datapoints1 = list(datapoints1)
+    datapoints1 = [x for x in emit_datapoints(tables)]
     assert datapoints1[-1] == {'freq': 'q',
                                'label': 'GDP_bln_rub',
                                'period': 4,
@@ -287,18 +283,21 @@ if __name__ == "__main__":
     # full parsing cycle:
     filename = "tab.csv"
     gen = to_values(filename, unit_mapper_dict, [parsing_definition1])
-    assert datapoints1 == list(gen)
+    assert datapoints1 == gen
 
     # NOT TODO below
 
     # Special cases:
     # a) trailing tables eg find industrial production ytd from tables[4]
-    itable1 = tables[2]  # this table has header for itable2
-    itable2 = tables[4]  # this table has only unit
+    pdef3 = dict(name='INDPRO',
+                 headers=['Индекс промышленного производства'],
+                 units=['yoy', 'rog', 'ytd'])
+    tables = get_tables('tab.csv', unit_mapper_dict, [pdef3])
+    assert [t.label for t in tables if t.is_defined()] == ['INDPRO_yoy', 'INDPRO_rog', 'INDPRO_ytd']  
 
-    # b) header found more than once in tables
+    # b) sections - header found more than once in tables
 
-    # c)- duplicate tables
+    # c) duplicate tables - values appear in two sections
 
     # d) special reader fucntion for government budget indicators
     from pathlib import Path
@@ -307,14 +306,11 @@ if __name__ == "__main__":
 1999	653,8	22,7	49,2	91,5	138,7	185,0	240,0	288,5	345,5	400,6	454,0	528,0"""
     f = Path('temp.txt')
     f.write_text(doc, encoding='utf-8')
-    csv_rows = read_csv(str(f))
-    tables_d = list(split_to_tables(csv_rows))
-    assign_units(tables_d, unit_mapper_dict)
     parsing_definition2 = dict(headers=['Консолидированные бюджеты субъектов'],
                                name='VARX',
-                               unit='bln_rub',
+                               units=['bln_rub'],
                                reader='fiscal')
-    data = list(get_datapoints(tables_d, parsing_definition2))
+    data = to_values('temp.txt', unit_mapper_dict, [parsing_definition2])
     assert data[0] == {
         'freq': 'a',
         'label': 'VARX_bln_rub',
@@ -324,3 +320,9 @@ if __name__ == "__main__":
     assert data[-1] == {'freq': 'm', 'label': 'VARX_bln_rub',
                         'period': 11, 'value': '528,0', 'year': '1999'}
     f.unlink()
+    
+    # TODO:
+    # - add real definitions
+    # - add segmentations
+    # - add defintions is fulfilled
+    # - check a defintion against file (no duplicate values)
