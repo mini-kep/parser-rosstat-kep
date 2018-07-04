@@ -215,4 +215,4 @@ commands:
     unit: bln_rub
 """
 import yaml
-_ = yaml.load_all(YAML_DOC)
+_ = list(yaml.load_all(YAML_DOC))
