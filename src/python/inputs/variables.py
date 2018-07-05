@@ -37,16 +37,16 @@ commands:
     header:
       - Уровень безработицы
       - Общая численность безработных
-    unit: 
+    unit:
       - pct
-      - yoy       
+      - yoy
       - mln
   - var: PPI
     header:
       - Индексы цен производителей промышленных товаров
     unit: rog
   - var: DWELLINGS_CONSTRUCTION
-    header: 
+    header:
         - Ввод в действие жилых домов организациями всех форм собственности
         - Ввод в действие жилых домов организациями всех форм
     unit: mln_m2
@@ -60,23 +60,23 @@ commands:
     unit: mln_rub
   - var: PROFIT_MANUF
     header: Обрабатывающие производства
-    unit: mln_rub  
+    unit: mln_rub
   - var: PROFIT_POWER_GAS_WATER
-    header: 
-        - Обеспечение электрической энергией, газом и паром 
+    header:
+        - Обеспечение электрической энергией, газом и паром
         - Производство и распределение электроэнергии, газа и воды
-    unit: mln_rub  
+    unit: mln_rub
   - var: PROFIT_CONSTR
     header: Строительство
-    unit: mln_rub     
+    unit: mln_rub
   - var: PROFIT_CONSTR
     header: Строительство
-    unit: mln_rub     
+    unit: mln_rub
   - var: PROFIT_TRANSPORT_STOR_COMM
-    header: 
+    header:
         - Транспортировка и хранение
         - Транспорт и связь
-    unit: mln_rub   
+    unit: mln_rub
 ---
 boundaries:
   - start: 1.9. Внешнеторговый оборот – всего
@@ -215,5 +215,4 @@ commands:
     unit: bln_rub
 """
 import yaml
-_ = yaml.load_all(YAML_DOC)
-
+_ = list(yaml.load_all(YAML_DOC))

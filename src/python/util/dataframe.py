@@ -24,7 +24,7 @@ def check_duplicates(df):
 def convert_labels(x):
     varname = x['label'][0]
     unit = x['label'][1]
-    z = dict(value=x['value'], 
+    z = dict(value=x['value'],
              freq=x['freq'],
              time_index=x['time_index'])
     z['label'] = make_label(varname, unit)
@@ -41,29 +41,36 @@ def to_dataframes(datapoints):
     dfs = split_to_freq(datapoints)
     for f in dfs.keys():
         dfs[f] = create_dataframe2(dfs[f], f)
-    return dfs 
+    return dfs
+
 
 def split_to_freq(gen):
-    lists = {f:[] for f in 'aqm'}
+    lists = {f: [] for f in 'aqm'}
     for x in gen:
         f = x['freq']
         lists[f].append(convert_labels(x))
     return lists
 
+
 def make_base_dataframe(datapoints):
     datapoints = [convert_labels(x) for x in datapoints]
-    df = pd.DataFrame(datapoints)   
-    df['label'] = df.apply(lambda df: df['label'][0]+'_'+df['label'][1], axis =1)
+    df = pd.DataFrame(datapoints)
+    df['label'] = df.apply(
+        lambda df: df['label'][0] +
+        '_' +
+        df['label'][1],
+        axis=1)
     if df.empty:
         return pd.DataFrame()
     check_duplicates(df)
     df = df.drop_duplicates(['freq', 'label', 'time_index'], keep='first')
     return df
 
+
 def create_dataframe3(datapoints, freq):
     df = pd.DataFrame(datapoints)
     if df.empty:
-       return pd.DataFrame()
+        return pd.DataFrame()
     check_duplicates(df)
     df = df.drop_duplicates(['freq', 'label', 'time_index'], keep='first')
     # reshape
@@ -86,12 +93,10 @@ def create_dataframe3(datapoints, freq):
     if freq == "m":
         df = deaccumulate(df, first_month=1)
     return df
-        
 
 
-    
 def create_dataframe2(base_df, freq):
-    df = base_df[base_df.freq==freq]
+    df = base_df[base_df.freq == freq]
     # reshape
     df = df.pivot(columns='label', values='value', index='time_index')
     # delete some internals for better view
@@ -108,8 +113,7 @@ def create_dataframe2(base_df, freq):
         df = deaccumulate(df, first_month=1)
     if freq == "a":
         df = rename_accum(df)
-    return df       
-        
+    return df
 
 
 def create_dataframe(datapoints, freq):

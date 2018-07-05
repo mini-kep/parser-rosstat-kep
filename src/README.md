@@ -1,7 +1,12 @@
-#### 2018-07-02:
-- `python` folder has mature code, runnable from `manage.py`
-- point of focus in python code is `dispatch.evaluate()` which parsers csv text based on parameters
-- `julia` and `go` folders have descriptions of minimal example
-- there is no `reader.go` implementation yet,  `reader.jl` just has csv file import 
-- current task is to read csv file and extract table header and datarows as explained in `reader.*` files
+## 2018-07-03
+
+##### `src/python`:
+ - folder has mature code, runnable from `manage.py`
+ - point of entry of parsing algorithm:  src.python.dispatch.evaluate() 
+
+##### `python-minimal`: 
+ - `reader.py` has minimal example pseudocode and start of its implementation 
+
+##### `julia-minimal`: 
+  - `reader.jl` just has csv file import
 

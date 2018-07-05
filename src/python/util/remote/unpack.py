@@ -10,15 +10,15 @@ if IS_WINDOWS:
 else:
     UNRAR_EXE = 'unrar'
 
-def unrar(filepath, folder, unrar_executable=UNRAR_EXE):
-        # UnRAR wants its folder argument with '/'
-        folder = "{}{}".format(folder, os.sep)
-        tokens = [unrar_executable, 'e', str(filepath), folder, '-y']
-        try:
-            return subprocess.check_call(tokens)
-        except subprocess.CalledProcessError as e:
-            raise e
 
+def unrar(filepath, folder, unrar_executable=UNRAR_EXE):
+    # UnRAR wants its folder argument with '/'
+    folder = "{}{}".format(folder, os.sep)
+    tokens = [unrar_executable, 'e', str(filepath), folder, '-y']
+    try:
+        return subprocess.check_call(tokens)
+    except subprocess.CalledProcessError as e:
+        raise e
 
 
 class DocFiles:
@@ -39,13 +39,13 @@ class DocFiles:
 class Unpacker:
     def __init__(self, archive_filepath,
                  destination_folder):
-       self.path = archive_filepath 
-       if not Path(self.path).exists():
-            raise FileNotFoundError(self.path)  
-       self.folder = destination_folder
-       self.status = (f'Already unpacked:\n{self.docs}'
-                      if self.docs.exist()
-                      else None)
+        self.path = archive_filepath
+        if not Path(self.path).exists():
+            raise FileNotFoundError(self.path)
+        self.folder = destination_folder
+        self.status = (f'Already unpacked:\n{self.docs}'
+                       if self.docs.exist()
+                       else None)
 
     @property
     def docs(self):

@@ -4,6 +4,7 @@ matplotlib
 pyyaml 
 requests
 arrow
+schema
 
 # needed on Windows machine, commented due to errors on Travis
 # pypiwin32

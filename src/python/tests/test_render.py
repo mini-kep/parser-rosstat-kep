@@ -91,17 +91,19 @@ pdef = Instruction(
             var='INVESTMENT',
             header=['Инвестиции в основной капитал'],
             unit=['bln_rub', 'yoy', 'rog'])
-        ],
-    )
+    ],
+)
 
 # actions
-tables = render(read_csv(csv_text), 
-                units, 
-                pdef.headers_dict, 
+tables = render(read_csv(csv_text),
+                units,
+                pdef.headers_dict,
                 pdef.required,
-                pdef.reader) 
+                pdef.reader)
 
 # checks
+
+
 def test_check_parsing_result():
     assert len(tables) == 3
     assert [t.unit for t in tables] == ['bln_rub', 'yoy', 'rog']
