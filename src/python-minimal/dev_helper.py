@@ -1,7 +1,9 @@
+#EP: может переименовать этот файл?
+
 import pathlib
 from parsing_definition import NAMERS, UNITS
 from reader import to_values
-from saver import to_dataframes, create_base_dataframe
+from saver import to_dataframes
 import pandas as pd
 from timeit import timeit
 
@@ -76,4 +78,5 @@ if __name__ == '__main__':
     print('Bare dataframe', tester('dev_helper.run_bare_df()'))
     print('Decorated dataframe', tester('dev_helper.run_foo()'))
     # TODO: channel warnings away from stdout
+    # EP: почему создание трех фреймов выполняется быстрее чем одного?
     print('All dataframes', tester('dev_helper.run_df()'))

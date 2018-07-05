@@ -11,10 +11,11 @@ def get_duplicates(df):
 def check_duplicates(df):
     dups = df[df.duplicated(keep=False)]
     if not dups.empty:
+        # как писать не зкшет а warnings?
         # FIXME: issue warnings
         print("Warning: duplicate rows found:\n{}".format(dups))
 
-
+# EP: можно еще как-то съедать список, чтобы при последующих просмотрах он был менше? 
 def subset(values, freq):
     # WONTFIX: can also .pop()
     return [x for x in values if x['freq'] == freq]
@@ -34,7 +35,7 @@ def create_base_dataframe(datapoints, freq):
     df.columns.name = None
     df.index.name = None
     # add year
-    #df.insert(0, "year", df.index.year)
+    df.insert(0, "year", df.index.year)
     return df
 
 
@@ -54,14 +55,20 @@ def create_dfm(datapoints):
     df.insert(1, "month", df.index.month)
     return deaccumulate(df, first_month=1)
 
-
+# EP: видимо нужно оставить одну какую-то функцию
 def to_dataframes(datapoints):
-    datapoints = list(datapoints)
-    return dict(a=create_dfq(datapoints),
+    #datapoints = list(datapoints)
+    return dict(a=create_dfa(datapoints),
                 q=create_dfq(datapoints),
                 m=create_dfm(datapoints)
                 )
 
+def unpack_dataframes(datapoints):
+    #datapoints = list(datapoints)
+    return [f(datapoints) for f in (create_dfa, create_dfq, create_dfm)] 
+
+
+# TODO: bring back original tests
 # TODO: need to be changed according to new format - must use 'a' as 'm12'
 # government revenue and expense time series transformation
 
@@ -94,15 +101,14 @@ if __name__ == '__main__':
     import pathlib
     from reader import to_values
     from parsing_definition import NAMERS, UNITS
+    from dev_helper import PATH
     filename = str(pathlib.Path(__file__).with_name('tab.csv'))
-    values = to_values(filename, UNITS, NAMERS)
-    dfa = create_dfa(values)
-    dfq = create_dfq(values)
-    dfm = create_dfm(values)
+    values = to_values(PATH, UNITS, NAMERS)
+    dfa, dfq, dfm = unpack_dataframes(values)
     dfs = to_dataframes(values)
 
 
-# FIXME:
+# FIXME: must check why happens
 """Warning: duplicate rows found:
         date freq        label  value
 8803  2016-5    m  PPI_mln_rub  101.4
