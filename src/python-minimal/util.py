@@ -3,8 +3,11 @@ from parsing_definition import NAMERS, UNITS
 from reader import to_values
 from saver import to_dataframes, create_base_dataframe 
 import pandas as pd
+from timeit import timeit
 
-PATH = str(pathlib.Path(__file__).with_name('tab.csv'))
+datafolder = pathlib.Path(__file__).parent / 'data'
+PATH = str(datafolder / 'tab.csv')
+PATH_LEGACY = str(datafolder / 'tab_old.csv')
 
 def messup(values):                  
     messed_years = set()
@@ -22,17 +25,16 @@ def messup(values):
             messed_values.add(value)
     return  messed_years, messed_values       
 
-x = list(to_values(PATH, UNITS, NAMERS))
 
 def run_to_values():
-     return list(to_values(PATH, UNITS, NAMERS))
+     return to_values(PATH, UNITS, NAMERS)
 
 def run_df():
-    return to_dataframes(x) 
-
-z = list({'freq': 'm'} for _ in range(10000))
+    x = run_to_values()
+    to_dataframes(x) 
 
 def foo(x, freq):
+    x = run_to_values()
     df = pd.DataFrame(x)
     df = df[df.freq == freq]
     #check_duplicates(df)
@@ -47,20 +49,28 @@ def foo(x, freq):
     df.insert(0, "year", df.index.year)
     return df
 
-def run_df1():
+def run_foo():
+    x = run_to_values()
     foo(x, 'm')
 
-def run_df3():
+def run_bare_df():
+    x = run_to_values()
     df = pd.DataFrame(x)
     df = df[df.freq == 'm']
+   
 
+def tester(code: str):
+    n = 5
+    msec = 1000 / n * timeit(code, 'import util', number=n)
+    return round(msec, 1)
+    
 
 if __name__ == '__main__':
-    from timeit import timeit
-    n = 5
-    # TODO: time to beat is benchmark time *t0*
-    t1 = 1000 / n * timeit('run_df1()', 'from util import run_df1', number=n)
-    t3 = 1000 / n * timeit('run_df3()', 'from util import run_df3', number=n)
-    print(t1, t3)
+    print('Get datapoints', tester('util.to_values(util.PATH, util.UNITS, util.NAMERS)'))
+    print('Bare dataframe', tester('util.run_bare_df()'))
+    print('Decorated dataframe',tester('util.run_foo()'))
+    # TODO: channel warnings away from stdout
+    print('All dataframes',tester('util.run_df()'))
+
     
 
