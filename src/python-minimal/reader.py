@@ -37,6 +37,7 @@ import csv
 import re
 from collections import OrderedDict
 from enum import Enum, unique
+import calendar
 
 # convert CSV to Table() instances
 
@@ -169,6 +170,34 @@ def get_row_format(key, row_format_dict=ROW_FORMAT_DICT):
     except KeyError:
         raise ValueError(f'Unknown row format: {key}')
 
+# WONTFIX: use re.match()
+REGEX_Y = re.compile(r'\s*(\d{4})')
+def clean_year(year: str) -> int:
+    return int(re.search(REGEX_Y, year).group(0))
+
+assert clean_year('20052),3)') == 2005
+assert clean_year('20114)') == 2011
+    
+REGEX_V = re.compile(r'\s*(\d*?.?\d*?)(\d\))*\s*$')
+def clean_value(x: str) -> float:
+    x = x.replace(',', '.').replace('…','')
+    return float(re.search(REGEX_V, x).group(1)) if x else 0     
+
+assert clean_value('406911)') == 40691
+assert clean_value('211,32)') == 211.3
+assert clean_value('') == 0
+assert clean_value('…') == 0
+
+from datetime import date                  
+                  
+MONTHS=dict(a=12, q=3, m=1)                  
+def timestamp(year: str, period: int, freq: str):
+    year = clean_year(year)
+    month = MONTHS[freq]*period
+    day = calendar.monthrange(year, month)[1]
+    return date(year, month, day)                 
+                  
+
 def emit_datapoints_from_row(row, label, row_format):
     occurences = ''
     for value, letter in zip(row, row_format):
@@ -177,11 +206,12 @@ def emit_datapoints_from_row(row, label, row_format):
             year = value
         else:    
             if value:
+                period = occurences.count(letter)
+                freq = letter.lower()                
                 yield dict(label=label,
-                           freq=letter.lower(),
-                           year=year,
-                           period=occurences.count(letter),
-                           value=value)
+                           freq=freq,
+                           date=timestamp(year, period, freq),
+                           value=clean_value(value))
 
 def emit_datapoints(tables):
     for table in tables:
@@ -288,15 +318,13 @@ if __name__ == "__main__":
     datapoints1 = [x for x in emit_datapoints(tables)]
     assert datapoints1[94] == {'freq': 'q',
                                'label': 'GDP_bln_rub',
-                               'period': 4,
-                               'value': '25503',
-                               'year': '20172)'}
+                               'date': date(2017,12,31),
+                               'value': 25503}
     assert datapoints1[0] == {
         'freq': 'a',
         'label': 'GDP_bln_rub',
-        'period': 1,
-        'value': '4823',
-        'year': '1999'}
+        'date': date(1999,12,31),
+        'value': 4823}
 
 #    # example 2 - full parsing cycle
     assert datapoints1 == to_values(filename, unit_mapper_dict1, [namer1])
@@ -315,15 +343,15 @@ if __name__ == "__main__":
            ['INDPRO_yoy', 'INDPRO_rog', 'INDPRO_ytd']  
     datapoints3 = [x for x in emit_datapoints(tables3)]     
     assert datapoints3[148] == {'freq': 'm',
-                                 'label': 'INDPRO_ytd',
-                                 'period': 4,
-                                 'value': '101,8', # checked at csv.txt
-                                 'year': '2018'}
+                                'label': 'INDPRO_ytd',
+                                'date': date(2018,4,30),
+                                'value': 101.8 # checked at csv.txt
+                                }
     assert datapoints3[0] == {'freq': 'a',
-                                 'label': 'INDPRO_yoy',
-                                 'period': 1,
-                                 'value': '99,2', # checked at csv.txt
-                                 'year': '2015'}
+                              'label': 'INDPRO_yoy',
+                              'date': date(2015,12, 31),
+                              'value': 99.2 # checked at csv.txt
+                                 }
       
 
 #    # example 4
@@ -345,15 +373,13 @@ if __name__ == "__main__":
     datapoints4 = [x for x in emit_datapoints(tables4)]  
     assert datapoints4[11] == {'freq': 'm',
                                'label': 'VARX_bln_rub',
-                               'period': 11,
-                               'value': '528,0',
-                               'year': '1999'}
+                               'date': date(1999,11,30),
+                               'value': 528.0}
     assert datapoints4[0] == {
                                 'freq': 'a',
                                 'label': 'VARX_bln_rub',
-                                'period': 1,
-                                'value': '653,8',
-                                'year': '1999'}
+                                'date': date(1999,12,31),
+                                'value': 653.8}
 
 #    # example 5
 #    # c) test for EXPORT/IMPORT improt with borders
@@ -370,7 +396,7 @@ if __name__ == "__main__":
                             unit_mapper_dict=UNITS, 
                             namers=[namer5])      
     datapoints5 = [x for x in emit_datapoints(tables5)]    
-    assert datapoints5[0]['value'] == '75,6'
+    assert datapoints5[0]['value'] == 75.6
     """1.9. Внешнеторговый оборот – всего1), млрд.долларов США / Foreign trade turnover – total1), bln US dollars																	
 							
 	Год Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.			
@@ -419,14 +445,11 @@ if __name__ == "__main__":
 # TODO - OTHER:   
 #  - convert to tests
 #  - timeit
-
-# TODO - UNFINISHED WORKFLOW (saver.py)
-#  - type conversions and comment cleaning    
-#  - (optional) checkpoints
-#  - saving to dataframes
+#  - datapoint checks
 #  - checking dataframes
 
 # WONTFIX:
+#  - saving to dataframes
 #  - testing on tab.csv and tab_old.csv
 #  - clean notebook folders
 #  - check a defintion against file (no duplicate values) - Namer.inspect()    
@@ -436,4 +459,5 @@ if __name__ == "__main__":
 #  - 1.7. Объем работ по виду деятельности ""Строительство - requires supress_apos() 
 
 # DONE 
+#  - type conversions and comment cleaning    
 #  - assert schema on namer imports
