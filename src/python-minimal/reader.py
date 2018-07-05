@@ -11,8 +11,7 @@
 # Output: list of dictionaries lile
 #      {'freq': 'm', 
 #       'label': 'INDPRO_rog', 
-#       'year': '1999', 
-#       'period': 11, 
+#       'date': '1999-12-31', 
 #       'value': '104,3'}
     
 
@@ -34,10 +33,12 @@
 
 
 import csv
-import re
+from datetime import date
 from collections import OrderedDict
 from enum import Enum, unique
 import calendar
+
+import filters 
 
 # convert CSV to Table() instances
 
@@ -55,28 +56,6 @@ class State(Enum):
     DATA = 1
     HEADERS = 2
 
-
-YEAR_CATCHER = re.compile("\D*(\d{4}).*")
-
-
-def get_year(string: str, rx=YEAR_CATCHER):
-    """Extracts year from *string* using *rx* regex.
-
-       Returns:
-           Year as integer
-           False if year is not valid or not in plausible range."""
-    match = re.match(rx, string)
-    if match:
-        year = int(match.group(1))
-        if year >= 1991 and year <= 2050:
-            return year
-    return False
-
-
-def is_year(string: str) -> bool:
-    return get_year(string) is not False
-
-
 def split_to_tables(csv_rows):
     """Yield Table() instances from *csv_rows*."""
     datarows = []
@@ -84,7 +63,7 @@ def split_to_tables(csv_rows):
     state = State.INIT
     for row in csv_rows:
         # is data row?
-        if is_year(row[0]):
+        if filters.is_year(row[0]):
             datarows.append(row)
             state = State.DATA
         else:
@@ -170,29 +149,10 @@ def get_row_format(key, row_format_dict=ROW_FORMAT_DICT):
     except KeyError:
         raise ValueError(f'Unknown row format: {key}')
 
-# WONTFIX: use re.match()
-REGEX_Y = re.compile(r'\s*(\d{4})')
-def clean_year(year: str) -> int:
-    return int(re.search(REGEX_Y, year).group(0))
-
-assert clean_year('20052),3)') == 2005
-assert clean_year('20114)') == 2011
-    
-REGEX_V = re.compile(r'\s*(\d*?.?\d*?)(\d\))*\s*$')
-def clean_value(x: str) -> float:
-    x = x.replace(',', '.').replace('…','')
-    return float(re.search(REGEX_V, x).group(1)) if x else 0     
-
-assert clean_value('406911)') == 40691
-assert clean_value('211,32)') == 211.3
-assert clean_value('') == 0
-assert clean_value('…') == 0
-
-from datetime import date                  
                   
 MONTHS=dict(a=12, q=3, m=1)                  
 def timestamp(year: str, period: int, freq: str):
-    year = clean_year(year)
+    year = filters.clean_year(year)
     month = MONTHS[freq]*period
     day = calendar.monthrange(year, month)[1]
     return date(year, month, day)                 
@@ -211,7 +171,7 @@ def emit_datapoints_from_row(row, label, row_format):
                 yield dict(label=label,
                            freq=freq,
                            date=timestamp(year, period, freq),
-                           value=clean_value(value))
+                           value=filters.clean_value(value))
 
 def emit_datapoints(tables):
     for table in tables:
@@ -283,17 +243,9 @@ def to_values(filename, unit_mapper_dict, namers):
     return [x for x in emit_datapoints(tables)]
 
 
-def iterate(x):
-    if isinstance(x, list):
-        return x
-    elif isinstance(x, (str, dict)):
-        return [x]
-    else:
-        raise TypeError(x)
-
-
 if __name__ == "__main__":
     from parsing_definition import NAMERS, UNITS, Namer
+    from dev_helper import PATH
     
 #   Usual case - simple parsing:    
     # example 1
@@ -307,7 +259,7 @@ if __name__ == "__main__":
         ('отчетный месяц в % к предыдущему месяцу', 'rog'),
     ])
     namer1 = Namer(name='GDP', headers=['Объем ВВП'], units=['bln_rub'])
-    filename = "tab.csv"
+    filename = PATH
     tables = parsed_tables(filename,  
                            unit_mapper_dict=unit_mapper_dict1, 
                            namers=[namer1])
@@ -422,7 +374,7 @@ if __name__ == "__main__":
     
     expected_values = []
     for namer in NAMERS:
-        param = 'tab.csv', UNITS, [namer]
+        param = PATH, UNITS, [namer]
         tables = parsed_tables(*param)
         namer.assert_all_labels_found(tables)
         data = to_values(*param)
