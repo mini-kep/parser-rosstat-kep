@@ -11,15 +11,16 @@ def get_duplicates(df):
 def check_duplicates(df):
     dups = df[df.duplicated(keep=False)]
     if not dups.empty:
-        #FIXME: issue warnings
+        # FIXME: issue warnings
         print("Warning: duplicate rows found:\n{}".format(dups))
+
 
 def subset(values, freq):
     # WONTFIX: can also .pop()
     return [x for x in values if x['freq'] == freq]
 
 
-def create_base_dataframe(datapoints, freq):    
+def create_base_dataframe(datapoints, freq):
     df = pd.DataFrame(datapoints)
     if df.empty:
         raise ValueError(('Empty', datapoints))
@@ -34,21 +35,25 @@ def create_base_dataframe(datapoints, freq):
     df.index.name = None
     # add year
     #df.insert(0, "year", df.index.year)
-    return df    
+    return df
+
 
 def create_dfa(datapoints):
     df = create_base_dataframe(datapoints, 'a')
     return rename_accum(df)
+
 
 def create_dfq(datapoints):
     df = create_base_dataframe(datapoints, 'q')
     df.insert(1, "qtr", df.index.quarter)
     return deaccumulate(df, first_month=3)
 
+
 def create_dfm(datapoints):
     df = create_base_dataframe(datapoints, 'm')
     df.insert(1, "month", df.index.month)
     return deaccumulate(df, first_month=1)
+
 
 def to_dataframes(datapoints):
     datapoints = list(datapoints)
@@ -59,6 +64,7 @@ def to_dataframes(datapoints):
 
 # TODO: need to be changed according to new format - must use 'a' as 'm12'
 # government revenue and expense time series transformation
+
 
 def rename_accum(df):
     return df.rename(mapper=lambda s: s.replace('_ACCUM', ''), axis=1)
@@ -84,27 +90,22 @@ def deaccumulate(df, first_month):
     return rename_accum(df)
 
 
+if __name__ == '__main__':
+    import pathlib
+    from reader import to_values
+    from parsing_definition import NAMERS, UNITS
+    filename = str(pathlib.Path(__file__).with_name('tab.csv'))
+    values = to_values(filename, UNITS, NAMERS)
+    dfa = create_dfa(values)
+    dfq = create_dfq(values)
+    dfm = create_dfm(values)
+    dfs = to_dataframes(values)
 
-if __name__=='__main__':  
-     import pathlib
-     from reader import to_values
-     from parsing_definition import NAMERS, UNITS
-     filename = str(pathlib.Path(__file__).with_name('tab.csv'))
-     values = to_values(filename, UNITS, NAMERS)
-     dfa = create_dfa(values)                
-     dfq = create_dfq(values)               
-     dfm = create_dfm(values)                
-     dfs = to_dataframes(values)
 
-
-# FIXME:     
+# FIXME:
 """Warning: duplicate rows found:
         date freq        label  value
 8803  2016-5    m  PPI_mln_rub  101.4
 8839  2016-2    m  PPI_mln_rub  101.1
 8842  2016-5    m  PPI_mln_rub  101.4
-8878  2016-2    m  PPI_mln_rub  101.1"""     
-
-
-
-    
+8878  2016-2    m  PPI_mln_rub  101.1"""

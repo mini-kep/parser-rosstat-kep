@@ -1,4 +1,4 @@
-from collections import OrderedDict 
+from collections import OrderedDict
 
 # mapper dictionary to convert text in table headers to unit of measurement
 UNITS = OrderedDict([  # 1. MONEY
@@ -21,7 +21,8 @@ UNITS = OrderedDict([  # 1. MONEY
     # this...
     ('период с начала отчетного года в % к соответствующему периоду предыдущего года', 'ytd'),
     #       ... must precede this
-    # because 'в % к предыдущему периоду' is found in 'период с начала отчетного года в % к соответствующему периоду предыдущего года'
+    # because 'в % к предыдущему периоду' is found in 'период с начала
+    # отчетного года в % к соответствующему периоду предыдущего года'
     ('в % к соответствующему периоду предыдущего года', 'yoy'),
     ('в % к соответствующему месяцу предыдущего года', 'yoy'),
     ('отчетный месяц в % к предыдущему месяцу', 'rog'),
@@ -45,15 +46,15 @@ UNITS = OrderedDict([  # 1. MONEY
     ('млн.человек', 'mln'),
     # 5. named headers
     ('собственные средства предприятий', 'bln_rub'),
-    ('привлеченные средства', 'bln_rub'),    
+    ('привлеченные средства', 'bln_rub'),
     ('из них бюджетные средства', 'bln_rub'),
     ('из федерального бюджета', 'bln_rub'),
     ('из бюджетов субъектов Российской Федерации', 'bln_rub'),
     ('Добыча полезных ископаемых', 'mln_rub'),
-    ('Обрабатывающие производства',  'mln_rub'),
-    ('Обеспечение электрической энергией, газом и паром',  'mln_rub'),
-    ('Производство и распределение электроэнергии, газа и воды',  'mln_rub'),
-    ('Строительство',  'mln_rub'),
+    ('Обрабатывающие производства', 'mln_rub'),
+    ('Обеспечение электрической энергией, газом и паром', 'mln_rub'),
+    ('Производство и распределение электроэнергии, газа и воды', 'mln_rub'),
+    ('Строительство', 'mln_rub'),
     ('Транспортировка и хранение', 'mln_rub'),
     ('Транспорт и связь', 'mln_rub'),
 ])
@@ -84,7 +85,7 @@ doc = """
     - Валовой внутренний продукт
   units:
     - bln_rub
-    
+
 - name: GDP_REAL
   headers:
     - Индекс физического объема произведенного ВВП, в %
@@ -92,7 +93,7 @@ doc = """
     - yoy
 
 - name: INDPRO
-  headers: 
+  headers:
     - Индекс промышленного производства
   units:
     - yoy
@@ -103,14 +104,14 @@ doc = """
   headers:
     - Индекс производства продукции сельского хозяйства в хозяйствах всех категорий
     - Продукция сельского хозяйства в хозяйствах всех категорий
-  units: 
+  units:
     - yoy
 
 - name: WAGE
   headers:
     - Среднемесячная номинальная начисленная заработная плата работников организаций
     - Среднемесячная номинальная начисленная заработная плата одного работника
-  units: 
+  units:
     - rub
 
 - name: WAGE_REAL
@@ -122,21 +123,21 @@ doc = """
     - rog
 
 - name: TRANSPORT_FREIGHT_TOTAL
-  headers: 
+  headers:
       - Грузооборот транспорта, включая коммерческий и некоммерческий грузооборот
-  units: 
-      - bln_tkm    
-    
+  units:
+      - bln_tkm
+
 - name: TRANSPORT_FREIGHT_COMMERCIAL
-  headers: 
+  headers:
       - Коммерческий грузооборот транспорта,
-  units: 
+  units:
       - bln_tkm
 
 - name: TRANSPORT_LOADING_RAIL
-  headers: 
+  headers:
       - Погрузка грузов на железнодорожном транспорте
-  units: 
+  units:
       - mln_t
 
 - name: INVESTMENT
@@ -153,41 +154,41 @@ doc = """
      - собственные средства предприятий
   units:
      - bln_rub
-  
+
 - name: INVESTMENT_EXTERNAL_FUNDS
   headers:
      - привлеченные средства
   units:
-     - bln_rub  
- 
+     - bln_rub
+
 - name: INVESTMENT_BUDGET_FUNDS
   headers:
      - из них бюджетные средства
   units:
-     - bln_rub  
-     
+     - bln_rub
+
 - name: INVESTMENT_BUDGET_FUNDS_FEDERAL
   headers:
      - из федерального бюджета
   units:
-     - bln_rub  
+     - bln_rub
 
 - name: INVESTMENT_BUDGET_FUNDS_SUBFEDERAL
   headers:
      - из бюджетов субъектов Российской Федерации
   units:
-     - bln_rub       
-     
-  
-# TODO:  
-# 1.7. Объем работ по виду деятельности ""Строительство     
+     - bln_rub
+
+
+# TODO:
+# 1.7. Объем работ по виду деятельности ""Строительство
 
 
 - name: EXPORT_GOODS
   headers:
       - экспорт товаров – всего
       - Экспорт товаров
-  units: 
+  units:
       - bln_usd
   starts:
       - "1.9. Внешнеторговый оборот – всего"
@@ -197,12 +198,12 @@ doc = """
       - "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья"
       - "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья"
       - "1.10.1.Внешнеторговый оборот со странами дальнего зарубежья"
-      
+
 - name: IMPORT_GOODS
   headers:
       - импорт товаров – всего
       - Импорт товаро
-  units: 
+  units:
       - bln_usd
   starts:
       - "1.9. Внешнеторговый оборот – всего"
@@ -211,7 +212,7 @@ doc = """
   ends:
       - "1.9.1. Внешнеторговый оборот со странами дальнего зарубежья"
       - "1.10.1. Внешнеторговый оборот со странами дальнего зарубежья"
-      - "1.10.1.Внешнеторговый оборот со странами дальнего зарубежья"       
+      - "1.10.1.Внешнеторговый оборот со странами дальнего зарубежья"
 
 
 - name: DWELLINGS_CONSTRUCTION
@@ -219,7 +220,7 @@ doc = """
       - Ввод в действие жилых домов организациями всех форм собственности
       - Ввод в действие жилых домов организациями всех форм
   units: mln_m2
-      
+
 - name: UNEMPL_COUNT
   headers:
     - Уровень безработицы
@@ -228,8 +229,8 @@ doc = """
 
 - name: PPI
   headers: Индексы цен производителей промышленных товаров
-  units: rog    
-    
+  units: rog
+
 - name: RETAIL_SALES
   headers: Оборот розничной торговли
   units:
@@ -239,7 +240,7 @@ doc = """
 
 - name: RETAIL_SALES_FOOD
   starts: "Из общего объема оборота розничной торговли:"
-  ends: Оборот общественного питания 
+  ends: Оборот общественного питания
   headers:
     - продовольственные товары
     - пищевые продукты, включая напитки и табачные изделия
@@ -251,12 +252,12 @@ doc = """
 
 - name: RETAIL_SALES_NONFOOD
   starts: "Из общего объема оборота розничной торговли:"
-  ends: Оборот общественного питания 
+  ends: Оборот общественного питания
   headers: непродовольственные товары
   units:
     - bln_rub
     - yoy
-    - rog   
+    - rog
 
 - name: CPI
   headers: Индекс потребительских цен
@@ -269,7 +270,7 @@ doc = """
     - непродовольственные товары
     - непродовольст- венные товары
   units: rog
-  
+
 - name: CPI_FOOD
   starts: "3.5. Индекс потребительских цен"
   ends: "4. Социальная сфера"
@@ -286,20 +287,20 @@ doc = """
   starts: "3.5. Индекс потребительских цен"
   ends: "4. Социальная сфера"
   headers: алкогольные напитки
-  units: rog        
- 
+  units: rog
+
 - name: PROFIT_MINING
   starts: 2.2. Сальдированный финансовый результат
   ends: Убыточные организации
   headers: Добыча полезных ископаемых
   units:  mln_rub
-  
+
 - name: PROFIT_MANUF
   starts: 2.2. Сальдированный финансовый результат
   ends: Убыточные организации
   headers: Обрабатывающие производства
   units: mln_rub
-  
+
 - name: PROFIT_POWER_GAS_WATER
   starts: 2.2. Сальдированный финансовый результат
   ends: Убыточные организации
@@ -307,13 +308,13 @@ doc = """
       - Обеспечение электрической энергией, газом и паром
       - Производство и распределение электроэнергии, газа и воды
   units: mln_rub
-  
+
 - name: PROFIT_CONSTR
   starts: 2.2. Сальдированный финансовый результат
   ends: Убыточные организации
   headers: Строительство
   units: mln_rub
-  
+
 - name: PROFIT_CONSTR
   starts: 2.2. Сальдированный финансовый результат
   ends: Убыточные организации
@@ -328,9 +329,9 @@ doc = """
   headers:
       - Транспортировка и хранение
       - Транспорт и связь
-  units: mln_rub   
- 
-# TODO 
+  units: mln_rub
+
+# TODO
  # ---
 # boundaries:
   # - start: 2.1.1. Доходы (по данным Федерального казначейства)
@@ -384,50 +385,52 @@ doc = """
   # - var: CORP_RECEIVABLE_OVERDUE
     # header: в том числе просроченная
     # unit: bln_rub
- 
-    
-"""
-import yaml  
-# docs at https://github.com/keleshev/schema
-from schema import Schema, Optional, Or, SchemaError #And, Use,
-from reader import make_label        
 
-class Namer(object):    
-    _ALWAYS_VALID_START_LINE = ''    
-    def __init__(self, name, headers, units, 
-                       starts=None, ends=None, reader=None):
+
+"""
+import yaml
+# docs at https://github.com/keleshev/schema
+from schema import Schema, Optional, Or, SchemaError  # And, Use,
+from reader import make_label
+
+
+class Namer(object):
+    _ALWAYS_VALID_START_LINE = ''
+
+    def __init__(self, name, headers, units,
+                 starts=None, ends=None, reader=None):
         self.name = name
         self.headers = self.iterate(headers)
         self.units = self.iterate(units)
         if starts:
             self.starts = self.iterate(starts)
         else:
-            self.starts = [self._ALWAYS_VALID_START_LINE]            
+            self.starts = [self._ALWAYS_VALID_START_LINE]
         self.ends = self.iterate(ends)
         self.reader = reader
-        
+
     @staticmethod
     def iterate(x):
         if isinstance(x, str):
             return [x]
         else:
             return x
-    
-    @property    
+
+    @property
     def labels(self):
         return set(make_label(self.name, unit) for unit in self.units)
-    
+
     def inspect(self, tables):
         pass
         # WONTFIX:
-        # is found header found not more than only once?    
-    
+        # is found header found not more than only once?
+
     def assert_all_labels_found(self, tables):
         diff = self.labels - {t.label for t in tables if t.is_defined()}
         if diff:
-            raise ValueError(('Not found:', diff))        
-        
-    def __repr__(self):    
+            raise ValueError(('Not found:', diff))
+
+    def __repr__(self):
         return str(self.__dict__)
 
 
@@ -437,21 +440,20 @@ schema = Schema(Or(str, [str]))
 assert schema.validate('a')
 assert schema.validate(['a', 'b'])
 
-schema = Schema({'name': str, # WONTFIX: all caps
+schema = Schema({'name': str,  # WONTFIX: all caps
                  'headers': Or(str, [str]),
                  'units': Or(str, [str]),
                  Optional('reader'): str,
                  Optional('starts'): Or(str, [str]),
                  Optional('ends'): Or(str, [str])
-          })
+                 })
 
 for p in PARSING_DEFINTIONS:
     try:
         schema.validate(p)
     except SchemaError:
         raise ValueError(p)
-    
+
 NAMERS = [Namer(x['name'], x['headers'], x['units'],
-                x.get('starts'), x.get('ends'),  x.get('reader'))
-          for x in yaml.load(doc)]    
-    
+                x.get('starts'), x.get('ends'), x.get('reader'))
+          for x in yaml.load(doc)]
