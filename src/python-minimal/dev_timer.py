@@ -103,9 +103,9 @@ def replicate_dupl_error():
     return dups   
 
 #TODO: how to control warnings 
-#import warnings
-#warnings.simplefilter("error")
+import warnings
+warnings.simplefilter("ignore")
 
 if __name__ == '__main__':
-    #timer()
-    replicate_dupl_error()
+    timer()
+    #replicate_dupl_error()
