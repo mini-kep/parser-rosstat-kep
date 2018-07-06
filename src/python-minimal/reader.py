@@ -7,7 +7,7 @@ Calls:
     import saver
 
     values = reader.to_values(path, unit_mapper_dict, namers)
-    dfa, dfs, dfq = saver.unpack_dataframes() 
+    dfa, dfs, dfq = saver.unpack_dataframes()
 
 Inputs:
   - csv file
@@ -27,7 +27,7 @@ Intermediate output: list of dictionaries lile
 Pseudocode
 ==========
 
- reader.py:    
+ reader.py:
  1. read CSV
  2. extract individual tables form CSV
  3. for each table:
@@ -284,10 +284,11 @@ if __name__ == "__main__":
         for label in namer.labels:
             print(label)
             subdata = [x for x in data if x['label'] == label]
+
             def one(i):
-                x = subdata[i]                
+                x = subdata[i]
                 expected_values.append(x)
-                print (x)
+                print(x)
                 return x
             a = one(0)
             z = one(-1)
@@ -297,7 +298,7 @@ if __name__ == "__main__":
 #  - convert to tests
 
 # TODO - OTHER:
-# - code review    
+# - code review
 # - run over many csv files: tab.csv and tab_old.csv + alldata/interim files
 
 # WONTFIX:
@@ -308,7 +309,7 @@ if __name__ == "__main__":
 #  - check a defintion against file (no duplicate values) - Namer.inspect()
 #  - header found more than once in tables
 #  - duplicate PPI_mln_rub
-#  - special 12m - a  situation 
+#  - special 12m - a  situation
 #  - 1.7. Объем работ по виду деятельности ""Строительство - requires supress_apos()
 #  - more definitions
 

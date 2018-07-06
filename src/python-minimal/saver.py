@@ -1,12 +1,16 @@
 import pandas as pd
 import warnings
 
+
 def check_duplicates(df):
     dups = df[df.duplicated(keep=False)]
     if not dups.empty:
         warnings.warn("Duplicate rows found:\n{}".format(dups))
 
-# EP: можно еще как-то съедать список, чтобы при последующих просмотрах он был менше? 
+# EP: можно еще как-то съедать список, чтобы при последующих просмотрах он
+# был менше?
+
+
 def subset(values, freq):
     # WONTFIX: can also .pop()
     return [x for x in values if x['freq'] == freq]
@@ -47,6 +51,8 @@ def create_dfm(datapoints):
     return deaccumulate(df, first_month=1)
 
 # EP: видимо нужно оставить одну какую-то функцию
+
+
 def to_dataframes(datapoints):
     #datapoints = list(datapoints)
     return dict(a=create_dfa(datapoints),
@@ -54,9 +60,10 @@ def to_dataframes(datapoints):
                 m=create_dfm(datapoints)
                 )
 
+
 def unpack_dataframes(datapoints):
     #datapoints = list(datapoints)
-    return [f(datapoints) for f in (create_dfa, create_dfq, create_dfm)] 
+    return [f(datapoints) for f in (create_dfa, create_dfq, create_dfm)]
 
 
 # TODO: bring back original tests

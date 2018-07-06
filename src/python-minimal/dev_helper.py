@@ -10,6 +10,8 @@ PATH = str(datafolder / 'tab.csv')
 PATH_LEGACY = str(datafolder / 'tab_old.csv')
 
 # WONTFIX: need more values from other files
+
+
 def messup(values):
     """Produce wrng values for year and cells."""
     messed_years = set()
@@ -29,7 +31,7 @@ def messup(values):
 
 
 def save_checkpoints():
-    """Persisting checkpoints. Write first and last values 
+    """Persisting checkpoints. Write first and last values
        of each time series to file 'checkpoints.yaml'.
     """
     expected_values = []
@@ -49,7 +51,6 @@ def save_checkpoints():
     path = os.path.join('data', 'checkpoints.yaml')
     pathlib.Path(path).write_text(yaml.dump(expected_values))
 
+
 if __name__ == "__main__":
     pass
-
-

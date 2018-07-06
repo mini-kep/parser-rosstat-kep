@@ -2,13 +2,13 @@
 from pathlib import Path
 
 
-import reader 
+import reader
 from parsing_definition import UNITS, Namer
 from dev_helper import PATH
 
 
-#EP: вместо PATH сделать фикстуру, которая будет предосталвлять файл CSV с гарантированным путем к нему? 
-#EP: надо ли изолировать UNITS?
+# EP: вместо PATH сделать фикстуру, которая будет предосталвлять файл CSV с гарантированным путем к нему?
+# EP: надо ли изолировать UNITS?
 
 class Test_emit_datapoints:
     def test_on_YAQQQ(self):
@@ -28,8 +28,21 @@ class Test_emit_datapoints:
 
     def test_on_YA12M(self):
         param = dict(
-            row=["2015", "94,6", "91,4", "110,9", "96,2", "102,7", "98,0", "103,4",
-                                 "100,9", "99,1", "103,9", "95,9", "104,2", ],
+            row=[
+                "2015",
+                "94,6",
+                "91,4",
+                "110,9",
+                "96,2",
+                "102,7",
+                "98,0",
+                "103,4",
+                "100,9",
+                "99,1",
+                "103,9",
+                "95,9",
+                "104,2",
+            ],
             label="MINING_rog",
             row_format="YMMMMMMMMMMMM",
         )
@@ -55,7 +68,7 @@ def test_parsed_tables_on_csv_file_and_simple_units_and_namer():
             # this ...
             ("период с начала отчетного года в % к соответствующему периоду предыдущего года",
              "ytd",
-            ),
+             ),
             # ... must precede this
             ("в % к соответствующему периоду предыдущего года", "yoy"),
             ("в % к предыдущему периоду", "rog"),
@@ -63,10 +76,10 @@ def test_parsed_tables_on_csv_file_and_simple_units_and_namer():
         ]
     )
     namer1 = Namer(name="GDP", headers=["Объем ВВП"], units=["bln_rub"])
-    tables = reader.parsed_tables(PATH, 
-                                  unit_mapper_dict=unit_mapper_dict1, 
+    tables = reader.parsed_tables(PATH,
+                                  unit_mapper_dict=unit_mapper_dict1,
                                   namers=[namer1]
-    )
+                                  )
     assert tables[0].name == "GDP"
     assert tables[0].unit == "bln_rub"
     assert tables[0].row_format == "YAQQQQ"
@@ -86,9 +99,9 @@ def test_parsed_tables_on_csv_file_and_simple_units_and_namer():
     }
 
 
-class BaseTest:    
+class BaseTest:
     doc = ""
-    
+
     def setup_method(self):
         self.f = Path("temp.txt").resolve()
         self.f.write_text(self.doc, encoding="utf-8")
@@ -128,7 +141,8 @@ class Test_to_values_on_namer_with_reader_parameter_and_doc(BaseTest):
             "value": 653.8,
         }
 
-class Test_to_values_on_namer_with_startend_and_csv(object):    
+
+class Test_to_values_on_namer_with_startend_and_csv(object):
     def test_returns_Expects_value_after_start(self):
         namer = Namer(
             name="EXPORT_GOODS",
@@ -145,7 +159,10 @@ class Test_to_values_on_namer_with_startend_and_csv(object):
                 "1.10.1.Внешнеторговый оборот со странами дальнего зарубежья",
             ],
         )
-        dps = reader.to_values(filename=PATH, unit_mapper_dict=UNITS, namers=[namer])
+        dps = reader.to_values(
+            filename=PATH,
+            unit_mapper_dict=UNITS,
+            namers=[namer])
         assert dps[0]["value"] == 75.6
         # as in:
         # 1.9. Внешнеторговый оборот – всего1), млрд.долларов США / Foreign trade turnover – total1), bln US dollars
@@ -158,14 +175,18 @@ class Test_to_values_on_namer_with_startend_and_csv(object):
         #    # example 3
         #    # a) trailing tables eg find industrial production ytd from tables[4]
 
-class Test_parsed_tables_on_trailing_tables(object):    
+
+class Test_parsed_tables_on_trailing_tables(object):
     def test_returns_tables_with_three_units(self):
         namer = Namer(
             name="INDPRO",
             headers=["Индекс промышленного производства"],
             units=["yoy", "rog", "ytd"],
         )
-        tables = reader.parsed_tables(filename=PATH, unit_mapper_dict=UNITS, namers=[namer])
+        tables = reader.parsed_tables(
+            filename=PATH,
+            unit_mapper_dict=UNITS,
+            namers=[namer])
 
         assert [t.label for t in tables if t.is_defined()] == [
             "INDPRO_yoy",
@@ -185,7 +206,6 @@ class Test_parsed_tables_on_trailing_tables(object):
             "date": '2015-12-31',
             "value": 99.2,  # checked at csv.txt
         }
-            
 
 
 def test_bugfix_short_unit_name():
