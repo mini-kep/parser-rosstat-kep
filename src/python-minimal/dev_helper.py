@@ -1,21 +1,22 @@
-#EP: может переименовать этот файл?
-
 import pathlib
+import yaml
+import os
+
 from parsing_definition import NAMERS, UNITS
-from reader import to_values
-from saver import to_dataframes
-import pandas as pd
-from timeit import timeit
+import reader
 
 datafolder = pathlib.Path(__file__).parent / 'data'
 PATH = str(datafolder / 'tab.csv')
 PATH_LEGACY = str(datafolder / 'tab_old.csv')
 
+# WONTFIX: need more values from other files
+
 
 def messup(values):
+    """Produce wrng values for year and cells."""
     messed_years = set()
     messed_values = set()
-    for v in to_values(PATH, UNITS, NAMERS):
+    for v in reader.to_values(PATH, UNITS, NAMERS):
         year = v['year']
         value = v['value'].replace(',', '.').replace('…', '')
         try:
@@ -29,51 +30,27 @@ def messup(values):
     return messed_years, messed_values
 
 
-def run_to_values():
-    return to_values(PATH, UNITS, NAMERS)
+def save_checkpoints():
+    """Persisting checkpoints. Write first and last values
+       of each time series to file 'checkpoints.yaml'.
+    """
+    expected_values = []
+    for namer in NAMERS:
+        param = PATH, UNITS, [namer]
+        tables = reader.parsed_tables(*param)
+        namer.assert_all_labels_found(tables)
+        data = reader.to_values(*param)
+        print(namer.name)
+        for label in namer.labels:
+            subdata = [x for x in data if x['label'] == label]
+            a, z = subdata[0], subdata[-1]
+            expected_values.extend([a, z])
+            print(label)
+            print(a)
+            print(z)
+    path = os.path.join('data', 'checkpoints.yaml')
+    pathlib.Path(path).write_text(yaml.dump(expected_values))
 
 
-def run_df():
-    x = run_to_values()
-    to_dataframes(x)
-
-
-def foo(x, freq):
-    df = pd.DataFrame(x)
-    df = df[df.freq == freq]
-    # check_duplicates(df)
-    df = df.drop_duplicates(['freq', 'label', 'date'], keep='first')
-    df['date'] = df['date'].apply(lambda x: pd.Timestamp(x))
-    # reshape
-    df = df.pivot(columns='label', values='value', index='date')
-    # delete some internals for better view
-    df.columns.name = None
-    df.index.name = None
-    # add year
-    df.insert(0, "year", df.index.year)
-    return df
-
-
-def run_foo():
-    x = run_to_values()
-    foo(x, 'm')
-
-
-def run_bare_df():
-    x = run_to_values()
-    df = pd.DataFrame(x)
-    df = df[df.freq == 'm']
-
-
-def tester(code: str):
-    n = 5
-    msec = 1000 / n * timeit(code, 'import dev_helper', number=n)
-    return round(msec, 1)
-
-
-if __name__ == '__main__':
-    print('Get datapoints', tester('dev_helper.run_to_values()'))
-    print('Bare dataframe', tester('dev_helper.run_bare_df()'))
-    print('Decorated dataframe', tester('dev_helper.run_foo()'))
-    # TODO: channel warnings away from stdout
-    print('All dataframes', tester('dev_helper.run_df()'))
+if __name__ == "__main__":
+    pass

@@ -34,6 +34,7 @@ def clean_year(year: str) -> int:
     found = re.search(REGEX_Y, year)
     return int(found.group(0)) if found else None
 
+
 # TODO: move to tests
 assert clean_year('20052),3)') == 2005
 assert clean_year('20114)') == 2011
@@ -48,6 +49,7 @@ REGEX_V = re.compile(r'\s*(\d*?.?\d*?)(\d\))*\s*$')
 def clean_value(x: str) -> float:
     x = x.replace(',', '.').replace('…', '')
     return float(re.search(REGEX_V, x).group(1)) if x else 0
+
 
 # TODO: move to tests
 assert clean_value('406911)') == 40691
