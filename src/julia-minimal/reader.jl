@@ -1,4 +1,5 @@
 module Reader
+import Base.repr
 export get_year, is_year
 # Parse data from CSV files
 
@@ -22,6 +23,22 @@ mutable struct Table
     unit::Any
 end
 Table(headers, datarows) = Table(headers, datarows, nothing, nothing)
+
+function get_label(table::Table)
+    return make_label(table.name, table.unit)
+end
+
+function get_coln(table::Table)
+    return 
+end
+
+function Base.show(io::IO, table::Table)
+    print(io, join(["Table(name=$(table.name)",
+                    "unit=$(table.unit)",
+                    "headers=$(table.headers)",
+                    "datarows=$(table.datarows))"], ",\n     "))
+end
+
 
 @enum State INIT=1 DATA=2 HEADERS=3
 
