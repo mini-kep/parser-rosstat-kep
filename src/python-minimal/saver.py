@@ -1,12 +1,10 @@
 import pandas as pd
-
+import warnings
 
 def check_duplicates(df):
     dups = df[df.duplicated(keep=False)]
     if not dups.empty:
-        # как писать не зкшет а warnings?
-        # FIXME: issue warnings
-        print("Warning: duplicate rows found:\n{}".format(dups))
+        warnings.warn("Duplicate rows found:\n{}".format(dups))
 
 # EP: можно еще как-то съедать список, чтобы при последующих просмотрах он был менше? 
 def subset(values, freq):

@@ -74,6 +74,7 @@ def tester(code: str):
 
 
 def timer():
+    print('Exеcution time in millisecond')
     for i, (msg, x) in enumerate([
             
          ('Get datapoints as list', 
@@ -101,6 +102,10 @@ def replicate_dupl_error():
     print(dups)
     return dups   
 
+#TODO: how to control warnings 
+#import warnings
+#warnings.simplefilter("error")
+
 if __name__ == '__main__':
-    timer()
-    #replicate_dupl_error()
+    #timer()
+    replicate_dupl_error()
