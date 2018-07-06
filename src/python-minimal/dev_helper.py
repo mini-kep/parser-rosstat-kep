@@ -39,7 +39,6 @@ def run_df():
 
 
 def foo(x, freq):
-    x = run_to_values()
     df = pd.DataFrame(x)
     df = df[df.freq == freq]
     # check_duplicates(df)
@@ -73,10 +72,8 @@ def tester(code: str):
 
 
 if __name__ == '__main__':
-    print('Get datapoints', tester(
-        'dev_helper.to_values(dev_helper.PATH, dev_helper.UNITS, dev_helper.NAMERS)'))
+    print('Get datapoints', tester('dev_helper.run_to_values()'))
     print('Bare dataframe', tester('dev_helper.run_bare_df()'))
     print('Decorated dataframe', tester('dev_helper.run_foo()'))
     # TODO: channel warnings away from stdout
-    # EP: почему создание трех фреймов выполняется быстрее чем одного?
     print('All dataframes', tester('dev_helper.run_df()'))
