@@ -109,8 +109,8 @@ def test(ctx):
 
 @task
 def cov(ctx):
-    ctx.run("py.tests --cov=csv2df")
-    ctx.run("coverage report --omit=*tests*,*__init__*")
+    ctx.run("py.test src/python-minimal/test_reader.py src/python/tests/")
+    ctx.run("coverage report --include=src/* --omit=*/__init__.py,*/test_*")
 
 
 @task
