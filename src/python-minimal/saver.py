@@ -1,13 +1,6 @@
 import pandas as pd
 
 
-def get_duplicates(df):
-    if df.empty:
-        return df
-    else:
-        return df[df.duplicated(keep=False)]
-
-
 def check_duplicates(df):
     dups = df[df.duplicated(keep=False)]
     if not dups.empty:

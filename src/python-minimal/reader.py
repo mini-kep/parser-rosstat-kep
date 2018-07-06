@@ -273,9 +273,6 @@ def to_values(filename, unit_mapper_dict, namers):
 if __name__ == "__main__":
     from parsing_definition import NAMERS, UNITS
     from dev_helper import PATH
-    import pathlib
-    import yaml
-    import os
 
     expected_values = []
     for namer in NAMERS:
@@ -285,15 +282,15 @@ if __name__ == "__main__":
         data = to_values(*param)
         print(namer.name)
         for label in namer.labels:
-            subdata = [x for x in data if x['label'] == label]
-            a, z = subdata[0], subdata[-1]
             print(label)
-            print(a)
-            expected_values.append(a)
-            print(z)
-            expected_values.append(z)
-    path = os.path.join('data', 'checkpoints.yaml')
-    pathlib.Path(path).write_text(yaml.dump(expected_values))
+            subdata = [x for x in data if x['label'] == label]
+            def one(i):
+                x = subdata[i]                
+                expected_values.append(x)
+                print (x)
+                return x
+            a = one(0)
+            z = one(-1)
 
 # WIP:
 #  - full new defintion of parsing_defintion.py
