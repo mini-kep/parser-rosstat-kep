@@ -2,18 +2,19 @@ import pathlib
 import yaml
 import os
 
-from parsing_definition import NAMERS, UNITS
-import reader
+from kep.definition.namers import NAMERS
+from kep.definition.namers import UNITS
+from kep.reader import to_values
+import kep.reader as reader
 
 datafolder = pathlib.Path(__file__).parent / 'data'
 PATH = str(datafolder / 'tab.csv')
 PATH_LEGACY = str(datafolder / 'tab_old.csv')
-
-# WONTFIX: need more values from other files
+PATH_CHECKPOINTS = os.path.join('data', 'checkpoints.yaml')
 
 
 def messup(values):
-    """Produce wrng values for year and cells."""
+    """Produce wrong values for year and cells."""
     messed_years = set()
     messed_values = set()
     for v in reader.to_values(PATH, UNITS, NAMERS):
@@ -48,9 +49,8 @@ def save_checkpoints():
             print(label)
             print(a)
             print(z)
-    path = os.path.join('data', 'checkpoints.yaml')
-    pathlib.Path(path).write_text(yaml.dump(expected_values))
+    pathlib.Path(PATH_CHECKPOINTS ).write_text(yaml.dump(expected_values))
 
 
 if __name__ == "__main__":
-    pass
+    messed_years, messed_values = messup(to_values(PATH))

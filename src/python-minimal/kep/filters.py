@@ -47,12 +47,10 @@ REGEX_V = re.compile(r'\s*(\d*?.?\d*?)(\d\))*\s*$')
 
 
 def clean_value(x: str) -> float:
-    x = x.replace(',', '.').replace('…', '')
-    return float(re.search(REGEX_V, x).group(1)) if x else 0
+    x = x.replace(',', '.')
+    return float(re.search(REGEX_V, x).group(1)) if x else None
 
 
 # TODO: move to tests
 assert clean_value('406911)') == 40691
 assert clean_value('211,32)') == 211.3
-assert clean_value('') == 0
-assert clean_value('…') == 0

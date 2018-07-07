@@ -1,5 +1,5 @@
+from collections import namedtuple
 """Parse data from CSV files
-
 
 Calls:
 
@@ -16,13 +16,6 @@ Inputs:
       {'name': 'INDPRO',
        'headers': ['Индекс промышленного производства'],
        'units': ['yoy', 'rog', 'ytd']}
-
-Intermediate output: list of dictionaries lile
-      {'freq': 'm',
-       'label': 'INDPRO_rog',
-       'date': '1999-12-31',
-       'value': '104,3'}
-
 
 Pseudocode
 ==========
@@ -41,19 +34,16 @@ Pseudocode
    - dfm (monthly data)
  5. adjust dataframes
 
-Full code
-=========
-
-Full code is at src/python/manage.py
-Point of entry of parsing algorithm:  src.python.dispatch.evaluate()
-
 """
 
 import csv
 from enum import Enum, unique
-import calendar
 
-import filters
+
+import kep.filters as filters
+import kep.row as row_model
+from kep.label import make_label
+
 
 # convert CSV to Table() instances
 
@@ -101,19 +91,14 @@ def split_to_tables(csv_rows):
         yield Table(headers, datarows)
 
 
-# Table class
-
-def make_label(name, unit):
-    return '{}_{}'.format(name, unit)
-
-
 class Table:
     def __init__(self, headers, datarows, name=None, unit=None):
+        self._headers = headers
         self.headers = [x[0] for x in headers if x[0]]
         self.datarows = datarows
         self.name = name
         self.unit = unit
-        self.row_format = get_row_format(self.coln)
+        self.row_format = row_model.get_format(row_length=self.coln)
 
     def __eq__(self, x):
         return str(self) == str(x)
@@ -139,12 +124,12 @@ class Table:
         return False
 
     def assign_row_format(self, key):
-        self.row_format = get_row_format(key)
+        self.row_format = row_model.assign_format(key)
 
     def emit_datapoints(self):
         _label = self.label
         for row in self.datarows:
-            for d in emit_datapoints_from_row(row, _label, self.row_format):
+            for d in row_model.emit_datapoints(row, _label, self.row_format):
                 yield d
 
     def __repr__(self):
@@ -153,58 +138,6 @@ class Table:
                                  f"row_format={repr(self.row_format)}",
                                  f'headers={self.headers}',
                                  f'datarows={self.datarows}'])
-
-# row operations
-
-
-ROW_FORMAT_DICT = {len(x): x for x in [
-    'YAQQQQMMMMMMMMMMMM',
-    'YAQQQQ',
-    'YAMMMMMMMMMMMM',
-    'YMMMMMMMMMMMM',
-    'YQQQQ',
-    'XXXX']}
-ROW_FORMAT_DICT['fiscal'] = 'YA' + 'M' * 11
-
-
-def get_row_format(key, row_format_dict=ROW_FORMAT_DICT):
-    try:
-        return row_format_dict[key]
-    except KeyError:
-        raise ValueError(f'Unknown row format: {key}')
-
-
-MONTHS = dict(a=12, q=3, m=1)
-
-
-def timestamp(year: str, period: int, freq: str):
-    year = filters.clean_year(year)
-    month = MONTHS[freq] * period
-    day = calendar.monthrange(year, month)[1]
-    return f'{year}-{str(month).zfill(2)}-{day}'
-
-
-def emit_datapoints_from_row(row, label, row_format):
-    occurences = ''
-    for value, letter in zip(row, row_format):
-        occurences += letter
-        if letter == 'Y':
-            year = value
-        else:
-            if value:
-                period = occurences.count(letter)
-                freq = letter.lower()
-                yield dict(label=label,
-                           freq=freq,
-                           date=timestamp(year, period, freq),
-                           value=filters.clean_value(value))
-
-
-def emit_datapoints(tables):
-    for table in tables:
-        if table.unit and table.name:
-            for x in table.emit_datapoints():
-                yield x
 
 # table parsing
 
@@ -265,56 +198,13 @@ def parsed_tables(filename, unit_mapper_dict, namers):
     return tables
 
 
+def emit_datapoints(tables):
+    for t in tables:
+        if t.name and t.unit:
+            for x in t.emit_datapoints():
+                 yield x    
+
 def to_values(filename, unit_mapper_dict, namers):
     tables = parsed_tables(filename, unit_mapper_dict, namers)
     return [x for x in emit_datapoints(tables)]
 
-
-if __name__ == "__main__":
-    from parsing_definition import NAMERS, UNITS
-    from dev_helper import PATH
-
-    expected_values = []
-    for namer in NAMERS:
-        param = PATH, UNITS, [namer]
-        tables = parsed_tables(*param)
-        namer.assert_all_labels_found(tables)
-        data = to_values(*param)
-        print(namer.name)
-        for label in namer.labels:
-            print(label)
-            subdata = [x for x in data if x['label'] == label]
-
-            def one(i):
-                x = subdata[i]
-                expected_values.append(x)
-                print(x)
-                return x
-            a = one(0)
-            z = one(-1)
-
-# WIP:
-#  - full new defintion of parsing_defintion.py
-#  - convert to tests
-
-# TODO - OTHER:
-# - code review
-# - run over many csv files: tab.csv and tab_old.csv + alldata/interim files
-
-# WONTFIX:
-#  - datapoint checks
-#  - checking dataframes
-#  - saving to disk
-#  - clean notebook folders
-#  - check a defintion against file (no duplicate values) - Namer.inspect()
-#  - header found more than once in tables
-#  - duplicate PPI_mln_rub
-#  - special 12m - a  situation
-#  - 1.7. Объем работ по виду деятельности ""Строительство - requires supress_apos()
-#  - more definitions
-
-# DONE
-#  - type conversions and comment cleaning
-#  - assert schema on namer imports
-#  - write expected values
-#  - timeit
