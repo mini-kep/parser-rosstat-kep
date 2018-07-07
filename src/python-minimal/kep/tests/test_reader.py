@@ -1,8 +1,8 @@
 ﻿from collections import OrderedDict
 from pathlib import Path
 
-
-import reader
+#FIXME
+import kep.reader as reader 
 from parsing_definition import UNITS, Namer
 from dev_helper import PATH
 
