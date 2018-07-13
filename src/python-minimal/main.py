@@ -3,59 +3,33 @@ import kep
 def read_dataframes(csv_path: str):
     values = kep.to_values(csv_path, kep.UNITS, kep.NAMERS)
     return kep.unpack_dataframes(values)
-    
+
+
+
 if __name__ == '__main__':
     from paths import PATH_CSV 
-    tables = kep.parsed_tables(PATH_CSV, kep.UNITS, kep.NAMERS)
-    dfa, dfq, dfm = read_dataframes(PATH_CSV)
+    tables = kep.reader.import_tables(PATH_CSV)
+    reviewer = kep.reader.TableList(tables)
+    n = [x for x in kep.NAMERS if x.name=='EXPORT_GOODS'][0]
+    subtabs = reviewer.segment(n.starts, n.ends) 
+    print (subtabs.labels)
+    subtabs.parse(unit_mapper_dict=kep.UNITS, namers=[n]) 
+    print (subtabs.labels)
+    assert subtabs.labels == ['EXPORT_GOODS_bln_usd']
+    assert n.labels == subtabs.labels
+    # TODO: may check that labels equal exactly the required labels
+    # TODO: namer may optionally have units mapper
+    # TODO: namer to have sorted labels
+    values = kep.reader.to_values2(PATH_CSV, kep.UNITS, kep.NAMERS)
     
-  
-r = ['2018', '', '101,9', '', '', '', '102,9', '101,5', '101,0', '101,3', '', '', '', '', '', '', '', '']
-f=kep.row.get_format(len(r))
-a = list(kep.row.emit_datapoints(r, 'INDPRO_yoy', f))
-# wrong parsing in 2018
-"""    
-                                            2018-12-31
-year                                            2018.0
-AGROPROD_yoy                                       NaN
-CPI_ALCOHOL_rog                                    NaN
-CPI_FOOD_rog                                       NaN
-CPI_NONFOOD_rog                                    NaN
-CPI_SERVICES_mln                                   NaN
-CPI_SERVICES_rog                                   NaN
-DWELLINGS_CONSTRUCTION_mln_m2                      NaN
-DWELLINGS_CONSTRUCTION_yoy                         NaN
-EXPORT_GOODS_bln_usd                               NaN
-EXPORT_GOODS_yoy                                   NaN
-GDP_REAL_yoy                                     101.3
-GDP_bln_rub                                        NaN
-IMPORT_GOODS_bln_usd                               NaN
-INDPRO_rog                                        97.8
-INDPRO_yoy                                       101.1
-INVESTMENT_BUDGET_FUNDS_FEDERAL_bln_rub            NaN
-INVESTMENT_BUDGET_FUNDS_SUBFEDERAL_bln_rub         NaN
-INVESTMENT_BUDGET_FUNDS_SUBFEDERAL_yoy             NaN
-INVESTMENT_BUDGET_FUNDS_bln_rub                    NaN
-INVESTMENT_EXTERNAL_FUNDS_bln_rub                  NaN
-INVESTMENT_OWN_FUNDS_bln_rub                       NaN
-INVESTMENT_bln_rub                                 NaN
-INVESTMENT_yoy                                     NaN
-PPI_mln_rub                                        NaN
-PPI_rog                                            NaN
-RETAIL_SALES_FOOD_bln_rub                          NaN
-RETAIL_SALES_NONFOOD_bln_rub                       NaN
-RETAIL_SALES_bln_rub                               NaN
-TRANSPORT_FREIGHT_COMMERCIAL_bln_tkm               NaN
-TRANSPORT_FREIGHT_COMMERCIAL_yoy                   NaN
-TRANSPORT_FREIGHT_TOTAL_bln_tkm                    NaN
-TRANSPORT_FREIGHT_TOTAL_yoy                        NaN
-TRANSPORT_LOADING_RAIL_mln_t                       NaN
-TRANSPORT_LOADING_RAIL_yoy                         NaN
-UNEMPL_COUNT_mln                                   NaN
-WAGE_REAL_yoy                                      NaN
-WAGE_rub                                           NaN
-""" 
     
+    
+    
+    
+    #print(reviewer.find('PPI', 'mln_rub'))
+    #print(reviewer.labels)
+    
+   
 
 # WIP:
 #  - full new defintion of parsing_defintion.py

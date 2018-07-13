@@ -149,6 +149,7 @@
 - name: PPI
   headers: Индексы цен производителей промышленных товаров
   units: rog
+#  ends: Добыча полезных ископаемых / Mining and quarrying
 
 - name: RETAIL_SALES
   headers: Оборот розничной торговли
@@ -182,73 +183,7 @@
   headers: Индекс потребительских цен
   units: rog
 
-- name: CPI_NONFOOD
-  starts: "3.5. Индекс потребительских цен"
-  ends: "4. Социальная сфера"
-  headers:
-    - непродовольственные товары
-    - непродовольст- венные товары
-  units: rog
 
-- name: CPI_FOOD
-  starts: "3.5. Индекс потребительских цен"
-  ends: "4. Социальная сфера"
-  headers: продукты питания
-  units: rog
-
-- name: CPI_SERVICES
-  starts: "3.5. Индекс потребительских цен"
-  ends: "4. Социальная сфера"
-  headers: услуги
-  units: rog
-
-- name: CPI_ALCOHOL
-  starts: "3.5. Индекс потребительских цен"
-  ends: "4. Социальная сфера"
-  headers: алкогольные напитки
-  units: rog
-
-- name: PROFIT_MINING
-  starts: 2.2. Сальдированный финансовый результат
-  ends: Убыточные организации
-  headers: Добыча полезных ископаемых
-  units:  mln_rub
-
-- name: PROFIT_MANUF
-  starts: 2.2. Сальдированный финансовый результат
-  ends: Убыточные организации
-  headers: Обрабатывающие производства
-  units: mln_rub
-
-- name: PROFIT_POWER_GAS_WATER
-  starts: 2.2. Сальдированный финансовый результат
-  ends: Убыточные организации
-  headers:
-      - Обеспечение электрической энергией, газом и паром
-      - Производство и распределение электроэнергии, газа и воды
-  units: mln_rub
-
-- name: PROFIT_CONSTR
-  starts: 2.2. Сальдированный финансовый результат
-  ends: Убыточные организации
-  headers: Строительство
-  units: mln_rub
-
-- name: PROFIT_CONSTR
-  starts: 2.2. Сальдированный финансовый результат
-  ends: Убыточные организации
-  headers: Строительство
-  units: mln_rub
-
-# WONTFIX: probably mix of time series
-
-- name: PROFIT_TRANSPORT_STOR_COMM
-  starts: 2.2. Сальдированный финансовый результат
-  ends: Убыточные организации
-  headers:
-      - Транспортировка и хранение
-      - Транспорт и связь
-  units: mln_rub
 
 # TODO
  # ---

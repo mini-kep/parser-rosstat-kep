@@ -41,10 +41,10 @@ def emit_tuples(row, label, row_format):
             if number_string(value):
                 period = occurences.count(letter)
                 freq = letter.lower()
-                try:
-                    yield (label, freq, year, period, value)
-                except UnboundLocalError:
-                    import pdb; pdb.set_trace()
+                #try:
+                yield (label, freq, year, period, value)
+                #except UnboundLocalError:
+                #    import pdb; pdb.set_trace()
 # must fail on row
 #['до/up to 2000,0', '2,6', '1,5', '1,0']
 

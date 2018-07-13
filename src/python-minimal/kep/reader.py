@@ -1,4 +1,3 @@
-from collections import namedtuple
 """Parse data from CSV files
 
 Calls:
@@ -38,7 +37,8 @@ Pseudocode
 
 import csv
 from enum import Enum, unique
-
+import re
+from collections import namedtuple
 
 import kep.filters as filters
 import kep.row as row_model
@@ -101,7 +101,7 @@ class Table:
         self.row_format = row_model.get_format(row_length=self.coln)
 
     def __eq__(self, x):
-        return str(self) == str(x)
+        return repr(self) == repr(x)
 
     @property
     def label(self):
@@ -115,13 +115,11 @@ class Table:
         return self.name and self.unit
 
     def contains_any(self, strings):
-        return any([self.headers_contain(s) for s in strings])
-
-    def headers_contain(self, string):
-        for x in self.headers:
-            if string in x:
-                return True
-        return False
+        for header in self.headers:
+            for s in strings:
+                if re.search(r'\b{}'.format(s), header):
+                    return s
+        return None
 
     def assign_row_format(self, key):
         self.row_format = row_model.assign_format(key)
@@ -132,79 +130,191 @@ class Table:
             for d in row_model.emit_datapoints(row, _label, self.row_format):
                 yield d
 
+    def assign_name(self, parser):
+        if self.contains_any(parser.headers):
+            self.name = parser.name
+    
+    
+    def assign_unit(self, parser):
+        for header in self.headers:
+            unit = parser.mapper.extract(header)
+            if unit:
+                self.unit = unit
+
+
     def __repr__(self):
         return ',\n      '.join([f"Table(name={repr(self.name)}",
                                  f"unit={repr(self.unit)}",
                                  f"row_format={repr(self.row_format)}",
                                  f'headers={self.headers}',
-                                 f'datarows={self.datarows}'])
+                                 f'datarows={self.datarows[0]}'
+                                 ]
+    )
 
-# table parsing
-
-
-def put_units(tables, unit_mapper_dict):
-    for table in tables:
-        for text, unit in unit_mapper_dict.items():
-            if table.headers_contain(text):
-                table.unit = unit
-                break
-
-
-def put_names(tables, namers):
-    for namer in namers:
+from copy import copy
+ 
+class TableList:
+    def __init__(self, tables=[]):
+        self.tables = list(tables)
+        
+    def __getitem__(self, i):
+        return self.tables[i]
+    
+    def __repr__(self):
+        return repr(self.tables)
+    
+    def extend(self, x):
+        self.tables.extend(copy(x)) 
+        return self        
+    
+    def remove(self, x):
+        for i, t in enumerate(self.tables):
+            if t == x:
+                del self.tables[i]
+        return self        
+    
+    def defined(self):
+        return [t for t in self.tables if t.is_defined()]
+            
+    def find(self, name=None, unit=None):
+        _tables = self.defined()
+        if name:
+             _tables = filter(lambda t: t.name == name, _tables)
+        if unit:
+             _tables = filter(lambda t: t.unit == unit, _tables)
+        return list(_tables)
+    
+    @property
+    def labels(self):
+        return [t.label for t in self.tables if t.is_defined()] 
+ 
+    def segment(self, start_strings, end_strings):
+        segment = []  
         we_are_in_segment = False
-        for t in tables:
-            if t.contains_any(namer.starts):
+        for t in self.tables:
+            if t.contains_any(start_strings):
                 we_are_in_segment = True
-            if (t.contains_any(namer.headers)
-                and t.name is None
-                    and we_are_in_segment):
-                t.name = namer.name
+            if t.contains_any(end_strings):
                 break
-            if namer.ends and t.contains_any(namer.ends):
+            if we_are_in_segment:
+                # warning: otherwise table gets modified unexpectedly 
+                z = copy(t)
+                segment.append(z)
+        return TableList(segment)        
+    
+
+    def prev_next_pairs(self):
+        return zip(self.tables[:-1], self.tables[1:]) 
+    
+    
+    def put_trailing_names(self, parser):
+        """Assign trailing variable names in tables.
+           Trailing names are defined in leading table and pushed down
+           to following tables, if their unit is specified in namers.units
+        """
+        _units = copy(parser.units)
+        for prev_table, table in self.prev_next_pairs():
+            if not _units:
                 break
-
-
-def put_trailing_names_and_readers(tables, namers):
-    """Assign trailing variable names in tables.
-       Trailing names are defined in leading table and pushed down
-       to following tables, if their unit is specified in namers.units
-    """
-    for namer in namers:
-        _units = namer.units.copy()
-        for prev_table, table in zip(tables[:-1], tables[1:]):
+            if prev_table.name == parser.name:
+               try:
+                    _units.remove(prev_table.unit)
+               except ValueError:
+                    pass                    
             if (table.name is None
                 and prev_table.name is not None
-                    and table.unit in _units):
+                and table.unit in _units):
                 table.name = prev_table.name
-                table.row_format = prev_table.row_format
+                print(table.headers)
+                print(_units)
                 _units.remove(table.unit)
 
 
-def put_readers(tables, namers):
-    namers = [n for n in namers if n.reader]
-    for namer in namers:
-        for table in tables:
-            if table.name == namer.name:
-                table.assign_row_format(namer.reader)
+    def put_trailing_units(self, parser):
+        """Assign trailing variable names in tables.
+           Trailing names are defined in leading table and pushed down
+           to following tables, if their unit is specified in namers.units
+        """
+        for prev_table, table in self.prev_next_pairs():
+            if (table.unit is None
+                and prev_table.unit is not None
+                and table.name):
+                table.unit = prev_table.unit
 
 
-def parsed_tables(filename, unit_mapper_dict, namers):
-    tables = import_tables(filename)
-    put_units(tables, unit_mapper_dict)
-    put_names(tables, namers)
-    put_readers(tables, namers)
-    put_trailing_names_and_readers(tables, namers)
-    return tables
-
-
-def emit_datapoints(tables):
-    for t in tables:
-        if t.name and t.unit:
+    def apply(self, parser):
+        for table in self.tables:
+             table.assign_name(parser)
+             table.assign_unit(parser)
+        self.put_trailing_names(parser)
+        self.put_trailing_units(parser)
+    
+    def emit_datapoints(self):
+        for t in self.tables:
             for x in t.emit_datapoints():
-                 yield x    
+                yield x
 
-def to_values(filename, unit_mapper_dict, namers):
-    tables = parsed_tables(filename, unit_mapper_dict, namers)
-    return [x for x in emit_datapoints(tables)]
+    def print(self):
+        for i, t in enumerate(self.tables):
+           print(i, t.headers)
 
+def cut_segment(tables, namer):
+    return tables.segment(namer.scope.starts, namer.scope.ends)
+
+# to tests:
+assert TableList([1,2,3]).remove(2).tables == [1, 3]    
+
+             
+# прочитать все определения
+# выбрать определения с границами
+#      получить таблицы
+#      использовать юнитс или кастом юнитс 
+#      добавить имена
+# вернуть новый cписок таблиц 
+# полуить значения
+if __name__ == '__main__':
+    from kep.definition.namers import NAMERS
+    from paths import PATH_CSV
+    filename=PATH_CSV
+    namers=NAMERS
+    tables = TableList(import_tables(filename))
+    res = TableList()
+    border_namers = [n for n in namers if n.scope.is_defined()]
+    #default_namers = [n for n in namers if not n.scope]
+    #for namer in border_namers:
+    #    subtables = tables.segment(namer.scope.starts, namer.scope.ends)
+    #    subtables.apply(namer)
+    #    print(namer, "expects", namer.labels)
+    #    print("Found", subtables.labels)
+        #if namer.labels != subtables.labels:
+        #   print((namer.labels, subtabnamersles.labels))
+    #    res.extend(subtables)        
+    for i, namer in enumerate(border_namers):
+        subtables = cut_segment(tables, namer)
+        subtables.apply(namer)
+        print(i)        
+        print('Expected', namer.labels)
+        print('Found', subtables.labels)
+        try:
+            assert subtables.labels == namer.labels 
+        except AssertionError:
+            raise AssertionError
+        del subtables 
+    
+
+    
+# to test    
+#    from kep.reader import Table
+#    p = Parser(name='DINPRO',
+#               headers=['Промышленное производство'],
+#               custom_mapper_dict={'динозавров в год': 'dins'} 
+#               )
+#    t = Table(headers=[['Промышленное производство, динозавров в год']], 
+#              datarows=[[2018, 40, 10, 10, 10]])
+#    
+#    assign_name(t, p)
+#    assign_unit(t, p)
+#    assert t.name == 'DINPRO'
+#    assert t.unit == 'dins'
+#    
+#
