@@ -1,64 +1,35 @@
-"""Parse data from CSV files
-
-Calls:
-
-    import reader
-    import saver
-
-    values = reader.to_values(path, unit_mapper_dict, namers)
-    dfa, dfs, dfq = saver.unpack_dataframes()
-
-Inputs:
-  - csv file
-  - text to unit mapping dictionary {'млрд.руб.': 'bln_rub'}
-  - variable name, text headers and units:
-      {'name': 'INDPRO',
-       'headers': ['Индекс промышленного производства'],
-       'units': ['yoy', 'rog', 'ytd']}
-
-Pseudocode
-==========
-
- reader.py:
- 1. read CSV
- 2. extract individual tables form CSV
- 3. for each table:
-   - identify unit of measurement
-   - identify variable name
-   - get values based on columns format like "YQQQQMMMMMMMMMMMM"
- saver.py:
- 4. combine data from tables into three dataframes based on frequency
-   - dfa (annual data)
-   - dfq (quarterly data)
-   - dfm (monthly data)
- 5. adjust dataframes
-
-"""
-
+import io 
 import csv
 from enum import Enum, unique
 import re
-from collections import namedtuple
+from copy import copy
 
 import kep.filters as filters
 import kep.row as row_model
 from kep.label import make_label
+from kep.units import UnitMapper
+from kep.commands import CommandList
+from kep.util import iterate
 
+# convert CSV fle to Table() instances
 
-# convert CSV to Table() instances
-
+def read_csv(file):
+    """Read csv file as list of lists / matrix"""
+    with open(file, 'r', encoding='utf-8') as f:
+        read_bytes_as_csv(f)
+            
+def read_bytes_as_csv(f):
+    for row in csv.reader(f, delimiter='\t', lineterminator='\n'):
+         yield row
 
 def import_tables(file):
     """Wraps read_csv() and split_to_tables() into one call."""
     return list(split_to_tables(read_csv(file)))
 
-
-def read_csv(file):
-    """Read csv file as list of lists / matrix"""
-    fmt = dict(delimiter='\t', lineterminator='\n')
-    with open(file, 'r', encoding='utf-8') as f:
-        for row in csv.reader(f, **fmt):
-            yield row
+def import_tables_from_string(text):
+    """Wraps read_csv() and split_to_tables() into one call."""
+    matrix = read_bytes_as_csv(io.StringIO(text)) 
+    return list(split_to_tables(matrix))
 
 
 @unique
@@ -92,27 +63,36 @@ def split_to_tables(csv_rows):
 
 
 class Table:
-    def __init__(self, headers, datarows, name=None, unit=None):
+    def __init__(self, headers, 
+                       datarows, 
+                       row_format=None, 
+                       name=None, 
+                       unit=None):
         self._headers = headers
         self.headers = [x[0] for x in headers if x[0]]
         self.datarows = datarows
         self.name = name
         self.unit = unit
-        self.row_format = row_model.get_format(row_length=self.coln)
+        if row_format: 
+            self.row_format = row_format 
+        else:     
+            self.row_format = row_model.get_format(row_length=self.coln)
 
     def __eq__(self, x):
         return repr(self) == repr(x)
 
+    def __bool__(self):
+        return (self.name is not None) and (self.unit is not None)
+
     @property
     def label(self):
-        return make_label(self.name, self.unit)
+        if self:
+            return make_label(self.name, self.unit)
+        return None
 
     @property
     def coln(self):
         return max([len(row) for row in self.datarows])
-
-    def is_defined(self):
-        return self.name and self.unit
 
     def contains_any(self, strings):
         for header in self.headers:
@@ -121,6 +101,7 @@ class Table:
                     return s
         return None
 
+    #FIXME: may omit in favour of direct_row_format
     def assign_row_format(self, key):
         self.row_format = row_model.assign_format(key)
 
@@ -130,191 +111,148 @@ class Table:
             for d in row_model.emit_datapoints(row, _label, self.row_format):
                 yield d
 
-    def assign_name(self, parser):
-        if self.contains_any(parser.headers):
-            self.name = parser.name
-    
-    
-    def assign_unit(self, parser):
-        for header in self.headers:
-            unit = parser.mapper.extract(header)
-            if unit:
-                self.unit = unit
-
-
     def __repr__(self):
-        return ',\n      '.join([f"Table(name={repr(self.name)}",
-                                 f"unit={repr(self.unit)}",
-                                 f"row_format={repr(self.row_format)}",
-                                 f'headers={self.headers}',
-                                 f'datarows={self.datarows[0]}'
-                                 ]
-    )
+        items = [f'Table(name={repr(self.name)}',
+                 f'unit={repr(self.unit)}',
+                 f'row_format={repr(self.row_format)}',
+                 f'headers={self.headers}',
+                 f'datarows={self.datarows[0]}'
+                ]
+        return ',\n      '.join(items)
 
-from copy import copy
- 
-class TableList:
-    def __init__(self, tables=[]):
-        self.tables = list(tables)
+class Container:
+    def __init__(self, text: str, base_units: dict):
+        tables = import_tables_from_string(text)
+        self.incoming_tables = list(tables)
+        self.tables = [] 
+        self.parsed_tables = []
+        self.curname = None
+        self.base_mapper = UnitMapper(base_units)
         
-    def __getitem__(self, i):
-        return self.tables[i]
-    
-    def __repr__(self):
-        return repr(self.tables)
-    
-    def extend(self, x):
-        self.tables.extend(copy(x)) 
-        return self        
-    
-    def remove(self, x):
+    def push(self):
+        self.parsed_tables.extend([t for t in self.tables if t])
+        
+    def init(self):
+        self.tables = self.incoming_tables 
+
+    def start_with(self, start_strings):
+        self.init()
+        start_strings = iterate(start_strings) 
         for i, t in enumerate(self.tables):
-            if t == x:
-                del self.tables[i]
-        return self        
-    
-    def defined(self):
-        return [t for t in self.tables if t.is_defined()]
-            
-    def find(self, name=None, unit=None):
-        _tables = self.defined()
-        if name:
-             _tables = filter(lambda t: t.name == name, _tables)
-        if unit:
-             _tables = filter(lambda t: t.unit == unit, _tables)
-        return list(_tables)
-    
-    @property
-    def labels(self):
-        return [t.label for t in self.tables if t.is_defined()] 
- 
-    def segment(self, start_strings, end_strings):
-        segment = []  
-        we_are_in_segment = False
-        for t in self.tables:
             if t.contains_any(start_strings):
-                we_are_in_segment = True
-            if t.contains_any(end_strings):
                 break
-            if we_are_in_segment:
-                # warning: otherwise table gets modified unexpectedly 
-                z = copy(t)
-                segment.append(z)
-        return TableList(segment)        
+        self.tables = self.tables[i:]
+        return self    
+        
+    def end_with(self, end_strings):
+        end_strings = iterate(end_strings) 
+        we_are_in_segment = True
+        for i, t in enumerate(self.tables):
+            if t.contains_any(end_strings):
+                we_are_in_segment = False
+            if not we_are_in_segment:    
+                break
+        self.tables = self.tables[:i]
+        return self
     
+    def assign_units(self, unit):
+        for t in self.tables:
+            t.unit = unit
+        return self
+   
+    def set_name(self, name):
+        self.curname = name
+        
+    def attach_headers(self, headers):
+        headers = iterate(headers) 
+        for t in self.tables:
+           if t.contains_any(headers):
+                t.name = self.curname 
+        return self        
+
+    def set_units(self, units):
+        self.units = iterate(units)
+
+    def parse_units(self):
+        for i, t in enumerate(self.tables):
+            for header in t.headers:
+                unit = self.base_mapper.extract(header)
+                if unit:
+                    t.unit = unit
 
     def prev_next_pairs(self):
-        return zip(self.tables[:-1], self.tables[1:]) 
-    
-    
-    def put_trailing_names(self, parser):
+        return zip([None] + self.tables[:-1], self.tables) 
+
+    # TODO
+    def trail_down_units(self):
         """Assign trailing variable names in tables.
            Trailing names are defined in leading table and pushed down
            to following tables, if their unit is specified in namers.units
         """
-        _units = copy(parser.units)
-        for prev_table, table in self.prev_next_pairs():
+#        for prev_table, table in self.prev_next_pairs():
+#            if (table.unit is None
+#                and prev_table.unit is not None
+#                and table.name):
+#                table.unit = prev_table.unit
+        pass        
+
+
+    # TODO
+    def trail_down_names(self):
+        """Assign trailing variable names in tables.
+           Trailing names are defined in leading table and pushed down
+           to following tables, if their unit is specified in namers.units
+        """
+        _units = copy(self.units)
+        for i, table in enumerate(self.tables):
             if not _units:
                 break
-            if prev_table.name == parser.name:
-               try:
-                    _units.remove(prev_table.unit)
-               except ValueError:
-                    pass                    
-            if (table.name is None
-                and prev_table.name is not None
-                and table.unit in _units):
-                table.name = prev_table.name
-                print(table.headers)
-                print(_units)
+            if table.name and table.unit in _units:
+                _units.remove(table.unit)
+            if i >= 1 and table.name is None and table.unit in _units:
+                table.name = self.tables[i-1].name
                 _units.remove(table.unit)
 
-
-    def put_trailing_units(self, parser):
-        """Assign trailing variable names in tables.
-           Trailing names are defined in leading table and pushed down
-           to following tables, if their unit is specified in namers.units
-        """
-        for prev_table, table in self.prev_next_pairs():
-            if (table.unit is None
-                and prev_table.unit is not None
-                and table.name):
-                table.unit = prev_table.unit
-
-
-    def apply(self, parser):
-        for table in self.tables:
-             table.assign_name(parser)
-             table.assign_unit(parser)
-        self.put_trailing_names(parser)
-        self.put_trailing_units(parser)
+    # TODO
+    def parse_units_with(self, mapper: dict={}):
+        for t in self.tables:
+            pass
+        return self
+    
+    def require(self, string):
+        label, freq, date, value = string.split(' ')
+        value = float(value)
+        dp = row_model.Datapoint(label, freq, date, value) 
+        assert dp in self.datapoints
+    
+    @property
+    def datapoints(self):
+        return list(self.emit_datapoints())
     
     def emit_datapoints(self):
-        for t in self.tables:
-            for x in t.emit_datapoints():
-                yield x
+        for t in self.parsed_tables:
+            if t:
+                for x in t.emit_datapoints():
+                    yield x
 
-    def print(self):
-        for i, t in enumerate(self.tables):
-           print(i, t.headers)
+    @property
+    def labels(self):
+        return [t.label for t in self.parsed_tables] 
 
-def cut_segment(tables, namer):
-    return tables.segment(namer.scope.starts, namer.scope.ends)
+    def apply(self, commands_source):
+        for func in CommandList(commands_source).functions():
+            func(self)
 
-# to tests:
-assert TableList([1,2,3]).remove(2).tables == [1, 3]    
 
-             
-# прочитать все определения
-# выбрать определения с границами
-#      получить таблицы
-#      использовать юнитс или кастом юнитс 
-#      добавить имена
-# вернуть новый cписок таблиц 
-# полуить значения
-if __name__ == '__main__':
-    from kep.definition.namers import NAMERS
-    from paths import PATH_CSV
-    filename=PATH_CSV
-    namers=NAMERS
-    tables = TableList(import_tables(filename))
-    res = TableList()
-    border_namers = [n for n in namers if n.scope.is_defined()]
-    #default_namers = [n for n in namers if not n.scope]
-    #for namer in border_namers:
-    #    subtables = tables.segment(namer.scope.starts, namer.scope.ends)
-    #    subtables.apply(namer)
-    #    print(namer, "expects", namer.labels)
-    #    print("Found", subtables.labels)
-        #if namer.labels != subtables.labels:
-        #   print((namer.labels, subtabnamersles.labels))
-    #    res.extend(subtables)        
-    for i, namer in enumerate(border_namers):
-        subtables = cut_segment(tables, namer)
-        subtables.apply(namer)
-        print(i)        
-        print('Expected', namer.labels)
-        print('Found', subtables.labels)
-        try:
-            assert subtables.labels == namer.labels 
-        except AssertionError:
-            raise AssertionError
-        del subtables 
-    
-
-    
-# to test    
-#    from kep.reader import Table
-#    p = Parser(name='DINPRO',
-#               headers=['Промышленное производство'],
-#               custom_mapper_dict={'динозавров в год': 'dins'} 
-#               )
-#    t = Table(headers=[['Промышленное производство, динозавров в год']], 
-#              datarows=[[2018, 40, 10, 10, 10]])
+#TODO:
 #    
-#    assign_name(t, p)
-#    assign_unit(t, p)
-#    assert t.name == 'DINPRO'
-#    assert t.unit == 'dins'
 #    
+#    def put_trailing_names(self, parser):
 #
+#
+#    def put_trailing_units(self, parser):
+
+# Fails on empty row 
+#    if filters.is_year(row[0]):
+# IndexError: list index out of range
+
