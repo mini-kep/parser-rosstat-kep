@@ -9,7 +9,7 @@ import kep.row as row_model
 from kep.label import make_label
 from kep.units import UnitMapper
 from kep.commands import CommandList
-from kep.util import iterate
+from kep.util import iterate, read
 
 # convert CSV fle to Table() instances
 
@@ -121,13 +121,12 @@ class Table:
         return ',\n      '.join(items)
 
 class Container:
-    def __init__(self, text: str, base_units: dict):
-        tables = import_tables_from_string(text)
-        self.incoming_tables = list(tables)
+    def __init__(self, csv_source: str, base_mapper: UnitMapper):
+        self.incoming_tables = import_tables_from_string(csv_source)
         self.tables = [] 
         self.parsed_tables = []
         self.curname = None
-        self.base_mapper = UnitMapper(base_units)
+        self.base_mapper = base_mapper
         
     def push(self):
         self.parsed_tables.extend([t for t in self.tables if t])

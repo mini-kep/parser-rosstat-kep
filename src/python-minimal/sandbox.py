@@ -68,27 +68,109 @@ INTRUCTIONS_DOC = """
 - push
 """   
 
-DOC2 = """
-- require: m 1999-12-31 CPI_NONFOOD_rog 101.1
-- require: m 2015-12-31 INDPRO_yoy 98.1
+
+UNITS_DOC =  """
+bln_usd :
+  - млрд.долл.  
+  - млрд.долларов
+  - млрд. долларов
+  - млрд, долларов
+bln_rub :
+  - млрд.руб.  
+  - млрд.рублей
+  - млрд. рублей
+mln_rub :
+  - млн.руб.  
+rub : 
+  - руб.
+  - рублей
+bln_tkm :
+  - млрд.тонно-км
+  - млрд. тонно-км
+mln_t :
+  - млн.тонн  
+gdp_percent :    
+  - в % к ВВП
+mln :
+  - млн
+rog : 
+  - '% к пред. периоду'
+  - 'в % к прошлому периоду'
+  - 'в % к предыдущему месяцу'
+  - 'в % к предыдущему периоду'
+  - '% к концу предыдущего периода'
+  - 'в % к предыдущему периоду (в сопоставимых ценах)'
+yoy :
+  - '% год к году'
+  - 'в % к соответствующему периоду предыдущего года (в сопоставимых ценах)'
+  - 'в % к соответствующему периоду предыдущего года'
+ytd : 
+  - период с начала года
+  - 'период  с начала отчетного года в % к соответствующему периоду предыдущего года' 
 """
 
+#DOC2 = """
+#- require: m 1999-12-31 CPI_NONFOOD_rog 101.1
+#- require: m 2015-12-31 INDPRO_yoy 98.1
+#"""
+
+
+"""
+Inputs:
+    csv file (as CSV_TEXT)
+    parsing instructions (as INTRUCTIONS_DOC)
+    default untis of measurement (as UNITS_DOC)
+
+Output:
+    - list of tables 
+    - each table is assigned with variable name, unit of measirement and row format
+    
+Pseudocode:
+1. split incoming CSV file to tables
+2.- repeat for all given parsing instruction: 
+    a. establish block of tables:
+        - all tables in CSV file,  
+        - a subset of tables, delimited by start and end text lines
+    b. apply parsing instructions to block of tables
+    c. check expected variable names and units of measurement 
+      are found in block of tables
+    d. save parsed tables to queue of parsed tables
+3. emit datapoints from queue of parsed tables
+4. check values in tables
+"""
+
+
+
 from kep.reader import Container
-from kep.commands import CommandList
+from kep.units import UnitMapper
+from kep.commands import Command
 from kep.util import read
 
 
-def apply(csv_source, commands_source, base_units_source):
-    base_units_dict = read(base_units_source)
-    container = Container(csv_source, base_units_dict)
+def apply(csv_source, commands_source, base_units_source):    
+    container = Container(csv_source, base_units_source)
     container.apply(commands_source)
     return container       
 
 
+class Session:
+    def __init__(self, base_units_source: str, commands_source: str):
+        default_unit_dict = read(base_units_source)
+        self.default_unit_mapper = UnitMapper(default_unit_dict)
+        commands = read(commands_source)
+        self.commands_list = [Command(c).as_func() for c in commands]
+        
+    def parse(self, csv_source):
+        container = Container(csv_source, self.default_unit_mapper)
+        container.apply(self.commands_list)
+        return container.parsed_tables    
+
+
 if __name__ == '__main__':    
+    from kep.commands import CommandList
     container = apply(CSV_TEXT, 
                       INTRUCTIONS_DOC, 
-                      base_units_source='base_units.txt')
+                      UNITS_DOC)
     assert container.parsed_tables
     assert container.parsed_tables[0]    
     a = CommandList(INTRUCTIONS_DOC)
