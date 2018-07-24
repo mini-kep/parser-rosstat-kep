@@ -1,18 +1,13 @@
 import pandas as pd
 import warnings
 
-
 def check_duplicates(df):
     dups = df[df.duplicated(keep=False)]
     if not dups.empty:
         warnings.warn("Duplicate rows found:\n{}".format(dups))
 
-# EP: можно еще как-то съедать список, чтобы при последующих просмотрах он
-# был менше?
-
 
 def subset(values, freq):
-    # WONTFIX: can also .pop()
     return [x for x in values if x['freq'] == freq]
 
 
@@ -50,19 +45,8 @@ def create_dfm(datapoints):
     df.insert(1, "month", df.index.month)
     return deaccumulate(df, first_month=1)
 
-# EP: видимо нужно оставить одну какую-то функцию
-
-
-def to_dataframes(datapoints):
-    #datapoints = list(datapoints)
-    return dict(a=create_dfa(datapoints),
-                q=create_dfq(datapoints),
-                m=create_dfm(datapoints)
-                )
-
 
 def unpack_dataframes(datapoints):
-    #datapoints = list(datapoints)
     return [f(datapoints) for f in (create_dfa, create_dfq, create_dfm)]
 
 
@@ -95,21 +79,3 @@ def deaccumulate(df, first_month):
     return rename_accum(df)
 
 
-if __name__ == '__main__':
-    import pathlib
-    from reader import to_values
-    from parsing_definition import NAMERS, UNITS
-    from dev_helper import PATH
-    filename = str(pathlib.Path(__file__).with_name('tab.csv'))
-    values = to_values(PATH, UNITS, NAMERS)
-    dfa, dfq, dfm = unpack_dataframes(values)
-    dfs = to_dataframes(values)
-
-
-# FIXME: must check why happens
-"""Warning: duplicate rows found:
-        date freq        label  value
-8803  2016-5    m  PPI_mln_rub  101.4
-8839  2016-2    m  PPI_mln_rub  101.1
-8842  2016-5    m  PPI_mln_rub  101.4
-8878  2016-2    m  PPI_mln_rub  101.1"""

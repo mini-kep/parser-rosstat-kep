@@ -1,5 +1,8 @@
+<<<<<<< HEAD:src/python-minimal/dev_timer.py
 #EP: может переименовать этот файл?
 
+=======
+>>>>>>> 299371a83351640f29ae1d9d8b76f097d7ce2ee8:src/python-minimal/non-sandbox/timer.py
 import pathlib
 from parsing_definition import NAMERS, UNITS
 from reader import to_values
@@ -10,23 +13,6 @@ from timeit import timeit
 datafolder = pathlib.Path(__file__).parent / 'data'
 PATH = str(datafolder / 'tab.csv')
 PATH_LEGACY = str(datafolder / 'tab_old.csv')
-
-
-def messup(values):
-    messed_years = set()
-    messed_values = set()
-    for v in to_values(PATH, UNITS, NAMERS):
-        year = v['year']
-        value = v['value'].replace(',', '.').replace('…', '')
-        try:
-            assert int(year) <= 2018 and int(year) >= 1998
-        except BaseException:
-            messed_years.add(year)
-        try:
-            float(value) if value else 0
-        except BaseException:
-            messed_values.add(value)
-    return messed_years, messed_values
 
 
 def run_to_values():
@@ -76,6 +62,7 @@ def tester(code: str):
 def timer():
     print('Exеcution time in millisecond')
     for i, (msg, x) in enumerate([
+<<<<<<< HEAD:src/python-minimal/dev_timer.py
             
          ('Get datapoints as list', 
           'dev_timer.run_to_values()')
@@ -106,6 +93,27 @@ def replicate_dupl_error():
 import warnings
 warnings.simplefilter("ignore")
 
+=======
+
+        ('Get datapoints as list',
+         'dev_timer.run_to_values()'), 
+        
+        ('Bare dataframe',
+          'dev_timer.run_bare_df()'), 
+          
+        ('Decorated dataframe (create_df)',
+           "dev_timer.create_df(x=dev_timer.run_to_values(), freq='m')"), 
+           
+        ('Decorated dataframe (saver.create_base_dataframe)',
+         'dev_timer.run_create_dataframe()'), 
+         
+        ('3 dataframes (saver.create_base_dataframe)',
+         'dev_timer.run_df()')
+
+    ]):
+        print(f'{i+1})', msg, tester(x))
+
+>>>>>>> 299371a83351640f29ae1d9d8b76f097d7ce2ee8:src/python-minimal/non-sandbox/timer.py
 
 if __name__ == '__main__':
     timer()
