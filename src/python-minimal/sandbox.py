@@ -74,18 +74,18 @@ DOC2 = """
 """
 
 from kep.reader import Container
-from kep.units import BASE_UNITS
 from kep.commands import CommandList
+from kep.util import read
 
 
 def apply(csv_source, commands_source, base_units_source):
-    container = Container(csv_source, base_units_source)
+    base_units_dict = read(base_units_source)
+    container = Container(csv_source, base_units_dict)
     container.apply(commands_source)
     return container       
 
 
-if __name__ == '__main__':
-    base_units_source =  
+if __name__ == '__main__':    
     container = apply(CSV_TEXT, 
                       INTRUCTIONS_DOC, 
                       base_units_source='base_units.txt')

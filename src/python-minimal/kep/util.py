@@ -3,6 +3,11 @@ import pathlib
 import os
 
 
+
+def read(incoming: str):
+    txt = file_or_string(incoming)
+    return str_to_yaml(txt)
+
 def read_text(filepath: str):
     return pathlib.Path(filepath).read_text(encoding='utf-8')
 
