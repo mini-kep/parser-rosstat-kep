@@ -242,6 +242,9 @@ class Container:
         for func in CommandList(commands_source).functions():
             func(self)
 
+    def fapply(self, command_func):
+        command_func(self)
+
 
 #TODO:
 #    

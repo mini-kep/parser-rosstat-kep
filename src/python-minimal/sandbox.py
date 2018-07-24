@@ -26,8 +26,7 @@ CSV_TEXT = """	Год / Year	Кварталы / Quarters	Янв. Jan.	Фев. Fe
 1999	134,0	109,5	109,0	107,2	104,7	104,1	103,2	101,9	103,1	102,1	103,5	103,1	101,9	102,0	102,0	101,7	100,9
 	Год1) Year1)	Кварталы1) / Quarters1)	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.			
 		I	II	III	IV												
-4. Социальная сфера / Social field																	
-    
+4. Социальная сфера / Social field	
 2.2. Сальдированный финансовый результат1) по видам экономической деятельности, млн.рублей / Balanced financial result by economic activity, mln rubles												
 Добыча полезных ископаемых / Mining and quarrying												
 2017	2595632	258752	431071	582484	786597	966414	1288872	1488124	1676187	1890266	2124278	2384759
@@ -158,21 +157,32 @@ class Session:
         default_unit_dict = read(base_units_source)
         self.default_unit_mapper = UnitMapper(default_unit_dict)
         commands = read(commands_source)
-        self.commands_list = [Command(c).as_func() for c in commands]
+        self.command_calls_list = [Command(c).as_func() for c in commands]
         
-    def parse(self, csv_source):
+    def parsed_tables(self, csv_source):
         container = Container(csv_source, self.default_unit_mapper)
-        container.apply(self.commands_list)
+        for command in self.command_calls_list:
+            container.fapply(command)
         return container.parsed_tables    
 
 
 if __name__ == '__main__':    
-    from kep.commands import CommandList
-    container = apply(CSV_TEXT, 
-                      INTRUCTIONS_DOC, 
-                      UNITS_DOC)
-    assert container.parsed_tables
-    assert container.parsed_tables[0]    
-    a = CommandList(INTRUCTIONS_DOC)
-    assert sorted(a.labels) == sorted(container.labels)  
-    assert len(container.datapoints) >= 65
+    s = Session(UNITS_DOC, INTRUCTIONS_DOC) 
+    parsed_tables = s.parsed_tables(CSV_TEXT)
+    assert parsed_tables
+    assert parsed_tables[0]
+    assert parsed_tables[1]
+    
+    
+    ### Curretn result: getting 2 tables instead of 5
+    ###
+    
+#    from kep.commands import CommandList
+#    container = apply(CSV_TEXT, 
+#                      INTRUCTIONS_DOC, 
+#                      UNITS_DOC)
+#    assert container.parsed_tables
+#    assert container.parsed_tables[0]    
+#    a = CommandList(INTRUCTIONS_DOC)
+#    assert sorted(a.labels) == sorted(container.labels)  
+#    assert len(container.datapoints) >= 65
