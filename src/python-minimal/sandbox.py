@@ -1,4 +1,4 @@
-CPI_TEXT = """	Год / Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.			
+CSV_TEXT = """	Год / Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.			
 		I	II	III	IV												
 1.2. Индекс промышленного производства1) / Industrial Production index1)																	
 в % к соответствующему периоду предыдущего года / percent of corresponding period of previous year																	
@@ -39,7 +39,7 @@ CPI_TEXT = """	Год / Year	Кварталы / Quarters	Янв. Jan.	Фев. Fe
 Убыточные организации
 """
 
-DOC = """
+INTRUCTIONS_DOC = """
 - init
 - set_name: INDPRO
 - attach_headers: Индекс промышленного производства
@@ -85,9 +85,12 @@ def apply(csv_source, commands_source, base_units_source):
 
 
 if __name__ == '__main__':
-    container = apply(CPI_TEXT, DOC, BASE_UNITS)
+    base_units_source =  
+    container = apply(CSV_TEXT, 
+                      INTRUCTIONS_DOC, 
+                      base_units_source='base_units.txt')
     assert container.parsed_tables
     assert container.parsed_tables[0]    
-    a = CommandList(DOC)
-    #FIXME:
+    a = CommandList(INTRUCTIONS_DOC)
     assert sorted(a.labels) == sorted(container.labels)  
+    assert len(container.datapoints) >= 65
