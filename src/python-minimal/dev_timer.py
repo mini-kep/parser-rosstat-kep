@@ -1,4 +1,4 @@
-# EP: может переименовать этот файл?
+#EP: может переименовать этот файл?
 
 import pathlib
 from parsing_definition import NAMERS, UNITS
@@ -32,7 +32,6 @@ def messup(values):
 def run_to_values():
     return to_values(PATH, UNITS, NAMERS)
 
-
 def run_bare_df():
     x = run_to_values()
     df = pd.DataFrame(x)
@@ -55,15 +54,16 @@ def create_df(x, freq):
     df.insert(0, "year", df.index.year)
     return df
 
-
 def run_create_dataframe():
     x = run_to_values()
     create_base_dataframe(x, 'm')
-
-
+    
 def run_df():
     x = run_to_values()
     to_dataframes(x)
+    
+
+
 
 
 def tester(code: str):
@@ -76,26 +76,37 @@ def tester(code: str):
 def timer():
     print('Exеcution time in millisecond')
     for i, (msg, x) in enumerate([
+            
+         ('Get datapoints as list', 
+          'dev_timer.run_to_values()')
+         
+        ,('Bare dataframe', 
+          'dev_timer.run_bare_df()')
+        
+        ,('Decorated dataframe (create_df)', 
+          "dev_timer.create_df(x=dev_timer.run_to_values(), freq='m')")
+        
+        ,('Decorated dataframe (saver.create_base_dataframe)', 
+          'dev_timer.run_create_dataframe()')
 
-        ('Get datapoints as list',
-         'dev_timer.run_to_values()'), ('Bare dataframe',
-                                        'dev_timer.run_bare_df()'), ('Decorated dataframe (create_df)',
-                                                                     "dev_timer.create_df(x=dev_timer.run_to_values(), freq='m')"), ('Decorated dataframe (saver.create_base_dataframe)',
-                                                                                                                                     'dev_timer.run_create_dataframe()'), ('3 dataframes (saver.create_base_dataframe)',
-                                                                                                                                                                           'dev_timer.run_df()')
+        ,('3 dataframes (saver.create_base_dataframe)', 
+          'dev_timer.run_df()')
 
-    ]):
+        ]):
         print(f'{i+1})', msg, tester(x))
-
 
 def replicate_dupl_error():
     values = to_values(PATH, UNITS, NAMERS)
     df = pd.DataFrame(values)
     dups = df[df.duplicated(keep=False)]
     print(dups)
-    return dups
+    return dups   
+
+#TODO: how to control warnings 
+import warnings
+warnings.simplefilter("ignore")
 
 
 if __name__ == '__main__':
     timer()
-    # replicate_dupl_error()
+    #replicate_dupl_error()
