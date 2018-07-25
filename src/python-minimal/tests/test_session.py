@@ -106,15 +106,14 @@ ytd :
   - 'период с начала отчетного года в % к соответствующему периоду предыдущего года' 
 """
 
-# TODO: required labels
-#DOC2 = """
-#- require: m 1999-12-31 CPI_NONFOOD_rog 101.1
-#- require: m 2015-12-31 INDPRO_yoy 98.1
-#"""
+from kep.session import Session 
 
-
-if __name__ == '__main__':    
-    from kep.session import Session 
+def test_integration():
     s = Session(UNITS_DOC, INTRUCTIONS_DOC) 
     c = s.parse_tables(CSV_TEXT)
+    assert c.labels == ['INDPRO_yoy',
+                        'INDPRO_rog',
+                        'INDPRO_ytd',
+                        'CPI_NONFOOD_rog',
+                        'PROFIT_MINING_mln_rub']
     assert len(c.datapoints) == 77

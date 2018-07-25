@@ -55,14 +55,14 @@ def clean_value(x: str) -> float:
 assert clean_value('406911)') == 40691
 assert clean_value('211,32)') == 211.3
 
-    
-#def find_at_word_start():
-#   pass    
+
+# def find_at_word_start():
+#   pass
 #x = re.search(r'\bпрод','не прод')
-#print(x)
+# print(x)
 #
 #
 #a = 'непродовольственные товары1)'
 #b = 'продовольственные товары'
 #x = re.search(r'\b{}'.format(b),a)
-#print(x)
+# print(x)

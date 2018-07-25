@@ -1,6 +1,7 @@
 import pandas as pd
 import warnings
 
+
 def check_duplicates(df):
     dups = df[df.duplicated(keep=False)]
     if not dups.empty:
@@ -50,7 +51,6 @@ def unpack_dataframes(datapoints):
     return [f(datapoints) for f in (create_dfa, create_dfq, create_dfm)]
 
 
-# TODO: bring back original tests
 # TODO: need to be changed according to new format - must use 'a' as 'm12'
 # government revenue and expense time series transformation
 
@@ -77,5 +77,3 @@ def deaccumulate(df, first_month):
             "ACCUM" in vn)]
     df[varnames] = deacc_main(df[varnames], first_month)
     return rename_accum(df)
-
-

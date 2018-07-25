@@ -1,8 +1,12 @@
-from kep.units import UnitMapper, BASE_UNITS
-
-mapper = UnitMapper(BASE_UNITS)   
-
+from kep.units import UnitMapper
 import pytest
+
+
+mapper = UnitMapper({
+        'bln_rub': ['млрд.рублей'], 
+        'yoy': ['в % к соответствующему периоду предыдущего года']
+        })
+
 @pytest.mark.parametrize('unit, text', [
     ['bln_rub', 'abc - млрд.рублей'],
     ['yoy', 'в % к соответствующему периоду предыдущего года '
