@@ -38,6 +38,7 @@ CSV_TEXT = """	Год / Year	Кварталы / Quarters	Янв. Jan.	Фев. Fe
 Убыточные организации
 """
 
+# split instructions
 INTRUCTIONS_DOC = """
 - init
 - set_name: INDPRO
@@ -45,26 +46,27 @@ INTRUCTIONS_DOC = """
 - set_units: 
     - yoy
     - rog
+    - ytd
 - parse_units
 - trail_down_names    
 - push
-- init
-- start_with: '3.5. Индекс потребительских цен'
-- end_with: '4. Социальная сфера'
-- assign_units: rog
-- set_name: CPI_NONFOOD
-- attach_headers: 
-  - 'непродовольственные товары'
-  - 'непродовольст- венные товары'
-- push
-- init
-# TODO: change format to 'fiscal'
-- start_with: '2.2. Сальдированный финансовый результат'
-- end_with: 'Убыточные организации'
-- assign_units: 'mln_rub'
-- set_name: PROFIT_MINING
-- attach_headers: Добыча полезных ископаемых
-- push
+#- init
+#- start_with: '3.5. Индекс потребительских цен'
+#- end_with: '4. Социальная сфера'
+#- assign_units: rog
+#- set_name: CPI_NONFOOD
+#- attach_headers: 
+#  - 'непродовольственные товары'
+#  - 'непродовольст- венные товары'
+#- push
+#- init
+## TODO: change format to 'fiscal'
+#- start_with: '2.2. Сальдированный финансовый результат'
+#- end_with: 'Убыточные организации'
+#- assign_units: 'mln_rub'
+#- set_name: PROFIT_MINING
+#- attach_headers: Добыча полезных ископаемых
+#- push
 """   
 
 
@@ -105,7 +107,7 @@ yoy :
   - 'в % к соответствующему периоду предыдущего года'
 ytd : 
   - период с начала года
-  - 'период  с начала отчетного года в % к соответствующему периоду предыдущего года' 
+  - 'период с начала отчетного года в % к соответствующему периоду предыдущего года' 
 """
 
 #DOC2 = """
@@ -116,7 +118,7 @@ ytd :
 
 """
 Inputs:
-    csv file (as CSV_TEXT)
+    CSV file (as CSV_TEXT)
     parsing instructions (as INTRUCTIONS_DOC)
     default untis of measurement (as UNITS_DOC)
 
@@ -145,12 +147,7 @@ from kep.units import UnitMapper
 from kep.commands import Command
 from kep.util import read
 
-
-def apply(csv_source, commands_source, base_units_source):    
-    container = Container(csv_source, base_units_source)
-    container.apply(commands_source)
-    return container       
-
+    
 
 class Session:
     def __init__(self, base_units_source: str, commands_source: str):
@@ -163,15 +160,16 @@ class Session:
         container = Container(csv_source, self.default_unit_mapper)
         for command in self.command_calls_list:
             container.fapply(command)
-        return container.parsed_tables    
+        return container.parsed_tables, container.tables,  container
 
 
 if __name__ == '__main__':    
     s = Session(UNITS_DOC, INTRUCTIONS_DOC) 
-    parsed_tables = s.parsed_tables(CSV_TEXT)
+    parsed_tables, tables, c = s.parsed_tables(CSV_TEXT)
     assert parsed_tables
     assert parsed_tables[0]
     assert parsed_tables[1]
+    assert parsed_tables[2]
     
     
     ### Curretn result: getting 2 tables instead of 5

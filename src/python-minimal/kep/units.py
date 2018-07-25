@@ -1,12 +1,7 @@
-from kep.util import read_yaml
-
 class UnitMapper:
-    def __init__(self, mapper_dict):
-        self.mapper_dict = mapper_dict
-        
-    def append(self, mapper_dict):
-        for k, v in mapper_dict.items():
-            self.mapper_dict[k] = v
+    def __init__(self, long_mapper_dict):
+        _items = long_mapper_dict.items() 
+        self.mapper_dict = {pat: key for key, values in _items for pat in values}        
             
     def keys(self):
         return self.mapper_dict.keys()
@@ -16,17 +11,20 @@ class UnitMapper:
         return list(set(values))
 
     def extract(self, text):
-        for pat in self.mapper_dict.keys():
+        found = []
+        for pat in self.mapper_dict.keys():             
              if pat in text:
-                 return self.mapper_dict[pat]
+                 found.append(pat)
+        if found:
+            # match larger string
+            print(found)
+            pat = max(found, key=len)
+            return self.mapper_dict[pat]
         return None
     
     def __repr__(self):
-        return repr(self.mapper_dict)
-        
-
-def read_base_units(filename='base_units.txt'):
-    base_doc = read_yaml(filename)
-    return {pat: key for key, values in base_doc.items() for pat in values}
-
-BASE_UNITS = read_base_units()
+        return repr(self.mapper_dict)     
+    
+#       unit='ytd',
+#       row_format='YAQQQQMMMMMMMMMMMM',
+#       headers=['период с начала отчетного года в % к соответствующему периоду предыдущего года / period from beginning of reporting year as percent of corresponding period of previous year'],    
