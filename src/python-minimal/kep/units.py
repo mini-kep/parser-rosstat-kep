@@ -4,15 +4,11 @@ def convert(listing_dict):
 
 
 class UnitMapper:
+    """Initialise mapper with *listing_dict* dictionary and use .extract() 
+       method to parse units of measurements for headers.
+    """
     def __init__(self, listing_dict):
         self.mapper_dict = convert(listing_dict)
-
-    def keys(self):
-        return self.mapper_dict.keys()
-
-    def values(self):
-        values = self.mapper_dict.values()
-        return list(set(values))
 
     def extract(self, text):
         found = []
@@ -27,8 +23,3 @@ class UnitMapper:
 
     def __repr__(self):
         return repr(self.mapper_dict)
-
-# TODO: make test for 'extract'
-#       unit='ytd',
-#       row_format='YAQQQQMMMMMMMMMMMM',
-#       headers=['период с начала отчетного года в % к соответствующему периоду предыдущего года / period from beginning of reporting year as percent of corresponding period of previous year'],

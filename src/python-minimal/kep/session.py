@@ -31,11 +31,11 @@ Pseudocode
 
 """
 
-from kep.reader import Container
+from kep.parser import Container
 from kep.units import UnitMapper
 from kep.commands import CommandSet
 
-from kep.util import read, read_many
+from kep.interface import read, read_many
 
 
 class Session:

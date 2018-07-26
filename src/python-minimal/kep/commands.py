@@ -1,5 +1,4 @@
-from kep.util import iterate
-from kep.label import make_label
+from kep.util import iterate, make_label
 
 
 def extract_command_parameters(command):
