@@ -2,28 +2,16 @@ import kep.commands as commands
 import pytest
 
 
-def extract_command_parameters(command):
-    if isinstance(command, str):
-        method = command
-        arg = None
-    elif isinstance(command, dict):
-        for method, arg in command.items():
-            break
-    else:
-        raise TypeError(command)
-    return method, arg
-
-
 @pytest.mark.parametrize('command, tup', [
      ['init', ('init', None)],
      [{'set_name': 'INDPRO'}, ('set_name', 'INDPRO')]
 ])
 def test_extract_command_parameters(command, tup):
-    assert extract_command_parameters(command) == tup
+    assert commands._extract_command_parameters(command) == tup
 
 
 def test_labels():
-    res = commands.labels([{'set_name': 'INDPRO'}, {'set_units': 'yoy'}])
+    res = commands._labels([{'set_name': 'INDPRO'}, {'set_units': 'yoy'}])
     assert res == ['INDPRO_yoy']    
     
 

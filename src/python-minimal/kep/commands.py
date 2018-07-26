@@ -1,7 +1,6 @@
 from kep.util import iterate, make_label
 
-
-def extract_command_parameters(command):
+def _extract_command_parameters(command):
     if isinstance(command, str):
         method = command
         arg = None
@@ -13,8 +12,8 @@ def extract_command_parameters(command):
     return method, arg
 
 
-def as_function(command):
-    method, arg = extract_command_parameters(command)
+def _as_function(command):
+    method, arg = _extract_command_parameters(command)
 
     def foo(cls):
         f = getattr(cls, method)
@@ -25,9 +24,9 @@ def as_function(command):
     return foo
 
 
-def labels(commands: list):
+def _labels(commands: list):
     for command in commands:
-        method, arg = extract_command_parameters(command)
+        method, arg = _extract_command_parameters(command)
         if method == 'set_name':
             name = arg
         elif method in ['set_units', 'assign_units']:
@@ -36,13 +35,16 @@ def labels(commands: list):
 
 
 class CommandSet:
+    """Accept a list of strings or dictionaries and provide
+       class manipulation methods or list of labels.
+    """
     def __init__(self, commands):
         self.commands = commands
 
     @property
     def methods(self):
-        return [as_function(c) for c in self.commands]
+        return [_as_function(c) for c in self.commands]
 
     @property
     def labels(self):
-        return labels(self.commands)
+        return _labels(self.commands)
