@@ -6,9 +6,12 @@ Exctact data from CSV file using parsing instructions and units of measurement d
 Inputs
 ======
 
-- CSV file (as `sandbox.CSV_TEXT`)
-- parsing instructions (as `sandbox.INTRUCTIONS_DOC`)
-- default units of measurement (as `sandbox.UNITS_DOC`)
+- [ ] CSV file (as `sandbox.CSV_TEXT`)
+- [ ] parsing instructions (as `sandbox.INTRUCTIONS_DOC`)
+- [ ] default units of measurement (as `sandbox.UNITS_DOC`)
+
+Comment: units of measurement can be a part of parsing instructions, but they are 
+         reused often, so better work as a separate input parameter 
 
 Output
 ======
@@ -17,15 +20,16 @@ Output
 Pseudocode
 ==========
 
-1. split incoming CSV file to tables
+1. split incoming CSV file to tables, containign header text lines and data
 2. repeat for all given parsing instruction: 
-    - a. apply parsing instructions to block of tables to obtain variable labels
-         (variable names and units of measurement) 
-    - b. check all expected variable variable are found 
-    - c. save parsed tables to queue of parsed tables
+   -  a. apply parsing instructions to limit block of tables 
+    - b. apply parsing instructions to table headers in block of tables 
+         to obtain variable labels (variable names and units of measurement) 
+    - c. check all expected variable labels are found 
+    - d. save parsed tables to queue of parsed tables
 3. emit datapoints from queue of parsed tables
 4. create pandas dataframes by frequency
-5. check values in from parsed tables
+5. check values in dataframes by control points
 
 TODOS
 =====
