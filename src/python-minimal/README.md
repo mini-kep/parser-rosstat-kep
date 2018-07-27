@@ -1,12 +1,13 @@
 Objective
 =========
 
-Exctact data from CSV file using parsing instructions and units of measurement definition. 
+Extract data from CSV file using parsing instructions and units of measurement definition. 
+Run over monthly data releases to learn about economic indicator revisions.
 
 Inputs
 ======
 
-- [ ] CSV file (as `sandbox.CSV_TEXT`)
+- [ ] one CSV file (as `sandbox.CSV_TEXT`)
 - [ ] parsing instructions (as `sandbox.INTRUCTIONS_DOC`)
 - [ ] default units of measurement (as `sandbox.UNITS_DOC`)
 
@@ -16,7 +17,7 @@ Comment: units of measurement can be a part of parsing instructions, but they ar
 Output
 ======
 
-Pandas dataframes at annual, quarterly and monthly frequencies (`dfa`, `dfq`, `dfm`)
+Three pandas dataframes at annual, quarterly and monthly frequencies (`dfa`, `dfq`, `dfm`)
     
 Pseudocode
 ==========
