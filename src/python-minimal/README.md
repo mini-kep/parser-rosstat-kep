@@ -11,8 +11,9 @@ Inputs
 - [ ] parsing instructions (as `sandbox.INTRUCTIONS_DOC`)
 - [ ] default units of measurement (as `sandbox.UNITS_DOC`)
 
-Comment: units of measurement can be a part of parsing instructions, but they are 
-         reused often, so better work as a separate input parameter 
+Comment: units of measurement can be a part of parsing instructions, 
+         but they are reused often, that is why they are a separate 
+         input parameter. 
 
 Output
 ======
@@ -28,24 +29,29 @@ Pseudocode
     - b. apply parsing instructions to table headers in block of tables 
          to obtain variable labels (variable names and units of measurement) 
     - c. check all expected variable labels are found 
-    - d. save parsed tables to queue of parsed tables
+    - d. check control values for parsed tables   
+    - e. save parsed tables to queue of parsed tables
 3. emit datapoints from queue of parsed tables
 4. create pandas dataframes by frequency
-5. check values in dataframes by control points
+5. deacculmulate some dataframes 
+
 
 TODOS
 =====
 - run Session on several CSV files
   - two files in data
   - actual files since 2007
-- restore download/unpack/convert functionality outside parser
-- restore value check procedure 
-  - done as hard check, will fail on missing values  
-  - no scope of control values presented
 - time running time 
+----
+- restore download/unpack/convert functionality outside parser
+- value check procedure 
+  - [x] done as hard check, but will fail on missing values  
 - plot deviations between first and last estimate
 - extend parsing definitions for more variables
 - upload to database
+
+NOT TODO
+========
 - check coverage report 
 - compeltion metrics: how many variables are parsed
 

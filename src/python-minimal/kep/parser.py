@@ -85,13 +85,7 @@ class Worker:
                 unit = self.base_mapper.extract(header)
                 if unit:
                     t.unit = unit
-
-    # TODO
-#    def parse_units_with(self, mapper: dict={}):
-#        for t in self.tables:
-#            pass
-#        return self
-
+                    
     def force_units(self, unit):
         """All tables in segment will be assigned 
            this *unit* of measurement. 
@@ -104,8 +98,6 @@ class Worker:
             fmt = 'YA' + 'M' * 11
         for t in self.tables:
             t.row_format = fmt
-        
-
 
 
 #TODO
@@ -147,15 +139,12 @@ class Worker:
                 table.name = self.tables[i-1].name
                 _units.remove(table.unit)
 
-    def require(self, strings):
-        _datapoints = self.datapoints()
-        for string in iterate(strings):
-            label, freq, date, value = string.split(' ')
-            value = float(value)
-            dp = Datapoint(label, freq, date, value)
-            if dp not in _datapoints:
-                similar = [x for x in _datapoints if x.label == dp.label] 
-                raise AssertionError((dp, similar))
+    def all(self, strings):
+        Verifier(strings, self.datapoints()).all()
+        
+    def any(self, strings):
+        Verifier(strings, self.datapoints()).any()
+
         
     def datapoints(self):
         """Values in parsed tables."""
@@ -167,6 +156,30 @@ class Worker:
     def labels(self):
         """Parsed variable names."""
         return [t.label for t in self.tables if t]
+
+class Verifier():
+     def __init__(self, strings, datapoints):
+         values = [self.to_datapoint(string) for string in iterate(strings)]
+         self.bools = [value in datapoints for value in values]
+         self.datapoints = datapoints
+        
+     def all(self):
+         if not all(self.bools):
+             self.raise_error()
+             
+     def any(self):
+         if not any(self.bools):
+             self.raise_error()
+             
+     def raise_error(self): 
+         raise AssertionError(self.datapoints)
+         
+     @staticmethod
+     def to_datapoint(string):
+        label, freq, date, value = string.split(' ')
+        value = float(value)
+        return Datapoint(label, freq, date, value)
+     
 
 class Container:
     def __init__(self, csv_source: str, base_mapper: UnitMapper):
