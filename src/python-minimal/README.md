@@ -44,14 +44,17 @@ TODOS
 - time running time 
 ----
 - restore download/unpack/convert functionality outside parser
-- value check procedure 
-  - [x] done as hard check, but will fail on missing values  
 - plot deviations between first and last estimate
 - extend parsing definitions for more variables
 - upload to database
 
 NOT TODO
 ========
+- more tests
+- interface levels - all funcs accept strings 
 - check coverage report 
 - compeltion metrics: how many variables are parsed
 
+DONE
+====
+- [x] value check procedure (now has all/any check) 
