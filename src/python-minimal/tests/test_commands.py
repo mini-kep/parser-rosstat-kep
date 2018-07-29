@@ -4,18 +4,20 @@ import pytest
 
 @pytest.mark.parametrize('command, tup', [
      ['init', ('init', None)],
-     [{'set_name': 'INDPRO'}, ('set_name', 'INDPRO')]
+     [{'var': 'INDPRO'}, ('var', 'INDPRO')]
 ])
 def test_extract_command_parameters(command, tup):
     assert commands._extract_command_parameters(command) == tup
 
 
 def test_labels():
-    res = commands._labels([{'set_name': 'INDPRO'}, {'set_units': 'yoy'}])
+    res = commands._labels([{'var': 'INDPRO'}, {'units': 'yoy'}])
     assert res == ['INDPRO_yoy']    
     
 
 def test_CommandSet_properties_are_callable():
-    cs = commands.CommandSet([{'set_name': 'INDPRO'}, {'set_units': 'yoy'}])
+    cs = commands.CommandSet([{'var': 'INDPRO'}, {'units': 'yoy'}])
     assert cs.methods
     assert cs.labels
+    
+# TODO: more tests for commands    

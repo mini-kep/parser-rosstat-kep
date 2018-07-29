@@ -14,24 +14,11 @@ ROW_FORMAT_DICT = {len(x): x for x in [
 Datapoint = namedtuple('Datapoint', 'label freq date value')    
 
 
-#FIXME: can supply format directly without fiscal
-
-def raise_format(key: str):
-    raise ValueError(f'Unknown row format: {key}')
-
-
 def get_format(row_length: int, row_format_dict=ROW_FORMAT_DICT):
     try:
         return row_format_dict[row_length]
     except KeyError:
-        raise_format(row_length)
-
-
-def assign_format(key: str):
-    if key == 'fiscal':
-        return 'YA' + 'M' * 11
-    else:
-        raise_format(key)
+        raise ValueError(f'Cannot decide on row format: {row_length}')
 
 
 def timestamp(freq: str, 
@@ -41,6 +28,16 @@ def timestamp(freq: str,
     month = MONTHS[freq] * period
     day = calendar.monthrange(year, month)[1]
     return f'{year}-{str(month).zfill(2)}-{day}'
+    
+def timestamp_short(freq: str, 
+                    year: str, 
+                    period: int):
+    if freq == 'a':
+        return year
+    if freq == 'q':
+        period = period * 3
+    month = str(period).zfill(2)
+    return f'{year}-{month}'
 
 
 def emit_datapoints(row, label, row_format):
@@ -55,7 +52,7 @@ def emit_datapoints(row, label, row_format):
                 freq = letter.lower()
                 yield Datapoint(label, 
                                 freq, 
-                                timestamp(freq, year, period), 
+                                timestamp_short(freq, year, period), 
                                 filters.clean_value(value))
 
 # WONTFIX

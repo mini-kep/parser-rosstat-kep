@@ -38,32 +38,39 @@ CSV_TEXT = """	Год / Year	Кварталы / Quarters	Янв. Jan.	Фев. Fe
 Убыточные организации
 """
 
-
 INTRUCTIONS_DOC = """
-- set_name: INDPRO
-- attach_headers: Индекс промышленного производства
-- set_units: 
+- var: INDPRO
+- headers: Индекс промышленного производства
+- units: 
     - yoy
     - rog
     - ytd
-- parse_units
-- trail_down_names    
+- trail_down_names
+- require:
+    - INDPRO_yoy a 2015 99.2
+    - INDPRO_rog q 2015-03 82.8
+    - INDPRO_ytd m 2015-01 100    
 ---
 - start_with: '3.5. Индекс потребительских цен'
 - end_with: '4. Социальная сфера'
-- assign_units: rog
-- set_name: CPI_NONFOOD
-- attach_headers: 
+- var: CPI_NONFOOD
+- headers: 
   - 'непродовольственные товары'
   - 'непродовольст- венные товары'
+- force_units: rog
+- require: 
+    - CPI_NONFOOD_rog m 1999-12 101.1
 ---
-# TODO: change format to 'fiscal'
 - start_with: '2.2. Сальдированный финансовый результат'
 - end_with: 'Убыточные организации'
-- assign_units: 'mln_rub'
-- set_name: PROFIT_MINING
-- attach_headers: Добыча полезных ископаемых
+- var: PROFIT_MINING
+- headers: Добыча полезных ископаемых
+- force_units: 'mln_rub'
+- force_format: 'fiscal'
+- require: 
+    - PROFIT_MINING_mln_rub a 2017 2595632
 """   
+# TODO: must deaccumulate PROFIT_MINING and similar
 
 
 UNITS_DOC =  """
@@ -108,12 +115,17 @@ ytd :
 
 from kep.session import Session 
 
-def test_integration():
+class Test_session():
+    
     s = Session(UNITS_DOC, INTRUCTIONS_DOC) 
     c = s.parse_tables(CSV_TEXT)
-    assert c.labels == ['INDPRO_yoy',
-                        'INDPRO_rog',
-                        'INDPRO_ytd',
-                        'CPI_NONFOOD_rog',
-                        'PROFIT_MINING_mln_rub']
-    assert len(c.datapoints) == 77
+    
+    def test_lables(self):    
+        assert self.c.labels == ['INDPRO_yoy',
+                            'INDPRO_rog',
+                            'INDPRO_ytd',
+                            'CPI_NONFOOD_rog',
+                            'PROFIT_MINING_mln_rub']
+    
+    def test_datapoint_method(self):     
+        assert len(self.c.datapoints()) == 77
