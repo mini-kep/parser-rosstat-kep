@@ -18,7 +18,8 @@ Comment: units of measurement can be a part of parsing instructions,
 Output
 ======
 
-Three pandas dataframes at annual, quarterly and monthly frequencies (`dfa`, `dfq`, `dfm`)
+Three pandas dataframes at annual, quarterly and monthly frequencies 
+(`dfa`, `dfq`, `dfm`)
     
 Pseudocode
 ==========
