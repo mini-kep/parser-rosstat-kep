@@ -39,7 +39,9 @@ TODOS
   - two files in data
   - actual files since 2007
 - restore download/unpack/convert functionality outside parser
-- restore value check procedure
+- restore value check procedure 
+  - done as hard check, will fail on missing values  
+  - no scope of control values presented
 - time running time 
 - plot deviations between first and last estimate
 - extend parsing definitions for more variables
