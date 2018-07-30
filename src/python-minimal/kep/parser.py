@@ -162,6 +162,7 @@ class Verifier():
          values = [self.to_datapoint(string) for string in iterate(strings)]
          self.bools = [value in datapoints for value in values]
          self.datapoints = datapoints
+         self.string = strings
         
      def all(self):
          if not all(self.bools):
@@ -172,13 +173,19 @@ class Verifier():
              self.raise_error()
              
      def raise_error(self): 
-         raise AssertionError(self.datapoints)
+         raise AssertionError(("Control datapoints not found",
+                               self.string, 
+                               self.datapoints))
          
      @staticmethod
      def to_datapoint(string):
-        label, freq, date, value = string.split(' ')
-        value = float(value)
-        return Datapoint(label, freq, date, value)
+        args = string.split(' ')
+        if args[1] == 'a':
+            label, freq, year, value = args
+            month = 12
+        else: 
+            label, freq, year, month, value = args
+        return Datapoint(label, freq, int(year), int(month), float(value))
      
 
 class Container:

@@ -48,8 +48,8 @@ INTRUCTIONS_DOC = """
 - trail_down_names
 - any:
     - INDPRO_yoy a 2015 99.2
-    - INDPRO_rog q 2015-03 82.8
-    - INDPRO_ytd m 2015-01 100    
+    - INDPRO_rog q 2015 3 82.8
+    - INDPRO_ytd m 2015 1 100    
 ---
 - start_with: '3.5. Индекс потребительских цен'
 - end_with: '4. Социальная сфера'
@@ -59,7 +59,7 @@ INTRUCTIONS_DOC = """
   - 'непродовольст- венные товары'
 - force_units: rog
 - all: 
-    - CPI_NONFOOD_rog m 1999-12 101.1
+    - CPI_NONFOOD_rog m 1999 12 101.1
 ---
 - start_with: '2.2. Сальдированный финансовый результат'
 - end_with: 'Убыточные организации'
