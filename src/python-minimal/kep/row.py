@@ -28,21 +28,27 @@ def get_month(freq: str, period: int):
 
 
 def emit_datapoints(row, label, row_format):
+    """Yield Datapoint instances from *row*.    
+    Args:
+        row(list) - lsit of strings
+        label(list) - variable identificator
+        row_format(list) - 
+    """    
     occurences = ''
     for value, letter in zip(row, row_format):
         occurences += letter
         if letter == 'Y':
             year = value
         else:
-            if filters.number_string(value):
-                period = occurences.count(letter)
-                freq = letter.lower()
-                yield Datapoint(label, 
-                                freq,
-                                #FIXME: maybe should clean year too 
-                                int(year),
-                                get_month(freq, period), 
-                                filters.clean_value(value))
+            if filters.is_omission(value):
+                continue                
+            period = occurences.count(letter)
+            freq = letter.lower()
+            yield Datapoint(label=label, 
+                            freq=freq,
+                            year=filters.clean_year(year),
+                            month=get_month(freq, period), 
+                            value=filters.clean_value(value))
 
 # WONTFIX
 # must fail on row

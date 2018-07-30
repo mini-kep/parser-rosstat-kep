@@ -40,5 +40,5 @@ def clean_value(x: str) -> float:
     return None
 
 
-def number_string(x):
-    return x.replace('…', '').replace('-', '')
+def is_omission(x):
+    return x in ['', '…', '-']

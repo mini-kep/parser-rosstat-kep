@@ -1,8 +1,10 @@
-from kep.filters import clean_year, clean_value, number_string
+from kep.filters import clean_year, clean_value, is_omission
 
-def test_number_string():
-    assert number_string('-') == ""
-    assert number_string('…') == ""    
+def test_is_omission():
+    assert is_omission('') is True
+    assert is_omission('-') is True
+    assert is_omission('…') is True
+    assert is_omission('1') is False    
 
 def test_clean_year():
 	assert clean_year('20052),3)') == 2005
