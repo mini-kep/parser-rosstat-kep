@@ -36,8 +36,8 @@ def _labels(commands: list):
 
 
 class CommandSet:
-    """Provide class manipulation functions or list of labels
-       based on parsing commands from yaml file.
+    """Use yaml file to collect parsing functions, 
+       list of labels, or control values.
     """
     def __init__(self, commands: str):
         """

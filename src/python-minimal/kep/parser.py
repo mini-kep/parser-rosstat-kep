@@ -2,9 +2,9 @@ from copy import copy
 from kep.units import UnitMapper
 from kep.util import iterate
 from kep.reader import import_tables_from_string
-from kep.row import Datapoint
+from kep.verifier import require_all, require_any
 
-__all__ = ['Worker', 'Container']
+__all__ = ['Worker', 'Collector']
 
 class Worker:
     """Parse *tables* using commands below.
@@ -35,6 +35,7 @@ class Worker:
         self.tables = tables
         self.name = None
         self.base_mapper = base_mapper
+        self.parse_units()
 
     def start_with(self, start_strings):
         """Limit parsing segment starting from any of *start_strings*."""
@@ -76,9 +77,8 @@ class Worker:
     def units(self, units):
         """Set list of *units* for parsing."""
         self.units = iterate(units)
-        self._parse_units()
 
-    def _parse_units(self):
+    def parse_units(self):
         """Identify units using standard units mapper."""
         for i, t in enumerate(self.tables):
             for header in t.headers:
@@ -140,85 +140,40 @@ class Worker:
                 _units.remove(table.unit)
 
     def all(self, strings):
-        Verifier(strings, self.datapoints()).all()
+        require_all(strings, self.datapoints())
         
     def any(self, strings):
-        Verifier(strings, self.datapoints()).any()
-
+        require_any(strings, self.datapoints())
         
     def datapoints(self):
         """Values in parsed tables."""
-        return [x for t in self.tables 
-                  for x in t.emit_datapoints()
-                  if t]
+        return [x for t in self.tables if t 
+                  for x in t.emit_datapoints()]
 
     @property
     def labels(self):
         """Parsed variable names."""
         return [t.label for t in self.tables if t]
 
-class Verifier():
-     def __init__(self, strings, datapoints):
-         values = [self.to_datapoint(string) for string in iterate(strings)]
-         self.bools = [value in datapoints for value in values]
-         self.datapoints = datapoints
-         self.string = strings
-        
-     def all(self):
-         if not all(self.bools):
-             self.raise_error()
-             
-     def any(self):
-         if not any(self.bools):
-             self.raise_error()
-             
-     def raise_error(self): 
-         raise AssertionError(("Control datapoints not found",
-                               self.string, 
-                               self.datapoints))
-         
-     @staticmethod
-     def to_datapoint(string):
-        args = string.split(' ')
-        if args[1] == 'a':
-            label, freq, year, value = args
-            month = 12
-        else: 
-            label, freq, year, month, value = args
-        return Datapoint(label, freq, int(year), int(month), float(value))
-     
-
-class Container:
+            
+class Collector:
+    """Process parsing instructions and collect parsed tables.
+    """
     def __init__(self, csv_source: str, base_mapper: UnitMapper):
-        self.incoming_tables = import_tables_from_string(csv_source)
+        incoming_tables = import_tables_from_string(csv_source)
+        self.base_worker = Worker(incoming_tables, base_mapper)
         self.parsed_tables = []
-        self.base_mapper = base_mapper
-        self.worker = None
-
-    def init(self):
-        self.worker = Worker(self.incoming_tables, self.base_mapper)
-
-    def push(self):
-        current_parsed_tables = [t for t in self.worker.tables if t]
-        self.parsed_tables.extend(current_parsed_tables)
-
-    def apply(self, command_functions):
-        self.init()
+        
+    def apply(self, command_functions, expected_labels):
+        self.worker = copy(self.base_worker)
         for func in command_functions:
             func(self.worker)
-        self.push()
-
-    def check(self, expected_labels):
         if self.worker.labels != expected_labels:
-            raise AssertionError(self.worker.labels, expected_labels)
-
+            raise AssertionError(self.worker.labels, expected_labels)   
+        self.parsed_tables.extend([t for t in self.worker.tables if t])    
+        
     def datapoints(self):
-        return list(self.emit_datapoints())
-
-    def emit_datapoints(self):
-        for t in self.parsed_tables:
-            for x in t.emit_datapoints():
-                yield x
+        return [x for t in self.parsed_tables for x in t.emit_datapoints()]
 
     @property
     def labels(self):

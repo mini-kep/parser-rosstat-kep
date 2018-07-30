@@ -112,18 +112,99 @@ ytd :
 """
 
 from kep.session import Session 
+from kep.row import Datapoint
+
+s = Session(UNITS_DOC, INTRUCTIONS_DOC) 
+s.parse_tables(CSV_TEXT)
 
 class Test_session():
-    
-    s = Session(UNITS_DOC, INTRUCTIONS_DOC) 
-    c = s.parse_tables(CSV_TEXT)
-    
     def test_lables(self):    
-        assert self.c.labels == ['INDPRO_yoy',
+        assert s.labels == ['INDPRO_yoy',
                             'INDPRO_rog',
                             'INDPRO_ytd',
                             'CPI_NONFOOD_rog',
                             'PROFIT_MINING_mln_rub']
     
     def test_datapoint_method(self):     
-        assert len(self.c.datapoints()) == 77
+        assert len(s.datapoints()) == 77
+        
+    def test_datapoint_mathces_exactly(self):
+        assert s.datapoints() == [
+ Datapoint(label='INDPRO_yoy', freq='a', year=2015, month=12, value=99.2),
+ Datapoint(label='INDPRO_yoy', freq='q', year=2015, month=3, value=99.9),
+ Datapoint(label='INDPRO_yoy', freq='q', year=2015, month=6, value=98.3),
+ Datapoint(label='INDPRO_yoy', freq='q', year=2015, month=9, value=99.5),
+ Datapoint(label='INDPRO_yoy', freq='q', year=2015, month=12, value=99.1),
+ Datapoint(label='INDPRO_yoy', freq='m', year=2015, month=1, value=100.0),
+ Datapoint(label='INDPRO_yoy', freq='m', year=2015, month=2, value=98.2),
+ Datapoint(label='INDPRO_yoy', freq='m', year=2015, month=3, value=101.2),
+ Datapoint(label='INDPRO_yoy', freq='m', year=2015, month=4, value=98.2),
+ Datapoint(label='INDPRO_yoy', freq='m', year=2015, month=5, value=97.6),
+ Datapoint(label='INDPRO_yoy', freq='m', year=2015, month=6, value=99.1),
+ Datapoint(label='INDPRO_yoy', freq='m', year=2015, month=7, value=98.5),
+ Datapoint(label='INDPRO_yoy', freq='m', year=2015, month=8, value=100.2),
+ Datapoint(label='INDPRO_yoy', freq='m', year=2015, month=9, value=99.7),
+ Datapoint(label='INDPRO_yoy', freq='m', year=2015, month=10, value=98.4),
+ Datapoint(label='INDPRO_yoy', freq='m', year=2015, month=11, value=101.0),
+ Datapoint(label='INDPRO_yoy', freq='m', year=2015, month=12, value=98.1),
+ Datapoint(label='INDPRO_rog', freq='q', year=2015, month=3, value=82.8),
+ Datapoint(label='INDPRO_rog', freq='q', year=2015, month=6, value=102.6),
+ Datapoint(label='INDPRO_rog', freq='q', year=2015, month=9, value=103.9),
+ Datapoint(label='INDPRO_rog', freq='q', year=2015, month=12, value=112.3),
+ Datapoint(label='INDPRO_rog', freq='m', year=2015, month=1, value=73.9),
+ Datapoint(label='INDPRO_rog', freq='m', year=2015, month=2, value=99.8),
+ Datapoint(label='INDPRO_rog', freq='m', year=2015, month=3, value=112.5),
+ Datapoint(label='INDPRO_rog', freq='m', year=2015, month=4, value=95.6),
+ Datapoint(label='INDPRO_rog', freq='m', year=2015, month=5, value=97.6),
+ Datapoint(label='INDPRO_rog', freq='m', year=2015, month=6, value=103.2),
+ Datapoint(label='INDPRO_rog', freq='m', year=2015, month=7, value=100.5),
+ Datapoint(label='INDPRO_rog', freq='m', year=2015, month=8, value=101.4),
+ Datapoint(label='INDPRO_rog', freq='m', year=2015, month=9, value=103.1),
+ Datapoint(label='INDPRO_rog', freq='m', year=2015, month=10, value=105.0),
+ Datapoint(label='INDPRO_rog', freq='m', year=2015, month=11, value=101.9),
+ Datapoint(label='INDPRO_rog', freq='m', year=2015, month=12, value=109.1),
+ Datapoint(label='INDPRO_ytd', freq='m', year=2015, month=1, value=100.0),
+ Datapoint(label='INDPRO_ytd', freq='m', year=2015, month=2, value=99.1),
+ Datapoint(label='INDPRO_ytd', freq='m', year=2015, month=3, value=99.9),
+ Datapoint(label='INDPRO_ytd', freq='m', year=2015, month=4, value=99.4),
+ Datapoint(label='INDPRO_ytd', freq='m', year=2015, month=5, value=99.1),
+ Datapoint(label='INDPRO_ytd', freq='m', year=2015, month=6, value=99.1),
+ Datapoint(label='INDPRO_ytd', freq='m', year=2015, month=7, value=99.0),
+ Datapoint(label='INDPRO_ytd', freq='m', year=2015, month=8, value=99.1),
+ Datapoint(label='INDPRO_ytd', freq='m', year=2015, month=9, value=99.2),
+ Datapoint(label='INDPRO_ytd', freq='m', year=2015, month=10, value=99.1),
+ Datapoint(label='INDPRO_ytd', freq='m', year=2015, month=11, value=99.3),
+ Datapoint(label='INDPRO_ytd', freq='m', year=2015, month=12, value=99.2),
+ Datapoint(label='CPI_NONFOOD_rog', freq='a', year=1999, month=12, value=139.2),
+ Datapoint(label='CPI_NONFOOD_rog', freq='q', year=1999, month=3, value=114.0),
+ Datapoint(label='CPI_NONFOOD_rog', freq='q', year=1999, month=6, value=108.6),
+ Datapoint(label='CPI_NONFOOD_rog', freq='q', year=1999, month=9, value=107.2),
+ Datapoint(label='CPI_NONFOOD_rog', freq='q', year=1999, month=12, value=104.9),
+ Datapoint(label='CPI_NONFOOD_rog', freq='m', year=1999, month=1, value=106.2),
+ Datapoint(label='CPI_NONFOOD_rog', freq='m', year=1999, month=2, value=104.0),
+ Datapoint(label='CPI_NONFOOD_rog', freq='m', year=1999, month=3, value=103.2),
+ Datapoint(label='CPI_NONFOOD_rog', freq='m', year=1999, month=4, value=104.0),
+ Datapoint(label='CPI_NONFOOD_rog', freq='m', year=1999, month=5, value=102.7),
+ Datapoint(label='CPI_NONFOOD_rog', freq='m', year=1999, month=6, value=101.6),
+ Datapoint(label='CPI_NONFOOD_rog', freq='m', year=1999, month=7, value=101.9),
+ Datapoint(label='CPI_NONFOOD_rog', freq='m', year=1999, month=8, value=102.4),
+ Datapoint(label='CPI_NONFOOD_rog', freq='m', year=1999, month=9, value=102.7),
+ Datapoint(label='CPI_NONFOOD_rog', freq='m', year=1999, month=10, value=102.2),
+ Datapoint(label='CPI_NONFOOD_rog', freq='m', year=1999, month=11, value=101.5),
+ Datapoint(label='CPI_NONFOOD_rog', freq='m', year=1999, month=12, value=101.1),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='a', year=2017, month=12, value=2595632.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2017, month=1, value=258752.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2017, month=2, value=431071.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2017, month=3, value=582484.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2017, month=4, value=786597.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2017, month=5, value=966414.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2017, month=6, value=1288872.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2017, month=7, value=1488124.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2017, month=8, value=1676187.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2017, month=9, value=1890266.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2017, month=10, value=2124278.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2017, month=11, value=2384759.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2018, month=1, value=340136.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2018, month=2, value=502726.0),
+ Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2018, month=3, value=840956.0)]
+        

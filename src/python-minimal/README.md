@@ -20,6 +20,7 @@ Output
 
 Three pandas dataframes at annual, quarterly and monthly frequencies 
 (`dfa`, `dfq`, `dfm`)
+
     
 Pseudocode
 ==========
@@ -34,28 +35,25 @@ Pseudocode
     - e. save parsed tables to queue of parsed tables
 3. emit datapoints from queue of parsed tables
 4. create pandas dataframes by frequency
-5. deacculmulate some dataframes 
+5. deacculmulate some dataframes
 
 
 TODOS
 =====
 - run Session on several CSV files
-  - two files in data
-  - actual files since 2007
-- time running time 
-----
-- restore download/unpack/convert functionality outside parser
+  - [x] two files in data
+  - [ ] actual files since 2007
+- [ ] restore download/unpack/convert functionality outside parser
+- [ ] estimate running time 
+
+FIXME
+=====
+- kep.filters has duplicate functions
+- must use 'a' as 'm12' in 'fiscal' format
+- more clear interface.py handling
+
+FINAL USE
+=========
 - plot deviations between first and last estimate
 - extend parsing definitions for more variables
 - upload to database
-
-NOT TODO
-========
-- more tests
-- interface levels - all funcs accept strings 
-- check coverage report 
-- compeltion metrics: how many variables are parsed
-
-DONE
-====
-- [x] value check procedure (now has all/any check) 

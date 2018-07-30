@@ -6,10 +6,6 @@ row1 = ['2018',
         '101,9', '', '', '',
         '102,9', '101,5', '', '', '', '', '', '', '', '', '', '']
 
-def test_get_format():
-    format1 = kep.row.get_format(len(row1))
-    assert format1 == 'YAQQQQMMMMMMMMMMMM'
-
 
 def test_emit_datapoints():
     gen1 = kep.row.emit_datapoints(row1, 'INDPRO_yoy', 'YAQQQQMMMMMMMMMMMM')

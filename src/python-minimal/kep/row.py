@@ -1,23 +1,8 @@
 from collections import namedtuple
 import kep.filters as filters
 
-ROW_FORMAT_DICT = {len(x): x for x in [
-    'YAQQQQMMMMMMMMMMMM',
-    'YAQQQQ',
-    'YAMMMMMMMMMMMM',
-    'YMMMMMMMMMMMM',
-    'YQQQQ',
-    'XXXX']}
+Datapoint = namedtuple('Datapoint', 'label freq year month value')   
 
-Datapoint = namedtuple('Datapoint', 'label freq year month value')    
-
-
-def get_format(row_length: int, row_format_dict=ROW_FORMAT_DICT):
-    try:
-        return row_format_dict[row_length]
-    except KeyError:
-        raise ValueError(f'Cannot decide on row format: {row_length}')
-    
 
 def get_month(freq: str, period: int):
     if freq == 'a':
@@ -32,7 +17,7 @@ def emit_datapoints(row, label, row_format):
     Args:
         row(list) - lsit of strings
         label(list) - variable identificator
-        row_format(list) - 
+        row_format(list) - format as 'YAQQQQ'
     """    
     occurences = ''
     for value, letter in zip(row, row_format):
@@ -44,11 +29,14 @@ def emit_datapoints(row, label, row_format):
                 continue                
             period = occurences.count(letter)
             freq = letter.lower()
-            yield Datapoint(label=label, 
-                            freq=freq,
-                            year=filters.clean_year(year),
-                            month=get_month(freq, period), 
-                            value=filters.clean_value(value))
+            try:
+                yield Datapoint(label=label, 
+                                freq=freq,
+                                year=filters.clean_year(year),
+                                month=get_month(freq, period), 
+                                value=filters.clean_value(value))
+            except UnboundLocalError:
+                raise ValueError((row, label))
 
 # WONTFIX
 # must fail on row

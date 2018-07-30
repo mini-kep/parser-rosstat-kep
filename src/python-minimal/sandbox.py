@@ -1,3 +1,43 @@
+UNITS_DOC =  """
+bln_usd :
+  - млрд.долл.  
+  - млрд.долларов
+  - млрд. долларов
+  - млрд, долларов
+bln_rub :
+  - млрд.руб.  
+  - млрд.рублей
+  - млрд. рублей
+mln_rub :
+  - млн.руб.  
+rub : 
+  - руб.
+  - рублей
+bln_tkm :
+  - млрд.тонно-км
+  - млрд. тонно-км
+mln_t :
+  - млн.тонн  
+gdp_percent :    
+  - в % к ВВП
+mln :
+  - млн
+rog : 
+  - '% к пред. периоду'
+  - 'в % к прошлому периоду'
+  - 'в % к предыдущему месяцу'
+  - 'в % к предыдущему периоду'
+  - '% к концу предыдущего периода'
+  - 'в % к предыдущему периоду (в сопоставимых ценах)'
+yoy :
+  - '% год к году'
+  - 'в % к соответствующему периоду предыдущего года (в сопоставимых ценах)'
+  - 'в % к соответствующему периоду предыдущего года'
+ytd : 
+  - период с начала года
+  - 'период с начала отчетного года в % к соответствующему периоду предыдущего года' 
+"""
+
 CSV_TEXT = """	Год / Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.			
 		I	II	III	IV												
 1.2. Индекс промышленного производства1) / Industrial Production index1)																	
@@ -48,8 +88,13 @@ INTRUCTIONS_DOC = """
 - trail_down_names
 - any:
     - INDPRO_yoy a 2015 99.2
+    - INDPRO_yoy a 2002 103.1
+- any:
     - INDPRO_rog q 2015 3 82.8
+    - INDPRO_rog q 2002 3 94.0
+- any:
     - INDPRO_ytd m 2015 1 100    
+    - INDPRO_ytd m 2002 1 103.7
 ---
 - start_with: '3.5. Индекс потребительских цен'
 - end_with: '4. Социальная сфера'
@@ -67,55 +112,40 @@ INTRUCTIONS_DOC = """
 - headers: Добыча полезных ископаемых
 - force_units: 'mln_rub'
 - force_format: 'fiscal'
-- all: 
+- any: 
     - PROFIT_MINING_mln_rub a 2017 2595632
+    - PROFIT_MINING_mln_rub a 1999 109148
 """   
 # TODO: must deaccumulate PROFIT_MINING and similar
 
-
-UNITS_DOC =  """
-bln_usd :
-  - млрд.долл.  
-  - млрд.долларов
-  - млрд. долларов
-  - млрд, долларов
-bln_rub :
-  - млрд.руб.  
-  - млрд.рублей
-  - млрд. рублей
-mln_rub :
-  - млн.руб.  
-rub : 
-  - руб.
-  - рублей
-bln_tkm :
-  - млрд.тонно-км
-  - млрд. тонно-км
-mln_t :
-  - млн.тонн  
-gdp_percent :    
-  - в % к ВВП
-mln :
-  - млн
-rog : 
-  - '% к пред. периоду'
-  - 'в % к прошлому периоду'
-  - 'в % к предыдущему месяцу'
-  - 'в % к предыдущему периоду'
-  - '% к концу предыдущего периода'
-  - 'в % к предыдущему периоду (в сопоставимых ценах)'
-yoy :
-  - '% год к году'
-  - 'в % к соответствующему периоду предыдущего года (в сопоставимых ценах)'
-  - 'в % к соответствующему периоду предыдущего года'
-ytd : 
-  - период с начала года
-  - 'период с начала отчетного года в % к соответствующему периоду предыдущего года' 
-"""
-
-
-if __name__ == '__main__':    
+if __name__ == '__main__':        
     from kep.session import Session 
+    from kep.saver import unpack_dataframes
     s = Session(UNITS_DOC, INTRUCTIONS_DOC) 
-    c = s.parse_tables(CSV_TEXT)
-    assert len(c.datapoints()) == 77
+    s.parse_tables(CSV_TEXT)
+    values = s.datapoints()
+    assert len(values) == 77
+    dfa, dfq, dfm = unpack_dataframes(values)
+    
+    # reading two files 
+    import pathlib
+    def get_by_name(filename):
+        path = pathlib.Path(__file__).parent / 'data' / filename
+        return path.read_text(encoding = 'utf-8')
+    csv_texts = [get_by_name(filename) for filename in ['tab.csv', 'tab_old.csv']]
+    for text in csv_texts:
+        s.parse_tables(text)
+        dfa, dfq, dfm = s.dataframes()
+        assert not dfa.empty
+        assert not dfq.empty
+        assert not dfm.empty
+        
+    # TODO: use helper to extract base units - base_units_source()
+    # TODO:                     ... commands - commands_course
+    # TODO:                    ... csv source - InterimCSV.text()
+
+    
+    
+    
+    
+    

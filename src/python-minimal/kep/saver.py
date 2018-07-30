@@ -1,6 +1,8 @@
 import pandas as pd
 import warnings
+from kep.util import timestamp
 
+__all__ = ['unpack_dataframes']
 
 def check_duplicates(df):
     dups = df[df.duplicated(keep=False)]
@@ -12,14 +14,19 @@ def subset(values, freq):
     return [x for x in values if x['freq'] == freq]
 
 
+def make_timestamp(x):    
+    date = timestamp(x.year, x.month)
+    return pd.Timestamp(date)
+
+
 def create_base_dataframe(datapoints, freq):
     df = pd.DataFrame(datapoints)
     if df.empty:
         raise ValueError(('Empty', datapoints))
     df = df[df.freq == freq]
     check_duplicates(df)
-    df = df.drop_duplicates(['freq', 'label', 'date'], keep='first')
-    df['date'] = df['date'].apply(lambda x: pd.Timestamp(x))
+    df = df.drop_duplicates(['freq', 'label', 'year', 'month'], keep='first')
+    df['date'] = df.apply(make_timestamp, axis=1)
     # reshape
     df = df.pivot(columns='label', values='value', index='date')
     # delete some internals for better view
@@ -48,7 +55,9 @@ def create_dfm(datapoints):
 
 
 def unpack_dataframes(datapoints):
-    return [f(datapoints) for f in (create_dfa, create_dfq, create_dfm)]
+    """Return a tuple of annual, quarterly, monthly pandas dataframes.""" 
+    funcs = [create_dfa, create_dfq, create_dfm]
+    return (_f(datapoints) for _f in funcs)
 
 
 # TODO: need to be changed according to new format - must use 'a' as 'm12'

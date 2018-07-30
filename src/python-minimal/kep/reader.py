@@ -64,6 +64,15 @@ def split_to_tables(csv_rows):
     if len(headers) > 0 and len(datarows) > 0:
         yield Table(headers, datarows)
 
+ROW_FORMAT_DICT = {len(x): x for x in [
+    'YAQQQQMMMMMMMMMMMM',
+    'YAQQQQ',
+    'YAMMMMMMMMMMMM',
+    'YMMMMMMMMMMMM',
+    'YQQQQ',
+    'XXXX',
+    'XXX',
+    'X'*11]}
 
 class Table:
     def __init__(self, headers,
@@ -79,7 +88,15 @@ class Table:
         if row_format:
             self.row_format = row_format
         else:
-            self.row_format = row_model.get_format(row_length=self.coln)
+            self.row_format = self.get_row_format()
+
+    def get_row_format(self, row_format_dict=ROW_FORMAT_DICT):
+        try:
+            return row_format_dict[self.coln]
+        except KeyError:
+            raise ValueError(('Cannot decide on row format', 
+                              self.coln,
+                              self.datarows))
 
     def __eq__(self, x):
         return repr(self) == repr(x)

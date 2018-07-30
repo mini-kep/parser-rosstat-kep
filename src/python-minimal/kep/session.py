@@ -2,10 +2,11 @@
    units of measurement. 
 """
 
-from kep.parser import Container
+from kep.parser import Collector
 from kep.units import UnitMapper
 from kep.commands import CommandSet
 from kep.interface import read, read_many
+from kep.saver import unpack_dataframes
 
 
 class Session:
@@ -13,11 +14,22 @@ class Session:
         unit_dict = read(base_units_source)
         self.base_mapper = UnitMapper(unit_dict)
         self.command_blocks = read_many(commands_source)
+        self.container = None
 
     def parse_tables(self, csv_source):
-        container = Container(csv_source, self.base_mapper)
+        container = Collector(csv_source, self.base_mapper)
         for commands in self.command_blocks:
             cs = CommandSet(commands)
-            container.apply(cs.methods)
-            container.check(cs.labels)
-        return container
+            container.apply(cs.methods, cs.labels)
+        self.container = container
+    
+    @property     
+    def labels(self):
+        return self.container.labels        
+        
+    def datapoints(self):
+        return self.container.datapoints()
+    
+    def dataframes(self):
+        dfa, dfq, dfm = unpack_dataframes(self.datapoints())
+        return dfa, dfq, dfm
