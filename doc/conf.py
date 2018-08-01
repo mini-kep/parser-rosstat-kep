@@ -19,7 +19,9 @@
 #
 import os
 import sys
-sys.path.insert(0, 'C:\Users\Евгений\Documents\GitHub\mini-kep\src\python-minimal')
+from pathlib import Path
+code_folder = str(Path(__file__).parents[1] / 'src' / 'python-minimal' )
+sys.path.insert(0, code_folder)
 
 autodoc_member_order = 'bysource'
 

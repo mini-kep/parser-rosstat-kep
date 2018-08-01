@@ -1,0 +1,3 @@
+{
+  "tests/test_interface.py::test_str_to_yaml_many_works_on_one_document": true
+}

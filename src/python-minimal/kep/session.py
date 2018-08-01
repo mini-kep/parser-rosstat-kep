@@ -5,15 +5,15 @@
 from kep.parser import Collector
 from kep.units import UnitMapper
 from kep.commands import CommandSet
-from kep.interface import read, read_many
+from kep.interface import load_yaml
 from kep.saver import unpack_dataframes
 
 
 class Session:
     def __init__(self, base_units_source: str, commands_source: str):
-        unit_dict = read(base_units_source)
-        self.base_mapper = UnitMapper(unit_dict)
-        self.command_blocks = read_many(commands_source)
+        units_dict = load_yaml(base_units_source)
+        self.base_mapper = UnitMapper(units_dict)
+        self.command_blocks = load_yaml(commands_source)
         self.container = None
 
     def parse_tables(self, csv_source):

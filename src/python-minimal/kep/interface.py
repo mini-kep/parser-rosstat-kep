@@ -1,32 +1,45 @@
+"""Read YAML files."""
 import yaml
 import pathlib
 import os
 
+all = ['load_yaml']
 
-def read(incoming: str):
-    txt = _file_or_string(incoming)
-    return _str_to_yaml(txt)
+def expect_string(x):
+    if not isinstance(x, str):
+        raise TypeError("expected str not %s" % type(x).__name__)   
+
+def exists(filename):
+    try:
+        return os.path.exists(filename)
+    except ValueError:
+        return False
+        
+    
+def accept_filename_or_string(func):
+    def wrapper(incoming: str):
+        """Treat *incoming* as a filename or string."""
+        expect_string(incoming)     
+        if exists(incoming):
+            doc = pathlib.Path(incoming).read_text(encoding='utf-8')
+        else:
+            doc = incoming 
+        return func(doc)    
+    return wrapper  
+
+@accept_filename_or_string
+def load_yaml(doc: str):
+    """Load yaml contents of *doc* string or filename."""
+    try:
+        return yaml.load(doc)
+    except yaml.YAMLError:
+        return list(yaml.load_all(doc))
 
 
-def read_many(incoming: str):
-    txt = _file_or_string(incoming)
-    return _str_to_yaml_many(txt)
 
 
-def read_text(filepath: str):
-    return pathlib.Path(filepath).read_text(encoding='utf-8')
 
 
-def _str_to_yaml(doc: str):
-    return yaml.load(doc)
 
+ 
 
-def _str_to_yaml_many(doc: str):
-    return list(yaml.load_all(doc))
-
-
-def _file_or_string(incoming: str):
-    if os.path.exists(incoming):
-        return read_text(incoming)
-    else:
-        return incoming
