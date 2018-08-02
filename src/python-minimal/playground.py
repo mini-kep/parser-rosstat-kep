@@ -23,6 +23,9 @@ def search_all():
         
 search_all()
 
+# Profiling reference:
+# https://www.blog.pythonlibrary.org/2016/05/24/python-101-an-intro-to-benchmarking-your-code/
+
 # Ideas:
 # - why so many calls to split_to_tables? expected 108*5.
 # - filter.py very time consuming, specifically is_year(), get_year()
