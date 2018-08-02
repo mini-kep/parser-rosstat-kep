@@ -64,7 +64,7 @@ def emit_datapoints(row, label, row_format):
             try:
                 yield Datapoint(label=label, 
                                 freq=freq,
-                                year=filters.clean_year(year),
+                                year=year,
                                 month=get_month(freq, period), 
                                 value=filters.clean_value(value))
             except UnboundLocalError:

@@ -1,6 +1,6 @@
 """Extract data from CSV file using parsing instructions."""
 
-from kep.reader import import_tables
+from kep.reader import read_csv_from_file, split_to_tables, Table
 from kep.parser import make_parser
 from kep.units import UnitMapper
 from kep.util import load_yaml
@@ -26,7 +26,8 @@ class Session:
         self.parsed_tables = []
         
     def parse(self, csv_source):
-        tables = import_tables(csv_source)
+        csv_rows = read_csv_from_file(csv_source)
+        tables = [Table(h, d) for h, d in split_to_tables(csv_rows)]
         parser = make_parser(self.base_mapper)
         self.parsed_tables = []
         for commands in self.command_blocks:

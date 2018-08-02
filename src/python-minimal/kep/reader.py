@@ -18,15 +18,16 @@ __all__ = ['import_tables', 'Table', 'read_csv', 'split_to_tables']
 
 def import_tables(source):
     """Wrap read_csv() and split_to_tables() into one call."""
-    gen = filter(filters.is_allowed,  read_csv(source))
+    gen = read_csv(source)
     return list(split_to_tables(gen))
 
 # CSV import
 
 def read_csv_from_file(filename):
-    """Read csv file as list of lists / matrix"""
-    with open(filename, 'r', encoding='utf-8') as f:
-        return read_bytes_as_csv(f)
+    """Read csv file as list of lists / matrix"""     
+    with open(filename, encoding='utf-8', newline='') as f:
+        for row in csv.reader(f, delimiter='\t', lineterminator='\n'):
+             yield row
 
 
 def read_bytes_as_csv(f):
@@ -49,26 +50,32 @@ class State(Enum):
 
 def split_to_tables(csv_rows):
     """Yield Table() instances from *csv_rows*."""
-    datarows = []
-    headers = []
+    csv_rows = filter(filters.is_allowed, csv_rows)
+    result = []
+    datarows, headers = [], []
     state = State.INIT
     for row in csv_rows:
         # is data row?
-        if filters.is_year(row[0]):
+        year = filters.clean_year(row[0])
+        if year:
+            row[0] = year
             datarows.append(row)
             state = State.DATA
         else:
             if state == State.DATA:
                 # table ended, emit it
-                yield Table(headers, datarows)
+                t = headers, datarows
+                result.append(t)
                 headers = []
                 datarows = []
             headers.append(row)
             state = State.HEADERS
     # still have some data left
     if len(headers) > 0 and len(datarows) > 0:
-        yield Table(headers, datarows)
-
+        t = headers, datarows
+        result.append(t)
+    return result
+        
 class Table:
     """Representation of a table from CSV file."""
     def __init__(self, headrows,

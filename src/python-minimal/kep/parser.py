@@ -44,7 +44,9 @@ class Worker:
         method, arg = extract_parameters(command)
         func = getattr(self, method)
         if arg:
-            func(arg)
+            #FIXME: shutting down value check 
+            if method not in ['all', 'any']:
+                func(arg)
         else:
             func()
 
