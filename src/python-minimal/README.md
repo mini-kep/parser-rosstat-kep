@@ -40,18 +40,19 @@ Pseudocode
 
 TODOS
 =====
-- [ ] previous functionality
-- [ ] speedup
+- [ ] restore download/unpack/convert functionality outside parser
+- [ ] get latest months in 2018 
 - [ ] more defintions
 
+ERRORS
+======
+- [ ] must use 'a' as 'm12' in 'fiscal' row format
 
-FIXME
-=====
-- [ ] restore download/unpack/convert functionality outside parser
-- [ ] get latest month 
-- kep.filters has duplicate functions
-- must use 'a' as 'm12' in 'fiscal' format
-- better check than `assert not dfa.empty`
+WONTFIX
+=======
+- [ ] speedup
+- [ ] better check than `assert not dfa.empty`
+- [ ] need better regex in  kep.filters
 
 FINAL USE
 =========
@@ -59,7 +60,7 @@ FINAL USE
   - make a special dataframe format
 - extend parsing definitions for more variables
 - upload to database
-- plot everything for one  month
+- plot everything for one month
 - save xls
 - write variable names
 
@@ -70,3 +71,4 @@ DONE
   - [x] actual files since 2007
 - [x] estimate running time 
 - [x] more clear yaml import
+- [x] kep.filters has duplicate functions
