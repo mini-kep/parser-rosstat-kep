@@ -1,3 +1,4 @@
+.pytest_cache/
 *.doc
 *.rar
 doc/html/
