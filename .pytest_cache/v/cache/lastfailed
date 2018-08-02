@@ -1,0 +1,6 @@
+{
+  "src/python-minimal/tests/test_commands.py::test_CommandSet_properties_are_callable": true,
+  "src/python-minimal/tests/test_commands.py::test_extract_command_parameters[command1-tup1]": true,
+  "src/python-minimal/tests/test_commands.py::test_extract_command_parameters[init-tup0]": true,
+  "src/python-minimal/tests/test_interface.py": true
+}

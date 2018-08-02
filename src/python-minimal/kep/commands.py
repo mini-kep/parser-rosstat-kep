@@ -1,58 +1,31 @@
+"""Interpret parsing commands. 
+
+A command is a string like `'trail_down_names'` or a dictionary like `{'name': 'CPI'}`
+"""
+
 from kep.util import iterate, make_label
 
-__all__ = ['CommandSet']
 
-def _extract_command_parameters(command):
-    if isinstance(command, str):
-        method = command
-        arg = None
-    elif isinstance(command, dict):
-        for method, arg in command.items():
-            break
-    else:
-        raise TypeError(command)
+__all__ = ['extract_parameters', 'extract_labels']
+
+
+def extract_key_value_from_dict(d: dict):
+    for method, arg in d.items():
+      break
     return method, arg
 
 
-def _as_function(command):
-    method, arg = _extract_command_parameters(command)
-    def foo(cls):
-        f = getattr(cls, method)
-        if arg:
-            f(arg)
-        else:
-            f()
-    return foo
-
-
-def _labels(commands: list):
+def extract_parameters(command):
+    if isinstance(command, str):
+        return command, None
+    elif isinstance(command, dict):
+        return extract_key_value_from_dict(command)
+    
+def extract_labels(commands: list):
     for command in commands:
-        method, arg = _extract_command_parameters(command)
+        method, arg = extract_parameters(command)
         if method == 'var':
             name = arg
         elif method in ['units', 'force_units']:
             units = iterate(arg)
     return [make_label(name, unit) for unit in units]
-
-
-class CommandSet:
-    """Use yaml file to collect parsing functions, 
-       list of labels, or control values.
-    """
-    def __init__(self, commands: str):
-        """
-        Args
-        ====        
-        commands(list) - parsing commands as list of strings or dictionaries. 
-        """
-        self.commands = iterate(commands)
-
-    @property
-    def methods(self):
-        """List of functions to manipulate `kep.parser.Worker` instance."""
-        return [_as_function(c) for c in self.commands]
-
-    @property
-    def labels(self):
-        """List of labels contained in parsing commands."""
-        return _labels(self.commands)

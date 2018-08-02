@@ -1,35 +1,46 @@
-"""Extract data from CSV file using parsing instructions and 
-   units of measurement. 
-"""
+"""Extract data from CSV file using parsing instructions."""
 
-from kep.parser import Collector
+from kep.reader import import_tables
+from kep.parser import make_parser
 from kep.units import UnitMapper
-from kep.commands import CommandSet
-from kep.interface import load_yaml
+from kep.util import load_yaml
 from kep.saver import unpack_dataframes
 
 
-class Session:
-    def __init__(self, base_units_source: str, commands_source: str):
-        units_dict = load_yaml(base_units_source)
-        self.base_mapper = UnitMapper(units_dict)
-        self.command_blocks = load_yaml(commands_source)
-        self.container = None
+def read_command_blocks(source: str):
+    return load_yaml(source)
 
-    def parse_tables(self, csv_source):
-        container = Collector(csv_source, self.base_mapper)
-        for commands in self.command_blocks:
-            cs = CommandSet(commands)
-            container.apply(cs.methods, cs.labels)
-        self.container = container
-    
-    @property     
-    def labels(self):
-        return self.container.labels        
+
+def make_unit_mapper(source: str):
+    units_dict = load_yaml(source)[0]
+    return UnitMapper(units_dict)   
+
+
+
+class Session:
+    """Initialise session with units of measurement and parsing instructions
+       Use parse() method to extract data from CSV file."""    
+    def __init__(self, base_units_source: str, commands_source: str):
+        self.base_mapper = make_unit_mapper(base_units_source)
+        self.command_blocks = read_command_blocks(commands_source)
+        self.parsed_tables = []
         
+    def parse(self, csv_source):
+        tables = import_tables(csv_source)
+        parser = make_parser(self.base_mapper)
+        self.parsed_tables = []
+        for commands in self.command_blocks:
+            next_tables = parser(tables, commands)
+            self.parsed_tables.extend(next_tables)
+
+    @property
+    def labels(self):
+        return [t.label for t in self.parsed_tables]    
+
     def datapoints(self):
-        return self.container.datapoints()
-    
+        return [x for t in self.parsed_tables for x in t.emit_datapoints()]
+   
+   
     def dataframes(self):
         dfa, dfq, dfm = unpack_dataframes(self.datapoints())
         return dfa, dfq, dfm

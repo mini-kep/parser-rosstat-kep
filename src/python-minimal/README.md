@@ -40,20 +40,33 @@ Pseudocode
 
 TODOS
 =====
-- run Session on several CSV files
-  - [x] two files in data
-  - [ ] actual files since 2007
-- [ ] restore download/unpack/convert functionality outside parser
-- [ ] estimate running time 
+- [ ] previous functionality
+- [ ] speedup
+- [ ] more defintions
+
 
 FIXME
 =====
+- [ ] restore download/unpack/convert functionality outside parser
+- [ ] get latest month 
 - kep.filters has duplicate functions
 - must use 'a' as 'm12' in 'fiscal' format
-- more clear interface.py handling
+- better check than `assert not dfa.empty`
 
 FINAL USE
 =========
 - plot deviations between first and last estimate
+  - make a special dataframe format
 - extend parsing definitions for more variables
 - upload to database
+- plot everything for one  month
+- save xls
+- write variable names
+
+DONE
+====
+- run Session on several CSV files
+  - [x] two files in data
+  - [x] actual files since 2007
+- [x] estimate running time 
+- [x] more clear yaml import

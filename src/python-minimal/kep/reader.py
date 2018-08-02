@@ -5,9 +5,8 @@ import re
 import pprint
 
 import kep.filters as filters
-import kep.row as row_model
-from kep.util import make_label
-from kep.interface import accept_filename_or_string
+from kep.row import get_row_format, emit_datapoints
+from kep.util import make_label, accept_filename_or_content_string
 
 # WONTFIX:
 # Fails on empty row
@@ -15,29 +14,31 @@ from kep.interface import accept_filename_or_string
 # IndexError: list index out of range
 
 
+__all__ = ['import_tables', 'Table', 'read_csv', 'split_to_tables']
 
-# convert CSV fle to Table() instances
+def import_tables(source):
+    """Wrap read_csv() and split_to_tables() into one call."""
+    gen = filter(filters.is_allowed,  read_csv(source))
+    return list(split_to_tables(gen))
 
+# CSV import
 
-def read_csv(filename):
+def read_csv_from_file(filename):
     """Read csv file as list of lists / matrix"""
     with open(filename, 'r', encoding='utf-8') as f:
         return read_bytes_as_csv(f)
 
-def read_csv_from_string(text:str):
-    """Read csv file as list of lists / matrix"""
-    return read_bytes_as_csv(io.StringIO(text))
 
 def read_bytes_as_csv(f):
     for row in csv.reader(f, delimiter='\t', lineterminator='\n'):
         yield row
 
-@accept_filename_or_string
-def import_tables_from_string(text):
-    """Wraps read_csv() and split_to_tables() into one call."""
-    gen = read_csv_from_string(text)
-    return list(split_to_tables(gen))
 
+@accept_filename_or_content_string
+def read_csv(source):
+    return read_bytes_as_csv(io.StringIO(source))
+
+# convert list of csv rows to Table() instances
 
 @unique
 class State(Enum):
@@ -68,85 +69,64 @@ def split_to_tables(csv_rows):
     if len(headers) > 0 and len(datarows) > 0:
         yield Table(headers, datarows)
 
-ROW_FORMAT_DICT = {len(x): x for x in [
-    'YAQQQQMMMMMMMMMMMM',
-    'YAQQQQ',
-    'YAMMMMMMMMMMMM',
-    'YMMMMMMMMMMMM',
-    'YQQQQ',
-    'XXXX',
-    'XXX',
-    'X'*11]}
-    
-def get_row_format(coln: int):
-    return ROW_FORMAT_DICT[coln]    
-
 class Table:
-    def __init__(self, header_rows,
-                 data_rows,
+    """Representation of a table from CSV file."""
+    def __init__(self, headrows,
+                 datarows,
                  row_format=None,
                  name=None,
                  unit=None):
-        self.header_rows = header_rows
-        self.datarows = data_rows
+        self.headrows = headrows
+        self.datarows = datarows
         self.name = name
         self.unit = unit
-        self.row_format = self.get_row_format()
-        # overrride if supplied
-        if row_format:
-            self.row_format = row_format
-
+        self.row_format = row_format or None
+        
     @property
     def headers(self):
-        return [x[0] for x in self.header_rows if x[0]]
+        """First elements of headrows."""
+        return [x[0] for x in self.headrows if x and x[0]]
 
-
-    def get_row_format(self):
-        try:
-            return get_row_format(self.coln)
-        except KeyError:
-            raise ValueError('Cannot define row format', 
-                              self.coln,
-                              self.datarows)
+    def _properties(self):
+        return (self.headrows, 
+                self.datarows, 
+                self.name, 
+                self.unit, 
+                self.row_format)               
 
     def __eq__(self, x):
-        return (self.header_rows == x.header_rows 
-                and self.datarows == x.datarows
-                and self.name == x.name
-                and self.unit == x.unit
-                and self.row_format == x.row_format)
+        return self._properties() == x._properties()
 
     def __bool__(self):
         return (self.name is not None) and (self.unit is not None)
 
     @property
     def label(self):
-        if self:
-            return make_label(self.name, self.unit)
-        return None
-
-    @property
-    def coln(self):
-        return max([len(row) for row in self.datarows])
+        """Variable identifier like 'CPI_rog'"""
+        return make_label(self.name, self.unit)
 
     def contains_any(self, strings):
+        """Return largest string found in table headers."""
         for header in self.headers:
             for s in strings:
                 if re.search(r'\b{}'.format(s), header):
                     return s
-        return None
+        return ''
 
     def emit_datapoints(self):
-        _label = self.label # speedup: create label once 
+        """Yield Datapoint() instances from table."""
+        if self.row_format is None:
+             self.row_format = get_row_format(self.datarows)        
+        label = self.label # speedup: create label once 
         for row in self.datarows:
-            for d in row_model.emit_datapoints(row, _label, self.row_format):
+            for d in emit_datapoints(row, label, self.row_format):
                 yield d
 
     def __repr__(self):
-        items = [f'Table(name={repr(self.name)}',
-                 f'unit={repr(self.unit)}',
-                 f'row_format={repr(self.row_format)}',
-                 f'header_rows={pprint.pformat(self.header_rows)}',
-                 f'data_rows={pprint.pformat(self.datarows)})'    
+        items = ['Table(name=%r' % self.name,
+                 'unit=%r'% self.unit,
+                 'row_format=%r' % self.row_format,
+                 'headrows=%s' % pprint.pformat(self.headrows),
+                 'datarows=%s)' % pprint.pformat(self.datarows)   
                  ]
         return ',\n      '.join(items)

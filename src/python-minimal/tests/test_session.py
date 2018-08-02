@@ -115,7 +115,7 @@ from kep.session import Session
 from kep.row import Datapoint
 
 s = Session(UNITS_DOC, INTRUCTIONS_DOC) 
-s.parse_tables(CSV_TEXT)
+s.parse(CSV_TEXT)
 
 class Test_session():
     def test_lables(self):    

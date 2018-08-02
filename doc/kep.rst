@@ -20,19 +20,12 @@ kep.filters module
     :undoc-members:
     :show-inheritance:
 
-kep.interface module
---------------------
-
-.. automodule:: kep.interface
-    :members:
-    :undoc-members:
-    :show-inheritance:
 
 kep.parser module
 -----------------
 
 .. automodule:: kep.parser
-    :members: Worker, Container
+    :members:
     :undoc-members:
     :show-inheritance:
 

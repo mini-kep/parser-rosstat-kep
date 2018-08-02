@@ -1,6 +1,7 @@
+"""Filter values in CSV file."""
 import re
 
-# дублирование: get_year - более протестированная и общая функция, но может быть ее
+# FIXME: дублирование: get_year - более протестированная и общая функция, но может быть ее
 # можно заменить на clean_year
 
 YEAR_CATCHER = re.compile("\D*(\d{4}).*")
@@ -40,5 +41,14 @@ def clean_value(x: str) -> float:
     return None
 
 
-def is_omission(x):
+def is_allowed(x):    
+    return '______________________' not in x[0]
+
+# kill annotations like
+# "______________________ 1) Индекс промышленного производства исчисляется по видам деятельности ""Добыча полезных ископаемых"", ""Обрабатывающие производства"", ""Производство и распределение электроэнергии, газа и воды"" на основе динамики производства важнейших товаров-представителей (в натуральном или стоимостном выражении). В качестве весов используется структура валовой добавленной стоимости по видам экономической деятельности 2008 базисного года. С учетом поправки на неформальную деятельность. / Industrial Production index covers ""Mining and quarrying"", ""Manufacturing"" and "" Electricity, gas and water supply"" using changes in production of major goods-representatives (in physical and value measures). The structure of Gross value added by economic activities of 2008 base year is used as weights. Data are adjusted to informal activity."																	
+
+
+
+def is_omission(x: str) -> bool:
+    """True if *x* is any of ['', '…', '-']"""
     return x in ['', '…', '-']
