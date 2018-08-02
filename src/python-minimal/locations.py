@@ -95,11 +95,17 @@ def parsing_instructions(data_root=DATA_ROOT):
 def unit_mapper(data_root=DATA_ROOT):
     return data_root / 'base_units.txt'
 
-
 @as_string
 def interim_csv(year: int, month: int, data_root=DATA_ROOT):
     return inner_folder(data_root, 'interim', year, month) / 'tab.csv'
 
+
+
+    def processed_csv(self, freq: str):
+        return str(self.inner_path('processed') / self.filename(freq))
+
+    def latest_csv(self, freq: str):
+        return str(self.inner_path('latest') / self.filename(freq))
 
 
 

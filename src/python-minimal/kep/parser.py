@@ -83,7 +83,7 @@ class Worker:
         for t in self.tables:
             if t.contains_any(headers):
                 t.name = self.name
-                # speedup: look for first entry only
+                
                 break
 
     def units(self, units):
