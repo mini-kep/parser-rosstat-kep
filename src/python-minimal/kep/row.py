@@ -1,4 +1,4 @@
-from collections import namedtuple
+﻿from collections import namedtuple
 import kep.filters as filters
 
 __all__ = ['Datapoint', 'get_row_format', 'emit_datapoints']
@@ -55,7 +55,7 @@ def emit_datapoints(row, label, row_format):
     for value, letter in zip(row, row_format):
         occurences += letter
         if letter == 'Y':
-            year = value
+            year = filters.clean_year(value)
         else:
             if filters.is_omission(value):
                 continue                

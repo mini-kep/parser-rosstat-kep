@@ -1,9 +1,9 @@
 """Helper functions."""
 
-import calendar
 import pathlib
+import tempfile   
+import calendar
 import os
-
 import yaml
 
 
@@ -38,6 +38,37 @@ def timestamp(year: int, month: int) -> str:
     """Make end of month YYYY-MM-DD timestamp."""
     day = last_day(year, month)
     return f'{year}-{str(month).zfill(2)}-{day}'
+ 
+
+class TempFile():
+    def __init__(self, content: str):
+        with tempfile.NamedTemporaryFile() as f:
+            self.path = f.name        
+        self.obj = pathlib.Path(self.path)
+        self.obj.write_text(content, encoding='utf-8')
+
+    def __enter__(self):
+        return self.path 
+
+    def __exit__(self, *args):
+        self.obj.unlink()
+        
+
+def exists(filename):
+    try:
+        return os.path.exists(filename)
+    except ValueError:
+        return False
+
+def accept_string_parameter(func):
+    """Treat *filename* a string with file content."""
+    def _wrapper(filename):
+        if exists(filename):
+            return func(filename)
+        with TempFile(filename) as temp_filename:
+            return func(temp_filename)
+    return _wrapper        
+               
 
 
 def _expect_types(x, types):
@@ -46,6 +77,9 @@ def _expect_types(x, types):
         annotation = ', '.join([t.__name__ for t in types])
         raise TypeError("expected types %s" % annotation + 
                         ", got type %s" % type(x).__name__)   
+
+
+
 
     
 def _read_source(source: str):

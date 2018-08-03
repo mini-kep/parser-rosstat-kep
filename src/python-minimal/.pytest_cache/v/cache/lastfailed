@@ -1,3 +1,6 @@
 {
-  "tests/test_interface.py::test_str_to_yaml_many_works_on_one_document": true
+  "tests/test_filters.py::test_clean_year": true,
+  "tests/test_interface.py::test_str_to_yaml_many_works_on_one_document": true,
+  "tests/test_reader.py::test_split_csv": true,
+  "tests/test_session.py::Test_session::()": true
 }

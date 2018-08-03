@@ -7,6 +7,29 @@ from kep.verifier import require_all, require_any
 __all__ = ['Worker', 'make_parser']
 
 
+def get_parsed_tables(tables, base_mapper, commands):
+    worker = Worker(tables, base_mapper)
+    for command in commands:
+        worker.apply(command)
+    return worker.parsed_tables
+
+
+def check_labels(parsed_tables, expected_labels, tables):
+    labels = [t.label for t in parsed_tables if t]
+    if labels != expected_labels:
+        import pdb; pdb.set_trace()
+        raise AssertionError(labels, expected_labels, parsed_tables)
+
+
+def make_parser(base_mapper):
+    def wrapper(tables, commands):
+        expected_labels = extract_labels(commands)
+        parsed_tables = get_parsed_tables(tables, base_mapper, commands)
+        check_labels(parsed_tables, expected_labels, tables)
+        return parsed_tables             
+    return wrapper    
+
+
 class Worker:
     """Parse *tables* using *base_mapper* and .apply(command). 
    
@@ -170,27 +193,5 @@ class Worker:
     @property
     def parsed_tables(self):
         return [t for t in self.tables if t] 
-
-
-def get_parsed_tables(tables, base_mapper, methods):
-    worker = Worker(tables, base_mapper)
-    for method in methods:
-        worker.apply(method)
-    return worker.parsed_tables
-
-
-def check_labels(parsed_tables, expected_labels):
-    labels = [t.label for t in parsed_tables if t]
-    if labels != expected_labels:
-        import pdb; pdb.set_trace()
-        raise AssertionError(labels, expected_labels)
-
-
-def make_parser(base_mapper):
-    def wrapper(tables, commands):
-        expected_labels = extract_labels(commands)
-        parsed_tables = get_parsed_tables(tables, base_mapper, commands)
-        check_labels(parsed_tables, expected_labels)
-        return parsed_tables             
-    return wrapper       
+   
 
