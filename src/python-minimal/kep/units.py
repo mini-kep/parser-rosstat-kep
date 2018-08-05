@@ -1,4 +1,14 @@
+from kep.util import load_yaml
+
 __all__ = ['UnitMapper']
+
+
+def get_units_dict(source: str):
+    return load_yaml(source)[0]    
+
+def get_mapper(source: str):
+    units_dict = get_units_dict(source)
+    return UnitMapper(units_dict)
 
 def to_mapper_dict(listing: dict):    
     return {pat: key for key, values in listing.items() for pat in values}

@@ -1,6 +1,22 @@
 from kep.util import iterate
 from kep.row import Datapoint
 
+def all(self, strings):
+    """Require all values from strings, raise exception otherwise."""
+    require_all(strings, self.datapoints())
+    
+def any(self, strings):
+    """Require at least one value from strings, raise exception otherwise."""
+    require_any(strings, self.datapoints())
+    
+def datapoints(self):
+    """Values in parsed tables.
+    
+    Return:
+        list of Datapoint instances"""
+    return [x for t in self.parsed_tables for x in t.emit_datapoints()]
+
+
 def to_datapoint(string: str):
     args = string.split(' ')
     if args[1] == 'a':

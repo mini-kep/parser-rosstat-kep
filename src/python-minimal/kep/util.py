@@ -7,9 +7,7 @@ import os
 import yaml
 
 
-__all__ =  ['accept_filename_or_content_string',
-            'make_label', 'iterate', 'timestamp', 
-            'load_yaml']
+__all__ =  ['make_label', 'iterate', 'timestamp', 'load_yaml']
 
 
 def make_label(name: str, unit: str)-> str:
@@ -37,7 +35,8 @@ def last_day(year: int, month: int) -> int:
 def timestamp(year: int, month: int) -> str:
     """Make end of month YYYY-MM-DD timestamp."""
     day = last_day(year, month)
-    return f'{year}-{str(month).zfill(2)}-{day}'
+    month = str(month).zfill(2)
+    return f'{year}-{month}-{day}'
  
 
 class TempFile():
@@ -62,47 +61,29 @@ def exists(filename):
 
 def accept_string_parameter(func):
     """Treat *filename* a string with file content."""
-    def _wrapper(filename):
-        if exists(filename):
-            return func(filename)
-        with TempFile(filename) as temp_filename:
-            return func(temp_filename)
-    return _wrapper        
-               
-
-
-def _expect_types(x, types):
-    """Enforce x is any of types."""
-    if not any([isinstance(x, t) for t in types]):
-        annotation = ', '.join([t.__name__ for t in types])
-        raise TypeError("expected types %s" % annotation + 
-                        ", got type %s" % type(x).__name__)   
-
-
-
-
-    
-def _read_source(source: str):
-    """Treat *source* as a filename or a string with content."""
-    def exists(filename):
-        try:
-            return os.path.exists(filename)
-        except ValueError:
-            return False
-    _expect_types(source, [str])     
-    if exists(source):
-        return pathlib.Path(source).read_text(encoding='utf-8')
-    return source 
-
-
-def accept_filename_or_content_string(func):
-    """Apply *func* to a string with content or to a filename."""
     def wrapper(source):
-        return func(_read_source(source))
+        if exists(source):
+            return func(source)
+        with TempFile(source) as temp_filename:
+            return func(temp_filename)
+    return wrapper        
+               
+ 
+def read_source(filename: str):
+    """Treat *source* as a filename or a string with content."""
+    return pathlib.Path(filename).read_text(encoding='utf-8')
+
+
+def accept_filename(func):
+    """Apply *func* to a string or to a filename."""
+    def wrapper(source):
+        if exists(source):
+            source = read_source(source) 
+        return func(source)
     return wrapper
 
 #FIXME: decorated fucntion docstring not appearing in spynx docs.
-@accept_filename_or_content_string
+@accept_filename
 def load_yaml(doc: str):
     """Load YAML contents of *doc* string or filename.    
        Always return a list. Each list element is a YAML document content.        

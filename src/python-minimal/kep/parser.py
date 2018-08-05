@@ -1,33 +1,36 @@
 from copy import copy
 from kep.units import UnitMapper
 from kep.util import iterate
-from kep.commands import extract_parameters, extract_labels
-from kep.verifier import require_all, require_any
+from kep.commands import extract_labels
 
 __all__ = ['Worker', 'make_parser']
 
 
+def make_parser(base_mapper: UnitMapper):
+    
+    def wrapper(tables, commands):
+        parsed_tables = get_parsed_tables(tables, base_mapper, commands)
+        expected_labels = extract_labels(commands)
+        check_labels(parsed_tables, expected_labels)
+        return parsed_tables             
+    return wrapper    
+
+
 def get_parsed_tables(tables, base_mapper, commands):
     worker = Worker(tables, base_mapper)
-    for command in commands:
-        worker.apply(command)
+    for method, arg in commands:
+        worker.apply(method, arg)
     return worker.parsed_tables
 
 
-def check_labels(parsed_tables, expected_labels, tables):
+def check_labels(parsed_tables, expected_labels):
     labels = [t.label for t in parsed_tables if t]
     if labels != expected_labels:
+        print(parsed_tables, labels, expected_labels)
         import pdb; pdb.set_trace()
-        raise AssertionError(labels, expected_labels, parsed_tables)
+        raise AssertionError(parsed_tables, labels, expected_labels)
 
 
-def make_parser(base_mapper):
-    def wrapper(tables, commands):
-        expected_labels = extract_labels(commands)
-        parsed_tables = get_parsed_tables(tables, base_mapper, commands)
-        check_labels(parsed_tables, expected_labels, tables)
-        return parsed_tables             
-    return wrapper    
 
 
 class Worker:
@@ -62,14 +65,11 @@ class Worker:
         """Create a copy of this instance."""        
         return copy(self)
     
-    def apply(self, command):
-        """Run a *command* on itself."""
-        method, arg = extract_parameters(command)
+    def apply(self, method, arg=None):
+        """Run a *command* on itself."""        
         func = getattr(self, method)
         if arg:
-            #FIXME: shutting down value check 
-            if method not in ['all', 'any']:
-                func(arg)
+            func(arg)
         else:
             func()
 
@@ -174,22 +174,7 @@ class Worker:
                 # then
                 table.name = self.tables[i-1].name
                 _units.remove(table.unit)
-
-    def all(self, strings):
-        """Require all values from strings, raise exception otherwise."""
-        require_all(strings, self.datapoints())
-        
-    def any(self, strings):
-        """Require at least one value from strings, raise exception otherwise."""
-        require_any(strings, self.datapoints())
-        
-    def datapoints(self):
-        """Values in parsed tables.
-        
-        Return:
-            list of Datapoint instances"""
-        return [x for t in self.parsed_tables for x in t.emit_datapoints()]
-   
+ 
     @property
     def parsed_tables(self):
         return [t for t in self.tables if t] 
