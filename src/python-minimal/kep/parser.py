@@ -6,8 +6,7 @@ from kep.commands import extract_labels
 __all__ = ['Worker', 'make_parser']
 
 
-def make_parser(base_mapper: UnitMapper):
-    
+def make_parser(base_mapper: UnitMapper):    
     def wrapper(tables, commands):
         parsed_tables = get_parsed_tables(tables, base_mapper, commands)
         expected_labels = extract_labels(commands)

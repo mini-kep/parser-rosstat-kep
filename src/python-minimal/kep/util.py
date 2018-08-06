@@ -89,3 +89,7 @@ def load_yaml(doc: str):
        Always return a list. Each list element is a YAML document content.        
     """
     return list(yaml.load_all(doc))
+
+
+def load_yaml_one_document(doc: str):
+    return load_yaml(doc)[0]

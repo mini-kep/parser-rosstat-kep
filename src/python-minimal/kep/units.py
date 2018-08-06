@@ -1,14 +1,7 @@
-from kep.util import load_yaml
+from kep.util import load_yaml_one_document
 
-__all__ = ['UnitMapper']
+__all__ = ['UnitMapper', 'get_mapper']
 
-
-def get_units_dict(source: str):
-    return load_yaml(source)[0]    
-
-def get_mapper(source: str):
-    units_dict = get_units_dict(source)
-    return UnitMapper(units_dict)
 
 def to_mapper_dict(listing: dict):    
     return {pat: key for key, values in listing.items() for pat in values}
@@ -39,3 +32,8 @@ class UnitMapper:
 
     def __repr__(self):
         return repr(self.mapper_dict)
+
+def get_mapper(source: str)-> UnitMapper:
+    """Read mapper for *source* (yaml file or string)."""
+    units_dict = load_yaml_one_document(source)
+    return UnitMapper(units_dict)

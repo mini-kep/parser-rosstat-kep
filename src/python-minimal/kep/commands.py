@@ -6,7 +6,7 @@ Used to read:
 
 """
 
-from kep.util import iterate, make_label, load_yaml
+from kep.util import iterate, make_label, load_yaml, load_yaml_one_document
 from typing import Union
 
 __all__ = ['read_instructions_for_headers', 
@@ -24,7 +24,7 @@ ALLOWED_METHODS_VERIFICATION = ['all', 'any']
 #not tested
 def read_instructions_for_checkpoints(source: str):
     return [extract_parameters(command, ALLOWED_METHODS_VERIFICATION) 
-            for command in load_yaml(source)[0]]
+            for command in load_yaml_one_document(source)]
 
 
 def read_instructions_for_headers(source: str):
@@ -37,7 +37,7 @@ def read_instructions_for_headers(source: str):
              for block in load_yaml(source)]
 
 
-def extract_key_value_from_dict(d: dict):
+def key_value_from_dict(d: dict):
     for method, arg in d.items():
       break
     return method, arg
@@ -53,7 +53,7 @@ def extract_parameters(command: Union[str, dict], allowed_commands) -> tuple:
     if isinstance(command, str):
         method, arg = command, None
     elif isinstance(command, dict):
-        method, arg = extract_key_value_from_dict(command)
+        method, arg = key_value_from_dict(command)
     if method not in allowed_commands:
         raise ValueError(method)
     return method, arg    
