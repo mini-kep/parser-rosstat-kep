@@ -10,8 +10,7 @@ from kep.util import iterate, make_label, load_yaml, load_yaml_one_document
 from typing import Union
 
 __all__ = ['read_instructions_for_headers', 
-           'read_instructions_for_checkpoints',
-           'extract_parameters', 'extract_labels']
+           'read_instructions_for_checkpoints']
 
 ALLOWED_METHODS_PARSING = ['start_with', 'end_with',
                            'var', 'headers', 'units',
@@ -21,10 +20,10 @@ ALLOWED_METHODS_PARSING = ['start_with', 'end_with',
 ALLOWED_METHODS_VERIFICATION = ['all', 'any']
 
 
-#not tested
+
 def read_instructions_for_checkpoints(source: str):
-    return [extract_parameters(command, ALLOWED_METHODS_VERIFICATION) 
-            for command in load_yaml_one_document(source)]
+    commands = load_yaml_one_document(source)
+    return make_parameter_list(commands, ALLOWED_METHODS_VERIFICATION)
 
 
 def read_instructions_for_headers(source: str):
@@ -32,15 +31,20 @@ def read_instructions_for_headers(source: str):
     Return:
         list of blocks, each block is a list of tuples
     """    
-    return [[extract_parameters(command, ALLOWED_METHODS_PARSING) 
-             for command in block] 
-             for block in load_yaml(source)]
+    return [CommandBlock(document) for document in load_yaml(source)]
 
 
-def key_value_from_dict(d: dict):
-    for method, arg in d.items():
-      break
-    return method, arg
+class CommandBlock:
+    def __init__(self, commands):
+        self.commands = make_parameter_list(commands, ALLOWED_METHODS_PARSING)      
+    @property
+    def expected_labels(self):
+        return extract_labels(self.commands)
+
+        
+
+def make_parameter_list(commands, allowed_methods):
+    return [extract_parameters(command, allowed_methods) for command in commands]
 
 
 def extract_parameters(command: Union[str, dict], allowed_commands) -> tuple:
@@ -70,3 +74,9 @@ def extract_labels(commands: list):
             current_labels = [make_label(name, unit) for unit in units]
             labels.extend(current_labels)
     return labels
+
+def key_value_from_dict(d: dict):
+    for method, arg in d.items():
+      break
+    return method, arg
+

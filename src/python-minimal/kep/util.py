@@ -59,7 +59,7 @@ def exists(filename):
     except ValueError:
         return False
 
-def accept_string_parameter(func):
+def accept_string(func):
     """Treat *filename* a string with file content."""
     def wrapper(source):
         if exists(source):
@@ -82,7 +82,8 @@ def accept_filename(func):
         return func(source)
     return wrapper
 
-#FIXME: decorated fucntion docstring not appearing in spynx docs.
+#FIXME: decorated fucntion docstring not appearing in spynx docs
+
 @accept_filename
 def load_yaml(doc: str):
     """Load YAML contents of *doc* string or filename.    

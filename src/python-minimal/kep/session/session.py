@@ -1,14 +1,14 @@
 """Extract data from CSV file using parsing instructions."""
 
-from kep.units import get_mapper
-from kep.commands import read_instructions_for_headers
-from kep.reader import get_tables
-from kep.parser import make_parser
-from kep.saver import unpack_dataframes
+from kep.session.commands import read_instructions_for_headers
+from kep.session.dataframes import unpack_dataframes
+
+from kep.parser.units import get_mapper
+from kep.parser.reader import get_tables
+from kep.parser.parser import make_parser
 
 
 __all__ = ['Session']
-
 
 
 class Session:
@@ -23,8 +23,10 @@ class Session:
         """Extract data *csv_source*."""
         tables = get_tables(csv_source)
         self.parsed_tables = []
-        for commands in self.command_blocks:
-            next_tables = self.parser(tables, commands)
+        for block in self.command_blocks:
+            next_tables = self.parser(tables, 
+                                      commands = block.commands, 
+                                      expected_labels = block.expected_labels)
             self.parsed_tables.extend(next_tables)
 
     def labels(self):

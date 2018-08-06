@@ -1,26 +1,19 @@
 from kep.session import Session 
 from locations import date_span, interim_csv, unit_mapper, parsing_instructions
-from kep.reader import get_tables
 
-from profilehooks import profile
-from profilehooks import timecall
+from profilehooks import profile, timecall
 
 ALL_DATES = date_span('2009-04', '2018-04')
 
 
 @profile(immediate=True, entries=20)
 def get_tables_all():
+    from kep.reader import get_tables
     for year, month in ALL_DATES:
         filepath = interim_csv(year, month)        
         get_tables(filepath)
-    
 
-def get_frames(s):
-    dfa, dfq, dfm = s.dataframes()
-    assert not dfa.empty
-    assert not dfq.empty
-    assert not dfm.empty 
-    
+   
 @profile(immediate=True, entries=20)
 #@timecall(immediate=True)
 def search_all():
@@ -30,6 +23,13 @@ def search_all():
         csv_source = interim_csv(year, month)
         s.parse(csv_source)
     return s    
+
+def get_frames(s):
+    dfa, dfq, dfm = s.dataframes()
+    assert not dfa.empty
+    assert not dfq.empty
+    assert not dfm.empty 
+
     
 if __name__ == '__main__':     
     s = search_all()

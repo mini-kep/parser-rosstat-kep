@@ -1,5 +1,5 @@
 ﻿from collections import namedtuple
-import kep.filters as filters
+import kep.parser.filters as filters
 
 __all__ = ['Datapoint', 'get_row_format', 'emit_datapoints']
 

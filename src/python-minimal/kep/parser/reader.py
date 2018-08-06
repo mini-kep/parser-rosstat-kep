@@ -1,23 +1,26 @@
-"""Convert CSV file to Table() instances."""
+"""Convert CSV file to Table() instances. Use get_tables(filepath)."""
 
 from enum import Enum, unique
 import re
 import pprint
 
-from kep.row import get_row_format, emit_datapoints
-from kep.util import make_label, accept_string_parameter
+from kep.parser.row import get_row_format, emit_datapoints
+from kep.util import make_label, accept_string
 
 
+__all__ = ['get_tables', 'get_csv', 'split_csv', 'Table']
 
-__all__ = ['get_tables', 'get_csv', 'split_csv','Table']
+# I accounts for quarterly headers
+RE_LITERALS = re.compile(r'[а-яI]')
 
-@accept_string_parameter
+@accept_string
 def get_tables(filepath: str):    
     rows = get_csv(filepath)    
     table_tuples = split_csv(rows, is_data_row)
     return [Table(headers, datarows) for headers, datarows in table_tuples]
 
-RE_LITERALS = re.compile(r'[а-яI]')
+def get_csv(filepath):
+    return filter(is_allowed, read_csv(filepath))
 
 def has_literals(s: str) -> bool:
     return re.search(RE_LITERALS, s)
@@ -32,10 +35,6 @@ def read_csv(filepath: str):
             
 def is_allowed(row):
     return row and '_' not in row
-
-def get_csv(filepath):
-    return filter(is_allowed, read_csv(filepath))
-
 
 @unique
 class State(Enum):

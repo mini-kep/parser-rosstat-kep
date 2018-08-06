@@ -1,15 +1,14 @@
 from copy import copy
-from kep.units import UnitMapper
+from kep.parser.units import UnitMapper
 from kep.util import iterate
-from kep.commands import extract_labels
+
 
 __all__ = ['Worker', 'make_parser']
 
 
 def make_parser(base_mapper: UnitMapper):    
-    def wrapper(tables, commands):
+    def wrapper(tables, commands, expected_labels):
         parsed_tables = get_parsed_tables(tables, base_mapper, commands)
-        expected_labels = extract_labels(commands)
         check_labels(parsed_tables, expected_labels)
         return parsed_tables             
     return wrapper    
@@ -28,9 +27,7 @@ def check_labels(parsed_tables, expected_labels):
         print(parsed_tables, labels, expected_labels)
         import pdb; pdb.set_trace()
         raise AssertionError(parsed_tables, labels, expected_labels)
-
-
-
+        
 
 class Worker:
     """Parse *tables* using *base_mapper* and .apply(command). 
@@ -177,5 +174,3 @@ class Worker:
     @property
     def parsed_tables(self):
         return [t for t in self.tables if t] 
-   
-

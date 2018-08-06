@@ -1,4 +1,4 @@
-CSV_TEXT = """	Год / Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.			
+﻿CSV_TEXT = """	Год / Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.			
 		I	II	III	IV												
 1.2. Индекс промышленного производства1) / Industrial Production index1)																	
 в % к соответствующему периоду предыдущего года / percent of corresponding period of previous year																	
