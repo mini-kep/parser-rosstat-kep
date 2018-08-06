@@ -40,3 +40,6 @@ class Session:
            from parsed tables."""
         dfa, dfq, dfm = unpack_dataframes(self.datapoints())
         return dfa, dfq, dfm
+    
+    def verify(self):
+        pass
