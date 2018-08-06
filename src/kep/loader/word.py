@@ -1,4 +1,4 @@
-"""make_csv(data_folder) dumps data from tables in Word document to csv file.
+"""Get data from MS Word files using *win32com.client*.   
    Windows-only, requires MS Word installed.
 """
 
@@ -11,6 +11,7 @@
 import csv
 import os
 
+__all__ = ['folder_to_csv']
 ENCODING = 'utf8'
 
 # -------------------------------------------------------------------------------
@@ -198,13 +199,13 @@ def make_file_list(folder):
     return [os.path.abspath(os.path.join(folder, fn)) for fn in files]
 
 
-def folder_to_csv(folder, csv_filename):
-    """Make single csv based on sevral .doc files in *folder*. """
+def folder_to_csv(folder, csv_filepath):
+    """Make single CSV file at *csv_filepath* based on all .doc files in *folder*. """
     print()
     print("Folder:\n    ", folder)
     file_list = make_file_list(folder)
-    dump_doc_files_to_csv(file_list, csv_filename)
-    print("Finished creating raw CSV file:", csv_filename)
+    dump_doc_files_to_csv(file_list, csv_filepath)
+    print("Finished creating raw CSV file:", csv_filepath)
     return True
 
 

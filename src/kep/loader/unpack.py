@@ -3,15 +3,15 @@ import platform
 from pathlib import Path
 import subprocess
 
-IS_WINDOWS = (platform.system() == 'Windows')
+__all__ = ['unpack']
 
-if IS_WINDOWS:
-    UNRAR_EXE = str(Path(__file__).parent / 'bin' / 'UnRAR.exe')
-else:
-    UNRAR_EXE = 'unrar'
+IS_WINDOWS = platform.system() == 'Windows'
+UNRAR_EXE = (str(Path(__file__).parent / 'bin' / 'UnRAR.exe')
+             if IS_WINDOWS
+             else 'unrar')
 
-
-def unrar(filepath, folder, unrar_executable=UNRAR_EXE):
+def _unrar(filepath: str, folder: str, unrar_executable=UNRAR_EXE):
+    """Unpack *filepath* to *folder*."""
     # UnRAR wants its folder argument with '/'
     folder = "{}{}".format(folder, os.sep)
     tokens = [unrar_executable, 'e', str(filepath), folder, '-y']
@@ -20,40 +20,20 @@ def unrar(filepath, folder, unrar_executable=UNRAR_EXE):
     except subprocess.CalledProcessError as e:
         raise e
 
-
-class DocFiles:
-    def __init__(self, folder):
-        self.folder = Path(folder)
-
-    @property
-    def paths(self):
-        return [str(x) for x in self.folder.glob('*.doc*')]
-
-    def exist(self):
-        return len(self.paths) > 0
-
-    def __str__(self):
-        return ' ' * 4 + ('\n' + ' ' * 4).join(self.paths)
-
-
-class Unpacker:
-    def __init__(self, archive_filepath,
-                 destination_folder):
-        self.path = archive_filepath
-        if not Path(self.path).exists():
-            raise FileNotFoundError(self.path)
-        self.folder = destination_folder
-        self.status = (f'Already unpacked:\n{self.docs}'
-                       if self.docs.exist()
-                       else None)
-
-    @property
-    def docs(self):
-        return DocFiles(self.folder)
-
-    def run(self):
-        res = unrar(self.path, self.folder)
-        if res == 0:
-            self.status = f'UnRARed {self.path}'
-            return True
-        return False
+def unpack(filepath, destination_folder, force=False):
+    assert_exists(filepath)
+    assert_exists(destination_folder)    
+    docs = docs_listing(destination_folder)
+    if docs and not force:
+        return "Already unpacked: %r" % docs
+    res = _unrar(filepath, destination_folder)  
+    if res == 0:
+        return "UnRARed to %s" % destination_folder
+    return ''   
+     
+def assert_exists(filepath):
+    if not Path(filepath).exists():
+        raise FileNotFoundError(filepath)
+        
+def docs_listing(folder):
+    return [str(x) for x in Path(folder).glob('*.doc*')]     

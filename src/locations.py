@@ -1,35 +1,40 @@
-"""Dates for the project."""
+"""Manage dataset."""
+from pathlib import Path
+import kep
 
-import pandas as pd
-
-def supported_dates(start_date='2009-04', exclude_dates=['2013-11']):
-    """Get a list of (year, month) tuples starting from (2009, 4) up to
-       a previous recent month. This a 'supported date list'.
-       Excludes (2013, 11) - no archive for this month.
-    Returns:
-        List of (year: int, month: int) tuples.
-    """
-    end_date = pd.to_datetime('today') - pd.offsets.MonthEnd()
-    dates = pd.date_range(start_date, end_date, freq='MS')
-    exclude = map(pd.to_datetime, exclude_dates)
-    return [(date.year, date.month) for date in dates.drop(exclude)]
+def download(year, month, force=False):
+    filepath = rarfile(year, month)
+    msg = kep.download(year, month, filepath, force)
+    print(msg)
 
 
+def unpack(year, month, force=False):
+    filepath = rarfile(year, month)
+    folder = raw_folder(year, month)
+    msg = kep.unpack(filepath, folder, force)
+    print(msg)
 
-def date_span(start_date, end_date):
-    supported_date_list =  supported_dates()
-    return [(date.year, date.month) for date in 
-             pd.date_range(start_date, end_date, freq='MS')
-             if (date.year, date.month) in supported_date_list]  
+    
+def make_interim_csv(year, month, force=False):
+    folder = raw_folder(year, month)
+    filepath = interim_csv(year, month)
+    msg = kep.folder_to_csv(folder, filepath)
+    print(msg)
+    
+    
+def parse(year, month, force=False):
+    # interim csv -> final dataframe files
+    pass    
     
 
-
-def is_latest(year: int, month: int):
-    return (year, month) in supported_dates()[:-2]
+    
+#def unpack(year, month):
+#    pass
+    
 
 #"""Run full cycle of data processing from download to saving dataframe."""
 #
-from pathlib import Path
+
 #import shutil
 #from io import StringIO
 #
@@ -47,14 +52,14 @@ from pathlib import Path
 #
 #
 #FREQUENCIES = list('aqm')
+
+# file locations 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_ROOT = PROJECT_ROOT / 'data'
 OUTPUT_ROOT = PROJECT_ROOT / 'output'
+assert DATA_ROOT.exists()
+assert OUTPUT_ROOT.exists()
 
-#assert DATA_ROOT.exists()
-#assert OUTPUT_ROOT.exists()
-#
-#
 
 def md(folder):
     if not folder.exists():
@@ -69,7 +74,6 @@ def md(folder):
 #
 #
 
-
 def as_string(func):
     def wrapper(*arg, **kwarg):
         return str(func(*arg, **kwarg))
@@ -77,15 +81,23 @@ def as_string(func):
     
 
 def inner_folder(data_root, tag, year, month):
+    kep.dates.assert_supported(year, month)
     allowed_tags = ('raw', 'interim', 'processed')
     if tag in allowed_tags:            
-        return data_root / tag / str(year) / str(month).zfill(2)
+        return md(data_root / tag / str(year) / str(month).zfill(2))
     else:
         raise ValueError(f'{tag} not supported, must be any of {allowed_tags}')
 
 def latest_folder(data_root=DATA_ROOT):
     return data_root / 'processed' / 'latest'
 
+@as_string
+def raw_folder(year, month, data_root=DATA_ROOT):
+    return inner_folder(data_root, 'raw', year, month)
+
+@as_string
+def rarfile(year, month):
+    return Path(raw_folder(year, month)) / 'download.rar'
 
 @as_string
 def parsing_instructions(data_root=DATA_ROOT):
@@ -99,49 +111,17 @@ def unit_mapper(data_root=DATA_ROOT):
 def interim_csv(year: int, month: int, data_root=DATA_ROOT):
     return inner_folder(data_root, 'interim', year, month) / 'tab.csv'
 
+@as_string
+def processed_csv(year, month, freq: str,  data_root=DATA_ROOT):
+    return inner_folder(data_root, 'processed', year, month) / filename(freq)
 
+@as_string
+def latest_csv(freq: str, data_root=DATA_ROOT):
+    return latest_folder(data_root) / filename(freq)
 
-    def processed_csv(self, freq: str):
-        return str(self.inner_path('processed') / self.filename(freq))
+def filename(freq):
+   return 'df{}.csv'.format(freq)
 
-    def latest_csv(self, freq: str):
-        return str(self.inner_path('latest') / self.filename(freq))
-
-
-
-
-class Location(object):
-    def __init__(self, 
-                 year: int,
-                 month: int,
-                 data_root=DATA_ROOT
-                 ):
-        if (year, month) not in supported_dates():
-            raise ValueError(year, month)
-        self.year = year
-        self.month = month
-        self.data = Path(data_root)
-
-    @property
-    def raw_folder(self):
-        return self.inner_path('raw')
-
-    @property
-    def rar(self):
-        return str(self.raw_folder / 'download.rar')
-
-    def interim_csv(self):
-        return str(self.inner_path('interim') / 'tab.csv')
-
-    def processed_csv(self, freq: str):
-        return str(self.inner_path('processed') / self.filename(freq))
-
-    def latest_csv(self, freq: str):
-        return str(self.inner_path('latest') / self.filename(freq))
-
-    @staticmethod
-    def filename(freq):
-        return 'df{}.csv'.format(freq)
 
 
 #def to_latest(year: int, month: int, loc):

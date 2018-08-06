@@ -6,15 +6,22 @@ from kep.util import iterate
 __all__ = ['Worker', 'get_parsed_tables']
 
 
-def get_parsed_tables(base_mapper: UnitMapper,
+def get_parsed_tables(base_mapper,
                       tables,
                       commands,
                       expected_labels=None):
     """
+    Parse *tables* using *base_mapper* and *commands* and check for 
+    *expected_labels*.
+    
     Args:
-       tables is list of Table instances
-       commands is list of (method, arg) tuples
-       expected labels is list of strings
+       base_mapper: a UnitMapper instance
+       tables: list of Table instances
+       commands: list of (method, arg) tuples
+       expected labels: list of strings
+
+    Return:
+       list of parsed Table() instances       
     """   
     parsed_tables = _get_parsed_tables(tables, base_mapper, commands)
     check_labels(parsed_tables, expected_labels)

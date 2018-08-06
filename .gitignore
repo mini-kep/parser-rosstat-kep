@@ -1,10 +1,9 @@
 .pytest_cache
 *.doc
 *.rar
-doc/html/
-doc2/
-temp.txt
-
+docs/_build
+docs/_static
+docs/_template
 src/.cache
 
 # Byte-compiled / optimized / DLL files

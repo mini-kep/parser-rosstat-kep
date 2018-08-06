@@ -1,54 +1,44 @@
 kep\.parser package
 ===================
 
-Submodules
-----------
 
-kep\.parser\.filters module
----------------------------
+kep\.parser\.filters
+--------------------
 
 .. automodule:: kep.parser.filters
     :members:
     :undoc-members:
     :show-inheritance:
 
-kep\.parser\.parser module
---------------------------
+kep\.parser\.worker 
+-------------------
 
-.. automodule:: kep.parser.parser
+.. automodule:: kep.parser.worker
     :members:
     :undoc-members:
     :show-inheritance:
 
-kep\.parser\.reader module
---------------------------
+kep\.parser\.reader 
+-------------------
 
 .. automodule:: kep.parser.reader
     :members:
     :undoc-members:
     :show-inheritance:
 
-kep\.parser\.row module
------------------------
+kep\.parser\.row 
+----------------
 
 .. automodule:: kep.parser.row
     :members:
     :undoc-members:
     :show-inheritance:
 
-kep\.parser\.units module
--------------------------
+kep\.parser\.units 
+------------------
 
 .. automodule:: kep.parser.units
     :members:
     :undoc-members:
     :show-inheritance:
 
-
-Module contents
----------------
-
-.. automodule:: kep.parser
-    :members:
-    :undoc-members:
-    :show-inheritance:

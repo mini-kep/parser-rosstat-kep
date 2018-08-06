@@ -1,38 +1,27 @@
 kep\.loader package
 ===================
 
-Submodules
-----------
 
-kep\.loader\.download module
-----------------------------
+kep\.loader\.download
+---------------------
 
 .. automodule:: kep.loader.download
     :members:
     :undoc-members:
     :show-inheritance:
 
-kep\.loader\.unpack module
---------------------------
+kep\.loader\.unpack
+-------------------
 
 .. automodule:: kep.loader.unpack
     :members:
     :undoc-members:
     :show-inheritance:
 
-kep\.loader\.word module
-------------------------
-
+kep\.loader\.word
+-----------------
 .. automodule:: kep.loader.word
     :members:
     :undoc-members:
     :show-inheritance:
 
-
-Module contents
----------------
-
-.. automodule:: kep.loader
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -2,11 +2,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
-<html xmlns="http://www.w3.org/1999/xhtml" lang="ru">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>kep.session package &#8212; Документация Clean timeseries 0.0.3</title>
-    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <title>kep.session package &#8212; Clean timeseries 0.0.3 documentation</title>
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -21,32 +21,31 @@
     <script type="text/javascript" src="_static/jquery.js"></script>
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
-    <script type="text/javascript" src="_static/translations.js"></script>
-    <link rel="index" title="Алфавитный указатель" href="genindex.html" />
-    <link rel="search" title="Поиск" href="search.html" />
-    <link rel="prev" title="kep.parser package" href="kep.parser.html" />
-   
-  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
-
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="kep.parser package" href="kep.parser.html" /> 
   </head>
   <body>
-  
+      <div class="header" role="banner"><h1 class="heading"><a href="index.html">
+          <span>Clean timeseries 0.0.3 documentation</span></a></h1>
+        <h2 class="heading"><span>kep.session package</span></h2>
+      </div>
+      <div class="topnav" role="navigation" aria-label="top navigation">
+      
+        <p>
+        «&#160;&#160;<a href="kep.parser.html">kep.parser package</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
+      </div>
+      <div class="content">
+        
+        
   <div class="section" id="kep-session-package">
-<h1>kep.session package<a class="headerlink" href="#kep-session-package" title="Ссылка на этот заголовок">¶</a></h1>
-<div class="section" id="submodules">
-<h2>Submodules<a class="headerlink" href="#submodules" title="Ссылка на этот заголовок">¶</a></h2>
-</div>
+<h1>kep.session package<a class="headerlink" href="#kep-session-package" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-kep.session.commands">
-<span id="kep-session-commands-module"></span><h2>kep.session.commands module<a class="headerlink" href="#module-kep.session.commands" title="Ссылка на этот заголовок">¶</a></h2>
+<span id="kep-session-commands"></span><h2>kep.session.commands<a class="headerlink" href="#module-kep.session.commands" title="Permalink to this headline">¶</a></h2>
 <p>Read YAML file with parsing or verification commands.</p>
 <dl class="docutils">
 <dt>Used to read:</dt>
@@ -58,201 +57,147 @@
 </dl>
 <dl class="function">
 <dt id="kep.session.commands.read_instructions_for_checkpoints">
-<code class="descclassname">kep.session.commands.</code><code class="descname">read_instructions_for_checkpoints</code><span class="sig-paren">(</span><em>source: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.commands.read_instructions_for_checkpoints" title="Ссылка на это определение">¶</a></dt>
+<code class="descclassname">kep.session.commands.</code><code class="descname">read_instructions_for_checkpoints</code><span class="sig-paren">(</span><em>source: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.commands.read_instructions_for_checkpoints" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="kep.session.commands.read_instructions_for_headers">
-<code class="descclassname">kep.session.commands.</code><code class="descname">read_instructions_for_headers</code><span class="sig-paren">(</span><em>source: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.commands.read_instructions_for_headers" title="Ссылка на это определение">¶</a></dt>
-<dd><p>Read parsing command blocks from <em>source</em>.    
-Return:</p>
-<blockquote>
-<div>list of blocks, each block is a list of tuples</div></blockquote>
+<code class="descclassname">kep.session.commands.</code><code class="descname">read_instructions_for_headers</code><span class="sig-paren">(</span><em>source: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.commands.read_instructions_for_headers" title="Permalink to this definition">¶</a></dt>
+<dd><p>Read parsing command blocks from <em>source</em>.
+:returns: list of blocks, each block is a list of tuples</p>
 </dd></dl>
 
 </div>
 <div class="section" id="module-kep.session.dataframes">
-<span id="kep-session-dataframes-module"></span><h2>kep.session.dataframes module<a class="headerlink" href="#module-kep.session.dataframes" title="Ссылка на этот заголовок">¶</a></h2>
+<span id="kep-session-dataframes"></span><h2>kep.session.dataframes<a class="headerlink" href="#module-kep.session.dataframes" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="kep.session.dataframes.unpack_dataframes">
-<code class="descclassname">kep.session.dataframes.</code><code class="descname">unpack_dataframes</code><span class="sig-paren">(</span><em>datapoints</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.dataframes.unpack_dataframes" title="Ссылка на это определение">¶</a></dt>
+<code class="descclassname">kep.session.dataframes.</code><code class="descname">unpack_dataframes</code><span class="sig-paren">(</span><em>datapoints</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.dataframes.unpack_dataframes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a tuple of annual, quarterly, monthly pandas dataframes.</p>
 </dd></dl>
 
 </div>
 <div class="section" id="module-kep.session.session">
-<span id="kep-session-session-module"></span><h2>kep.session.session module<a class="headerlink" href="#module-kep.session.session" title="Ссылка на этот заголовок">¶</a></h2>
+<span id="kep-session-session"></span><h2>kep.session.session<a class="headerlink" href="#module-kep.session.session" title="Permalink to this headline">¶</a></h2>
 <p>Extract data from CSV file using parsing instructions.</p>
 <dl class="class">
 <dt id="kep.session.session.Session">
-<em class="property">class </em><code class="descclassname">kep.session.session.</code><code class="descname">Session</code><span class="sig-paren">(</span><em>base_units_source: str</em>, <em>commands_source: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.session.Session" title="Ссылка на это определение">¶</a></dt>
-<dd><blockquote>
-<div>Базовые классы: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></div></blockquote>
+<em class="property">class </em><code class="descclassname">kep.session.session.</code><code class="descname">Session</code><span class="sig-paren">(</span><em>base_units_source: str</em>, <em>commands_source: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.session.Session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></p>
 <dl class="method">
-<dt id="kep.session.session.Session.get_parsed_tables">
-<code class="descname">get_parsed_tables</code><span class="sig-paren">(</span><em>csv_source</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.session.Session.get_parsed_tables" title="Ссылка на это определение">¶</a></dt>
+<dt id="kep.session.session.Session.parse">
+<code class="descname">parse</code><span class="sig-paren">(</span><em>csv_source</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.session.Session.parse" title="Permalink to this definition">¶</a></dt>
 <dd><p>Extract data <em>csv_source</em>.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="kep.session.session.Session.labels">
-<code class="descname">labels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.session.Session.labels" title="Ссылка на это определение">¶</a></dt>
+<code class="descname">labels</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.session.Session.labels" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return list of labels from parsed tables.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="kep.session.session.Session.datapoints">
-<code class="descname">datapoints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.session.Session.datapoints" title="Ссылка на это определение">¶</a></dt>
+<code class="descname">datapoints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.session.Session.datapoints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a list of values from parsed tables.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="kep.session.session.Session.dataframes">
-<code class="descname">dataframes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.session.Session.dataframes" title="Ссылка на это определение">¶</a></dt>
+<code class="descname">dataframes</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.session.Session.dataframes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a tuple of annual, quarterly and monthly dataframes
 from parsed tables.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="kep.session.session.Session.verify">
-<code class="descname">verify</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.session.Session.verify" title="Ссылка на это определение">¶</a></dt>
+<code class="descname">verify</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.session.Session.verify" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 </div>
 <div class="section" id="module-kep.session.to_excel">
-<span id="kep-session-to-excel-module"></span><h2>kep.session.to_excel module<a class="headerlink" href="#module-kep.session.to_excel" title="Ссылка на этот заголовок">¶</a></h2>
+<span id="kep-session-to-excel"></span><h2>kep.session.to_excel<a class="headerlink" href="#module-kep.session.to_excel" title="Permalink to this headline">¶</a></h2>
 <p>Save xls file.</p>
 <dl class="function">
 <dt id="kep.session.to_excel.save_excel">
-<code class="descclassname">kep.session.to_excel.</code><code class="descname">save_excel</code><span class="sig-paren">(</span><em>filepath</em>, <em>dataframes</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.to_excel.save_excel" title="Ссылка на это определение">¶</a></dt>
+<code class="descclassname">kep.session.to_excel.</code><code class="descname">save_excel</code><span class="sig-paren">(</span><em>filepath</em>, <em>dataframes</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.to_excel.save_excel" title="Permalink to this definition">¶</a></dt>
 <dd><p>Save <em>dataframes</em> .xlsx <em>filepath</em>.</p>
 </dd></dl>
 
 </div>
 <div class="section" id="module-kep.session.verifier">
-<span id="kep-session-verifier-module"></span><h2>kep.session.verifier module<a class="headerlink" href="#module-kep.session.verifier" title="Ссылка на этот заголовок">¶</a></h2>
+<span id="kep-session-verifier"></span><h2>kep.session.verifier<a class="headerlink" href="#module-kep.session.verifier" title="Permalink to this headline">¶</a></h2>
 <dl class="function">
 <dt id="kep.session.verifier.all">
-<code class="descclassname">kep.session.verifier.</code><code class="descname">all</code><span class="sig-paren">(</span><em>self</em>, <em>strings</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.all" title="Ссылка на это определение">¶</a></dt>
+<code class="descclassname">kep.session.verifier.</code><code class="descname">all</code><span class="sig-paren">(</span><em>self</em>, <em>strings</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.all" title="Permalink to this definition">¶</a></dt>
 <dd><p>Require all values from strings, raise exception otherwise.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="kep.session.verifier.any">
-<code class="descclassname">kep.session.verifier.</code><code class="descname">any</code><span class="sig-paren">(</span><em>self</em>, <em>strings</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.any" title="Ссылка на это определение">¶</a></dt>
+<code class="descclassname">kep.session.verifier.</code><code class="descname">any</code><span class="sig-paren">(</span><em>self</em>, <em>strings</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.any" title="Permalink to this definition">¶</a></dt>
 <dd><p>Require at least one value from strings, raise exception otherwise.</p>
 </dd></dl>
 
 <dl class="function">
 <dt id="kep.session.verifier.datapoints">
-<code class="descclassname">kep.session.verifier.</code><code class="descname">datapoints</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.datapoints" title="Ссылка на это определение">¶</a></dt>
+<code class="descclassname">kep.session.verifier.</code><code class="descname">datapoints</code><span class="sig-paren">(</span><em>self</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.datapoints" title="Permalink to this definition">¶</a></dt>
 <dd><p>Values in parsed tables.</p>
-<dl class="docutils">
-<dt>Return:</dt>
-<dd>list of Datapoint instances</dd>
-</dl>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">list of Datapoint instances</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="function">
 <dt id="kep.session.verifier.to_datapoint">
-<code class="descclassname">kep.session.verifier.</code><code class="descname">to_datapoint</code><span class="sig-paren">(</span><em>string: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.to_datapoint" title="Ссылка на это определение">¶</a></dt>
+<code class="descclassname">kep.session.verifier.</code><code class="descname">to_datapoint</code><span class="sig-paren">(</span><em>string: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.to_datapoint" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="kep.session.verifier.as_datapoints">
-<code class="descclassname">kep.session.verifier.</code><code class="descname">as_datapoints</code><span class="sig-paren">(</span><em>strings: list</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.as_datapoints" title="Ссылка на это определение">¶</a></dt>
+<code class="descclassname">kep.session.verifier.</code><code class="descname">as_datapoints</code><span class="sig-paren">(</span><em>strings: list</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.as_datapoints" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="kep.session.verifier.subset">
-<code class="descclassname">kep.session.verifier.</code><code class="descname">subset</code><span class="sig-paren">(</span><em>x</em>, <em>datapoints</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.subset" title="Ссылка на это определение">¶</a></dt>
+<code class="descclassname">kep.session.verifier.</code><code class="descname">subset</code><span class="sig-paren">(</span><em>x</em>, <em>datapoints</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.subset" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="kep.session.verifier.require_all">
-<code class="descclassname">kep.session.verifier.</code><code class="descname">require_all</code><span class="sig-paren">(</span><em>strings</em>, <em>datapoints</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.require_all" title="Ссылка на это определение">¶</a></dt>
+<code class="descclassname">kep.session.verifier.</code><code class="descname">require_all</code><span class="sig-paren">(</span><em>strings</em>, <em>datapoints</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.require_all" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="function">
 <dt id="kep.session.verifier.require_any">
-<code class="descclassname">kep.session.verifier.</code><code class="descname">require_any</code><span class="sig-paren">(</span><em>strings</em>, <em>datapoints</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.require_any" title="Ссылка на это определение">¶</a></dt>
+<code class="descclassname">kep.session.verifier.</code><code class="descname">require_any</code><span class="sig-paren">(</span><em>strings</em>, <em>datapoints</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.session.verifier.require_any" title="Permalink to this definition">¶</a></dt>
 <dd></dd></dl>
 
 </div>
-<div class="section" id="module-kep.session">
-<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-kep.session" title="Ссылка на этот заголовок">¶</a></h2>
-</div>
 </div>
 
 
-          </div>
-        </div>
       </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="index.html">Clean timeseries</a></h1>
+      <div class="bottomnav" role="navigation" aria-label="bottom navigation">
+      
+        <p>
+        «&#160;&#160;<a href="kep.parser.html">kep.parser package</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
 
-
-
-
-
-
-
-
-<h3>Навигация</h3>
-<ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="kep.loader.html">kep.loader package</a></li>
-<li class="toctree-l1"><a class="reference internal" href="kep.parser.html">kep.parser package</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">kep.session package</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-kep.session.commands">kep.session.commands module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-kep.session.dataframes">kep.session.dataframes module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-kep.session.session">kep.session.session module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-kep.session.to_excel">kep.session.to_excel module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-kep.session.verifier">kep.session.verifier module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#module-kep.session">Module contents</a></li>
-</ul>
-</li>
-</ul>
-
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="kep.parser.html" title="предыдущая глава">kep.parser package</a></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Быстрый поиск</h3>
-    <form class="search" action="search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Искать" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
-        </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2018, Evgeny Pogrebnyak.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-      |
-      <a href="_sources/kep.session.rst.txt"
-          rel="nofollow">Page source</a>
-    </div>
 
-    
-
-    
+    <div class="footer" role="contentinfo">
+        &#169; Copyright 2018, Evgeny Pogrebnyak.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
+    </div>
   </body>
 </html>

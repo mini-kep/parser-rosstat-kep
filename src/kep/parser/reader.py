@@ -8,9 +8,9 @@ from kep.parser.row import get_row_format, emit_datapoints
 from kep.util import make_label, accept_string
 
 
-__all__ = ['get_tables', 'get_csv', 'split_csv', 'Table']
+__all__ = ['get_tables', 'get_csv', 'Table']
 
-# I accounts for quarterly headers
+# 'I' accounts for quarterly headers with I, II, III and IV
 RE_LITERALS = re.compile(r'[а-яI]')
 
 @accept_string

@@ -1,54 +1,43 @@
 kep\.session package
 ====================
 
-Submodules
-----------
-
-kep\.session\.commands module
------------------------------
+kep\.session\.commands 
+----------------------
 
 .. automodule:: kep.session.commands
     :members:
     :undoc-members:
     :show-inheritance:
 
-kep\.session\.dataframes module
--------------------------------
+kep\.session\.dataframes 
+------------------------
 
 .. automodule:: kep.session.dataframes
     :members:
     :undoc-members:
     :show-inheritance:
 
-kep\.session\.session module
-----------------------------
+kep\.session\.session
+---------------------
 
 .. automodule:: kep.session.session
     :members:
     :undoc-members:
     :show-inheritance:
 
-kep\.session\.to\_excel module
-------------------------------
+kep\.session\.to\_excel
+-----------------------
 
 .. automodule:: kep.session.to_excel
     :members:
     :undoc-members:
     :show-inheritance:
 
-kep\.session\.verifier module
------------------------------
+kep\.session\.verifier
+----------------------
 
 .. automodule:: kep.session.verifier
     :members:
     :undoc-members:
     :show-inheritance:
 
-
-Module contents
----------------
-
-.. automodule:: kep.session
-    :members:
-    :undoc-members:
-    :show-inheritance:

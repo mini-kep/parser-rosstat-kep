@@ -22,10 +22,4 @@ kep\.util module
     :show-inheritance:
 
 
-Module contents
----------------
 
-.. automodule:: kep
-    :members:
-    :undoc-members:
-    :show-inheritance:

@@ -2,14 +2,16 @@
 
 Bad friends:
     
-    '1001)' (a comment)
-    '1001)2)' (two comments)
-    '…' (omission)
-    '-' ()
+    - '1001)' (a comment)
+    - '1001)2)' (two comments)
+    - '…' (omission)
+    - '-' (omission)
 
 """
 import re
 from datetime import date
+
+__all__ = ['clean_year', 'clean_value', 'is_omission']
 
 
 def make_regex_annual(start=1999, end=date.today().year):

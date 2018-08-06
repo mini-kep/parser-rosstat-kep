@@ -1,9 +1,9 @@
 ﻿from collections import namedtuple
 from kep.parser.filters import is_omission, clean_year, clean_value
 
-__all__ = ['Datapoint', 'get_row_format', 'emit_datapoints']
+__all__ = ['Datapoint', 'emit_datapoints']
 
-# FIXME: does not look great in documentation
+
 Datapoint = namedtuple('Datapoint', 'label freq year month value')   
 
 
@@ -47,9 +47,9 @@ def emit_datapoints(row, label, row_format):
     """Yield Datapoint instances from *row*. 
     
        Args:       
-         -  row(list) - list of strings like ['1999', '100', '100', '100', '100']
-         -  label(str) - variable identificator like 'CPI_rog'
-         -  row_format(str) - format string like 'YAQQQQ'
+         row(list): list of strings like ['1999', '100', '100', '100', '100']
+         label(str): variable identificator like 'CPI_rog'
+         row_format(str): format string like 'YAQQQQ'
     """    
     occurences = ''
     for value, letter in zip(row, row_format):
