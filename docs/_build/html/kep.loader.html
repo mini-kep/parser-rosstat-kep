@@ -1,0 +1,304 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>kep.loader package &#8212; Документация Clean timeseries 0.0.3</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script>
+    <link rel="index" title="Алфавитный указатель" href="genindex.html" />
+    <link rel="search" title="Поиск" href="search.html" />
+    <link rel="next" title="kep.parser package" href="kep.parser.html" />
+    <link rel="prev" title="kep package" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="kep-loader-package">
+<h1>kep.loader package<a class="headerlink" href="#kep-loader-package" title="Ссылка на этот заголовок">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Ссылка на этот заголовок">¶</a></h2>
+</div>
+<div class="section" id="module-kep.loader.download">
+<span id="kep-loader-download-module"></span><h2>kep.loader.download module<a class="headerlink" href="#module-kep.loader.download" title="Ссылка на этот заголовок">¶</a></h2>
+<p>Download and unpack Word files from Rosstat web site.</p>
+<dl class="class">
+<dt id="kep.loader.download.Downloader">
+<em class="property">class </em><code class="descclassname">kep.loader.download.</code><code class="descname">Downloader</code><span class="sig-paren">(</span><em>year: int</em>, <em>month: int</em>, <em>local_filepath: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.download.Downloader" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div>Базовые классы: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></div></blockquote>
+<dl class="method">
+<dt id="kep.loader.download.Downloader.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.download.Downloader.run" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.download.download">
+<code class="descclassname">kep.loader.download.</code><code class="descname">download</code><span class="sig-paren">(</span><em>url</em>, <em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.download.download" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.download.make_url">
+<code class="descclassname">kep.loader.download.</code><code class="descname">make_url</code><span class="sig-paren">(</span><em>year</em>, <em>month</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.download.make_url" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-kep.loader.unpack">
+<span id="kep-loader-unpack-module"></span><h2>kep.loader.unpack module<a class="headerlink" href="#module-kep.loader.unpack" title="Ссылка на этот заголовок">¶</a></h2>
+<dl class="class">
+<dt id="kep.loader.unpack.DocFiles">
+<em class="property">class </em><code class="descclassname">kep.loader.unpack.</code><code class="descname">DocFiles</code><span class="sig-paren">(</span><em>folder</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.unpack.DocFiles" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div>Базовые классы: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></div></blockquote>
+<dl class="method">
+<dt id="kep.loader.unpack.DocFiles.exist">
+<code class="descname">exist</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.unpack.DocFiles.exist" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kep.loader.unpack.DocFiles.paths">
+<code class="descname">paths</code><a class="headerlink" href="#kep.loader.unpack.DocFiles.paths" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.loader.unpack.Unpacker">
+<em class="property">class </em><code class="descclassname">kep.loader.unpack.</code><code class="descname">Unpacker</code><span class="sig-paren">(</span><em>archive_filepath</em>, <em>destination_folder</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.unpack.Unpacker" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div>Базовые классы: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></div></blockquote>
+<dl class="attribute">
+<dt id="kep.loader.unpack.Unpacker.docs">
+<code class="descname">docs</code><a class="headerlink" href="#kep.loader.unpack.Unpacker.docs" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="method">
+<dt id="kep.loader.unpack.Unpacker.run">
+<code class="descname">run</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.unpack.Unpacker.run" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.unpack.unrar">
+<code class="descclassname">kep.loader.unpack.</code><code class="descname">unrar</code><span class="sig-paren">(</span><em>filepath</em>, <em>folder</em>, <em>unrar_executable='C:\\Users\\PogrebnyakEV\\Desktop\\mini-kep\\kep\\src\\kep\\loader\\bin\\UnRAR.exe'</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.unpack.unrar" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-kep.loader.word">
+<span id="kep-loader-word-module"></span><h2>kep.loader.word module<a class="headerlink" href="#module-kep.loader.word" title="Ссылка на этот заголовок">¶</a></h2>
+<p>make_csv(data_folder) dumps data from tables in Word document to csv file.
+Windows-only, requires MS Word installed.</p>
+<dl class="function">
+<dt id="kep.loader.word.win32_word_dispatch">
+<code class="descclassname">kep.loader.word.</code><code class="descname">win32_word_dispatch</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.win32_word_dispatch" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.open_ms_word">
+<code class="descclassname">kep.loader.word.</code><code class="descname">open_ms_word</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.open_ms_word" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.close_ms_word">
+<code class="descclassname">kep.loader.word.</code><code class="descname">close_ms_word</code><span class="sig-paren">(</span><em>app</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.close_ms_word" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.open_doc">
+<code class="descclassname">kep.loader.word.</code><code class="descname">open_doc</code><span class="sig-paren">(</span><em>path</em>, <em>word</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.open_doc" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.get_table_count">
+<code class="descclassname">kep.loader.word.</code><code class="descname">get_table_count</code><span class="sig-paren">(</span><em>doc</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.get_table_count" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.delete_double_space">
+<code class="descclassname">kep.loader.word.</code><code class="descname">delete_double_space</code><span class="sig-paren">(</span><em>line</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.delete_double_space" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.filter_cell_contents">
+<code class="descclassname">kep.loader.word.</code><code class="descname">filter_cell_contents</code><span class="sig-paren">(</span><em>cell_value</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.filter_cell_contents" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.get_filtered_cell_value">
+<code class="descclassname">kep.loader.word.</code><code class="descname">get_filtered_cell_value</code><span class="sig-paren">(</span><em>table</em>, <em>i</em>, <em>j</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.get_filtered_cell_value" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.get_cell_value">
+<code class="descclassname">kep.loader.word.</code><code class="descname">get_cell_value</code><span class="sig-paren">(</span><em>table</em>, <em>i</em>, <em>j</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.get_cell_value" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.cell_iter">
+<code class="descclassname">kep.loader.word.</code><code class="descname">cell_iter</code><span class="sig-paren">(</span><em>table</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.cell_iter" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.row_iter">
+<code class="descclassname">kep.loader.word.</code><code class="descname">row_iter</code><span class="sig-paren">(</span><em>table</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.row_iter" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.query_all_tables">
+<code class="descclassname">kep.loader.word.</code><code class="descname">query_all_tables</code><span class="sig-paren">(</span><em>path</em>, <em>func</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.query_all_tables" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Queries data from all tables within doc file.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>path: path to doc file.
+func: name of the function used to get_parsed_tables the table</dd>
+<dt>Yields:</dt>
+<dd>list of lists (rows)</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.yield_continious_rows">
+<code class="descclassname">kep.loader.word.</code><code class="descname">yield_continious_rows</code><span class="sig-paren">(</span><em>path</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.yield_continious_rows" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Yields rows of the table within doc file.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>path: path to doc file.</dd>
+<dt>Yields:</dt>
+<dd>list of strings (row elements)</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.to_csv">
+<code class="descclassname">kep.loader.word.</code><code class="descname">to_csv</code><span class="sig-paren">(</span><em>gen</em>, <em>csv_path</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.to_csv" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Accept iterable of rows and write in to csv_path</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.yield_rows_from_many_files">
+<code class="descclassname">kep.loader.word.</code><code class="descname">yield_rows_from_many_files</code><span class="sig-paren">(</span><em>file_list</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.yield_rows_from_many_files" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Iterate by row over .doc files in <em>file_list</em></p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.dump_doc_files_to_csv">
+<code class="descclassname">kep.loader.word.</code><code class="descname">dump_doc_files_to_csv</code><span class="sig-paren">(</span><em>file_list</em>, <em>csv_path</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.dump_doc_files_to_csv" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Write tables from .doc in <em>file_list</em> into one <em>csv_path</em> file.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.make_file_list">
+<code class="descclassname">kep.loader.word.</code><code class="descname">make_file_list</code><span class="sig-paren">(</span><em>folder</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.make_file_list" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.loader.word.folder_to_csv">
+<code class="descclassname">kep.loader.word.</code><code class="descname">folder_to_csv</code><span class="sig-paren">(</span><em>folder</em>, <em>csv_filename</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.loader.word.folder_to_csv" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Make single csv based on sevral .doc files in <em>folder</em>.</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-kep.loader">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-kep.loader" title="Ссылка на этот заголовок">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Clean timeseries</a></h1>
+
+
+
+
+
+
+
+
+<h3>Навигация</h3>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">kep.loader package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-kep.loader.download">kep.loader.download module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-kep.loader.unpack">kep.loader.unpack module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-kep.loader.word">kep.loader.word module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-kep.loader">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="kep.parser.html">kep.parser package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kep.session.html">kep.session package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="предыдущая глава">kep package</a></li>
+      <li>Next: <a href="kep.parser.html" title="следующая глава">kep.parser package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Быстрый поиск</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Искать" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Evgeny Pogrebnyak.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/kep.loader.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

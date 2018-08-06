@@ -1,0 +1,424 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ru">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>kep.parser package &#8212; Документация Clean timeseries 0.0.3</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '0.0.3',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/translations.js"></script>
+    <link rel="index" title="Алфавитный указатель" href="genindex.html" />
+    <link rel="search" title="Поиск" href="search.html" />
+    <link rel="next" title="kep.session package" href="kep.session.html" />
+    <link rel="prev" title="kep.loader package" href="kep.loader.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head>
+  <body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="kep-parser-package">
+<h1>kep.parser package<a class="headerlink" href="#kep-parser-package" title="Ссылка на этот заголовок">¶</a></h1>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Ссылка на этот заголовок">¶</a></h2>
+</div>
+<div class="section" id="module-kep.parser.filters">
+<span id="kep-parser-filters-module"></span><h2>kep.parser.filters module<a class="headerlink" href="#module-kep.parser.filters" title="Ссылка на этот заголовок">¶</a></h2>
+<p>Filter digits from CSV file.</p>
+<p>Bad friends:</p>
+<blockquote>
+<div>„1001)“ (a comment)
+„1001)2)“ (two comments)
+„…“ (omission)
+„-„ ()</div></blockquote>
+<dl class="function">
+<dt id="kep.parser.filters.clean_value">
+<code class="descclassname">kep.parser.filters.</code><code class="descname">clean_value</code><span class="sig-paren">(</span><em>x: str</em><span class="sig-paren">)</span> &#x2192; float<a class="headerlink" href="#kep.parser.filters.clean_value" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.parser.filters.clean_year">
+<code class="descclassname">kep.parser.filters.</code><code class="descname">clean_year</code><span class="sig-paren">(</span><em>year: str</em><span class="sig-paren">)</span> &#x2192; int<a class="headerlink" href="#kep.parser.filters.clean_year" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.parser.filters.is_omission">
+<code class="descclassname">kep.parser.filters.</code><code class="descname">is_omission</code><span class="sig-paren">(</span><em>x: str</em><span class="sig-paren">)</span> &#x2192; bool<a class="headerlink" href="#kep.parser.filters.is_omission" title="Ссылка на это определение">¶</a></dt>
+<dd><p>True if <em>x</em> is any of [„“, „…“, „-„]</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.parser.filters.make_regex_annual">
+<code class="descclassname">kep.parser.filters.</code><code class="descname">make_regex_annual</code><span class="sig-paren">(</span><em>start=1999</em>, <em>end=2018</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.filters.make_regex_annual" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+</div>
+<div class="section" id="module-kep.parser.parser">
+<span id="kep-parser-parser-module"></span><h2>kep.parser.parser module<a class="headerlink" href="#module-kep.parser.parser" title="Ссылка на этот заголовок">¶</a></h2>
+<dl class="function">
+<dt id="kep.parser.parser.get_parsed_tables">
+<code class="descclassname">kep.parser.parser.</code><code class="descname">get_parsed_tables</code><span class="sig-paren">(</span><em>base_mapper: kep.parser.units.UnitMapper</em>, <em>tables</em>, <em>commands</em>, <em>expected_labels=None</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.parser.get_parsed_tables" title="Ссылка на это определение">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Args:</dt>
+<dd>tables is list of Table instances
+commands is list of (method, arg) tuples
+expected labels is list of strings</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.parser.parser.Worker">
+<em class="property">class </em><code class="descclassname">kep.parser.parser.</code><code class="descname">Worker</code><span class="sig-paren">(</span><em>tables</em>, <em>base_mapper: kep.parser.units.UnitMapper</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.parser.Worker" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div>Базовые классы: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></div></blockquote>
+<p>Parse <em>tables</em> using <em>base_mapper</em> and .apply(command).</p>
+<p>Limit scope of tables:</p>
+<blockquote>
+<div><ul class="simple">
+<li>start_with</li>
+<li>end_with</li>
+</ul>
+</div></blockquote>
+<p>Parse tables:</p>
+<blockquote>
+<div><ul class="simple">
+<li>name</li>
+<li>headers</li>
+<li>units</li>
+</ul>
+</div></blockquote>
+<p>Handle special situaltions:</p>
+<blockquote>
+<div><ul class="simple">
+<li>force_units</li>
+<li>force_format</li>
+<li>trail_down_names</li>
+</ul>
+</div></blockquote>
+<p>All methods above are valid parsing commands in yaml file.</p>
+<dl class="method">
+<dt id="kep.parser.parser.Worker.new">
+<code class="descname">new</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.parser.Worker.new" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Create a copy of this instance.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.parser.parser.Worker.apply">
+<code class="descname">apply</code><span class="sig-paren">(</span><em>method</em>, <em>arg=None</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.parser.Worker.apply" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Run a <em>command</em> on itself.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.parser.parser.Worker.start_with">
+<code class="descname">start_with</code><span class="sig-paren">(</span><em>start_strings</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.parser.Worker.start_with" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Limit parsing segment starting from any of <em>start_strings</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.parser.parser.Worker.end_with">
+<code class="descname">end_with</code><span class="sig-paren">(</span><em>end_strings</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.parser.Worker.end_with" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Limit parsing segment ending by any of <em>end_strings</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.parser.parser.Worker.var">
+<code class="descname">var</code><span class="sig-paren">(</span><em>name: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.parser.Worker.var" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Set current variable <em>name</em> for parsing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.parser.parser.Worker.headers">
+<code class="descname">headers</code><span class="sig-paren">(</span><em>headers</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.parser.Worker.headers" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Set <em>headers</em> strings corresponding to variable <em>name</em>.
+Works after .var().</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.parser.parser.Worker.units">
+<code class="descname">units</code><span class="sig-paren">(</span><em>units</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.parser.Worker.units" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Set list of <em>units</em> for parsing.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.parser.parser.Worker.parse_units">
+<code class="descname">parse_units</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.parser.Worker.parse_units" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Identify units using standard units mapper.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.parser.parser.Worker.force_units">
+<code class="descname">force_units</code><span class="sig-paren">(</span><em>unit: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.parser.Worker.force_units" title="Ссылка на это определение">¶</a></dt>
+<dd><p>All tables in segment will be assigned this <em>unit</em> of measurement.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.parser.parser.Worker.force_format">
+<code class="descname">force_format</code><span class="sig-paren">(</span><em>fmt: str</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.parser.Worker.force_format" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Row format for tabels will be assigned to <em>fmt</em>.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.parser.parser.Worker.trail_down_names">
+<code class="descname">trail_down_names</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.parser.Worker.trail_down_names" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Assign trailing variable names in tables.</p>
+<p>We look for a case where a table name is defined once and there are 
+following tables with expected unit names, but no variable name 
+specified.</p>
+<p>In this case we assign table name similar to previous table.</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="kep.parser.parser.Worker.parsed_tables">
+<code class="descname">parsed_tables</code><a class="headerlink" href="#kep.parser.parser.Worker.parsed_tables" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-kep.parser.reader">
+<span id="kep-parser-reader-module"></span><h2>kep.parser.reader module<a class="headerlink" href="#module-kep.parser.reader" title="Ссылка на этот заголовок">¶</a></h2>
+<p>Convert CSV file to Table() instances. Use get_tables(filepath).</p>
+<dl class="function">
+<dt id="kep.parser.reader.get_tables">
+<code class="descclassname">kep.parser.reader.</code><code class="descname">get_tables</code><span class="sig-paren">(</span><em>source</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.reader.get_tables" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.parser.reader.get_csv">
+<code class="descclassname">kep.parser.reader.</code><code class="descname">get_csv</code><span class="sig-paren">(</span><em>filepath</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.reader.get_csv" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="function">
+<dt id="kep.parser.reader.split_csv">
+<code class="descclassname">kep.parser.reader.</code><code class="descname">split_csv</code><span class="sig-paren">(</span><em>rows</em>, <em>_is_data_row=&lt;function is_data_row&gt;</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.reader.split_csv" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Split <em>csv_rows</em> by_table. Each table is a tuple of header and data rows.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd>csv_rows - list of rows or iterator
+is_data_row - function</dd>
+<dt>Returns:</dt>
+<dd>list of (header, data) tuples</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="kep.parser.reader.Table">
+<em class="property">class </em><code class="descclassname">kep.parser.reader.</code><code class="descname">Table</code><span class="sig-paren">(</span><em>header_strings</em>, <em>datarow_strings</em>, <em>row_format=None</em>, <em>name=None</em>, <em>unit=None</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.reader.Table" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div>Базовые классы: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></div></blockquote>
+<p>Representation of a table from CSV file.</p>
+<dl class="attribute">
+<dt id="kep.parser.reader.Table.datarows">
+<code class="descname">datarows</code><a class="headerlink" href="#kep.parser.reader.Table.datarows" title="Ссылка на это определение">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="attribute">
+<dt id="kep.parser.reader.Table.label">
+<code class="descname">label</code><a class="headerlink" href="#kep.parser.reader.Table.label" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Variable identifier like „CPI_rog“</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.parser.reader.Table.contains_any">
+<code class="descname">contains_any</code><span class="sig-paren">(</span><em>strings</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.reader.Table.contains_any" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Return largest string found in table headers.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="kep.parser.reader.Table.emit_datapoints">
+<code class="descname">emit_datapoints</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.reader.Table.emit_datapoints" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Yield Datapoint() instances from table.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="module-kep.parser.row">
+<span id="kep-parser-row-module"></span><h2>kep.parser.row module<a class="headerlink" href="#module-kep.parser.row" title="Ссылка на этот заголовок">¶</a></h2>
+<dl class="class">
+<dt id="kep.parser.row.Datapoint">
+<em class="property">class </em><code class="descclassname">kep.parser.row.</code><code class="descname">Datapoint</code><span class="sig-paren">(</span><em>label</em>, <em>freq</em>, <em>year</em>, <em>month</em>, <em>value</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.row.Datapoint" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div>Базовые классы: <code class="xref py py-class docutils literal"><span class="pre">tuple</span></code></div></blockquote>
+<dl class="attribute">
+<dt id="kep.parser.row.Datapoint.freq">
+<code class="descname">freq</code><a class="headerlink" href="#kep.parser.row.Datapoint.freq" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="kep.parser.row.Datapoint.label">
+<code class="descname">label</code><a class="headerlink" href="#kep.parser.row.Datapoint.label" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="kep.parser.row.Datapoint.month">
+<code class="descname">month</code><a class="headerlink" href="#kep.parser.row.Datapoint.month" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Alias for field number 3</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="kep.parser.row.Datapoint.value">
+<code class="descname">value</code><a class="headerlink" href="#kep.parser.row.Datapoint.value" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Alias for field number 4</p>
+</dd></dl>
+
+<dl class="attribute">
+<dt id="kep.parser.row.Datapoint.year">
+<code class="descname">year</code><a class="headerlink" href="#kep.parser.row.Datapoint.year" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Alias for field number 2</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.parser.row.get_row_format">
+<code class="descclassname">kep.parser.row.</code><code class="descname">get_row_format</code><span class="sig-paren">(</span><em>datarows: list</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.row.get_row_format" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Return a format string like „YAQQQQ“</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.parser.row.emit_datapoints">
+<code class="descclassname">kep.parser.row.</code><code class="descname">emit_datapoints</code><span class="sig-paren">(</span><em>row</em>, <em>label</em>, <em>row_format</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.row.emit_datapoints" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Yield Datapoint instances from <em>row</em>.</p>
+<dl class="docutils">
+<dt>Args:       </dt>
+<dd><ul class="first last simple">
+<li>row(list) - list of strings like [„1999“, „100“, „100“, „100“, „100“]</li>
+<li>label(str) - variable identificator like „CPI_rog“</li>
+<li>row_format(str) - format string like „YAQQQQ“</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-kep.parser.units">
+<span id="kep-parser-units-module"></span><h2>kep.parser.units module<a class="headerlink" href="#module-kep.parser.units" title="Ссылка на этот заголовок">¶</a></h2>
+<dl class="class">
+<dt id="kep.parser.units.UnitMapper">
+<em class="property">class </em><code class="descclassname">kep.parser.units.</code><code class="descname">UnitMapper</code><span class="sig-paren">(</span><em>listing: dict</em><span class="sig-paren">)</span><a class="headerlink" href="#kep.parser.units.UnitMapper" title="Ссылка на это определение">¶</a></dt>
+<dd><blockquote>
+<div>Базовые классы: <code class="xref py py-class docutils literal"><span class="pre">object</span></code></div></blockquote>
+<p>Initialise mapper with <em>listing</em> dictionary 
+and use .extract() method to get_parsed_tables text.</p>
+<dl class="method">
+<dt id="kep.parser.units.UnitMapper.extract">
+<code class="descname">extract</code><span class="sig-paren">(</span><em>text: str</em><span class="sig-paren">)</span> &#x2192; str<a class="headerlink" href="#kep.parser.units.UnitMapper.extract" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Extract unit of measurement from <em>text</em>.</p>
+<dl class="docutils">
+<dt>Returns:</dt>
+<dd>str like „rog“ or „bln_usd</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="kep.parser.units.get_mapper">
+<code class="descclassname">kep.parser.units.</code><code class="descname">get_mapper</code><span class="sig-paren">(</span><em>source: str</em><span class="sig-paren">)</span> &#x2192; kep.parser.units.UnitMapper<a class="headerlink" href="#kep.parser.units.get_mapper" title="Ссылка на это определение">¶</a></dt>
+<dd><p>Read mapper for <em>source</em> (yaml file or string).</p>
+</dd></dl>
+
+</div>
+<div class="section" id="module-kep.parser">
+<span id="module-contents"></span><h2>Module contents<a class="headerlink" href="#module-kep.parser" title="Ссылка на этот заголовок">¶</a></h2>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Clean timeseries</a></h1>
+
+
+
+
+
+
+
+
+<h3>Навигация</h3>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="kep.loader.html">kep.loader package</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">kep.parser package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-kep.parser.filters">kep.parser.filters module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-kep.parser.parser">kep.parser.parser module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-kep.parser.reader">kep.parser.reader module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-kep.parser.row">kep.parser.row module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-kep.parser.units">kep.parser.units module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-kep.parser">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="kep.session.html">kep.session package</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="kep.loader.html" title="предыдущая глава">kep.loader package</a></li>
+      <li>Next: <a href="kep.session.html" title="следующая глава">kep.session package</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Быстрый поиск</h3>
+    <form class="search" action="search.html" method="get">
+      <div><input type="text" name="q" /></div>
+      <div><input type="submit" value="Искать" /></div>
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Evgeny Pogrebnyak.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/kep.parser.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

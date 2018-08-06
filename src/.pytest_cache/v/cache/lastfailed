@@ -1,8 +1,0 @@
-{
-  "python-minimal/tests/session/test_session.py::Test_session::()": true,
-  "python-minimal/tests/test_util.py::Test_load_yaml::()": true,
-  "python/tests/test_dispatch.py": true,
-  "python/tests/test_render.py": true,
-  "python/tests/test_table.py": true,
-  "python/tests/test_year_functions.py": true
-}
