@@ -1,28 +1,40 @@
-"""Interpret parsing commands. 
+"""Read YAML file with parsing or verification commands.
 
-A command is:
--  a string like `'trail_down_names'` 
--  a dictionary like `{'name': 'CPI'}`
+Used to read:
+   - instructions.txt
+   - checkpoints.txt
+
 """
 
 from kep.util import iterate, make_label, load_yaml
 from typing import Union
 
-__all__ = ['read_instructions', 'extract_parameters', 'extract_labels']
+__all__ = ['read_instructions_for_headers', 
+           'read_instructions_for_checkpoints',
+           'extract_parameters', 'extract_labels']
 
-ALLOWED_METHODS = ['start_with', 'end_with',
-                    'var', 'headers', 'units',
-                    'force_units', 'force_format', 
-                    'trail_down_names']
+ALLOWED_METHODS_PARSING = ['start_with', 'end_with',
+                           'var', 'headers', 'units',
+                           'force_units', 'force_format', 
+                           'trail_down_names']
+
+ALLOWED_METHODS_VERIFICATION = ['all', 'any']
 
 
-def read_instructions(source: str):
-    """Read command blocks from *source*    
+#not tested
+def read_instructions_for_checkpoints(source: str):
+    return [extract_parameters(command, ALLOWED_METHODS_VERIFICATION) 
+            for command in load_yaml(source)[0]]
+
+
+def read_instructions_for_headers(source: str):
+    """Read parsing command blocks from *source*.    
     Return:
         list of blocks, each block is a list of tuples
     """    
-    return [[extract_parameters(command) for command in block] 
-            for block in load_yaml(source)]
+    return [[extract_parameters(command, ALLOWED_METHODS_PARSING) 
+             for command in block] 
+             for block in load_yaml(source)]
 
 
 def extract_key_value_from_dict(d: dict):
@@ -31,13 +43,18 @@ def extract_key_value_from_dict(d: dict):
     return method, arg
 
 
-def extract_parameters(command: Union[str, dict]) -> tuple:
-    """Return method and argument from command.""" 
+def extract_parameters(command: Union[str, dict], allowed_commands) -> tuple:
+    """Return method and argument from command.
+    
+    Args:
+        A command is a string like 'trail_down_names' 
+        or a dictionary like {'name': 'CPI'}
+    """ 
     if isinstance(command, str):
         method, arg = command, None
     elif isinstance(command, dict):
         method, arg = extract_key_value_from_dict(command)
-    if method not in ALLOWED_METHODS:
+    if method not in allowed_commands:
         raise ValueError(method)
     return method, arg    
         

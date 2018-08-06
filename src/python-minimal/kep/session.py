@@ -1,7 +1,7 @@
 """Extract data from CSV file using parsing instructions."""
 
 from kep.units import get_mapper
-from kep.commands import read_instructions
+from kep.commands import read_instructions_for_headers
 from kep.reader import get_tables
 from kep.parser import make_parser
 from kep.saver import unpack_dataframes
@@ -16,7 +16,7 @@ class Session:
         """Initialise session with units of measurement and parsing instructions."""
         mapper = get_mapper(base_units_source)
         self.parser = make_parser(mapper)
-        self.command_blocks = read_instructions(commands_source)
+        self.command_blocks = read_instructions_for_headers(commands_source)
         self.parsed_tables = []
         
     def parse(self, csv_source):
