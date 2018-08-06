@@ -16,8 +16,8 @@ RE_LITERALS = re.compile(r'[а-яI]')
 @accept_string
 def get_tables(filepath: str):    
     rows = get_csv(filepath)    
-    table_tuples = split_csv(rows, is_data_row)
-    return [Table(headers, datarows) for headers, datarows in table_tuples]
+    table_dicts = split_csv(rows, is_data_row)
+    return [Table(td['h'], td['d']) for td in table_dicts]
 
 def get_csv(filepath):
     return filter(is_allowed, read_csv(filepath))
@@ -43,6 +43,9 @@ class State(Enum):
     HEADERS = 2
 
 
+def as_dict(headers, datarows):
+    return dict(h=headers, d=datarows)
+
 def split_csv(rows, _is_data_row=is_data_row):
     """Split *csv_rows* by_table. Each table is a tuple of header and data rows.
        
@@ -65,7 +68,7 @@ def split_csv(rows, _is_data_row=is_data_row):
         else:
             if state == State.DATA:
                 # table ended, emit it
-                t = headers, datarows
+                t = as_dict(headers, datarows)
                 result.append(t)
                 # reset containers
                 headers = []
@@ -74,7 +77,7 @@ def split_csv(rows, _is_data_row=is_data_row):
             state = State.HEADERS
     # still have some data left, emit it too
     if len(headers) > 0 and len(datarows) > 0:
-        t = headers, datarows
+        t = as_dict(headers, datarows)
         result.append(t)
     return result
 

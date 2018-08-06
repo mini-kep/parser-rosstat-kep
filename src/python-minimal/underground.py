@@ -1,7 +1,7 @@
 from kep.session import Session 
 from locations import date_span, interim_csv, unit_mapper, parsing_instructions
 
-from profilehooks import profile, timecall
+from profilehooks import profile#, timecall
 
 ALL_DATES = date_span('2009-04', '2018-04')
 

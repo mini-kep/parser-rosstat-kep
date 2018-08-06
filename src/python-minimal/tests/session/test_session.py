@@ -45,11 +45,7 @@ INTRUCTIONS_DOC = """
     - yoy
     - rog
     - ytd
-- trail_down_names
-- any:
-    - INDPRO_yoy a 2015 99.2
-    - INDPRO_rog q 2015 3 82.8
-    - INDPRO_ytd m 2015 1 100    
+- trail_down_names 
 ---
 - start_with: '3.5. Индекс потребительских цен'
 - end_with: '4. Социальная сфера'
@@ -58,8 +54,6 @@ INTRUCTIONS_DOC = """
   - 'непродовольственные товары'
   - 'непродовольст- венные товары'
 - force_units: rog
-- all: 
-    - CPI_NONFOOD_rog m 1999 12 101.1
 ---
 - start_with: '2.2. Сальдированный финансовый результат'
 - end_with: 'Убыточные организации'
@@ -67,8 +61,6 @@ INTRUCTIONS_DOC = """
 - headers: Добыча полезных ископаемых
 - force_units: 'mln_rub'
 - force_format: 'fiscal'
-- all: 
-    - PROFIT_MINING_mln_rub a 2017 2595632
 """
 
 UNITS_DOC =  """
@@ -112,14 +104,14 @@ ytd :
 """
 
 from kep.session import Session 
-from kep.row import Datapoint
+from kep.parser.row import Datapoint
 
 s = Session(UNITS_DOC, INTRUCTIONS_DOC) 
 s.parse(CSV_TEXT)
 
 class Test_session():
     def test_lables(self):    
-        assert s.labels == ['INDPRO_yoy',
+        assert s.labels() == ['INDPRO_yoy',
                             'INDPRO_rog',
                             'INDPRO_ytd',
                             'CPI_NONFOOD_rog',

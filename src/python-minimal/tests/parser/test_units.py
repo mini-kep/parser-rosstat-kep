@@ -1,4 +1,4 @@
-from kep.units import UnitMapper
+from kep.parser.units import UnitMapper
 import pytest
 
 

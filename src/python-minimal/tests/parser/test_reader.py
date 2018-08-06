@@ -1,8 +1,5 @@
-try:
-    from .shared import TempFile
-except ModuleNotFoundError:
-    from shared import TempFile    
-from kep.reader import get_tables, read_csv, Table, split_csv
+from kep.util import TempFile   
+from kep.parser.reader import get_tables, read_csv, Table, split_csv
 
 DOC = ("заголовок1 header1\t\t\t\n"
        "заголовок2 header2\t\t\t\n"
@@ -23,6 +20,16 @@ CSV = ['заголовок1 header1\t\t\t',
        '\t\tI\tII\tIII\tIV',
        '2001\t300\t300\t300\t300']
 
+CSV_SPLIT = [{'d': ['1999\t100\t100\t100\t100', 
+                    '2000\t120\t120\t120\t120'],
+              'h': ['заголовок1 header1\t\t\t',
+                                  'заголовок2 header2\t\t\t',
+                                  '\t\tI\tII\tIII\tIV']},
+             {'d': ['2001\t300\t300\t300\t300'],
+              'h': ['____ комментарий',
+                    'новый заголовок next table',
+                    '\t\tI\tII\tIII\tIV']}]
+
 TABLE_1 = Table(name=None,
       unit=None,
       row_format=None,
@@ -37,21 +44,21 @@ TABLE_2 = Table(name=None,
 
 
 def test_get_tables_on_string():    
-        tables = get_tables(DOC)  
-        assert tables == [TABLE_1, TABLE_2]
+        assert get_tables(DOC) == [TABLE_1, TABLE_2]
 
 def test_get_tables_on_file():    
     with TempFile(content=DOC) as filename:
-        tables = get_tables(filename)  
-        assert tables == [TABLE_1, TABLE_2]
+        assert get_tables(filename) == [TABLE_1, TABLE_2]
+
 def test_split_csv():
-    assert split_csv(CSV) == [TABLE_1, TABLE_2]
+    assert split_csv(CSV) == CSV_SPLIT
 
 def test_Table_headers_property():
     assert TABLE_1.headers == ['заголовок1 header1\t\t\t', 'заголовок2 header2\t\t\t', '\t\tI\tII\tIII\tIV']
 
 def test_Table_repr_is_callable():
     assert repr(TABLE_1)
+    assert repr(TABLE_2)
 
 def test_read_csv_from_string():
     with TempFile(DOC) as f:  

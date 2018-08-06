@@ -3,16 +3,22 @@ from kep.parser.units import UnitMapper
 from kep.util import iterate
 
 
-__all__ = ['Worker', 'make_parser']
+__all__ = ['Worker', 'parse']
 
 
-def make_parser(base_mapper: UnitMapper):    
-    def wrapper(tables, commands, expected_labels):
-        parsed_tables = get_parsed_tables(tables, base_mapper, commands)
-        check_labels(parsed_tables, expected_labels)
-        return parsed_tables             
-    return wrapper    
-
+def parse(base_mapper: UnitMapper, 
+          tables, 
+          commands, 
+          expected_labels=None):
+    """
+    Args:
+       tables is list of Table instances
+       commands is list of (method, arg) tuples
+       expected labels is list of strings
+    """   
+    parsed_tables = get_parsed_tables(tables, base_mapper, commands)
+    check_labels(parsed_tables, expected_labels)
+    return parsed_tables
 
 def get_parsed_tables(tables, base_mapper, commands):
     worker = Worker(tables, base_mapper)

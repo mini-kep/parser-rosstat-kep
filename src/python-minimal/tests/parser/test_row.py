@@ -1,5 +1,4 @@
-﻿import kep
-from kep.row import Datapoint
+﻿from kep.parser.row import Datapoint, emit_datapoints
 
 row1 = ['2018',
         '100',
@@ -8,7 +7,7 @@ row1 = ['2018',
 
 
 def test_emit_datapoints():
-    gen1 = kep.row.emit_datapoints(row1, 'INDPRO_yoy', 'YAQQQQMMMMMMMMMMMM')
+    gen1 = emit_datapoints(row1, 'INDPRO_yoy', 'YAQQQQMMMMMMMMMMMM')
     pts = list(gen1)
     assert pts == [
         Datapoint(

@@ -1,5 +1,5 @@
 ﻿from collections import namedtuple
-import kep.parser.filters as filters
+from kep.parser.filters import is_omission, clean_year, clean_value
 
 __all__ = ['Datapoint', 'get_row_format', 'emit_datapoints']
 
@@ -55,9 +55,9 @@ def emit_datapoints(row, label, row_format):
     for value, letter in zip(row, row_format):
         occurences += letter
         if letter == 'Y':
-            year = filters.clean_year(value)
+            year = clean_year(value)
         else:
-            if filters.is_omission(value):
+            if is_omission(value):
                 continue                
             period = occurences.count(letter)
             freq = letter.lower()
@@ -66,7 +66,7 @@ def emit_datapoints(row, label, row_format):
                                 freq=freq,
                                 year=year,
                                 month=get_month(freq, period), 
-                                value=filters.clean_value(value))
+                                value=clean_value(value))
             except UnboundLocalError:
                 raise ValueError((row, label))
 
