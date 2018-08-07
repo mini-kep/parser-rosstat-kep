@@ -1,6 +1,6 @@
-from kep.session import Session 
+from kep.session import Session
 from kep.dates import date_span
-from locations import  interim_csv, unit_mapper, parsing_instructions
+from locations import interim_csv, unit_mapper, parsing_instructions
 
 from profilehooks import profile
 
@@ -14,26 +14,28 @@ def search_all():
         print('Parsing', year, month)
         csv_source = interim_csv(year, month)
         s.parse(csv_source)
-    return s    
+    return s
 
 #@profile(immediate=True, entries=20)
+
+
 def get_frames(s):
     dfa, dfq, dfm = s.dataframes()
     assert not dfa.empty
     assert not dfq.empty
-    assert not dfm.empty 
-    return dfa, dfq, dfm 
+    assert not dfm.empty
+    return dfa, dfq, dfm
 
-    
-if __name__ == '__main__':     
+
+if __name__ == '__main__':
     s = search_all()
     dfa, dfq, dfm = get_frames(s)
-    
+
 
 # Profiling reference:
 # https://www.blog.pythonlibrary.org/2016/05/24/python-101-an-intro-to-benchmarking-your-code
 
-# Packaging reference: 
+# Packaging reference:
 # http://python-packaging.readthedocs.io/en/latest/testing.html
 
 """
@@ -67,4 +69,4 @@ function called 1 times
       112    0.229    0.002    0.289    0.003 {method 'read' of '_io.TextIOWrapper' objects}
       110    0.133    0.001    0.133    0.001 {method 'splitlines' of 'str' objects}
    609403    0.097    0.000    0.097    0.000 reader.py:24(is_allowed)
-"""      
+"""

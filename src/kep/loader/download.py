@@ -6,6 +6,7 @@ from pathlib import Path
 
 __all__ = ['download']
 
+
 def _download(url, path):
     """Download *url* to *path*."""
     r = requests.get(url.strip(), stream=True)
@@ -31,8 +32,8 @@ def download(year: int, month: int, filepath: str, force=False):
     _download(url, path)
     return 'Downloaded %s' % path
 
-# TODO: convert to test    
-#if __name__ == "__main__":  # pragma: no cover
+# TODO: convert to test
+# if __name__ == "__main__":  # pragma: no cover
 #    import tempfile
 #    import pytest
 #    with tempfile.NamedTemporaryFile() as f:

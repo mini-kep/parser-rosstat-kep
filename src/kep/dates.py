@@ -13,18 +13,20 @@ def supported_dates(start_date='2009-04', exclude_dates=['2013-11']):
     exclude = map(pd.to_datetime, exclude_dates)
     return [(date.year, date.month) for date in dates.drop(exclude)]
 
+
 SUPPORTED_DATES = supported_dates()
 
+
 def assert_supported(year, month):
-    if not (year, month) in SUPPORTED_DATES: 
-        raise ValueError(year, month) 
+    if not (year, month) in SUPPORTED_DATES:
+        raise ValueError(year, month)
 
 
 def date_span(start_date, end_date):
-    supported_date_list =  supported_dates()
-    return [(date.year, date.month) for date in 
-             pd.date_range(start_date, end_date, freq='MS')
-             if (date.year, date.month) in supported_date_list]      
+    supported_date_list = supported_dates()
+    return [(date.year, date.month) for date in
+            pd.date_range(start_date, end_date, freq='MS')
+            if (date.year, date.month) in supported_date_list]
 
 
 def is_latest(year: int, month: int, offset=2):

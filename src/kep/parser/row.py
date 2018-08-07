@@ -4,7 +4,7 @@ from kep.parser.filters import is_omission, clean_year, clean_value
 __all__ = ['Datapoint', 'emit_datapoints']
 
 
-Datapoint = namedtuple('Datapoint', 'label freq year month value')   
+Datapoint = namedtuple('Datapoint', 'label freq year month value')
 
 
 ROW_FORMAT_DICT = {len(x): x for x in [
@@ -15,20 +15,21 @@ ROW_FORMAT_DICT = {len(x): x for x in [
     'YQQQQ',
     'XXXX',
     'XXX',
-    'X'*11,
-    'X'*15,
-    'X'*12]}
-    
+    'X' * 11,
+    'X' * 15,
+    'X' * 12]}
+
+
 def get_row_format(datarows: list):
     """Return a format string like 'YAQQQQ'
     """
     _coln = coln(datarows)
     try:
-        return ROW_FORMAT_DICT[_coln] 
+        return ROW_FORMAT_DICT[_coln]
     except KeyError:
-        raise ValueError('Cannot guess row format', 
-                          _coln,
-                          datarows)   
+        raise ValueError('Cannot guess row format',
+                         _coln,
+                         datarows)
 
 
 def coln(datarows):
@@ -44,13 +45,13 @@ def get_month(freq: str, period: int):
 
 
 def emit_datapoints(row, label, row_format):
-    """Yield Datapoint instances from *row*. 
-    
-       Args:       
+    """Yield Datapoint instances from *row*.
+
+       Args:
          row(list): list of strings like ['1999', '100', '100', '100', '100']
          label(str): variable identificator like 'CPI_rog'
          row_format(str): format string like 'YAQQQQ'
-    """    
+    """
     occurences = ''
     for value, letter in zip(row, row_format):
         occurences += letter
@@ -58,14 +59,14 @@ def emit_datapoints(row, label, row_format):
             year = clean_year(value)
         else:
             if is_omission(value):
-                continue                
+                continue
             period = occurences.count(letter)
             freq = letter.lower()
             try:
-                yield Datapoint(label=label, 
+                yield Datapoint(label=label,
                                 freq=freq,
                                 year=year,
-                                month=get_month(freq, period), 
+                                month=get_month(freq, period),
                                 value=clean_value(value))
             except UnboundLocalError:
                 raise ValueError((row, label))

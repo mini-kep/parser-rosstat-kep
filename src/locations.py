@@ -5,11 +5,11 @@
    make_interim_csv(year, month)
    parse_and_save(year, month)
    to_latest(year, month)
-   to_excel(year, month)   
-   
+   to_excel(year, month)
+
 File access:
     get_dataframe(year, month, freq)
-    
+
 """
 from pathlib import Path
 from io import StringIO
@@ -23,21 +23,25 @@ OUTPUT_ROOT = PROJECT_ROOT / 'output'
 assert DATA_ROOT.exists()
 assert OUTPUT_ROOT.exists()
 
+
 def echo(func):
     def wrapper(*arg, **kwarg):
         msg = func(*arg, **kwarg)
         print(msg)
-    return wrapper    
+    return wrapper
+
 
 def as_string(func):
     def wrapper(*arg, **kwarg):
         return str(func(*arg, **kwarg))
     return wrapper
 
+
 @echo
 def download(year, month, force=False):
     filepath = rarfile(year, month)
     return kep.download(year, month, filepath, force)
+
 
 @echo
 def unpack(year, month, force=False):
@@ -45,52 +49,62 @@ def unpack(year, month, force=False):
     folder = raw_folder(year, month)
     return kep.unpack(filepath, folder, force)
 
+
 @echo
 def make_interim_csv(year, month, force=False):
     folder = raw_folder(year, month)
     filepath = interim_csv(year, month)
     return kep.folder_to_csv(folder, filepath)
-    
-@echo    
+
+
+@echo
 def parse_and_save(year, month, force=False):
     dfs = parse_to_dataframes(year, month)
     return save(year, month, *dfs)
-    
+
+
 def parse_to_dataframes(year, month):
     s = kep.session.Session(unit_mapper(), parsing_instructions())
     csv_source = interim_csv(year, month)
     s.parse(csv_source)
     return s.dataframes()
-    
-def save(year, month, dfa, dfq, dfm):      
+
+
+def save(year, month, dfa, dfq, dfm):
     for df, freq in zip([dfa, dfq, dfm], 'aqm'):
         path = processed_csv(year, month, freq)
         df.to_csv(path)
-        return "Saved dataframe to {}".format(path)   
-   
+        return "Saved dataframe to {}".format(path)
+
+
 def md(folder):
     if not folder.exists():
         folder.mkdir(parents=True)
     return folder
 
+
 def _inner_folder(data_root, tag, year, month):
     return md(data_root / tag / str(year) / str(month).zfill(2))
+
 
 def inner_folder(data_root, tag, year, month):
     """Protective version of _inner_folder()"""
     kep.dates.assert_supported(year, month)
     allowed_tags = ('raw', 'interim', 'processed')
-    if tag in allowed_tags:            
+    if tag in allowed_tags:
         return _inner_folder(data_root, tag, year, month)
     else:
         raise ValueError(f'{tag} not supported, use be any of {allowed_tags}')
 
+
 def latest_folder(data_root=DATA_ROOT):
     return data_root / 'processed' / 'latest'
+
 
 @as_string
 def xl_location():
     return OUTPUT_ROOT / 'kep.xlsx'
+
 
 @echo
 def to_excel(year: int, month: int):
@@ -103,32 +117,40 @@ def to_excel(year: int, month: int):
 def raw_folder(year, month, data_root=DATA_ROOT):
     return inner_folder(data_root, 'raw', year, month)
 
+
 @as_string
 def rarfile(year, month):
     return Path(raw_folder(year, month)) / 'download.rar'
+
 
 @as_string
 def parsing_instructions(data_root=DATA_ROOT):
     return data_root / 'instructions.txt'
 
+
 @as_string
 def unit_mapper(data_root=DATA_ROOT):
     return data_root / 'base_units.txt'
+
 
 @as_string
 def interim_csv(year: int, month: int, data_root=DATA_ROOT):
     return inner_folder(data_root, 'interim', year, month) / 'tab.csv'
 
+
 def filename(freq):
-   return 'df{}.csv'.format(freq)
+    return 'df{}.csv'.format(freq)
+
 
 @as_string
-def processed_csv(year, month, freq: str,  data_root=DATA_ROOT):
+def processed_csv(year, month, freq: str, data_root=DATA_ROOT):
     return inner_folder(data_root, 'processed', year, month) / filename(freq)
+
 
 @as_string
 def latest_csv(freq: str, data_root=DATA_ROOT):
     return latest_folder(data_root) / filename(freq)
+
 
 @echo
 def to_latest(year: int, month: int):
@@ -139,11 +161,11 @@ def to_latest(year: int, month: int):
         dst = latest_csv(freq)
         shutil.copyfile(src, dst)
         print("Updated", dst)
-    return f"Latest folder now refers to {year}-{month}"    
+    return f"Latest folder now refers to {year}-{month}"
 
 
 def read_csv(source):
-    """Wrapper for pd.read_csv(). Treats first column as time index.    
+    """Wrapper for pd.read_csv(). Treats first column as time index.
        Returns:
            pd.DataFrame()
     """

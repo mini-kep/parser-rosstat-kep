@@ -4,6 +4,7 @@ from kep.util import timestamp
 
 __all__ = ['unpack_dataframes']
 
+
 def check_duplicates(df):
     dups = df[df.duplicated(keep=False)]
     if not dups.empty:
@@ -14,7 +15,7 @@ def subset(values, freq):
     return [x for x in values if x['freq'] == freq]
 
 
-def make_timestamp(x):    
+def make_timestamp(x):
     date = timestamp(x.year, x.month)
     return pd.Timestamp(date)
 
@@ -55,7 +56,7 @@ def create_dfm(datapoints):
 
 
 def unpack_dataframes(datapoints):
-    """Return a tuple of annual, quarterly, monthly pandas dataframes.""" 
+    """Return a tuple of annual, quarterly, monthly pandas dataframes."""
     funcs = [create_dfa, create_dfq, create_dfm]
     return (_f(datapoints) for _f in funcs)
 

@@ -5,8 +5,8 @@ from pathlib import Path
 
 import pandas as pd
 
-FOLDER = Path(__file__).parent / 'data' 
-             
+FOLDER = Path(__file__).parent / 'data'
+
 
 def locate(freq):
     return FOLDER / 'df{}.csv'.format(freq)
@@ -43,5 +43,5 @@ def get_dataframe(freq):
     return read_csv(filelike)
 
 
-if '__main__' == __name__:   
-     dfa, dfq, dfm = (get_dataframe(freq) for freq in 'aqm')
+if '__main__' == __name__:
+    dfa, dfq, dfm = (get_dataframe(freq) for freq in 'aqm')

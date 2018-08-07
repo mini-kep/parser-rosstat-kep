@@ -1,4 +1,4 @@
-"""Get data from MS Word files using *win32com.client*.   
+"""Get data from MS Word files using *win32com.client*.
    Windows-only, requires MS Word installed.
 """
 

@@ -15,7 +15,7 @@ def test_emit_datapoints():
             freq='a',
             year=2018,
             month=12,
-            value=100),    
+            value=100),
         Datapoint(
             label='INDPRO_yoy',
             freq='q',
@@ -34,4 +34,4 @@ def test_emit_datapoints():
             year=2018,
             month=2,
             value=101.5),
-]
+    ]

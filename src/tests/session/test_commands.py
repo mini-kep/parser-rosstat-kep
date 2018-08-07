@@ -8,6 +8,4 @@ def test_extract_command_parameters():
 
 def test_labels():
     res = extract_labels([('var', 'INDPRO'), ('units', 'yoy')])
-    assert res == ['INDPRO_yoy']    
-    
-
+    assert res == ['INDPRO_yoy']
