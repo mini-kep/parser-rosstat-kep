@@ -29,10 +29,15 @@ def parse_tables(base_mapper,
     return parsed_tables
 
 
-def check_labels(parsed_tables, expected_labels):
-    labels = [t.label for t in parsed_tables if t]
+def check_labels(tables, expected_labels):
+    parsed_tables = [t for t in tables if t]
+    labels = [t.label for t in parsed_tables]
     if labels != expected_labels:
-        raise AssertionError(parsed_tables, labels, expected_labels)
+        raise AssertionError(tables, labels, expected_labels)
+
+
+
+    
 
 
 class Worker:
@@ -72,7 +77,11 @@ class Worker:
         """Run a *command* on itself."""
         func = getattr(self, method)
         if arg:
+            #try:
             func(arg)
+            #except TypeError:
+            #    print(method, arg)
+            #    raise TypeError
         else:
             func()
 
@@ -90,10 +99,10 @@ class Worker:
         """
         labels = [t.label for t in self.parsed_tables]
         if labels != expected_labels:
-            print(labels, expected_labels)
-            import pdb
-            pdb.set_trace()
-            #raise AssertionError(parsed_tables, labels, expected_labels)
+            #print(labels, expected_labels)
+            #import pdb
+            #pdb.set_trace()
+            raise AssertionError(self.parsed_tables, labels, expected_labels)
 
     def start_with(self, start_strings):
         """Limit parsing segment starting from any of *start_strings*."""

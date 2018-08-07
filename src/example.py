@@ -17,9 +17,9 @@ def search_all():
         print('Parsing', year, month)
         csv_source = interim_csv(year, month)
         s.parse(csv_source)
-        values = s.datapoints()
-        print('Checked values:')
-        check(checkpoints(), values)
+        #values = s.datapoints()
+        #print('Checked values:')
+        #check(checkpoints(), values)
     return s
 
 

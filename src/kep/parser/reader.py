@@ -23,7 +23,6 @@ def is_data_row(row: str) -> bool:
 
 # data import
 
-
 def is_allowed(row):
     return row and '_' not in row
 
