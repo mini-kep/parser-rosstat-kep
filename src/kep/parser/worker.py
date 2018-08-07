@@ -3,13 +3,13 @@ from kep.parser.units import UnitMapper
 from kep.util import iterate
 
 
-__all__ = ['Worker', 'get_parsed_tables']
+__all__ = ['Worker', 'parse_tables']
 
 
-def get_parsed_tables(base_mapper,
-                      tables,
-                      commands,
-                      expected_labels=None):
+def parse_tables(base_mapper,
+                 tables,
+                 commands,
+                 expected_labels=None):
     """
     Parse *tables* using *base_mapper* and *commands* and check for 
     *expected_labels*.
@@ -23,15 +23,9 @@ def get_parsed_tables(base_mapper,
     Return:
        list of parsed Table() instances       
     """   
-    parsed_tables = _get_parsed_tables(tables, base_mapper, commands)
+    parsed_tables = Worker(tables, base_mapper).apply_all(commands).parsed_tables
     check_labels(parsed_tables, expected_labels)
     return parsed_tables
-
-def _get_parsed_tables(tables, base_mapper, commands):
-    worker = Worker(tables, base_mapper)
-    for method, arg in commands:
-        worker.apply(method, arg)
-    return worker.parsed_tables
 
 
 def check_labels(parsed_tables, expected_labels):
@@ -81,6 +75,24 @@ class Worker:
             func(arg)
         else:
             func()
+            
+    def apply_all(self, commands):
+        """Run *commands* list on itself.""" 
+        for method, arg in commands:
+            self.apply(method, arg)
+        return self
+    
+    def check_labels(self, expected_labels):
+        """Assert labels of parsed tables are exactly as *expected_labels*.
+        
+        Arg:
+            expected_labels - list of strings            
+        """
+        labels = [t.label for t in self.parsed_tables]
+        if labels != expected_labels:
+            print(labels, expected_labels)
+            import pdb; pdb.set_trace()
+            #raise AssertionError(parsed_tables, labels, expected_labels)
 
     def start_with(self, start_strings):
         """Limit parsing segment starting from any of *start_strings*."""

@@ -9,8 +9,7 @@ Used to read:
 from kep.util import iterate, make_label, load_yaml, load_yaml_one_document
 from typing import Union
 
-__all__ = ['read_instructions_for_headers', 
-           'read_instructions_for_checkpoints']
+__all__ = ['get_instructions', 'get_checkpoints']
 
 ALLOWED_METHODS_PARSING = ['start_with', 'end_with',
                            'var', 'headers', 'units',
@@ -21,12 +20,12 @@ ALLOWED_METHODS_VERIFICATION = ['all', 'any']
 
 
 
-def read_instructions_for_checkpoints(source: str):
+def get_checkpoints(source: str):
     commands = load_yaml_one_document(source)
     return make_parameter_list(commands, ALLOWED_METHODS_VERIFICATION)
 
 
-def read_instructions_for_headers(source: str):
+def get_instructions(source: str):
     """Read parsing command blocks from *source*.    
     Return:
         list of blocks, each block is a list of tuples
