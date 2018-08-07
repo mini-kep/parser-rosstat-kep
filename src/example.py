@@ -1,3 +1,4 @@
+from kep import all_labels
 from kep.session import Session, Verifier
 from kep.dates import date_span
 from locations import interim_csv, unit_mapper, parsing_instructions, checkpoints
@@ -9,6 +10,8 @@ ALL_DATES = date_span('2009-04', '2018-06')
 
 @profile(immediate=True, entries=20)
 def search_all():
+    labels = all_labels(parsing_instructions())
+    print(f'Parsing {len(labels)} labels: %s' % ", ".join(labels))
     s = Session(unit_mapper(), parsing_instructions())
     for year, month in ALL_DATES:
         print('Parsing', year, month)

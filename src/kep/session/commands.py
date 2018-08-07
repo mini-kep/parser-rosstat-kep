@@ -8,13 +8,18 @@ Used to read:
 from kep.util import iterate, make_label, load_yaml
 from typing import Union
 
-__all__ = ['get_instructions']
+__all__ = ['get_instructions', 'all_labels']
 
 ALLOWED_METHODS_PARSING = ['start_with', 'end_with',
                            'var', 'headers', 'units',
                            'force_units', 'force_format',
                            'trail_down_names']
 
+
+def all_labels(source: str):
+    return [label for block in get_instructions(source)
+                  for label in block.expected_labels]
+    
 
 def get_instructions(source: str):
     """Read parsing command blocks from *source*.
@@ -31,6 +36,9 @@ class CommandBlock:
     @property
     def expected_labels(self):
         return extract_labels(self.commands)
+    
+    def count(self):
+        return len(self.expected_labels)
 
 
 def make_parameter_list(commands, allowed_methods):
