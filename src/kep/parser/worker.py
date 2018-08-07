@@ -32,9 +32,6 @@ def parse_tables(base_mapper,
 def check_labels(parsed_tables, expected_labels):
     labels = [t.label for t in parsed_tables if t]
     if labels != expected_labels:
-        print(parsed_tables, labels, expected_labels)
-        import pdb
-        pdb.set_trace()
         raise AssertionError(parsed_tables, labels, expected_labels)
 
 

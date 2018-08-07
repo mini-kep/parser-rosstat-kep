@@ -5,6 +5,11 @@
     - rog
     - ytd
 - trail_down_names
+#- var: GDP
+#- headers: Индекс физического объема произведенного ВВП
+#- units: 
+#   - bln_rub
+#   - yoy
 ---
 - start_with: '3.5. Индекс потребительских цен'
 - end_with: '4. Социальная сфера'
