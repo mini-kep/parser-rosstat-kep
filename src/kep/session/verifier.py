@@ -1,10 +1,9 @@
+"""Check contents of dataframes with checkpoints"""
 import pandas as pd
 from kep.util import iterate
 from kep.parser.row import Datapoint
 from kep.session .commands import get_checkpoints
 
-
-# TODO: check dfa, dfq, dfm with checkpoints_source
 
 def is_in(d: Datapoint, df: pd.DataFrame):
     return 1
@@ -12,8 +11,6 @@ def is_in(d: Datapoint, df: pd.DataFrame):
 class Verifier():
     def init(self, dfa, dfq, dfm):
         self.dfs = dict(a=dfa, q=dfq, m=dfm)
-        pass
-        # flatten frames withh to_dict()
         
     def all(self, lookup_values):
         """Require all values from strings, raise exception otherwise."""
@@ -44,6 +41,13 @@ def verify(checkpoints_source, dfa, dfq, dfm):
         x = as_datapoints(args)
         getattr(v, method)(x)
 
+SRC = """
+- any:
+    - INDPRO_yoy a 2015 99.2
+    - INDPRO_yoy a 2002 103.1
+- all: 
+    - CPI_NONFOOD_rog m 1999 12 101.1
+"""
    
 # --------------
     

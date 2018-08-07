@@ -27,5 +27,5 @@ def date_span(start_date, end_date):
              if (date.year, date.month) in supported_date_list]      
 
 
-def is_latest(year: int, month: int):
-    return (year, month) in supported_dates()[:-2]
+def is_latest(year: int, month: int, offset=2):
+    return (year, month) in SUPPORTED_DATES[:-offset]

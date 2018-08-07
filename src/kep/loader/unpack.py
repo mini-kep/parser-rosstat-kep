@@ -29,7 +29,7 @@ def unpack(filepath, destination_folder, force=False):
     res = _unrar(filepath, destination_folder)  
     if res == 0:
         return "UnRARed to %s" % destination_folder
-    return ''   
+    return 'UnRAR failed with code %s' % res   
      
 def assert_exists(filepath):
     if not Path(filepath).exists():

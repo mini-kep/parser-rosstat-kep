@@ -40,19 +40,24 @@ Pseudocode
 
 TODOS
 =====
-- [ ] restore download/unpack/convert functionality outside parser
-- [ ] get latest months in 2018 
-- [ ] more defintions
+- [ ] verifyer
+- [ ] more variable definitions + count
+- [ ] varibale descriptions (ru and en)
 
 ERRORS
 ======
 - [ ] must use 'a' as 'm12' in 'fiscal' row format
 
+
+IDEAS
+=====
+- [ ] read environment variable /  structure as package with setuptools
+- [ ] move locations.py inside kep.package
+
 WONTFIX
 =======
-- [ ] speedup
 - [ ] better check than `assert not dfa.empty`
-- [ ] need better regex in  kep.filters
+- [ ] need better regex in kep.filters
 
 FINAL USE
 =========
@@ -66,9 +71,13 @@ FINAL USE
 
 DONE
 ====
+- [x] restore to_latest() and to_excel() functions
+- [x] get latest months in 2018 
+- [x] restore download/unpack/convert functionality outside parser
 - run Session on several CSV files
   - [x] two files in data
   - [x] actual files since 2007
 - [x] estimate running time 
 - [x] more clear yaml import
 - [x] kep.filters has duplicate functions
+- [x] speedup

@@ -201,12 +201,10 @@ def make_file_list(folder):
 
 def folder_to_csv(folder, csv_filepath):
     """Make single CSV file at *csv_filepath* based on all .doc files in *folder*. """
-    print()
     print("Folder:\n    ", folder)
     file_list = make_file_list(folder)
     dump_doc_files_to_csv(file_list, csv_filepath)
-    print("Finished creating raw CSV file:", csv_filepath)
-    return True
+    return "Finished creating raw CSV file: {}".format(csv_filepath)
 
 
 if __name__ == "__main__":
