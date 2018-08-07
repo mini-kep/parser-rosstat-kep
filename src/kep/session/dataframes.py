@@ -20,11 +20,16 @@ def make_timestamp(x):
     return pd.Timestamp(date)
 
 
+def separate_dataframes(datapoints):
+    datapoints = list(datapoints)
+    return [[d for d in datapoints if d.freq == freq] for freq in 'aqm']
+        
+
 def create_base_dataframe(datapoints, freq):
     df = pd.DataFrame(datapoints)
     if df.empty:
         raise ValueError(('Empty', datapoints))
-    df = df[df.freq == freq]
+    #df = df[df.freq == freq]
     check_duplicates(df)
     df = df.drop_duplicates(['freq', 'label', 'year', 'month'], keep='first')
     df['date'] = df.apply(make_timestamp, axis=1)
@@ -57,8 +62,8 @@ def create_dfm(datapoints):
 
 def unpack_dataframes(datapoints):
     """Return a tuple of annual, quarterly, monthly pandas dataframes."""
-    funcs = [create_dfa, create_dfq, create_dfm]
-    return (_f(datapoints) for _f in funcs)
+    a, q, m = separate_dataframes(datapoints)    
+    return create_dfa(a), create_dfq(q), create_dfm(m)
 
 
 # TODO: need to be changed according to new format - must use 'a' as 'm12'
