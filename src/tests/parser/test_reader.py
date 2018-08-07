@@ -20,15 +20,14 @@ CSV = ['заголовок1 header1\t\t\t',
        '\t\tI\tII\tIII\tIV',
        '2001\t300\t300\t300\t300']
 
-CSV_SPLIT = [{'d': ['1999\t100\t100\t100\t100', 
-                    '2000\t120\t120\t120\t120'],
-              'h': ['заголовок1 header1\t\t\t',
+CSV_SPLIT = [{'datarow_strings': ['1999\t100\t100\t100\t100', '2000\t120\t120\t120\t120'],
+              'header_strings': ['заголовок1 header1\t\t\t',
                                   'заголовок2 header2\t\t\t',
-                                  '\t\tI\tII\tIII\tIV']},
-             {'d': ['2001\t300\t300\t300\t300'],
-              'h': ['____ комментарий',
-                    'новый заголовок next table',
-                    '\t\tI\tII\tIII\tIV']}]
+                                   '\t\tI\tII\tIII\tIV']},
+             {'datarow_strings': ['2001\t300\t300\t300\t300'],
+              'header_strings': ['____ комментарий',
+                               'новый заголовок next table',
+                               '\t\tI\tII\tIII\tIV']}]
 
 TABLE_1 = Table(name=None,
       unit=None,
@@ -42,9 +41,6 @@ TABLE_2 = Table(name=None,
       header_strings=['новый заголовок next table', '\t\tI\tII\tIII\tIV'],
       datarow_strings=['2001\t300\t300\t300\t300'])
 
-
-def test_get_tables_on_string():    
-        assert get_tables(DOC) == [TABLE_1, TABLE_2]
 
 def test_get_tables_on_file():    
     with TempFile(content=DOC) as filename:
@@ -64,4 +60,5 @@ def test_read_csv_from_string():
     with TempFile(DOC) as f:  
         rows = list(read_csv(f))
         assert rows == CSV        
-    
+
+# FIXME: add Table class tests    

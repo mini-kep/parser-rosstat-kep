@@ -105,9 +105,13 @@ ytd :
 
 from kep.session import Session 
 from kep.parser.row import Datapoint
+from kep.util import TempFile
 
-s = Session(UNITS_DOC, INTRUCTIONS_DOC) 
-s.parse(CSV_TEXT)
+with TempFile(UNITS_DOC) as units_filepath:
+    with TempFile(INTRUCTIONS_DOC) as instructions_filepath:
+        s = Session(units_filepath, instructions_filepath) 
+with TempFile(CSV_TEXT) as csv_filepath:
+    s.parse(csv_filepath)
 
 class Test_session():
     def test_lables(self):    

@@ -5,22 +5,13 @@ import re
 import pprint
 
 from kep.parser.row import get_row_format, emit_datapoints
-from kep.util import make_label, accept_string
+from kep.util import make_label
 
 
-__all__ = ['get_tables', 'get_csv', 'Table']
+__all__ = ['get_tables', 'split_csv', 'Table']
 
-# 'I' accounts for quarterly headers with I, II, III and IV
+# 'I' accounts for quarterly headers in I, II, III and IV
 RE_LITERALS = re.compile(r'[а-яI]')
-
-@accept_string
-def get_tables(filepath: str):    
-    rows = get_csv(filepath)    
-    table_dicts = split_csv(rows, is_data_row)
-    return [Table(td['h'], td['d']) for td in table_dicts]
-
-def get_csv(filepath):
-    return filter(is_allowed, read_csv(filepath))
 
 def has_literals(s: str) -> bool:
     return re.search(RE_LITERALS, s)
@@ -28,13 +19,22 @@ def has_literals(s: str) -> bool:
 def is_data_row(row: str) -> bool:
     return not has_literals(row)
 
+# data import
+            
+def is_allowed(row):
+    return row and '_' not in row
+
+def get_tables(filepath: str):    
+    rows = filter(is_allowed, read_csv(filepath))
+    table_dicts = split_csv(rows)
+    return [Table(**td) for td in table_dicts]
+
 def read_csv(filepath: str):
     with open(filepath, 'r', encoding='utf-8') as f:
         for row in f.read().splitlines():
             yield row  
-            
-def is_allowed(row):
-    return row and '_' not in row
+
+# split to tables
 
 @unique
 class State(Enum):
@@ -44,9 +44,10 @@ class State(Enum):
 
 
 def as_dict(headers, datarows):
-    return dict(h=headers, d=datarows)
+    return dict(header_strings=headers, datarow_strings=datarows)
 
-def split_csv(rows, _is_data_row=is_data_row):
+
+def split_csv(rows):
     """Split *csv_rows* by_table. Each table is a tuple of header and data rows.
        
        Args:
@@ -54,14 +55,14 @@ def split_csv(rows, _is_data_row=is_data_row):
            is_data_row - function
            
        Returns:
-           list of (header, data) tuples
+           list of dictionaries
     """
     result = []
     datarows, headers = [], []
     state = State.INIT
     for row in rows:
         # is this a data row?
-        if _is_data_row(row):
+        if is_data_row(row):
             # this is a data row!            
             datarows.append(row)
             state = State.DATA

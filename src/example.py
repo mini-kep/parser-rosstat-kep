@@ -1,9 +1,10 @@
 from kep.session import Session 
-from locations import date_span, interim_csv, unit_mapper, parsing_instructions
+from kep.dates import date_span
+from locations import  interim_csv, unit_mapper, parsing_instructions
 
 from profilehooks import profile
 
-ALL_DATES = date_span('2009-04', '2018-04')
+ALL_DATES = date_span('2009-04', '2018-06')
 
 
 @profile(immediate=True, entries=20)
@@ -15,7 +16,7 @@ def search_all():
         s.parse(csv_source)
     return s    
 
-@profile(immediate=True, entries=20)
+#@profile(immediate=True, entries=20)
 def get_frames(s):
     dfa, dfq, dfm = s.dataframes()
     assert not dfa.empty
@@ -29,15 +30,6 @@ if __name__ == '__main__':
     dfa, dfq, dfm = get_frames(s)
     
 
-#    ‘dict’ (default) : dict like {column -> {index -> value}}
-#    ‘list’ : dict like {column -> [values]}
-#    ‘series’ : dict like {column -> Series(values)}
-#    ‘split’ : dict like {‘index’ -> [index], ‘columns’ -> [columns], ‘data’ -> [values]}
-#    ‘records’ : list like [{column -> value}, … , {column -> value}]
-#    ‘index’ : dict like {index -> {column -> value}}
-    
-    
-    
 # Profiling reference:
 # https://www.blog.pythonlibrary.org/2016/05/24/python-101-an-intro-to-benchmarking-your-code/
 

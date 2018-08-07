@@ -7,6 +7,7 @@ from kep.dates import supported_dates
 
 year, month = random.choice(supported_dates()[:-12])    
 
+
 def test_randomised_import():
     s = Session(unit_mapper(), parsing_instructions())
     csv_source = interim_csv(year, month)
