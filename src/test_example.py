@@ -1,6 +1,8 @@
 import random
-from locations import supported_dates, interim_csv, unit_mapper, parsing_instructions
+
+from locations import interim_csv, unit_mapper, parsing_instructions
 from kep.session import Session 
+from kep.dates import supported_dates
 
 
 year, month = random.choice(supported_dates()[:-12])    

@@ -9,6 +9,6 @@ install:
 # command to run tests
 script: 
   - sudo apt-get install -y unrar
-  - pytest src --doctest-modules --cov=src
+  - pytest src --cov=src
 after_success:
   - codecov
