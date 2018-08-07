@@ -5,30 +5,21 @@ Used to read:
    - checkpoints.txt
 
 """
-
-from kep.util import iterate, make_label, load_yaml, load_yaml_one_document
+from kep.util import iterate, make_label, load_yaml
 from typing import Union
 
-__all__ = ['get_instructions', 'get_checkpoints']
+__all__ = ['get_instructions']
 
 ALLOWED_METHODS_PARSING = ['start_with', 'end_with',
                            'var', 'headers', 'units',
                            'force_units', 'force_format', 
                            'trail_down_names']
 
-ALLOWED_METHODS_VERIFICATION = ['all', 'any']
-
-
-
-def get_checkpoints(source: str):
-    commands = load_yaml_one_document(source)
-    return make_parameter_list(commands, ALLOWED_METHODS_VERIFICATION)
-
 
 def get_instructions(source: str):
     """Read parsing command blocks from *source*.    
     Return:
-        list of blocks, each block is a list of tuples
+        list of blocks, each block is a list of tuples, each tuple is (method, arg)
     """    
     return [CommandBlock(document) for document in load_yaml(source)]
 
@@ -58,7 +49,7 @@ def extract_parameters(command: Union[str, dict], allowed_commands) -> tuple:
     elif isinstance(command, dict):
         method, arg = key_value_from_dict(command)
     if method not in allowed_commands:
-        raise ValueError(method)
+        raise ValueError(f'{method} expected to be one of {allowed_commands}')
     return method, arg    
         
     
