@@ -1,6 +1,6 @@
-from kep.session import Session
+from kep.session import Session, Verifier
 from kep.dates import date_span
-from locations import interim_csv, unit_mapper, parsing_instructions
+from locations import interim_csv, unit_mapper, parsing_instructions, checkpoints
 
 from profilehooks import profile
 
@@ -14,22 +14,15 @@ def search_all():
         print('Parsing', year, month)
         csv_source = interim_csv(year, month)
         s.parse(csv_source)
+        dfa, dfq, dfm = s.dataframes()
+        v = Verifier(checkpoints(), dfa, dfq, dfm)
+        v.any()
+        v.all()
     return s
-
-#@profile(immediate=True, entries=20)
-
-
-def get_frames(s):
-    dfa, dfq, dfm = s.dataframes()
-    assert not dfa.empty
-    assert not dfq.empty
-    assert not dfm.empty
-    return dfa, dfq, dfm
 
 
 if __name__ == '__main__':
     s = search_all()
-    dfa, dfq, dfm = get_frames(s)
 
 
 # Profiling reference:

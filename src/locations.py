@@ -132,6 +132,10 @@ def parsing_instructions(data_root=DATA_ROOT):
 def unit_mapper(data_root=DATA_ROOT):
     return data_root / 'base_units.txt'
 
+@as_string
+def checkpoints(data_root=DATA_ROOT):
+    return data_root / 'checkpoints.txt'
+
 
 @as_string
 def interim_csv(year: int, month: int, data_root=DATA_ROOT):

@@ -1,15 +1,19 @@
-﻿- any:
-    - INDPRO_yoy a 2015 99.2
-    - INDPRO_yoy a 2002 103.1
-- any:
-    - INDPRO_rog q 2015 3 82.8
-    - INDPRO_rog q 2002 3 94.0
-- any:
-    - INDPRO_ytd m 2015 1 100    
-    - INDPRO_ytd m 2002 1 103.7
-- all: 
-    - CPI_NONFOOD_rog m 1999 12 101.1
-- any: 
-    - PROFIT_MINING_mln_rub a 2017 2595632
-    - PROFIT_MINING_mln_rub m 2017 1 258752    
-    - PROFIT_MINING_mln_rub a 1999 109148
+﻿INDPRO_yoy:
+  any:
+    - a 2015 99.2
+    - a 2002 103.1
+INDPRO_rog: 
+  any:
+    - q 2015 3 82.8
+    - q 2002 3 94.0
+INDPRO_ytd:
+  any:
+    - m 2015 1 100    
+    - m 2002 1 103.7
+CPI_NONFOOD_rog:
+   all: 
+    - m 1999 12 101.1
+#PROFIT_MINING_mln_rub: 
+#   any: 
+#    - a 2017 2595632
+#    - a 1999 109148

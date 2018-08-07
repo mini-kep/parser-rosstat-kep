@@ -1,74 +1,19 @@
 """Check contents of dataframes with checkpoints"""
 import pandas as pd
-from kep.util import iterate, load_yaml
+from kep.util import load_yaml_one_document
 from kep.parser.row import Datapoint
 
-
-class Verifier():
-    def init(self, dfa, dfq, dfm):
-        self.dfs = dict(a=dfa, q=dfq, m=dfm)
-
-    def all(self, lookup_values):
-        """Require all values from strings, raise exception otherwise."""
-        for v in lookup_values:
-            if not self.is_found(v):
-                msg = "Datapoint not found", v  # , subset(v, datapoints)
-                raise AssertionError(msg)
-
-    def any(self, lookup_values):
-        """Require at least one value from strings, raise exception otherwise."""
-        bools = [self.if_found(value) for value in lookup_values]
-        if not any(bools):
-            d = [(k, v) for k, v in zip(bools, lookup_values)]
-            # , subset(lookup_values[0], datapoints)
-            msg = "Datapoints not found", d
-            raise AssertionError(msg)
-
-    def which_df(self, freq):
-        return self.dfs[freq]
-
-    def is_found(self, d: Datapoint):
-        df = self.which_df(d.freq)
-        return is_in(d, df)
-
-
-# def verify(checkpoints_source, dfa, dfq, dfm):
-#    v = Verifier(dfa, dfq, dfm)
-#    for method, args in get_checkpoints(checkpoints_source):
-#        x = as_datapoints(args)
-#        getattr(v, method)(x)
-
-SRC = """
-CPI_NONFOOD_rog:
-   all:
-      - m 1999  1 106.2
-      - m 1999 12 101.1
-      - m 2018  5 100.9
-      - m 2019  1 -99.9
-   any:
-      - a 2015 99.2
-      - a 2002 103.1
-#
-#INDPRO_yoy:
-#   -
-#     a 2015 99.2
-#     a 2002 103.1
-#  -  a 2015 99.2
-#     a 2002 103.1
-"""
-
-
-def is_in(tseries, year, month, value, **kwargs):
-    timestamp = ts(year, month)
+def is_in(tseries, dp):
+    timestamp = ts(dp.year, dp.month)
     try:
         x = tseries[timestamp]
     except KeyError:
         # timestamp not in tseries index
         return False
-    return x == value
+    return x == dp.value
 
 
-def to_datapoint(string: str):
+def to_datapoint(string: str, name):
     string = string.replace('  ', ' ')
     args = string.split(' ')
     try:
@@ -76,28 +21,80 @@ def to_datapoint(string: str):
     except ValueError:
         freq, year, value = args
         month = 12
-    return dict(freq=freq,
-                year=int(year),
-                month=int(month),
-                value=float(value)
-                )
+    return Datapoint(name, freq, int(year), int(month), float(value))
 
 
 def extract(source_dict: dict, freq: str, method: str):
+    res = []
     for name, subdict in source_dict.items():
         items = subdict.get(method)
         if items:
-            datapoints = [to_datapoint(item) for item in items]
-            yield (name, [dp for dp in datapoints if dp['freq'] == freq])
+            datapoints = [to_datapoint(item, name) for item in items]
+            out = [dp for dp in datapoints if dp.freq == freq]
+            if out: 
+                res.append((name, out))
+    return res    
+
+
+class ValidationError(Exception):
+    pass
+
+
+class Verifier():
+    def __init__(self, checkpoint_source, dfa, dfq, dfm):
+        self.dfs = dict(a=dfa, q=dfq, m=dfm)
+        self.check_dict = load_yaml_one_document(checkpoint_source)
+
+    def checkpoints(self, freq, mode):
+        return extract(self.check_dict, freq, mode)
+    
+    def find(self, freq, mode):
+        res = []
+        df = self.dfs[freq]
+        checkpoints = self.checkpoints(freq, mode)
+        for name, values in checkpoints:
+            tseries = df[name]
+            for value in values:
+                x = value, is_in(tseries, value)                
+                res.append(x)
+        return res        
+                
+    def zip(self, freq, mode):
+        found = self.find(freq, mode)
+        return [[x[i] for x in found] for i in [0, 1]] 
+    
+    def all(self):
+        for freq in 'aqm':
+            for x, flag in self.find(freq, 'all'):
+                if not flag:                    
+                    raise ValidationError(f'Required value not found: {x}') 
+        return True            
+                    
+    def any(self):  
+        for freq in 'aqm':  
+            values, bools = self.zip(freq, 'any')
+            if bools and not any(bools):
+                raise ValidationError(f'Found none of: {values}')
+        return True        
+            
+            
+                
+                
+SRC = """
+CPI_NONFOOD_rog:
+   all:
+      - m 1999  1 106.2
+      - m 1999 12 101.1
+   any:
+      - m 1999 12 101.1
+      - m 2018  5 100.9
+"""
 
 
 def ts(year, month):
     return pd.Timestamp(year, month, 1) + pd.offsets.MonthEnd()
 
-
-z = load_yaml(SRC)[0]
-print(z)
-df = pd.DataFrame({'CPI_NONFOOD_rog':
+_df = pd.DataFrame({'CPI_NONFOOD_rog':
                    {ts(1999, 1): 106.2,
                     ts(1999, 2): 104.0,
                        ts(1999, 3): 103.2,
@@ -117,9 +114,9 @@ df = pd.DataFrame({'CPI_NONFOOD_rog':
                        ts(2018, 5): 100.9,
                        ts(2018, 6): 100.4}})
 
-# df must be subset by frequency
-y = list(extract(z, 'm', 'all'))
-for name, values in y:
-    tseries = df[name]
-    for v in values:
-        print(name, v, is_in(tseries, **v))
+# dataframes    
+dfa, dfq, dfm = _df, _df, _df    
+v = Verifier(SRC, dfa, dfq, dfm)
+assert v.any()        
+assert v.all()        
+            
