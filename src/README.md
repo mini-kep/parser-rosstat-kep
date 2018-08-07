@@ -7,9 +7,9 @@ Run over monthly data releases to learn about economic indicator revisions.
 Inputs
 ======
 
-- [ ] one CSV file (as `sandbox.CSV_TEXT`)
-- [ ] parsing instructions (as `sandbox.INTRUCTIONS_DOC`)
-- [ ] default units of measurement (as `sandbox.UNITS_DOC`)
+- one CSV file (as `sandbox.CSV_TEXT`)
+- parsing instructions (as `sandbox.INTRUCTIONS_DOC`)
+- default units of measurement (as `sandbox.UNITS_DOC`)
 
 Comment: units of measurement can be a part of parsing instructions, 
          but they are reused often, that is why they are a separate 
@@ -40,9 +40,9 @@ Pseudocode
 
 TODOS
 =====
-- [ ] verifyer
-- [ ] more variable definitions + count
+- [ ] more variable definitions
 - [ ] varibale descriptions (ru and en)
+
 
 ERRORS
 ======
@@ -51,6 +51,8 @@ ERRORS
 
 IDEAS
 =====
+- [ ] grouping of variables for Excel file 
+- [ ] add check all variables in parsing definition are covered with checkpoints 
 - [ ] read environment variable /  structure as package with setuptools
 - [ ] move locations.py inside kep.package
 
@@ -71,6 +73,7 @@ FINAL USE
 
 DONE
 ====
+- [x] fixed: fails with corporate profits
 - [x] restore to_latest() and to_excel() functions
 - [x] get latest months in 2018 
 - [x] restore download/unpack/convert functionality outside parser
@@ -80,4 +83,4 @@ DONE
 - [x] estimate running time 
 - [x] more clear yaml import
 - [x] kep.filters has duplicate functions
-- [x] speedup
+- [x] speedups

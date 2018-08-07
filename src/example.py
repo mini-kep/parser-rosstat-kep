@@ -1,5 +1,5 @@
 from kep import all_labels
-from kep.session import Session, Verifier
+from kep.session import Session, check
 from kep.dates import date_span
 from locations import interim_csv, unit_mapper, parsing_instructions, checkpoints
 
@@ -17,10 +17,9 @@ def search_all():
         print('Parsing', year, month)
         csv_source = interim_csv(year, month)
         s.parse(csv_source)
-        dfa, dfq, dfm = s.dataframes()
-        v = Verifier(checkpoints(), dfa, dfq, dfm)
-        v.any()
-        v.all()
+        values = s.datapoints()
+        print('Checked values:')
+        check(checkpoints(), values)
     return s
 
 
