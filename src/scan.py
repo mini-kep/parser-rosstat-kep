@@ -5,6 +5,7 @@ from kep.util import iterate, load_yaml
 from kep.dates import date_span
 from kep.parser.reader import get_tables as read_tables
 from kep.parser.units import UnitMapper
+from kep.session.dataframes import unpack_dataframes
 from locations import interim_csv
 
 ALL_DATES = date_span('2009-04', '2018-06')       
@@ -125,7 +126,18 @@ def select(tables, name):
 def find(tables, string):
    for t in tables:
         if t.contains_any([string]):
-            return t    
+            return t 
+        
+def datapoints(tables):
+    """Return a list of values from parsed tables."""
+    return [x for t in parsed(tables) for x in t.emit_datapoints()]
+
+def dataframes(tables):
+    """Return a tuple of annual, quarterly and monthly dataframes
+       from parsed tables."""
+    dfa, dfq, dfm = unpack_dataframes(datapoints(tables))
+    return dfa, dfq, dfm        
+        
 
 # get parameters and data
 

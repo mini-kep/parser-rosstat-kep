@@ -1,11 +1,21 @@
+# Deflate retail sales
+# Relationship between price indices?
+# Do profits predict investment?
+# Consumer behaviour?
+# FX vs trade deficit
+# Loans and interest rates
+# Smoothing
+
 - Output and business activity:
     - GDP
     - INDPRO
     - AGROPROD
     - TRANSPORT_FREIGHT
     - DWELL
-- Investnment:
-    - ABC
+    
+- Investment:
+    - INVESTMENT
+    
 - Prices:
     - CPI
     - CPI_NONFOOD
@@ -13,23 +23,34 @@
     - CPI_ALCOHOL
     - CPI_SERVICES
     - PPI
-- Wages:
+    
+- Wages and income:
+
     - WAGE_NOMINAL
     - WAGE_REAL
+    - PINCOME_NOMINAL
+    - PINCOME_NOMINAL
+    
 - Consumer demand:
-    - RETAILS_SALES
-    - RETAILS_SALES_FOOD
-    - RETAILS_SALES_NONFOOD
-- Labor:
+    - RETAIL_SALES
+    - RETAIL_SALES_FOOD
+    - RETAIL_SALES_NONFOOD
+    
+- Labor and population:
     - UNEMPL
+    - POPULATION
+    
 - Corporate finance:
     - PROFIT_MINING
+    
 - Government finances:
     - GOV_REVENUE
     - GOV_EXPENSES
+    
 - Exchange rates:
-    - USD
-    - RUR    
+    - FXUSD
+    - FXEUR    
+    
 - Foreign trade:
-  - EXPORT_GOODS
-  - IMPORT_GOODS
+    - EXPORT_GOODS
+    - IMPORT_GOODS
