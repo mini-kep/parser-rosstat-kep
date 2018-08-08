@@ -1,0 +1,35 @@
+- Output and business activity:
+    - GDP
+    - INDPRO
+    - AGROPROD
+    - TRANSPORT_FREIGHT
+    - DWELL
+- Investnment:
+    - ABC
+- Prices:
+    - CPI
+    - CPI_NONFOOD
+    - CPI_FOOD
+    - CPI_ALCOHOL
+    - CPI_SERVICES
+    - PPI
+- Wages:
+    - WAGE_NOMINAL
+    - WAGE_REAL
+- Consumer demand:
+    - RETAILS_SALES
+    - RETAILS_SALES_FOOD
+    - RETAILS_SALES_NONFOOD
+- Labor:
+    - UNEMPL
+- Corporate finance:
+    - PROFIT_MINING
+- Government finances:
+    - GOV_REVENUE
+    - GOV_EXPENSES
+- Exchange rates:
+    - USD
+    - RUR    
+- Foreign trade:
+  - EXPORT_GOODS
+  - IMPORT_GOODS

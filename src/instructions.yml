@@ -104,8 +104,25 @@ commands:
     units: mln_rub
     force_units: true
     row_format: 'fiscal'
-    
-    
+---     
+start_with:
+  - 1.9. Внешнеторговый оборот – всего     
+  - 1.10. Внешнеторговый оборот – всего
+end_with:
+  - 1.9.1. Внешнеторговый оборот со странами дальнего зарубежья
+  - 1.10.1. Внешнеторговый оборот со странами дальнего зарубежья
+  - 1.10.1.Внешнеторговый оборот со странами дальнего зарубежья
+commands:
+  - name: EXPORT_GOODS
+    headers: 
+      - экспорт товаров – всего
+      - Экспорт товаров
+    units: bln_usd
+  - name: IMPORT_GOODS
+    headers: 
+      - импорт товаров – всего
+      - Импорт товаров
+    units: bln_usd
     
 #"""
 #PARSING_DEFINITION_BY_SEGMENT = [

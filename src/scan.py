@@ -199,17 +199,13 @@ def main(common_dicts, segment_dicts, base_mapper):
         last = get_parsed_tables(tables, common_dicts, segment_dicts,  base_mapper)
     return last    
 
-# batch reference 
+# batch reference     
+def get_groups(filepath):
+    items = load_yaml(filepath)[0]  
+    groups = [(first_key(x), x[first_key(x)]) for x in items]
+    return OrderedDict(groups)
 
-GROUPS = OrderedDict([
-    ('Output and business activity',  
-        ['GDP', 'INDPRO', 'AGROPROD', 'TRANSPORT_FREIGHT', 'DWELL']),
-    ('Prices', ['CPI', 'CPI_NONFOOD', 'CPI_FOOD', 
-                'CPI_ALCOHOL', 'CPI_SERVICES', 'PPI']),
-    ('Wages', ['WAGE_NOMINAL', 'WAGE_REAL']),
-    ('Labor', ['UNEMPL']),
-    ('Corporate finance', ['PROFIT_MINING'])
-])
+GROUPS = get_groups('groups.yml')
 
 def with_comma(items):
     return ", ".join(items)
@@ -237,6 +233,9 @@ def print_reference(tables):
     if ng: 
         print('\nNot listed in groups\n   ', with_comma(ng))   
                   
+
+def first_key(d):
+    return list(d.keys())[0]
 
 if __name__ == '__main__':
     common_dicts, segment_dicts = get_parsing_parameters('instructions.yml') 
