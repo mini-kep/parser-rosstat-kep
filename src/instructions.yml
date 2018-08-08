@@ -1,0 +1,40 @@
+﻿name: INDPRO
+headers: Индекс промышленного производства
+units: 
+  - yoy
+  - rog
+  - ytd
+---
+name: GDP
+headers:
+  - Валовой внутренний продукт
+  - Объем валового внутреннего продукта
+  - Объем ВВП
+units: 
+  - bln_rub
+  - yoy
+---
+name: DWELL
+units: mln_m2
+headers: 
+  - Ввод в действие жилых домов
+  - Ввод в действие жилых домов организациями всех форм собственности
+---
+start_with: '3.5. Индекс потребительских цен'
+end_with: '4. Социальная сфера'
+commands:
+  - name: CPI_NONFOOD
+    headers: 
+      - 'непродовольственные товары'
+      - 'непродовольст- венные товары'
+    units: rog
+    force_units: 1
+---
+start_with: '2.2. Сальдированный финансовый результат'
+end_with: 'Убыточные организации'
+commands:
+  - name: PROFIT_MINING
+    headers: Добыча полезных ископаемых
+    units: mln_rub
+    force_units: 1
+    format: 'fiscal'

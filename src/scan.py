@@ -1,11 +1,10 @@
 from copy import copy
-from profilehooks import profile
 
-from kep.util import iterate
+from kep.util import iterate, load_yaml
 from kep.dates import date_span
 from kep.parser.reader import get_tables
-from kep.parser.units import get_mapper
-from locations import interim_csv, unit_mapper
+from kep.parser.units import UnitMapper
+from locations import interim_csv
 
 ALL_DATES = date_span('2009-04', '2018-06')
        
@@ -51,7 +50,7 @@ def trail_down_names(tables, name, units):
       following tables with expected unit names, but no variable name
       specified. In this case we assign table name similar to previous table.
     """
-    _units = copy(units)
+    _units = copy(iterate(units))
     trailing_allowed = False
     for i, table in enumerate(tables):
         if not _units:
@@ -75,9 +74,16 @@ def parsed(tables):
 def select(tables, name):
     return [t for t in tables if t.name==name]
 
-#@profile(immediate=True, entries=0)
-def main(parsing_parameters):
-    base_mapper = get_mapper(unit_mapper())            
+def get_parsing_parameters(filepath):
+    return [x for x in load_yaml(filepath) if 'name' in x.keys()]
+
+def get_unit_mapper(filepath):
+    return UnitMapper(load_yaml(filepath)[0])
+
+
+BASE_MAPPER = get_unit_mapper('base_units.yml')
+
+def main(parsing_parameters, base_mapper=BASE_MAPPER):
     for year, month in ALL_DATES:
         print(year, month)
         path = interim_csv(year, month)
@@ -89,23 +95,10 @@ def main(parsing_parameters):
 
 
 groups = ('BUSINESS_ACTIVITY', ('GDP', 'INDPRO', 'DWELL'))
-parsing_parameters = [
-    dict(name='GDP', 
-         units=['bln_rub', 'yoy'], 
-         headers=['Валовой внутренний продукт',
-                  'Объем валового внутреннего продукта', 
-                  'Объем ВВП']),
-    dict(name='INDPRO', 
-         units=['yoy', 'rog' , 'ytd'], 
-         headers=['Индекс промышленного производства']),    
-    dict(name='DWELL',
-         units=['mln_m2'],
-         headers=['Ввод в действие жилых домов',
-                  'Ввод в действие жилых домов организациями всех форм собственности']),
-     
-         
-    ]  
-tables = main(parsing_parameters) 
+
+if __name__ == '__main__':
+    parsing_parameters = get_parsing_parameters('instructions.yml')
+    tables = main(parsing_parameters) 
 
 # read json +  bakc to groups what we are looking for
 
