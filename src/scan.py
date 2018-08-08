@@ -2,7 +2,7 @@ from copy import copy
 
 from kep.util import iterate, load_yaml
 from kep.dates import date_span
-from kep.parser.reader import get_tables
+from kep.parser.reader import get_tables as read_tables
 from kep.parser.units import UnitMapper
 from locations import interim_csv
 
@@ -10,24 +10,22 @@ ALL_DATES = date_span('2009-04', '2018-06')
        
 
 def expected_labels(name, units):
-    return [(name, unit) for unit in units]
+    return [(name, unit) for unit in iterate(units)]
 
 def labels(tables):
     return [(t.name, t.unit) for t in tables] 
 
 def assert_labels_found(tables, name, units):
-    parsed_tables = [t for t in tables if t]
-    current_labels = labels(parsed_tables) 
-    for lab in expected_labels(name, units):
+    current_labels = labels(parsed(tables)) 
+    expected_label_list = expected_labels(name, units)
+    for lab in expected_label_list:
         if lab not in current_labels:
-            raise AssertionError(lab)
-        
-def common_parse(tables, name, headers, units, **kwargs):
+            raise AssertionError(f'{lab} must be in {expected_label_list}')
+
+def parse_after_units(tables, name, headers, units, **kwargs):
     parse_headers(tables, name, headers)
     trail_down_names(tables, name, units)
     assert_labels_found(tables, name, units)
-    assert expected_labels
-
     
 def parse_units(tables, base_mapper):
     for t in tables:
@@ -74,34 +72,55 @@ def parsed(tables):
 def select(tables, name):
     return [t for t in tables if t.name==name]
 
+def find(tables, string):
+   for t in tables:
+        if t.contains_any([string]):
+            return t
+    
+
 def get_parsing_parameters(filepath):
     return [x for x in load_yaml(filepath) if 'name' in x.keys()]
 
 def get_unit_mapper(filepath):
     return UnitMapper(load_yaml(filepath)[0])
 
+def get_tables(year, month):
+    path = interim_csv(year, month)
+    return read_tables(path)
 
-BASE_MAPPER = get_unit_mapper('base_units.yml')
+def parse(year, month, parsing_parameters, base_mapper):    
+    tables = get_tables(year, month)
+    parse_units(tables, base_mapper)        
+    for p in parsing_parameters:
+         parse_after_units(tables, **p)
+    return tables     
+    
 
-def main(parsing_parameters, base_mapper=BASE_MAPPER):
+def main(parsing_parameters, base_mapper):
     for year, month in ALL_DATES:
         print(year, month)
-        path = interim_csv(year, month)
-        tables = get_tables(path)
-        parse_units(tables, base_mapper)        
-        for p in parsing_parameters:
-            common_parse(tables, **p)
-    return parsed(tables)        
-
+        parse(year, month, parsing_parameters, base_mapper)
 
 groups = ('BUSINESS_ACTIVITY', ('GDP', 'INDPRO', 'DWELL'))
 
+def test_1():
+    parsing_parameters = get_parsing_parameters('instructions.yml')    
+    base_mapper = get_unit_mapper('base_units.yml') 
+    tables = get_tables(2009, 4)
+    t = find(tables, 'Ввод в действие жилых домов организациями всех форм собственности')
+    p = parsing_parameters[2]
+    parse_units([t], BASE_MAPPER)
+    parse_after_units([t], **p)
+    assert t.name == 'DWELL'
+    assert t.unit == 'mln_m2'    
+
+
 if __name__ == '__main__':
-    parsing_parameters = get_parsing_parameters('instructions.yml')
-    tables = main(parsing_parameters) 
+    parsing_parameters = get_parsing_parameters('instructions.yml')    
+    base_mapper = get_unit_mapper('base_units.yml')
+    tables = main(parsing_parameters, base_mapper ) 
 
-# read json +  bakc to groups what we are looking for
-
+# read json +  bakc to groups 
 """
 [
     {
