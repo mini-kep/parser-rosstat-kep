@@ -40,7 +40,7 @@ Pseudocode
 
 TODOS
 =====
-- [ ] find old definition in git eg https://github.com/mini-kep/parser-rosstat-kep/blob/archive_master_1/src/kep/parsing_definition/default.json
+- [ ] find old definition in git eg 
 - [ ] restore more definitons (fro groups)
 
 
@@ -51,8 +51,8 @@ ERRORS
 
 IDEAS
 =====
+- [ ] plot(label, freq)
 - [ ] varibale descriptions (ru and en)
-- [ ] write parsign result in session - 110 months, 5 labels
 - [ ] grouping of variables for Excel file 
 - [ ] add check all variables in parsing definition are covered with checkpoints 
 - [ ] read environment variable /  structure as package with setuptools
@@ -75,6 +75,8 @@ FINAL USE
 
 DONE
 ====
+- [x] https://github.com/mini-kep/parser-rosstat-kep/blob/archive_master_1/src/kep/parsing_definition/default.json
+- [x] write parsign result in session - 110 months, 5 labels
 - [x] fixed: fails with corporate profits
 - [x] restore to_latest() and to_excel() functions
 - [x] get latest months in 2018 
