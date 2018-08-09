@@ -1,3 +1,4 @@
+# Replicate GDP
 # Deflate retail sales
 # Relationship between price indices?
 # Do profits predict investment?
@@ -15,6 +16,9 @@
     
 - Investment:
     - INVESTMENT
+
+- Corporate finance:
+    - PROFIT_MINING
     
 - Prices:
     - CPI
@@ -24,8 +28,11 @@
     - CPI_SERVICES
     - PPI
     
+- Exchange rates:
+    - FXUSD
+    - FXEUR        
+    
 - Wages and income:
-
     - WAGE_NOMINAL
     - WAGE_REAL
     - PINCOME_NOMINAL
@@ -40,16 +47,9 @@
     - UNEMPL
     - POPULATION
     
-- Corporate finance:
-    - PROFIT_MINING
-    
 - Government finances:
     - GOV_REVENUE
-    - GOV_EXPENSES
-    
-- Exchange rates:
-    - FXUSD
-    - FXEUR    
+    - GOV_EXPENSES   
     
 - Foreign trade:
     - EXPORT_GOODS

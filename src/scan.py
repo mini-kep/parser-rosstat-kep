@@ -217,27 +217,30 @@ def get_groups(filepath):
     groups = [(first_key(x), x[first_key(x)]) for x in items]
     return OrderedDict(groups)
 
-GROUPS = get_groups('groups.yml')
+def first_key(d):
+    return list(d.keys())[0]
+
+GROUPS = get_groups('param//groups.yml')
 
 def with_comma(items):
     return ", ".join(items)
+
+def get_underscored_labels(label_list, name):
+    return [underscore(name, unit) for _name, unit in label_list if _name == name]
     
-def print_reference(tables):    
+def print_reference(tables, groups = GROUPS):
     print(varcount(tables), "variables and", len(tables), "labels")
     label_list = labels(tables)
     name_list = names(tables)
     found = []
-    for group, group_names in GROUPS.items():
+    for group, group_names in groups.items():
         print(group)
         for name in group_names:            
             if name in name_list:
                 found.append(name)  
-                labels_for_name = [underscore(name, unit) 
-                                   for _name, unit in label_list
-                                   if _name == name]
-                msg = with_comma(labels_for_name)                                    
+                msg = with_comma(get_underscored_labels(label_list, name))                                    
                 print(f"    {name} ({msg})")           
-    group_names = [x for _names in GROUPS.values() for x in _names]
+    group_names = [x for _names in groups.values() for x in _names]
     nf = set(group_names) - set(found)
     if nf:
         print('\nNot found in data\n   ', with_comma(nf))
@@ -246,14 +249,16 @@ def print_reference(tables):
         print('\nNot listed in groups\n   ', with_comma(ng))   
                   
 
-def first_key(d):
-    return list(d.keys())[0]
 
 if __name__ == '__main__':
-    common_dicts, segment_dicts = get_parsing_parameters('instructions.yml') 
-    base_mapper = get_unit_mapper('base_units.yml')
-    tables = main(common_dicts, segment_dicts, base_mapper)    
+    common_dicts, segment_dicts = get_parsing_parameters('param//instructions.yml') 
+    base_mapper = get_unit_mapper('param//base_units.yml')
+    tables = main(common_dicts, segment_dicts, base_mapper)  
+    values = datapoints(tables)
     print_reference(tables)
     
-
+    from fax import get_checkpoints, check
+    c = get_checkpoints('param//checkpoints.yml')
+    check(values, **c)
+    # reference needed: what is not covered by checkpoints?
     
