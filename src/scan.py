@@ -245,7 +245,7 @@ def main(common_dicts, segment_dicts, base_mapper):
         last = get_parsed_tables(tables, common_dicts, segment_dicts,  base_mapper)
     return last    
 
-# batch reference     
+# results reference     
 def get_groups(filepath):
     def _first_key(d):
         return tuple(d)[0]
@@ -264,17 +264,8 @@ class Grouper:
     def items(self):
         return self.groups.items()
     
-    def minus(self, x):
-        return list(self.names - set(x))    
-
-    def outside(self, x):
-        return list(set(x) - self.names)
-    
-    def includes_too_much(self, x):        
-        return 'Not found in data\n    %s' % with_comma(self.minus(x))
-
-    def includes_too_little(self, x):
-        return 'Not listed in groups\n    %s' % with_comma(self.outside(x))  
+    def found(self, tables):
+        return [name for name in names(tables) if name in self.names]
 
 GROUPER = Grouper('param//groups.yml')
 
@@ -284,24 +275,28 @@ def filtered_labels(label_list, name):
 
 def with_comma(items):
     return ", ".join(items)
+
+def cover(tables, grouper):
+    found = grouper.found(tables)
+    _names = names(tables)
+    return set(found)-set(_names) or '' , set(_names)-set(found) or ''
+    
     
 def print_reference(tables, grouper = GROUPER):
     print(varcount(tables), "variables and", len(tables), "labels")
     label_list = labels(tables)
     name_list = names(tables)
-    found = []
-    for group, group_names in grouper.items():
-        print(group)
+    for group_header, group_names in grouper.items():
+        print(group_header)
         for name in group_names:            
-            if name in name_list:
-                found.append(name)  
-                group_labels = filtered_labels(label_list, name)
-                msg = with_comma(group_labels)            
-                print("    {} ({})".format(name, msg))           
-    if grouper.minus(found):
-        print(grouper.includes_too_much(found))
-    if grouper.outside(found): 
-        print(grouper.includes_too_little(found))
+            if name in name_list:                
+                msg = with_comma(filtered_labels(label_list, name))            
+                print("    {} ({})".format(name, msg))  
+    missing, extras = cover(tables, grouper)
+    if extras:
+       print(extras)            
+    if missing:
+        print('Also found in dataset:', extras)
 
 if __name__ == '__main__':
     common_dicts, segment_dicts = get_parsing_parameters('param//instructions.yml') 

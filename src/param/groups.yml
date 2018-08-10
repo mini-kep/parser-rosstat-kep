@@ -1,16 +1,18 @@
-# Replicate GDP
-# Deflate retail sales
+# Replicate GDP as C + I + G + NX
 # Relationship between price indices?
 # Do profits predict investment?
 # Consumer behaviour?
 # FX vs trade deficit
 # Loans and interest rates
-# Smoothing
+# Proxies for missing values 
 
-- Output and business activity:
+- Aggregate business activity:
     - GDP
     - INDPRO
     - AGROPROD
+    - CONSTRUCTION
+    
+- Output:    
     - TRANSPORT_FREIGHT
     - DWELL
     
@@ -30,13 +32,13 @@
     
 - Exchange rates:
     - FXUSD
-    - FXEUR        
-    
+    - FXEUR 
+   
 - Wages and income:
     - WAGE_NOMINAL
     - WAGE_REAL
-    - PINCOME_NOMINAL
-    - PINCOME_NOMINAL
+    - PERSONAL_NOMINAL
+    - PERSONAL_NOMINAL
     
 - Consumer demand:
     - RETAIL_SALES
@@ -48,8 +50,8 @@
     - POPULATION
     
 - Government finances:
-    - GOV_REVENUE
-    - GOV_EXPENSES   
+    - ACCUM_GOV_REVENUE_CONSOLIDATED
+    - ACCUM_GOV_EXPENSE_CONSOLIDATED   
     
 - Foreign trade:
     - EXPORT_GOODS
