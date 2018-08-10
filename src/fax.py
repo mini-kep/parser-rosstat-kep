@@ -15,33 +15,36 @@ def to_datapoint(name: str, args: list):
         month = 12
     return Datapoint(name, freq, int(year), int(month), float(value))
 
+class Validator:
+    def __init__(self, filepath):
+        self.doc = load_yaml_one_document(filepath)
+        
+    def mandatory(self):   
+        alls = []
+        for string in self.doc['all']:
+            name, *args = split(string)
+            x = to_datapoint(name, args)
+            alls.append(x) 
+        return alls    
+            
+    def optional(self):        
+        return [[to_datapoint(name, split(s)) for s in strings]
+                 for name, strings in self.doc['any'].items()]
 
-def extract_datapoints(doc: dict):    
-    return [[to_datapoint(name, split(s)) for s in strings]
-             for name, strings in doc.items()] 
-
-
-def get_checkpoints(filepath):
-    doc = load_yaml_one_document(filepath)
-    alls = []
-    for string in doc['all']:
-        name, *args = split(string)
-        x = to_datapoint(name, args)
-        alls.append(x)    
-    anys = extract_datapoints(doc['any'])
-    return dict(any_list=anys, all_list=alls)
-
-all_list, any_lists = get_checkpoints('param//checkpoints.yml')
+def validate(datapoints, filepath):
+    v = Validator(filepath)
+    checkpoints = v.mandatory()
+    require_all(checkpoints, datapoints)
+    for checkpoints in v.optional():
+        require_any(checkpoints, datapoints)
+    print("All values checked")    
 
 
 class ValidationError(Exception):
     pass        
-
-def contains_which(checkpoints, datapoints):
-    return [c for c in checkpoints if c in datapoints]
-   
+  
 def require_any(checkpoints, datapoints):   
-    found = contains_which(checkpoints, datapoints)
+    found = [c for c in checkpoints if c in datapoints]
     if not found:
         raise ValidationError(f'Found none of: {checkpoints}')
     return found    
@@ -51,10 +54,4 @@ def require_all(checkpoints, datapoints):
         if x not in datapoints:
             raise ValidationError(f'Required value not found: {x}')
     return checkpoints         
-
-def check(datapoints, any_list, all_list):
-    for checkpoints in any_list:
-        require_any(checkpoints, datapoints)
-    require_all(all_list, datapoints)
-    print('All checks passed')
     

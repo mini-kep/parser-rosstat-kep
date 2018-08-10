@@ -10,27 +10,32 @@ from locations import interim_csv
 
 ALL_DATES = date_span('2009-04', '2018-06')       
 
-# label assertions
+# label assertion
 
 def expected_labels(name, units):
     return [(name, unit) for unit in iterate(units)]
 
-def message_not_found(expected_label, current_labels):
-    return f'expected label {expected_label} not found in {current_labels}'
+def raise_not_found(not_found_list, current_labels):
+    msg = f'expected label(s) {not_found_list} not found in {current_labels}'
+    raise AssertionError(msg)
+
+def not_found(current_labels, name, units):
+    expected_label_list = expected_labels(name, units)
+    return [x for x in expected_label_list if x not in current_labels]
 
 def assert_labels_found(tables, name, units):
+    """Assert that labels defined by *name* and *units*
+       are found in *tables*.
+    """   
     current_labels = labels(parsed(tables)) 
-    expected_label_list = expected_labels(name, units)
-    for lab in expected_label_list:
-        if lab not in current_labels:
-            msg = message_not_found(lab, current_labels)
-            print(msg)
-            #import pdb; pdb.set_trace()
-            raise AssertionError(msg)            
+    not_found_list = not_found(current_labels, name, units)
+    if not_found_list:
+        raise_not_found(not_found_list, current_labels)
 
 # atomic parsing functions
     
 def parse_units(tables, base_mapper):
+    """Stage 1 of the table parsing algorithm."""
     for t in tables:
         for header in t.headers:
             unit = base_mapper.extract(header)
@@ -58,9 +63,12 @@ def assign_format(tables, fmt):
 def trail_down_names(tables, name, units):
     """Assign trailing variable names in tables.
 
-      We look for a case where a table name is defined once and there are
-      following tables with expected unit names, but no variable name
-      specified. In this case we assign table name similar to previous table.
+      We look for a case where: 
+      - a table name is defined once and 
+      - there are following tables with expected unit тфьуы
+      - but no variable name specified. 
+      
+      In this case we assign table name to previous table name.
     """
     _units = copy(iterate(units))
     trailing_allowed = False
@@ -72,11 +80,11 @@ def trail_down_names(tables, name, units):
             if table.unit in _units:
                 # unit already found, exclude it from futher search
                 _units.remove(table.unit)
-        if (i > 0 and
+        condition = (i > 0 and
             trailing_allowed and
             table.name is None and
-            table.unit in _units):
-            # then
+            table.unit in _units)        
+        if condition:
             table.name = tables[i - 1].name
             _units.remove(table.unit)
             
@@ -106,12 +114,15 @@ def trim_end(tables, end_strings):
 def varcount(tables):
     return len(names(tables))
 
-def underscore(name, unit):
-    return f"{name}_{unit}"    
+def underscore(label: tuple):
+    name, unit = label 
+    return f"{name}_{unit}"
 
 def names(tables):
-    res = []    
-    [res.append(t.name) for t in tables if t.name not in res]
+    res = []
+    for t in tables:
+        if t.name not in res:
+            res.append(t.name)
     return res   
 
 def labels(tables):
@@ -139,19 +150,20 @@ def dataframes(tables):
     return dfa, dfq, dfm        
         
 
-# get parameters and data
+# get parameters and data from filepaths
 
 def get_parsing_parameters(filepath):
-    return get_common(filepath), get_segments(filepath) 
+    return _get_common(filepath), _get_segments(filepath) 
 
-def read_parameters(filepath, pivot_key):
+def _read_parameters(filepath, pivot_key):
+    """Read dictionaries from YAML file if *pivot_key* is there."""
     return [x for x in load_yaml(filepath) if pivot_key in x.keys()]
 
-def get_common(filepath):
-    return read_parameters(filepath, 'name')
+def _get_common(filepath):
+    return _read_parameters(filepath, 'name')
 
-def get_segments(filepath):
-    return read_parameters(filepath, 'start_with')    
+def _get_segments(filepath):
+    return _read_parameters(filepath, 'start_with')    
 
 def get_unit_mapper(filepath):
     return UnitMapper(load_yaml(filepath)[0])
@@ -169,6 +181,10 @@ def parse_after_units(tables,
                       force_units=False, 
                       row_format=None,
                       mandatory=True):
+    """Assign variable names to *tables* and perform optional mappings.    
+       This is Stage 2 of the table parsing algorithm.
+       All function arguments except *tables* are keys in YAML dictionaries.
+    """
     parse_headers(tables, name, headers)
     trail_down_names(tables, name, units)
     if force_units:
@@ -176,19 +192,36 @@ def parse_after_units(tables,
     if row_format:
         assign_format(tables, row_format)
     if mandatory:        
-       assert_labels_found(tables, name, units)
+        assert_labels_found(tables, name, units)
+
+def apply_commands(tables, dicts):
+    for d in dicts:
+          parse_after_units(tables, **d)
+    return tables      
+    
 
 def parse_common(tables, common_dicts, base_mapper):
-    parse_units(tables, base_mapper)         
-    for d in common_dicts:
-          parse_after_units(tables, **d)
+    """Parse *tables* without cutting a segment of them."""
+    # stage 1 - define units in tables
+    parse_units(tables, base_mapper)      
+    # stage 2 - define headers and other mapping 
+    tables = apply_commands(tables, common_dicts)
     return parsed(tables)
 
-def parse_segment(tables, start_with, end_with, commands):
+def parse_segment(tables, start_with, end_with, commands):    
+    """Trim and parse *tables*.
+    
+    Args:
+      _tables - list Talble instances  
+      start_with, end_with are lists of strings
+      commands - list of dictionaries.      
+    
+    All args except tables are dictionary keys in a YAML file.
+    """
+    # note: did not work out as inline functions, using assignments
     tables = trim_start(tables, start_with)
     tables = trim_end(tables, end_with)
-    for p in commands:
-        parse_after_units(tables, **p)
+    tables = apply_commands(tables, commands)
     return parsed(tables)       
 
 def get_parsed_tables(tables, 
@@ -196,12 +229,13 @@ def get_parsed_tables(tables,
                       segment_dicts,
                       base_mapper):    
     parse_units(tables, base_mapper)
-    res = parse_common(tables, common_dicts, base_mapper)       
-    for d in segment_dicts:
-        _tables = copy(tables)     
-        _res = parse_segment(_tables, **d)
-        res.extend(_res)
-    return res    
+    parsed_tables = parse_common(tables, common_dicts, base_mapper)       
+    for sd in segment_dicts:
+        # make a copy, otherwise we will sploil the next run of function
+        tables2 = copy(tables)
+        new_tables = parse_segment(tables2, **sd)
+        parsed_tables.extend(new_tables)
+    return parsed_tables    
 
 def main(common_dicts, segment_dicts, base_mapper):
     """Run parsing for all dates and return latest set of tables."""
@@ -213,42 +247,61 @@ def main(common_dicts, segment_dicts, base_mapper):
 
 # batch reference     
 def get_groups(filepath):
+    def _first_key(d):
+        return tuple(d)[0]
     items = load_yaml(filepath)[0]  
-    groups = [(first_key(x), x[first_key(x)]) for x in items]
+    groups = [(_first_key(x), x[_first_key(x)]) for x in items]
     return OrderedDict(groups)
 
-def first_key(d):
-    return list(d.keys())[0]
+class Grouper:
+    def __init__(self, filepath):
+        self.groups = get_groups(filepath)
+    
+    @property
+    def names(self):
+        return set([x for _names in self.groups.values() for x in _names])
+    
+    def items(self):
+        return self.groups.items()
+    
+    def minus(self, x):
+        return list(self.names - set(x))    
 
-GROUPS = get_groups('param//groups.yml')
+    def outside(self, x):
+        return list(set(x) - self.names)
+    
+    def includes_too_much(self, x):        
+        return 'Not found in data\n    %s' % with_comma(self.minus(x))
+
+    def includes_too_little(self, x):
+        return 'Not listed in groups\n    %s' % with_comma(self.outside(x))  
+
+GROUPER = Grouper('param//groups.yml')
+
+def filtered_labels(label_list, name):
+    labels = [(name, unit) for _name, unit in label_list if _name == name] 
+    return list(map(underscore, labels))
 
 def with_comma(items):
     return ", ".join(items)
-
-def get_underscored_labels(label_list, name):
-    return [underscore(name, unit) for _name, unit in label_list if _name == name]
     
-def print_reference(tables, groups = GROUPS):
+def print_reference(tables, grouper = GROUPER):
     print(varcount(tables), "variables and", len(tables), "labels")
     label_list = labels(tables)
     name_list = names(tables)
     found = []
-    for group, group_names in groups.items():
+    for group, group_names in grouper.items():
         print(group)
         for name in group_names:            
             if name in name_list:
                 found.append(name)  
-                msg = with_comma(get_underscored_labels(label_list, name))                                    
-                print(f"    {name} ({msg})")           
-    group_names = [x for _names in groups.values() for x in _names]
-    nf = set(group_names) - set(found)
-    if nf:
-        print('\nNot found in data\n   ', with_comma(nf))
-    ng = set(name_list) - set(group_names)
-    if ng: 
-        print('\nNot listed in groups\n   ', with_comma(ng))   
-                  
-
+                group_labels = filtered_labels(label_list, name)
+                msg = with_comma(group_labels)            
+                print("    {} ({})".format(name, msg))           
+    if grouper.minus(found):
+        print(grouper.includes_too_much(found))
+    if grouper.outside(found): 
+        print(grouper.includes_too_little(found))
 
 if __name__ == '__main__':
     common_dicts, segment_dicts = get_parsing_parameters('param//instructions.yml') 
@@ -257,8 +310,7 @@ if __name__ == '__main__':
     values = datapoints(tables)
     print_reference(tables)
     
-    from fax import get_checkpoints, check
-    c = get_checkpoints('param//checkpoints.yml')
-    check(values, **c)
-    # reference needed: what is not covered by checkpoints?
+    from fax import validate
+    validate(values, 'param//checkpoints.yml')
+    
     
