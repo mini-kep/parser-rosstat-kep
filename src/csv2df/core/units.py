@@ -1,4 +1,4 @@
-from kep.util import load_yaml_one_document
+from csv2df.util import load_yaml_one_document
 
 __all__ = ['UnitMapper', 'get_mapper']
 
@@ -32,7 +32,7 @@ class UnitMapper:
         return ''
 
     def __repr__(self):
-        return repr(self.mapper_dict)
+        return "UnitMapper(%s)" % self.mapper_dict
 
 
 def get_mapper(source: str)-> UnitMapper:

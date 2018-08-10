@@ -1,5 +1,5 @@
 ﻿from collections import namedtuple
-from kep.parser.filters import is_omission, clean_year, clean_value
+from csv2df.core.filters import is_omission, clean_year, clean_value
 
 __all__ = ['Datapoint', 'emit_datapoints']
 

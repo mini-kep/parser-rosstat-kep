@@ -1,7 +1,6 @@
 """Check datapoints with control values."""
-from kep.util import load_yaml_one_document
-from kep.parser.row import Datapoint
-
+from csv2df.core.row import Datapoint
+from csv2df.util import load_yaml_one_document
 
 def split(string):
     string = string.replace('  ', ' ')
@@ -52,10 +51,6 @@ def require_all(checkpoints, datapoints):
         if x not in datapoints:
             raise ValidationError(f'Required value not found: {x}')
     return checkpoints             
-
-def get_checkpoints(filepath):
-    v = Checkpoints(filepath)
-    return v.mandatory(), v.optional()
 
 def validate(datapoints, checkpoints, optional_lists):
     """Check datapoints with control values found in YAML file at *filepath*.

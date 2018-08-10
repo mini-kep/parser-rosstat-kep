@@ -7,7 +7,7 @@ import os
 import yaml
 
 
-__all__ = ['make_label', 'iterate', 'timestamp', 'load_yaml']
+__all__ = ['make_label', 'timestamp', 'load_yaml']
 
 
 def make_label(name: str, unit: str)-> str:
@@ -17,14 +17,6 @@ def make_label(name: str, unit: str)-> str:
         str, like 'CPI_rog'
     """
     return '{}_{}'.format(name, unit)
-
-
-def iterate(x)-> list:
-    """Mask string as [x] list."""
-    if isinstance(x, str):
-        return [x]
-    else:
-        return x
 
 
 def last_day(year: int, month: int) -> int:
@@ -84,6 +76,14 @@ def accept_filename(func):
     return wrapper
 
 # FIXME: decorated fucntion docstring not appearing in spynx docs
+
+def load_yaml_from_file(filename: str):
+    """Load YAML contents of *doc* string or filename.
+       Always return a list. Each list element is a YAML document content.
+    """
+    doc = read_source(filename)
+    return list(yaml.load_all(doc))
+
 
 
 @accept_filename

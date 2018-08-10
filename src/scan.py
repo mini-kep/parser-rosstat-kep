@@ -1,14 +1,19 @@
 from copy import copy
-from collections import OrderedDict
+from profilehooks import profile
 
-from kep.util import iterate, load_yaml
-from kep.dates import date_span
-from kep.parser.reader import get_tables as read_tables
-from kep.parser.units import UnitMapper
-from kep.session.dataframes import unpack_dataframes
+from csv2df import read_tables, unpack_dataframes, validate, ParsingParameters
+from dates import date_span
 from locations import interim_csv
 
 ALL_DATES = date_span('2009-04', '2018-06')       
+
+
+def iterate(x)-> list:
+    """Mask string as [x] list."""
+    if isinstance(x, str):
+        return [x]
+    else:
+        return x
 
 # label assertion
 
@@ -148,29 +153,6 @@ def dataframes(tables):
        from parsed tables."""
     dfa, dfq, dfm = unpack_dataframes(datapoints(tables))
     return dfa, dfq, dfm        
-        
-
-# get parameters and data from filepaths
-
-def get_parsing_parameters(filepath):
-    return _get_common(filepath), _get_segments(filepath) 
-
-def _read_parameters(filepath, pivot_key):
-    """Read dictionaries from YAML file if *pivot_key* is there."""
-    return [x for x in load_yaml(filepath) if pivot_key in x.keys()]
-
-def _get_common(filepath):
-    return _read_parameters(filepath, 'name')
-
-def _get_segments(filepath):
-    return _read_parameters(filepath, 'start_with')    
-
-def get_unit_mapper(filepath):
-    return UnitMapper(load_yaml(filepath)[0])
-
-def get_tables(year, month):
-    path = interim_csv(year, month)
-    return read_tables(path)
 
 # parsing batch functions
 
@@ -197,8 +179,7 @@ def parse_after_units(tables,
 def apply_commands(tables, dicts):
     for d in dicts:
           parse_after_units(tables, **d)
-    return tables      
-    
+    return tables          
 
 def parse_common(tables, common_dicts, base_mapper):
     """Parse *tables* without cutting a segment of them."""
@@ -224,6 +205,10 @@ def parse_segment(tables, start_with, end_with, commands):
     tables = apply_commands(tables, commands)
     return parsed(tables)       
 
+def get_tables(year, month):
+    path = interim_csv(year, month)
+    return read_tables(path)
+
 def get_parsed_tables(tables, 
                       common_dicts, 
                       segment_dicts,
@@ -237,6 +222,7 @@ def get_parsed_tables(tables,
         parsed_tables.extend(new_tables)
     return parsed_tables    
 
+@profile(immediate=True, entries=20)
 def main(common_dicts, segment_dicts, base_mapper):
     """Run parsing for all dates and return latest set of tables."""
     for year, month in ALL_DATES:
@@ -245,68 +231,12 @@ def main(common_dicts, segment_dicts, base_mapper):
         last = get_parsed_tables(tables, common_dicts, segment_dicts,  base_mapper)
     return last    
 
-# results reference     
-def get_groups(filepath):
-    def _first_key(d):
-        return tuple(d)[0]
-    items = load_yaml(filepath)[0]  
-    groups = [(_first_key(x), x[_first_key(x)]) for x in items]
-    return OrderedDict(groups)
-
-class Grouper:
-    def __init__(self, filepath):
-        self.groups = get_groups(filepath)
-    
-    @property
-    def names(self):
-        return set([x for _names in self.groups.values() for x in _names])
-    
-    def items(self):
-        return self.groups.items()
-    
-    def found(self, tables):
-        return [name for name in names(tables) if name in self.names]
-
-GROUPER = Grouper('param//groups.yml')
-
-def filtered_labels(label_list, name):
-    labels = [(name, unit) for _name, unit in label_list if _name == name] 
-    return list(map(underscore, labels))
-
-def with_comma(items):
-    return ", ".join(items)
-
-def cover(tables, grouper):
-    found = grouper.found(tables)
-    _names = names(tables)
-    return set(found)-set(_names) or '' , set(_names)-set(found) or ''
-    
-    
-def print_reference(tables, grouper = GROUPER):
-    print(varcount(tables), "variables and", len(tables), "labels")
-    label_list = labels(tables)
-    name_list = names(tables)
-    for group_header, group_names in grouper.items():
-        print(group_header)
-        for name in group_names:            
-            if name in name_list:                
-                msg = with_comma(filtered_labels(label_list, name))            
-                print("    {} ({})".format(name, msg))  
-    missing, extras = cover(tables, grouper)
-    if extras:
-       print(extras)            
-    if missing:
-        print('Also found in dataset:', extras)
-
 if __name__ == '__main__':
-    common_dicts, segment_dicts = get_parsing_parameters('param//instructions.yml') 
-    base_mapper = get_unit_mapper('param//base_units.yml')
-    tables = main(common_dicts, segment_dicts, base_mapper)  
-    values = datapoints(tables)
-    print_reference(tables)
-    
-    from fax import validate, get_checkpoints
-    mandatory, optional = get_checkpoints('param//checkpoints.yml')
-    validate(values, mandatory, optional)
-    
+    # must lazy import, will loop otherwise
+    from man import print_reference
+    p = ParsingParameters()
+    tables = main(p.common_dicts, p.segment_dicts, p.mapper)  
+    values = datapoints(tables)    
+    print_reference(tables, p.grouper)
+    validate(values, p.mandatory, p.optional)    
     

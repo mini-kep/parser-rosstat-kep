@@ -4,11 +4,11 @@ from enum import Enum, unique
 import re
 import pprint
 
-from kep.parser.row import get_row_format, emit_datapoints
-from kep.util import make_label
+from csv2df.core.row import get_row_format, emit_datapoints
+from csv2df.util import make_label
 
 
-__all__ = ['get_tables', 'split_csv', 'Table']
+__all__ = ['read_tables', 'split_csv', 'Table']
 
 # 'I' accounts for quarterly headers in I, II, III and IV
 RE_LITERALS = re.compile(r'[а-яI]')
@@ -27,7 +27,7 @@ def is_allowed(row):
     return row and '_' not in row
 
 
-def get_tables(filepath: str):
+def read_tables(filepath: str):
     rows = filter(is_allowed, read_csv(filepath))
     table_dicts = split_csv(rows)
     return [Table(**td) for td in table_dicts]

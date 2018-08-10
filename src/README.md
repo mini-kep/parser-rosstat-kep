@@ -37,6 +37,11 @@ Pseudocode
 4. create pandas dataframes by frequency
 5. deacculmulate some dataframes
 
+NOTES
+=====
+- [Profiling reference](https://www.blog.pythonlibrary.org/2016/05/24/python-101-an-intro-to-benchmarking-your-code)
+- [Packaging reference](http://python-packaging.readthedocs.io/en/latest/testing.html)
+
 
 TODOS
 =====

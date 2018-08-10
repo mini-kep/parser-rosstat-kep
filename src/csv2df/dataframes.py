@@ -1,6 +1,6 @@
 import pandas as pd
 import warnings
-from kep.util import timestamp
+from csv2df.util import timestamp
 
 __all__ = ['unpack_dataframes']
 

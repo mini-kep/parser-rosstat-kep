@@ -1,3 +1,4 @@
+import random
 import pandas as pd
 
 
@@ -15,6 +16,9 @@ def supported_dates(start_date='2009-04', exclude_dates=['2013-11']):
 
 
 SUPPORTED_DATES = supported_dates()
+
+def random_date():
+    return random.choice(SUPPORTED_DATES[:-2])
 
 
 def assert_supported(year, month):
