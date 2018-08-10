@@ -310,7 +310,8 @@ if __name__ == '__main__':
     values = datapoints(tables)
     print_reference(tables)
     
-    from fax import validate
-    validate(values, 'param//checkpoints.yml')
+    from fax import validate, get_checkpoints
+    mandatory, optional = get_checkpoints('param//checkpoints.yml')
+    validate(values, mandatory, optional)
     
     
