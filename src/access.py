@@ -30,11 +30,22 @@ def read_dataframe(path):
  
 
 def get_dataframe(year, month, freq):
-    """Read dataframe from local folder"""
+    """Read processed dataframe from local folder by *year* and *month*."""
     path = kep.processed_csv(year, month, freq)
     return read_dataframe(path)
 
 
 def get_df_latest(freq):
+    """Read processed dataframe from local *latest* folder."""
     path = kep.latest_csv(freq)
     return read_dataframe(path)
+
+
+def get_dataframe_from_web(frequency):
+    """Read dataframe by frequency from stable URL."""
+    if frequency not in ['a', 'q', 'm']:
+        raise ValueError(f'{frequency} must be a, q or m')
+    url = ('https://raw.githubusercontent.com/mini-kep/parser-rosstat-kep/'
+          f'master/data/processed/latest/df{frequency}.csv')
+    return pd.read_csv(url, converters={0: pd.to_datetime}, index_col=0)
+

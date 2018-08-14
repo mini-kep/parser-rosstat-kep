@@ -131,7 +131,7 @@ def add(ctx, year, month):
 
 
 class PathContext():    
-    path=str(Path(__file__).parent / 'src')
+    path=str(PROJECT_DIR / 'src')
     
     def __init__(self):
         pass
