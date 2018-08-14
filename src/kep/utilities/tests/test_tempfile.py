@@ -10,7 +10,7 @@ def test_TempFile():
 def test_TempFile_is_not_readable_on_different_encoding():
     text = 'конь-огонь'
     with TempFile(text) as filename:
-        assert text != pathlib.Path(filename).read_text()  
+        assert text != pathlib.Path(filename).read_text(encoding='ansi')  
 
 
 

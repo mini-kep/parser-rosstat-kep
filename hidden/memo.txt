@@ -1,0 +1,43 @@
+tests in dataframe
+
+Pains and lessons of writing a Rosstat data parser.
+
+Someone said there are two ways to obscure statistics: hide it or show too much of it. 
+In Russia I think there is a third way: publish it as Microsoft Word files. 
+(Well, forth way is PDF files of image scans.)
+I'm old enough to remember it when paper publication was the only 
+way to obtain the official economic statistics and you had to type in the new digits from a paper book to Excel
+(earlier - to SuperCalc, but I'm not that old). 
+
+When Rosstat went on to putting these publications electronically on its web site and for free 
+this was a breakthough, but I think it was around 10-15 years ago. The problem is that a book-like "publication" 
+still remains a number one distribution channel, and despite allowing some access to databases, 
+"витрины данных", open data (and even a strategy for open data) and occasional Excel files. None of that really work 
+for you if you want machine-readable time series of Russian macroeconomic data. And then there is FRED,
+there getting inflation time series is as easy as typing https://fred.stlouisfed.org/series/CPIAUCSL.
+We hate saying something works better in the US, but yes, here it does. 
+
+Coding experiences 
+==================
+- My stack: 
+
+- Data Science cookiecuter
+
+- 
+
+- Decoupling
+
+- Things that enlight me:
+
+- Thinks I could do better with:
+
+Non-coding Afterthoughts
+========================
+
+- Zero community
+
+- Rethinking official statistics 
+
+- Upwork inflation 
+
+- Use case for economic statistics and analyst automation 

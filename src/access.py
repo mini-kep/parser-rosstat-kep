@@ -1,3 +1,4 @@
+import kep
 from pathlib import Path
 from io import StringIO
 import pandas as pd
@@ -23,8 +24,17 @@ def proxy(path):
     return StringIO(content)
 
 
+def read_dataframe(path):
+    filelike = proxy(path)
+    return read_csv(filelike)   
+ 
+
 def get_dataframe(year, month, freq):
     """Read dataframe from local folder"""
-    path = processed_csv(year, month, freq)
-    filelike = proxy(path)
-    return read_csv(filelike)
+    path = kep.processed_csv(year, month, freq)
+    return read_dataframe(path)
+
+
+def get_df_latest(freq):
+    path = kep.latest_csv(freq)
+    return read_dataframe(path)

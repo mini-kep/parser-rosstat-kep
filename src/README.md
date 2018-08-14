@@ -48,17 +48,20 @@ NOTES
 
 TODOS
 =====
+- [ ] update database
 - [ ] restore more definitons
-- [ ] tests for load subpackage omitted
 - [ ] coverage of checkpoints
+- [ ] 'hidden\code_extras' for writing a pdf
 
 ERRORS
 ======
 - [ ] must use 'a' as 'm12' in 'fiscal' row format
+- [ ] https://codecov.io/gh/mini-kep/parser-rosstat-kep/branch/dev does not update
 
 
 IDEAS
 =====
+- [ ] essay / writeup
 - [ ] plot(label, freq)
 - [ ] varibale descriptions (ru and en)
 - [ ] grouping of variables for Excel file 
@@ -68,7 +71,8 @@ IDEAS
 
 WONTFIX
 =======
-- /index.html#module-kep
+- /index.html#module-kep needs more docstrings
+- [ ] tests for load subpackage omitted
 - [ ] better check than `assert not dfa.empty`
 - [ ] need better regex in kep.filters
 
@@ -100,6 +104,5 @@ DONE
 - [x] find old definition in git eg 
 - [x] tests for dataframes onitted
 
-Writeup
-=======
+
 
