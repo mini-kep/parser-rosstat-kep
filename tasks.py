@@ -53,7 +53,7 @@ def clean(ctx):
 
 
 @task
-def lint(ctx, folder="src/csv2df"):
+def lint(ctx, folder="src"):
     """Check style with flake8
 
        See more flake8 usage at:
@@ -65,33 +65,39 @@ def lint(ctx, folder="src/csv2df"):
 
 # documentation 
 
-def apidoc(subpkg=None, exclude=''):
+# FIXME
+def apidoc(exclude=''):
     """Call sphinx-apidoc to document *pkg* package without files
        in *exclude* pattern. """
-    rst_source_dir = os.path.join('doc', 'rst')    
+    rst_source_dir = 'docs'
     pkg_dir = 'src'
-    if subpkg is not None:
-        pkg_dir = os.path.join('src', subpkg)
     flags = '--module-first --no-toc --force' 
     return f'sphinx-apidoc {flags} -o {rst_source_dir} {pkg_dir} {exclude}'
 
 
+# FIXME
 @task
 def rst(ctx):
     """Build new rst files with sphinx-apidoc"""
-    command = apidoc(exclude='*tests* *example*')
+    command = apidoc(exclude='*test* *__init__.py')
     ctx.run(command)
 
 
+# FIXME
 @task
-def doc(ctx):
-    source_dir = os.path.join('doc', 'rst')
-    html_dir = os.path.join('doc', 'html')
-    index_html = os.path.join(html_dir, 'index.html')
+def make_html(ctx):
+    """Equivalent of *make html*."""
+    source_dir = str(PROJECT_DIR / 'docs')
+    html_dir = str(source_dir / '_build' / 'html')
     build_command = f'sphinx-build -b html {source_dir} {html_dir}'
     ctx.run(build_command)
+
+
+@task
+def man(ctx):
+    index_html = PROJECT_DIR / 'docs' / '_build' / 'html' / 'index.html'
     if platform == "win32":
-        ctx.run('start {}'.format(index_html))
+        ctx.run(f'start {index_html}')      
 
 
 @task
@@ -104,12 +110,12 @@ def find(ctx, regex):
 
 @task
 def test(ctx):
-    ctx.run("py.tests src --doctest-modules")  # --cov=csv2df
+    ctx.run("py.test src")
 
 
 @task
 def cov(ctx):
-    ctx.run("py.test src/python-minimal/test_reader.py src/python/tests/")
+    ctx.run("py.test src -cov=src")
     ctx.run("coverage report --include=src/* --omit=*/__init__.py,*/test_*")
 
 
@@ -147,7 +153,7 @@ ns = Collection()
 for t in [ls, clean,
           pep8, lint,
           test, cov,
-          doc, rst,
+          man, make_html, rst,
           find,
           add]:
     ns.add_task(t)

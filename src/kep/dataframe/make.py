@@ -1,6 +1,5 @@
 import calendar
 import pandas as pd
-import warnings
 
 __all__ = ['unpack_dataframes']
 

@@ -116,7 +116,7 @@ def trail_down_names(tables, name, units):
             table.name = tables[i - 1].name
             _units.remove(table.unit)
 
- # limit scope
+# limit scope
 
 
 def trim_start(tables, start_strings):

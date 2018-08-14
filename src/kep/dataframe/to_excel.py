@@ -10,5 +10,5 @@ def save_excel(filepath: str, a, q, m):
         q.to_excel(writer, sheet_name='quarter')
         m.to_excel(writer, sheet_name='month')
         # TODO: add variable names
-        #self.df_vars().to_excel(writer, sheet_name='variables')
+        # self.df_vars().to_excel(writer, sheet_name='variables')
     return 'Saved Excel file to {}'.format(filepath)
