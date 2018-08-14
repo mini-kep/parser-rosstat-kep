@@ -25,29 +25,32 @@ Three pandas dataframes at annual, quarterly and monthly frequencies
 Pseudocode
 ==========
 
-1. split incoming CSV file to tables, containign header text lines and data
-2. repeat for all given parsing instruction: 
-   -  a. apply parsing instructions to limit block of tables 
-    - b. apply parsing instructions to table headers in block of tables 
-         to obtain variable labels (variable names and units of measurement) 
-    - c. check all expected variable labels are found 
-    - d. check control values for parsed tables   
-    - e. save parsed tables to queue of parsed tables
+1. split incoming CSV file to tables, with headers and data
+2. read parsing instructions, they are either common instructions for all of the document or instuctions for document segments
+2.1 for common instructions: 
+    - apply parsing instructions to table headers in block of tables 
+      to obtain variable labels (variable name and unit of measurement) 
+    - check all expected variable labels are found in tables 
+	- save parsed tables to queue of parsed tables
+2.2. segment instructions
+   -  limit block of tables 
+   -  apply parsing instructions for this segment as in 2.1 
 3. emit datapoints from queue of parsed tables
-4. create pandas dataframes by frequency
-5. deacculmulate some dataframes
+4. check datapoints with control values
+5. create pandas dataframes by frequency, transform (deacculmulate) some dataframes
 
 NOTES
 =====
 - [Profiling reference](https://www.blog.pythonlibrary.org/2016/05/24/python-101-an-intro-to-benchmarking-your-code)
 - [Packaging reference](http://python-packaging.readthedocs.io/en/latest/testing.html)
+- [Module and subpackaige naming](https://gitlab.com/warsaw/mailman/tree/master/src/mailman) 
 
 
 TODOS
 =====
 - [ ] restore more definitons
-- [ ] tests for dataframes onitted
 - [ ] tests for load subpackage omitted
+- [ ] coverage of checkpoints
 
 ERRORS
 ======
@@ -65,6 +68,7 @@ IDEAS
 
 WONTFIX
 =======
+- /index.html#module-kep
 - [ ] better check than `assert not dfa.empty`
 - [ ] need better regex in kep.filters
 
@@ -94,3 +98,8 @@ DONE
 - [x] kep.filters has duplicate functions
 - [x] speedups
 - [x] find old definition in git eg 
+- [x] tests for dataframes onitted
+
+Writeup
+=======
+
