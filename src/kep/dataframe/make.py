@@ -19,6 +19,7 @@ def timestamp(year: int, month: int) -> str:
     month = str(month).zfill(2)
     return f'{year}-{month}-{day}'
 
+
 def make_timestamp(x):
     date = timestamp(x.year, x.month)
     try:
@@ -35,15 +36,17 @@ def check_duplicates(df):
     if not dups.empty:
         raise ValueError("Duplicate rows found:", dups)
 
+
 def check_empty(df):
     if df.empty:
         raise ValueError('Empty', df)
-        
+
+
 def create_base_dataframe(datapoints, freq):
     df = pd.DataFrame(datapoints)
     check_empty(df)
     check_duplicates(df)
-    # create date    
+    # create date
     df['date'] = df.apply(make_timestamp, axis=1)
     # reshape
     df = df.pivot(columns='label', values='value', index='date')
@@ -56,19 +59,21 @@ def create_base_dataframe(datapoints, freq):
 
 # -----------------------------------------------------------------------------
 
+
 def subset(values, freq):
     return [x for x in values if x.freq == freq]
 
 
-def separate_dataframes(datapoints, frequencies = 'aqm'):
+def separate_dataframes(datapoints, frequencies='aqm'):
     datapoints = list(datapoints)
-    return [subset(datapoints, freq) for freq in frequencies]        
+    return [subset(datapoints, freq) for freq in frequencies]
 
 
 def unpack_dataframes(datapoints):
     """Return a tuple of annual, quarterly, monthly pandas dataframes."""
-    a, q, m = separate_dataframes(datapoints, frequencies = 'aqm')    
+    a, q, m = separate_dataframes(datapoints, frequencies='aqm')
     return create_annual(a), create_quarterly(q), create_monthly(m)
+
 
 def create_annual(datapoints):
     df = create_base_dataframe(datapoints, 'a')
@@ -85,7 +90,6 @@ def create_monthly(datapoints):
     df = create_base_dataframe(datapoints, 'm')
     df.insert(1, "month", df.index.month)
     return deaccumulate(df, first_month=1)
-
 
 
 # TODO: need to be changed according to new format - must use 'a' as 'm12'

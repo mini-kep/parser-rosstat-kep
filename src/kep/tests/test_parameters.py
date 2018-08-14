@@ -12,20 +12,21 @@ VALUE_2 = [['abc', 'def']]
 
 
 def test_load_yaml_list():
-    with TempFile(TEXT_1) as f :
+    with TempFile(TEXT_1) as f:
         load_yaml_list(f) == VALUE_1
-        
+
+
 def test_load_yaml_one_document():
-    with TempFile(TEXT_2) as f :
+    with TempFile(TEXT_2) as f:
         load_yaml_one_document(f) == VALUE_2
+
 
 def test_ParsingParameters():
     p = ParsingParameters
     assert p.common_dicts
     assert p.segment_dicts
-    assert p.units_dict  
-    
-    
+    assert p.units_dict
+
 
 def test_CheckParameters():
     c = CheckParameters

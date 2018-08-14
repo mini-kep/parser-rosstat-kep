@@ -9,7 +9,7 @@
 """
 
 __all__ = ['download', 'unpack', 'convert',
-           'save_processed',  
+           'save_processed',
            'to_latest', 'to_excel']
 
 import shutil
@@ -52,7 +52,7 @@ def save_processed(year: int, month: int):
         path = loc.processed_csv(year, month, freq)
         df.to_csv(path)
         return f"Saved {year}-{month} dataframe to {path}"
-    
+
 
 @echo
 def to_excel(year: int, month: int):

@@ -12,7 +12,8 @@ from kep.utilities.dates import date_span
 __all__ = ['get_dataframes', 'get_dataframe_dict', 'run_sample']
 
 
-ALL_DATES = date_span('2009-04', '2018-06')   
+ALL_DATES = date_span('2009-04', '2018-06')
+
 
 def random_date():
     return random.choice(ALL_DATES)
@@ -26,19 +27,19 @@ def extract_tables(year, month):
     p = ParsingParameters
     path = interim_csv(year, month)
     tables = read_tables(path)
-    return parse_tables(tables, p.common_dicts, p.segment_dicts, p.units_dict) 
+    return parse_tables(tables, p.common_dicts, p.segment_dicts, p.units_dict)
 
 
 def get_dataframes(year, month):
     """
     Return a tuple of annual, quarterly and monthly dataframes by *year* and *month*.
-    Prints parsing synopsis to stdout. 
+    Prints parsing synopsis to stdout.
     """
     tables = extract_tables(year, month)
     values = datapoints(tables)
     c = CheckParameters
     print_reference(tables, c.group_dict)
-    validate(values, c.mandatory_list, c.optional_lists) 
+    validate(values, c.mandatory_list, c.optional_lists)
     return unpack_dataframes(values)
 
 
@@ -58,6 +59,6 @@ def run_sample(n=3):
 
 if __name__ == '__main__':
     run_sample()
-    year, month = 2018, 6 
+    year, month = 2018, 6
     tables = extract_tables(year, month)
     dfa, dfq, dfm = get_dataframes(year, month)

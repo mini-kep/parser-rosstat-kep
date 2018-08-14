@@ -3,6 +3,7 @@ import pathlib
 import tempfile
 import os
 
+
 class TempFile():
     def __init__(self, content: str, encoding='utf-8'):
         with tempfile.NamedTemporaryFile() as f:

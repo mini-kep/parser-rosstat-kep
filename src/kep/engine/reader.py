@@ -22,6 +22,7 @@ def is_data_row(row: str) -> bool:
 
 # data import
 
+
 def is_allowed(row):
     return row and '_' not in row
 
@@ -104,7 +105,7 @@ class Table:
     @property
     def datarows(self):
         return [[x for x in row.split('\t')] for row in self._datarow_strings]
-    
+
     def __eq__(self, x):
         return self.__dict__ == x.__dict__
 
@@ -142,7 +143,8 @@ class Table:
                  'datarow_strings=%s)' % pprint.pformat(self._datarow_strings)
                  ]
         return ',\n      '.join(items)
-    
+
+
 def make_label(name: str, unit: str)-> str:
     """Concat variable name and unit.
 
@@ -150,4 +152,3 @@ def make_label(name: str, unit: str)-> str:
         str, like 'CPI_rog'
     """
     return '{}_{}'.format(name, unit)
-    

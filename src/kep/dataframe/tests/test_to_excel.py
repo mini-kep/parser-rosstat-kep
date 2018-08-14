@@ -12,7 +12,7 @@ def test_write_xls_writes_some_xlsx_file():
         path = os.path.join(tmpdir, '123.xlsx')
         df = pd.DataFrame()
         save_excel(path, a=df, q=df, m=df)
-        os.unlink(path)    
+        os.unlink(path)
 
 
 if __name__ == "__main__":

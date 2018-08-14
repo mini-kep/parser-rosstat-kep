@@ -3,7 +3,7 @@ import pytest
 
 
 units_dict = {
-    'млрд.рублей': 'bln_rub', 
+    'млрд.рублей': 'bln_rub',
     'в % к соответствующему периоду предыдущего года': 'yoy'
 }
 
@@ -19,8 +19,8 @@ def test_extract_unit(unit, text):
 
 def test_iterate():
     assert iterate('abc') == ['abc']
-    
-    
+
+
 CSV_TEXT = """	Год / Year	Кварталы / Quarters	Янв. Jan.	Фев. Feb.	Март Mar.	Апр. Apr.	Май May	Июнь June	Июль July	Август Aug.	Сент. Sept.	Окт. Oct.	Нояб. Nov.	Дек. Dec.
 		I	II	III	IV
 1.2. Индекс промышленного производства1) / Industrial Production index1)
@@ -137,24 +137,26 @@ from kep.utilities import TempFile
 
 with TempFile(UNITS_DOC) as units_filepath:
     units_dict = kep.parameters.get_mapper(units_filepath)
-    
+
 with TempFile(INTRUCTIONS_DOC) as instructions_filepath:
-    common_dicts = kep.parameters.read_by_key(instructions_filepath, 'name') 
-    segment_dicts = kep.parameters.read_by_key(instructions_filepath, 'start_with') 
+    common_dicts = kep.parameters.read_by_key(instructions_filepath, 'name')
+    segment_dicts = kep.parameters.read_by_key(
+        instructions_filepath, 'start_with')
 
 with TempFile(CSV_TEXT) as csv_filepath:
-    tables = read_tables(csv_filepath)    
+    tables = read_tables(csv_filepath)
 
-parsed_tables = parse_tables(tables, common_dicts, segment_dicts, units_dict)    
+parsed_tables = parse_tables(tables, common_dicts, segment_dicts, units_dict)
 datapoints = datapoints(parsed_tables)
-    
+
+
 class Test_parsed_tables():
     def test_lables(self):
         assert labels(parsed_tables) == [('INDPRO', 'yoy'),
-                              ('INDPRO', 'rog'),
-                              ('INDPRO', 'ytd'),
-                              ('CPI_NONFOOD', 'rog'),
-                              ('PROFIT_MINING', 'mln_rub')]
+                                         ('INDPRO', 'rog'),
+                                         ('INDPRO', 'ytd'),
+                                         ('CPI_NONFOOD', 'rog'),
+                                         ('PROFIT_MINING', 'mln_rub')]
 
     def test_datapoint_method(self):
         assert len(datapoints) == 77
@@ -238,4 +240,3 @@ class Test_parsed_tables():
             Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2018, month=1, value=340136.0),
             Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2018, month=2, value=502726.0),
             Datapoint(label='PROFIT_MINING_mln_rub', freq='m', year=2018, month=3, value=840956.0)]
-    

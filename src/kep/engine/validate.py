@@ -1,19 +1,23 @@
 """Check datapoints with control values."""
 
+
 class ValidationError(Exception):
-    pass        
-  
-def require_any(checkpoints, datapoints):   
+    pass
+
+
+def require_any(checkpoints, datapoints):
     found = [c for c in checkpoints if c in datapoints]
     if not found:
         raise ValidationError(f'Found none of: {checkpoints}')
-    return found    
+    return found
 
-def require_all(checkpoints, datapoints):   
+
+def require_all(checkpoints, datapoints):
     for x in checkpoints:
         if x not in datapoints:
             raise ValidationError(f'Required value not found: {x}')
-    return checkpoints             
+    return checkpoints
+
 
 def validate(datapoints, checkpoints, optional_lists):
     """Check datapoints with control values found in YAML file at *filepath*.
@@ -22,5 +26,5 @@ def validate(datapoints, checkpoints, optional_lists):
     require_all(checkpoints, datapoints)
     for _checkpoints in optional_lists:
         require_any(_checkpoints, datapoints)
-    # TODO: show how many of time series are covered     
-    print("All values checked")  
+    # TODO: show how many of time series are covered
+    print("All values checked")

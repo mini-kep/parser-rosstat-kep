@@ -3,6 +3,7 @@ from pathlib import Path
 from io import StringIO
 import pandas as pd
 
+
 def read_csv(source):
     """Wrapper for pd.read_csv(). Treats first column as time index.
        Returns:
@@ -26,8 +27,8 @@ def proxy(path):
 
 def read_dataframe(path):
     filelike = proxy(path)
-    return read_csv(filelike)   
- 
+    return read_csv(filelike)
+
 
 def get_dataframe(year, month, freq):
     """Read processed dataframe from local folder by *year* and *month*."""
@@ -46,6 +47,5 @@ def get_dataframe_from_web(frequency):
     if frequency not in ['a', 'q', 'm']:
         raise ValueError(f'{frequency} must be a, q or m')
     url = ('https://raw.githubusercontent.com/mini-kep/parser-rosstat-kep/'
-          f'master/data/processed/latest/df{frequency}.csv')
+           f'master/data/processed/latest/df{frequency}.csv')
     return pd.read_csv(url, converters={0: pd.to_datetime}, index_col=0)
-

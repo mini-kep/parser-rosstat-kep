@@ -9,6 +9,7 @@ def as_string(func):
         return str(func(*arg, **kwarg))
     return wrapper
 
+
 def md(folder):
     if not folder.exists():
         folder.mkdir(parents=True)
@@ -56,6 +57,7 @@ def parsing_instructions(data_root=DATA_ROOT):
 @as_string
 def unit_mapper(data_root=DATA_ROOT):
     return data_root / 'base_units.txt'
+
 
 @as_string
 def checkpoints(data_root=DATA_ROOT):
