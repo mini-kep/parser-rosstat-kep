@@ -15,41 +15,41 @@ __all__ = ['download', 'unpack', 'convert',
 import shutil
 
 import kep
-import kep.util.locations as locations
+import kep.utilities.locations as loc
 
 
 def echo(func):
-    def wrapper(*arg, **kwarg):
-        msg = func(*arg, **kwarg)
+    def wrapper(year, month):
+        msg = func(year, month)
         print(msg)
     return wrapper
 
 
 @echo
-def download(year, month, force=False):
-    filepath = locations.rarfile(year, month)
-    return kep.load.download(year, month, filepath, force)
+def download(year: int, month: int):
+    filepath = loc.rarfile(year, month)
+    return kep.load.download(year, month, filepath)
 
 
 @echo
-def unpack(year, month, force=False):
-    filepath = locations.rarfile(year, month)
-    folder = locations.raw_folder(year, month)
-    return kep.load.unpack(filepath, folder, force)
+def unpack(year: int, month: int):
+    filepath = loc.rarfile(year, month)
+    folder = loc.raw_folder(year, month)
+    return kep.load.unpack(filepath, folder)
 
 
 @echo
-def convert(year, month):
-    folder = locations.raw_folder(year, month)
-    filepath = locations.interim_csv(year, month)
+def convert(year: int, month: int):
+    folder = loc.raw_folder(year, month)
+    filepath = loc.interim_csv(year, month)
     return kep.load.folder_to_csv(folder, filepath)
 
 
 @echo
-def save_processed(year, month):
+def save_processed(year: int, month: int):
     df_dict = kep.get_dataframe_dict(year, month)
     for freq, df in df_dict.items():
-        path = locations.processed_csv(year, month, freq)
+        path = loc.processed_csv(year, month, freq)
         df.to_csv(path)
         return f"Saved {year}-{month} dataframe to {path}"
     
@@ -57,7 +57,7 @@ def save_processed(year, month):
 @echo
 def to_excel(year: int, month: int):
     df_dict = kep.get_dataframe_dict(year, month)
-    path = locations.xl_location()
+    path = loc.xl_location()
     return kep.dataframe.save_excel(path, **df_dict)
 
 
@@ -66,8 +66,8 @@ def to_latest(year: int, month: int):
     """Copy CSV files from folder like *processed/2017/04* to *processed/latest*.
     """
     for freq in 'aqm':
-        src = locations.processed_csv(year, month, freq)
-        dst = locations.latest_csv(freq)
+        src = loc.processed_csv(year, month, freq)
+        dst = loc.latest_csv(freq)
         shutil.copyfile(src, dst)
         print("Updated", dst)
     return f"Latest folder now refers to {year}-{month}"

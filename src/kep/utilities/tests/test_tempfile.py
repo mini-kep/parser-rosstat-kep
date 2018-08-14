@@ -1,5 +1,5 @@
 import pathlib
-from kep.util import TempFile
+from kep.utilities import TempFile
 
 def test_TempFile():
     text = 'конь-огонь'

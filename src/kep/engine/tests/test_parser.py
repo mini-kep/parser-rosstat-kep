@@ -1,4 +1,4 @@
-from kep.extract.parser import extract_unit, iterate
+from kep.engine.parser import extract_unit, iterate
 import pytest
 
 
@@ -72,19 +72,21 @@ units:
 start_with: '3.5. Индекс потребительских цен'
 end_with: '4. Социальная сфера'
 commands:
-    - var: CPI_NONFOOD
+    - name: CPI_NONFOOD
       headers:
       - 'непродовольственные товары'
       - 'непродовольст- венные товары'
-      force_units: rog
+      units: rog
+      force_units: true
 ---
 start_with: '2.2. Сальдированный финансовый результат'
 end_with: 'Убыточные организации'
 commands:
-    - var: PROFIT_MINING
+    - name: PROFIT_MINING
       headers: Добыча полезных ископаемых
-      force_units: 'mln_rub'
-      force_format: 'fiscal'
+      units: 'mln_rub'
+      force_units: true
+      row_format: 'fiscal'
 """
 
 UNITS_DOC = """
@@ -128,10 +130,10 @@ ytd :
 """
 
 import kep.parameters
-from kep.extract.row import Datapoint
-from kep.extract.reader import read_tables
-from kep.extract.parser import parse_common, labels, get_datapoints
-from kep.util import TempFile
+from kep.engine.row import Datapoint
+from kep.engine.reader import read_tables
+from kep.engine.parser import parse_tables, labels, datapoints
+from kep.utilities import TempFile
 
 with TempFile(UNITS_DOC) as units_filepath:
     units_dict = kep.parameters.get_mapper(units_filepath)
@@ -143,53 +145,22 @@ with TempFile(INTRUCTIONS_DOC) as instructions_filepath:
 with TempFile(CSV_TEXT) as csv_filepath:
     tables = read_tables(csv_filepath)    
 
-z = """
-name: INDPRO
-headers: Индекс промышленного производства
-units: 
-  - yoy
-  - rog
-  - ytd
----
-name: GDP
-headers:
-  - Валовой внутренний продукт
-  - Объем валового внутреннего продукта
-  - Объем ВВП
-units: 
-  - bln_rub
-  - yoy 
----
-name: DWELL
-units: mln_m2
-headers: 
-  - Ввод в действие жилых домов
-  - Ввод в действие жилых домов организациями всех форм собственности
-"""  
-
-with TempFile(z) as instructions_filepath:
-    x = kep.parameters.load_yaml_list(instructions_filepath) 
-with TempFile(INTRUCTIONS_DOC) as instructions_filepath:
-    y = kep.parameters.load_yaml_list(instructions_filepath) 
-
-
-class Test_parsed_tables():    
+parsed_tables = parse_tables(tables, common_dicts, segment_dicts, units_dict)    
+datapoints = datapoints(parsed_tables)
     
-    parsed_tables = parse_common(tables, common_dicts, units_dict)    
-    datapoints = get_datapoints(parsed_tables)
-    
+class Test_parsed_tables():
     def test_lables(self):
-        assert labels(self.parsed_tables) == ['INDPRO_yoy',
-                              'INDPRO_rog',
-                              'INDPRO_ytd',
-                              'CPI_NONFOOD_rog',
-                              'PROFIT_MINING_mln_rub']
+        assert labels(parsed_tables) == [('INDPRO', 'yoy'),
+                              ('INDPRO', 'rog'),
+                              ('INDPRO', 'ytd'),
+                              ('CPI_NONFOOD', 'rog'),
+                              ('PROFIT_MINING', 'mln_rub')]
 
     def test_datapoint_method(self):
-        assert len(self.datapoints) == 77
+        assert len(datapoints) == 77
 
     def test_datapoint_mathces_exactly(self):
-        assert self.datapoints == [
+        assert datapoints == [
             Datapoint(label='INDPRO_yoy', freq='a', year=2015, month=12, value=99.2),
             Datapoint(label='INDPRO_yoy', freq='q', year=2015, month=3, value=99.9),
             Datapoint(label='INDPRO_yoy', freq='q', year=2015, month=6, value=98.3),

@@ -149,13 +149,6 @@ def find(tables, string):
         if t.contains_any([string]):
             return t 
 
-# values
-        
-def get_datapoints(tables):
-    """Return a list of values from parsed tables."""
-    return [x for t in parsed(tables) for x in t.emit_datapoints()]
-
-
 # parsing batch functions
 
 def parse_after_units(tables, 
@@ -180,7 +173,10 @@ def parse_after_units(tables,
 
 def apply_commands(tables, dicts):
     for d in dicts:
-          parse_after_units(tables, **d)
+        try:
+            parse_after_units(tables, **d)
+        except TypeError:
+            raise ValueError(d)
     return tables          
 
 def parse_common(tables, common_dicts, base_mapper):
@@ -192,10 +188,10 @@ def parse_common(tables, common_dicts, base_mapper):
     return parsed(tables)
 
 def parse_segment(tables, start_with, end_with, commands):    
-    """Trim and parse *tables*.
+    """Trim and engine *tables*.
     
     Args:
-      _tables - list Talble instances  
+      tables - list Talble instances  
       start_with, end_with are lists of strings
       commands - list of dictionaries.      
     
@@ -218,4 +214,10 @@ def parse_tables(tables,
         tables2 = copy(tables)
         new_tables = parse_segment(tables2, **sd)
         parsed_tables.extend(new_tables)
-    return parsed_tables    
+    return parsed_tables
+
+# values
+
+def datapoints(tables):
+    """Return a list of values from parsed tables."""
+    return [x for t in parsed(tables) for x in t.emit_datapoints()]

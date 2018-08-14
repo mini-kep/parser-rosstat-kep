@@ -1,4 +1,4 @@
-from kep.util.tempfile import TempFile
+from kep.utilities.tempfile import TempFile
 
 from kep.parameters import (load_yaml_list, load_yaml_one_document,
                             ParsingParameters, CheckParameters)

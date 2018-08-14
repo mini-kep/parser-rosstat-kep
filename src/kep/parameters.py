@@ -3,7 +3,7 @@ from collections import OrderedDict
 import pathlib
 import yaml
 
-from kep.extract.row import Datapoint
+from kep.engine.row import Datapoint
 
 __all__ = ['ParsingParameters', 'CheckParameters']
 
@@ -62,6 +62,7 @@ def split(string):
     string = string.replace('  ', ' ')
     return string.split(' ')
 
+
 def to_datapoint(name: str, args: list):
     try:
         freq, year, month, value = args
@@ -70,9 +71,7 @@ def to_datapoint(name: str, args: list):
         month = 12
     return Datapoint(name, freq, int(year), int(month), float(value))
 
-# -----------------------------------------------------------------------------
 
-        
 def get_mandatory(filepath):   
     """Return list of Datapoint instances."""
     doc = load_yaml_one_document(filepath)
@@ -83,6 +82,7 @@ def get_mandatory(filepath):
         alls.append(x) 
     return alls    
             
+
 def get_optional(filepath):        
     """Return list of lists of Datapoint instances.
        Will require at least one value from each list."""
@@ -93,16 +93,20 @@ def get_optional(filepath):
         anys.append(x)
     return anys
 
+# -----------------------------------------------------------------------------
+
+i = persist('instructions.yml')
+u = persist('base_units.yml')
+
 class ParsingParameters:
-    i = persist('instructions.yml')
-    u = persist('base_units.yml')
     common_dicts = read_by_key(i, 'name')
     segment_dicts = read_by_key(i, 'start_with') 
     units_dict = get_mapper(u)
 
+c = persist('checkpoints.yml')
+g = persist('groups.yml')
+
 class CheckParameters:
-    c = persist('checkpoints.yml')
-    g = persist('groups.yml')
     group_dict = get_groups(g)           
     mandatory_list = get_mandatory(c)
     optional_lists = get_optional(c)

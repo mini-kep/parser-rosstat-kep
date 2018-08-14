@@ -1,6 +1,6 @@
 """Display parsing result description."""
 
-from kep.extract.parser import names, labels
+from kep.engine.parser import names, labels
 
 __all__ = ['print_reference']
 

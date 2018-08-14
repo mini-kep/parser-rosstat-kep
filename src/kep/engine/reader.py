@@ -4,7 +4,7 @@ from enum import Enum, unique
 import re
 import pprint
 
-from kep.extract.row import get_row_format, emit_datapoints
+from kep.engine.row import get_row_format, emit_datapoints
 
 
 __all__ = ['read_tables', 'split_csv', 'Table']

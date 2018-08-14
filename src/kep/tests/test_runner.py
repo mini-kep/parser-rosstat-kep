@@ -1,4 +1,4 @@
-from kep.main import random_date, get_dataframes
+from kep.runner import random_date, get_dataframes
 
 
 def test_randomised_import():

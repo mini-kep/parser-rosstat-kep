@@ -45,9 +45,9 @@ NOTES
 
 TODOS
 =====
-- [ ] find old definition in git eg 
-- [ ] restore more definitons (fro groups)
-
+- [ ] restore more definitons
+- [ ] tests for dataframes onitted
+- [ ] tests for load subpackage omitted
 
 ERRORS
 ======
@@ -93,3 +93,4 @@ DONE
 - [x] more clear yaml import
 - [x] kep.filters has duplicate functions
 - [x] speedups
+- [x] find old definition in git eg 

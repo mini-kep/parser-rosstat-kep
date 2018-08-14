@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from kep.util.dates import assert_supported
+from kep.utilities.dates import assert_supported
 from kep.config import DATA_ROOT, OUTPUT_ROOT
 
 

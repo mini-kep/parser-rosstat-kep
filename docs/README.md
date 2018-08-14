@@ -1,3 +1,12 @@
+Short workflow
+==============
+
+- create project with sphinx-quickstart
+- edit conf.py to make your modules importable 
+- generate .rst files with sphinx-apidoc -o docs src
+- rename index.rst
+- make html
+- open index.html in browser
 
 Understanding sphinx
 ====================

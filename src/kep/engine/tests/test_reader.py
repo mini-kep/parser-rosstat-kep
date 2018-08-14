@@ -1,5 +1,5 @@
-from kep.util import TempFile
-from kep.extract.reader import read_tables, read_csv, Table, split_csv
+from kep.utilities import TempFile
+from kep.engine.reader import read_tables, read_csv, Table, split_csv
 
 DOC = ("заголовок1 header1\t\t\t\n"
        "заголовок2 header2\t\t\t\n"

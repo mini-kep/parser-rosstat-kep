@@ -6,20 +6,44 @@ Subpackages
 
 .. toctree::
 
-    kep.loader
-    kep.parser
-    kep.session
+    kep.dataframe
+    kep.engine
+    kep.load
+    kep.utilities
 
 Submodules
 ----------
 
-kep\.util module
-----------------
+kep\.commands module
+--------------------
 
-.. automodule:: kep.util
+.. automodule:: kep.commands
     :members:
     :undoc-members:
     :show-inheritance:
 
 
+kep\.parameters module
+----------------------
 
+.. automodule:: kep.parameters
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+kep\.runner module
+------------------
+
+.. automodule:: kep.runner
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module contents
+---------------
+
+.. automodule:: kep
+    :members:
+    :undoc-members:
+    :show-inheritance:
