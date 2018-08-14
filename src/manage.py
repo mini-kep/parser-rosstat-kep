@@ -1,7 +1,5 @@
 import kep
 
-year, month = 2018, 6
-
 def run(year, month):
     kep.download(year, month)
     kep.unpack(year, month)
@@ -11,4 +9,5 @@ def run(year, month):
     kep.to_excel(year, month)
     
 if __name__ == '__main__':
-   dfa, dfq, dfm = kep.get_dataframes(year, month)    
+    year, month = 2018, 6
+    dfa, dfq, dfm = kep.get_dataframes(year, month)    
