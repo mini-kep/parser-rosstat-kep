@@ -5,9 +5,9 @@
 
 Parser          |                       KEP    
 ----------------|-------------------------------------------------------------------------------------------------
-Data source     | [Short-term Economic Indicators (KEP) by Rosstat][Rosstat]
+Data source     | [Short-term Economic Indicators (KEP) by Rosstat as MS Word files][Rosstat]
 Parsing result  | [Annual, quarterly and monthly time series in CSV files][backend]
-Releases        | [2018 schedule][schedule]
+Releases        | [See 2018 schedule][schedule]
 
 Concept
 -------
