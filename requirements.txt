@@ -4,12 +4,14 @@ matplotlib
 pyyaml 
 requests
 arrow
+schema
 
 # needed on Windows machine, commented due to errors on Travis
 # pypiwin32
 
 # for task orgainisation in tasks.py - https://pypi.python.org/pypi/invoke/0.15.0
 invoke
+profilehooks
 
 # for database upload
 git+https://github.com/mini-kep/parsers.git#egg=mini-kep-parsers

@@ -5,16 +5,16 @@
 
 Parser          |                       KEP    
 ----------------|-------------------------------------------------------------------------------------------------
-Data source     | ["Short-term Economic Indicators" (KEP) by Rosstat][Rosstat]
+Data source     | [Short-term Economic Indicators (KEP) by Rosstat as MS Word files][Rosstat]
 Parsing result  | [Annual, quarterly and monthly time series in CSV files][backend]
-Schedule        | [2018][schedule]
+Releases        | [See 2018 schedule][schedule]
 
 Concept
 -------
 
-In this repo we publish a dataset of Russian macroeconomic time series 
+In this repo I publish a dataset of Russian macroeconomic time series 
 as machine-readable [CSV files][backend]. 
-We keep track of monthly macroeconomic data releases (vintages) 
+I keep track of monthly macroeconomic data releases (vintages) 
 since April 2009.
 Original files by Rosstat are in [MS Word format][Rosstat]. 
 
@@ -24,34 +24,32 @@ Interface
 
 [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/kep/manage.py) does the following job:
 - download and unpack MS Word files from Rosstat
-- extract tables from Word files and assigns variable names
-- create pandas dataframes with time series (at annual, quarterly and monthly frequency) 
+- convert MS Word to interim csv files
+- parse interim csv files to get pandas dataframes with time series (at annual, quarterly and monthly frequency) 
 - save dataframes as [CSV files at stable URL][backend] 
+- create Excel file, if needed
 
 [kep]: https://github.com/mini-kep/parser-rosstat-kep
 [Rosstat]: http://www.gks.ru/wps/wcm/connect/rosstat_main/rosstat/ru/statistics/publications/catalog/doc_1140080765391
 [backend]: https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest
 [schedule]: http://www.gks.ru/gis/images/graf-oper2018.htm
-
+[excel]: https://github.com/mini-kep/parser-rosstat-kep/tree/master/output/kep.xlsx
 
 Access to parsing result
 ------------------------
 
 Stable URL: <https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest> 
 
-<!--
-Excel file: [kep.xlsx](https://github.com/mini-kep/parser-rosstat-kep/tree/master/data/processed/latest/kep.xlsx)
--->
+
 
 ```python
 import pandas as pd
 
 def get_dataframe_from_web(freq):
-    url_base = ('https://raw.githubusercontent.com/mini-kep/parser-rosstat-kep/'
-                'master/data/processed/latest/{}')
-    filename = "df{}.csv".format(freq)
-    url = url_base.format(filename)
-    return pd.read_csv1(url, converters={0: pd.to_datetime}, index_col=0)
+    filename = f'df{freq}.csv'
+    url = ('https://raw.githubusercontent.com/mini-kep/parser-rosstat-kep/'
+          f'master/data/processed/latest/{filename}')
+    return pd.read_csv(url, converters={0: pd.to_datetime}, index_col=0)
 
 dfa, dfq, dfm = (get_dataframe_from_web(freq) for freq in 'aqm')
 ```
@@ -72,11 +70,11 @@ This command:
 - unpacks MS Word files, 
 - dumps all tables from MS Word files to an interim CSV file, 
 - parses interim CSV file to three dataframes by frequency 
-- transforms some variables (eg. deaccumulates government expenditures)
 - validates parsing result
+- transforms some variables (eg. deaccumulates government expenditures)
 - saves dataframes as processed CSV files
-- saves csv for latest date (todo)
-- saves an Excel file for latest date (todo).
+- saves csv for latest date
+- saves an Excel file for latest date.
 
 Same job can be done by [manage.py](https://github.com/mini-kep/parser-rosstat-kep/blob/master/src/manage.py)
 
@@ -91,7 +89,7 @@ Source type         |  MS Word  <!-- Word, Excel, CSV, HTML, XML, API, other -->
 Frequency           |  Monthly
 When released       |  Start of month as in [schedule](http://www.gks.ru/gis/images/graf-oper2017.htm) 
 Code                | <https://github.com/epogrebnyak/mini-kep/tree/master/src/>
-Test health         | [![Build Status](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=master)](https://travis-ci.org/mini-kep/parser-rosstat-kep)
+Test health         |  [![Build Status](https://travis-ci.org/mini-kep/parser-rosstat-kep.svg?branch=master)](https://travis-ci.org/mini-kep/parser-rosstat-kep)
 Test coverage       |  [![Coverage badge](https://codecov.io/gh/mini-kep/parser-rosstat-kep/branch/master/graphs/badge.svg)](https://codecov.io/gh/mini-kep/parser-rosstat-kep)
 Documentation       |  [![Documentation Status](https://readthedocs.org/projects/mini-kep-parcer-for-rosstat-kep-publication/badge/?version=latest)](http://mini-kep-parcer-for-rosstat-kep-publication.readthedocs.io/en/latest/?badge=latest)
 CSV endpoint        | <https://github.com/epogrebnyak/mini-kep/tree/master/data/processed/latest>
@@ -102,10 +100,6 @@ Validation          |  Hardcoded checkpoints and consistency checks
 All historic raw data available on internet? 
 - [ ] Yes
 - [x] No (data prior to 2016-12 is in this repo only)  
-
-Is scrapper automated (can download required_labels information from internet  without manual operations)?
-- [x] Yes
-- [ ] No 
 
 
 

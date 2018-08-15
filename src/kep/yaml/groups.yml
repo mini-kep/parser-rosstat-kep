@@ -1,0 +1,58 @@
+# Replicate GDP as C + I + G + NX
+# Relationship between price indices?
+# Do profits predict investment?
+# Consumer behaviour?
+# FX vs trade deficit
+# Loans and interest rates
+# Proxies for missing values 
+
+- Aggregate business activity:
+    - GDP
+    - INDPRO
+    - AGROPROD
+    - CONSTRUCTION
+    
+- Output:    
+    - TRANSPORT_FREIGHT
+    - DWELL
+    
+- Investment:
+    - INVESTMENT
+
+- Corporate finance:
+    - PROFIT_MINING
+    
+- Prices:
+    - CPI
+    - CPI_NONFOOD
+    - CPI_FOOD
+    - CPI_ALCOHOL
+    - CPI_SERVICES
+    - PPI
+    
+- Exchange rates:
+    - FXUSD
+    - FXEUR 
+   
+- Wages and income:
+    - WAGE_NOMINAL
+    - WAGE_REAL
+    - PERSONAL_NOMINAL
+    - PERSONAL_NOMINAL
+    
+- Consumer demand:
+    - RETAIL_SALES
+    - RETAIL_SALES_FOOD
+    - RETAIL_SALES_NONFOOD
+    
+- Labor and population:
+    - UNEMPL
+    - POPULATION
+    
+- Government finances:
+    - ACCUM_GOV_REVENUE_CONSOLIDATED
+    - ACCUM_GOV_EXPENSE_CONSOLIDATED   
+    
+- Foreign trade:
+    - EXPORT_GOODS
+    - IMPORT_GOODS
