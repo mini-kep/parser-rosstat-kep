@@ -14,7 +14,9 @@ __all__ = ['download', 'unpack', 'convert',
 
 import shutil
 
-import kep
+import kep.load
+import kep.dataframe
+import kep.runner
 import kep.utilities.locations as loc
 
 
@@ -47,7 +49,7 @@ def convert(year: int, month: int):
 
 @echo
 def save_processed(year: int, month: int):
-    df_dict = kep.get_dataframe_dict(year, month)
+    df_dict = kep.runner.get_dataframe_dict(year, month)
     for freq, df in df_dict.items():
         path = loc.processed_csv(year, month, freq)
         df.to_csv(path)
@@ -56,7 +58,7 @@ def save_processed(year: int, month: int):
 
 @echo
 def to_excel(year: int, month: int):
-    df_dict = kep.get_dataframe_dict(year, month)
+    df_dict =  kep.runner.get_dataframe_dict(year, month)
     path = loc.xl_location()
     return kep.dataframe.save_excel(path, **df_dict)
 
